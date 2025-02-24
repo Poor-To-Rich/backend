@@ -1,5 +1,5 @@
 # 배포 환경
-FROM openjdk:21-jdk
+FROM openjdk:21-jdk-slim
 
 ARG JAR_FILE=./build/libs/*.jar
 
