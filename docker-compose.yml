@@ -3,9 +3,9 @@ version: '3.8'
 services:
   db:
     image: mariadb:latest
-    container_name: poor_to_rich_mariadb_container
+    container_name: poor_to_rich_mariadb
     ports:
-      - "${DB_PORT}:3306"
+      - "${DB_BINDING_PORT}:${DB_PORT}"
     environment:
       MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD}
       MARIADB_DATABASE: ${MARIADB_DATABASE}
@@ -14,13 +14,22 @@ services:
     volumes:
       - mariadb_data:/var/lib/mysql
 
+  redis:
+    image: redis:alpine
+    container_name: poor_to_rich_redis
+    ports:
+      - "${REDIS_BINDING_PORT:-6379}:${REDIS_PORT}"
+    volumes:
+      - redis_data:/var/lib/redis
+
   app:
     build: .
-    container_name: poor_to_rich_application_container
+    container_name: poor_to_rich_application
     depends_on:
       - db
+      - redis
     ports:
-      - "8080:8080"
+      - "${APP_BINDING_PORT}:${APP_PORT}"
     environment:
       SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL}
       SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
@@ -29,7 +38,10 @@ services:
       S3_BUCKET_NAME: ${S3_BUCKET_NAME}
       S3_ACCESS_KEY: ${S3_ACCESS_KEY}
       S3_SECRET_ACCESS_KEY: ${S3_SECRET_ACCESS_KEY}
+      REDIS_HOST: ${REDIS_HOST}
+      REDIS_PORT: ${REDIS_PORT}
     env_file:
       - .env
 volumes:
   mariadb_data:
+  redis_data:
