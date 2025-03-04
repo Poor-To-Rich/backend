@@ -23,7 +23,7 @@ public class CategoryService {
                 .map(category -> CategoryResponse.builder()
                         .name(category.getName())
                         .color(category.getColor())
-                        .visibility(category.isVisibility())
+                        .visibility(category.getVisibility())
                         .build())
                 .collect(Collectors.toList());
     }
