@@ -8,7 +8,7 @@ import java.math.BigInteger;
 import java.sql.Timestamp;
 
 @Entity
-@Getter @Setter
+@Getter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor

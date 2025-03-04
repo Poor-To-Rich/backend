@@ -9,6 +9,8 @@ import lombok.*;
 public class CategoryResponse {
 
     private String color;
+
     private String name;
+
     private boolean visibility;
 }
