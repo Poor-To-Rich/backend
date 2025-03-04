@@ -17,7 +17,7 @@ public class Category {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private BigInteger id;
+    private Long id;
 
     @Enumerated(EnumType.STRING)
     private CategoryType type;
@@ -26,9 +26,11 @@ public class Category {
 
     private String color;
 
-    private boolean visibility;
+    private Boolean visibility;
 
     private Timestamp createdDate;
 
     private Timestamp updatedDate;
+
+    // User 외래키
 }
