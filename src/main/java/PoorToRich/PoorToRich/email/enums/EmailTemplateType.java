@@ -22,15 +22,15 @@ public enum EmailTemplateType {
             감사합니다.
             """;
 
-    private final String identifier;
+    private final String purpose;
 
     private final String subject;
 
     private final String description;
 
-    public static EmailTemplateType toEmailTemplateType(String purpose) {
+    public static EmailTemplateType getTemplateByPurpose(String purpose) {
         for (var templateType : EmailTemplateType.values()) {
-            if (templateType.getIdentifier().equals(purpose)) {
+            if (templateType.getPurpose().equals(purpose)) {
                 return templateType;
             }
         }

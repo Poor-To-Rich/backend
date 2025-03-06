@@ -18,7 +18,7 @@ public class MailService {
 
     private SimpleMailMessage createMailMessage(String email, String purpose, String verificationCode) {
         SimpleMailMessage mailMessage = new SimpleMailMessage();
-        EmailTemplateType emailTemplate = EmailTemplateType.toEmailTemplateType(purpose);
+        EmailTemplateType emailTemplate = EmailTemplateType.getTemplateByPurpose(purpose);
 
         mailMessage.setTo(email);
         mailMessage.setSubject(emailTemplate.getSubject());

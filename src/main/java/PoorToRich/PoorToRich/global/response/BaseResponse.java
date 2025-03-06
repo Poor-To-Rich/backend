@@ -13,8 +13,9 @@ public class BaseResponse {
     private final String resultMessage;
 
     public static ResponseEntity<BaseResponse> toResponseEntity(Response response) {
-        return ResponseEntity.status(response.getHttpStatus())
-                .body(BaseResponse.builder().resultCode(response.getHttpStatus().value())
-                        .resultMessage(response.getMessage()).build());
+        BaseResponse baseResponse = BaseResponse.builder().resultCode(response.getHttpStatus().value())
+                .resultMessage(response.getMessage()).build();
+
+        return ResponseEntity.status(response.getHttpStatus()).body(baseResponse);
     }
 }
