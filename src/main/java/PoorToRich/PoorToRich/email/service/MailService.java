@@ -30,10 +30,6 @@ public class MailService {
 
     public void sendEmail(String email, String purpose, String verificationCode) {
         SimpleMailMessage mailMessage = this.createMailMessage(email, purpose, verificationCode);
-        try {
-            emailSender.send(mailMessage);
-        } catch (Exception e) {
-            System.err.println(e.getMessage());
-        }
+        emailSender.send(mailMessage);
     }
 }
