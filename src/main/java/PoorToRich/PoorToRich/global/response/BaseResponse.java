@@ -2,6 +2,7 @@ package PoorToRich.PoorToRich.global.response;
 
 import lombok.Builder;
 import lombok.Getter;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 @Builder
@@ -17,5 +18,12 @@ public class BaseResponse {
                 .resultMessage(response.getMessage()).build();
 
         return ResponseEntity.status(response.getHttpStatus()).body(baseResponse);
+    }
+
+    public static ResponseEntity<BaseResponse> toResponseEntity(HttpStatus httpStatus, String message) {
+        BaseResponse baseResponse = BaseResponse.builder().resultCode(httpStatus.value()).resultMessage(message)
+                .build();
+
+        return ResponseEntity.status(httpStatus.value()).body(baseResponse);
     }
 }
