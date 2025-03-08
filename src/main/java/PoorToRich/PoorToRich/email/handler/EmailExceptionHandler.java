@@ -17,7 +17,12 @@ public class EmailExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<BaseResponse> handleEmailMethodArgumentNotValidException(
             MethodArgumentNotValidException exception) {
-        Response response = EmailResponse.getResponseByIdentifier(exception.getMessage());
+        StringBuilder errorMessageBuilder = new StringBuilder();
+        exception.getBindingResult().getAllErrors().forEach(error -> {
+            errorMessageBuilder.append(error.getDefaultMessage()).append(" ");
+        });
+
+        Response response = EmailResponse.getResponseByIdentifier(errorMessageBuilder.toString());
         return BaseResponse.toResponseEntity(response);
     }
 

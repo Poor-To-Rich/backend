@@ -20,7 +20,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<BaseResponse> handleMethodArgumentNotValidException(
             MethodArgumentNotValidException exception) {
-        return BaseResponse.toResponseEntity(HttpStatus.BAD_REQUEST, exception.getMessage());
+        StringBuilder errorMessageBuilder = new StringBuilder();
+        exception.getBindingResult().getAllErrors().forEach(error -> {
+            errorMessageBuilder.append(error.getDefaultMessage()).append(" ");
+        });
+        return BaseResponse.toResponseEntity(HttpStatus.BAD_REQUEST, errorMessageBuilder.toString());
     }
 
     @ExceptionHandler(AuthorizationException.class)
