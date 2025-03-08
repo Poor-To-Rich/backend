@@ -8,6 +8,7 @@ import PoorToRich.PoorToRich.global.exceptions.InternalServerErrorException;
 import PoorToRich.PoorToRich.global.exceptions.NotFoundException;
 import PoorToRich.PoorToRich.global.exceptions.UnauthorizedException;
 import PoorToRich.PoorToRich.global.response.BaseResponse;
+import java.util.Objects;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -20,11 +21,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<BaseResponse> handleMethodArgumentNotValidException(
             MethodArgumentNotValidException exception) {
-        StringBuilder errorMessageBuilder = new StringBuilder();
-        exception.getBindingResult().getAllErrors().forEach(error -> {
-            errorMessageBuilder.append(error.getDefaultMessage()).append(" ");
-        });
-        return BaseResponse.toResponseEntity(HttpStatus.BAD_REQUEST, errorMessageBuilder.toString());
+        String errorMessage = Objects.requireNonNull(exception.getBindingResult().getFieldError()).getDefaultMessage();
+        return BaseResponse.toResponseEntity(HttpStatus.BAD_REQUEST, errorMessage);
     }
 
     @ExceptionHandler(AuthorizationException.class)

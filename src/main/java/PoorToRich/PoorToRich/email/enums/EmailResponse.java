@@ -12,7 +12,7 @@ public enum EmailResponse implements Response {
     INVALID_VERIFICATION_CODE("invalid_verification_code", HttpStatus.BAD_REQUEST, "인증 코드가 올바르지 않습니다."),
     VERIFICATION_CODE_EXPIRED("verification_code_expired", HttpStatus.GONE, "인증 코드가 만료되었습니다."),
     TOO_MANY_REQUESTS("too_many_request", HttpStatus.TOO_MANY_REQUESTS, "인증 요청 횟수를 초과하였습니다."),
-    
+
     INVALID_EMAIL("invalid_email", HttpStatus.BAD_REQUEST, "유효하지 않은 이메일입니다."),
     INVALID_PURPOSE("invalid_purpose", HttpStatus.BAD_REQUEST, "유효하지 않은 인증 목적입니다."),
     EMAIL_SEND_FAILURE("mail_send_failure", HttpStatus.INTERNAL_SERVER_ERROR, "이메일 전송에 실패했습니다."),
