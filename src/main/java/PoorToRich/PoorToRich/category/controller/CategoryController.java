@@ -15,7 +15,12 @@ public class CategoryController {
     private final CategoryService categoryService;
 
     @GetMapping("/expense/default")
-    public DefaultCategoriesResponse getDefaultCategories() {
+    public DefaultCategoriesResponse getExpenseDefaultCategories() {
         return new DefaultCategoriesResponse(categoryService.getExpenseCategories());
+    }
+
+    @GetMapping("/income/default")
+    public DefaultCategoriesResponse getIncomeDefaultCategories() {
+        return new DefaultCategoriesResponse(categoryService.getIncomeCategories());
     }
 }
