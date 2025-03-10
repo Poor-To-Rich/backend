@@ -23,7 +23,8 @@ public class MailController {
 
     @PostMapping("/send")
     public ResponseEntity<BaseResponse> sendVerificationCode(
-            @RequestBody @Valid EmailVerificationRequest emailVerificationRequest) {
+            @RequestBody @Valid EmailVerificationRequest emailVerificationRequest
+    ) {
         emailFacade.sendVerificationCode(emailVerificationRequest);
         return BaseResponse.toResponseEntity(EmailResponse.VERIFICATION_CODE_SENT);
     }

@@ -1,5 +1,6 @@
 package PoorToRich.PoorToRich.email.enums;
 
+import PoorToRich.PoorToRich.global.exceptions.BadRequestException;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -34,6 +35,6 @@ public enum EmailTemplateType {
                 return templateType;
             }
         }
-        throw new RuntimeException("Need Exception Handler(invalid purpose)");
+        throw new BadRequestException(EmailResponse.INVALID_PURPOSE);
     }
 }

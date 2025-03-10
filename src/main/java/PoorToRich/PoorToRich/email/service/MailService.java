@@ -23,17 +23,14 @@ public class MailService {
         mailMessage.setTo(email);
         mailMessage.setSubject(emailTemplate.getSubject());
         mailMessage.setText(
-                String.format(EmailTemplateType.BODY_TEMPLATE, emailTemplate.getDescription(), verificationCode));
+                String.format(EmailTemplateType.BODY_TEMPLATE, emailTemplate.getDescription(), verificationCode)
+        );
 
         return mailMessage;
     }
 
     public void sendEmail(String email, String purpose, String verificationCode) {
         SimpleMailMessage mailMessage = this.createMailMessage(email, purpose, verificationCode);
-        try {
-            emailSender.send(mailMessage);
-        } catch (Exception e) {
-            System.err.println(e.getMessage());
-        }
+        emailSender.send(mailMessage);
     }
 }
