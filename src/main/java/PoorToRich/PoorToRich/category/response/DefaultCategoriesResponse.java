@@ -13,5 +13,5 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class DefaultCategoriesResponse {
-    private List<CategoryResponse> defaultCategories;
+    private List<DefaultCategoryResponse> defaultCategories;
 }
