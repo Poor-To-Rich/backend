@@ -1,6 +1,9 @@
 package PoorToRich.PoorToRich.category.response;
 
-import lombok.*;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
 
 import java.util.List;
 
@@ -10,5 +13,5 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class DefaultCategoriesResponse {
-    private List<CategoryResponse> defaultCategories;
+    private List<DefaultCategoryResponse> defaultCategories;
 }

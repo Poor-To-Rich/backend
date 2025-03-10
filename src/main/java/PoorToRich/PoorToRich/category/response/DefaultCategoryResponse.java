@@ -1,16 +1,17 @@
 package PoorToRich.PoorToRich.category.response;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CategoryResponse {
+public class DefaultCategoryResponse {
 
     private String color;
-
     private String name;
-
     private boolean visibility;
 }

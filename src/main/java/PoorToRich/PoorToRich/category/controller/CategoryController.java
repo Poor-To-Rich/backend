@@ -1,11 +1,16 @@
 package PoorToRich.PoorToRich.category.controller;
 
+import PoorToRich.PoorToRich.category.entity.CategoryType;
 import PoorToRich.PoorToRich.category.response.DefaultCategoriesResponse;
+import PoorToRich.PoorToRich.category.response.DefaultCategoryResponse;
 import PoorToRich.PoorToRich.category.service.CategoryService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/category")
@@ -15,7 +20,16 @@ public class CategoryController {
     private final CategoryService categoryService;
 
     @GetMapping("/expense/default")
-    public DefaultCategoriesResponse getDefaultCategories() {
-        return new DefaultCategoriesResponse(categoryService.getExpenseCategories());
+    public ResponseEntity<DefaultCategoriesResponse> getExpenseDefaultCategories() {
+        List<DefaultCategoryResponse> expenseCategories = categoryService.getCategories(CategoryType.DEFAULT_EXPENSE);
+        DefaultCategoriesResponse response = new DefaultCategoriesResponse(expenseCategories);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/income/default")
+    public ResponseEntity<DefaultCategoriesResponse> getIncomeDefaultCategories() {
+        List<DefaultCategoryResponse> incomeCategories = categoryService.getCategories(CategoryType.DEFAULT_INCOME);
+        DefaultCategoriesResponse response = new DefaultCategoriesResponse(incomeCategories);
+        return ResponseEntity.ok(response);
     }
 }
