@@ -26,4 +26,15 @@ public class CategoryService {
                         .build())
                 .collect(Collectors.toList());
     }
+
+    public List<CustomCategoryResponse> getCustomCategories(CategoryType type) {
+        return categoryRepository.findAll().stream()
+                .filter(category -> category.getType() == type)
+                .map(category -> CustomCategoryResponse.builder()
+                        .id(category.getId())
+                        .color(category.getColor())
+                        .name(category.getName())
+                        .build())
+                .collect(Collectors.toList());
+    }
 }

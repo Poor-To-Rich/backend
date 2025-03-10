@@ -34,4 +34,11 @@ public class CategoryController {
         DefaultCategoriesResponse response = new DefaultCategoriesResponse(incomeCategories);
         return ResponseEntity.ok(response);
     }
+
+    @GetMapping("/expense/custom")
+    public ResponseEntity<CustomCategoriesResponse> getExpenseCustomCategories() {
+        List<CustomCategoryResponse> expenseCategories = categoryService.getCustomCategories(CategoryType.CUSTOM_EXPENSE);
+        CustomCategoriesResponse response = new CustomCategoriesResponse(expenseCategories);
+        return ResponseEntity.ok(response);
+    }
 }
