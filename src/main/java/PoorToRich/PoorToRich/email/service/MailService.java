@@ -23,7 +23,8 @@ public class MailService {
         mailMessage.setTo(email);
         mailMessage.setSubject(emailTemplate.getSubject());
         mailMessage.setText(
-                String.format(EmailTemplateType.BODY_TEMPLATE, emailTemplate.getDescription(), verificationCode));
+                String.format(EmailTemplateType.BODY_TEMPLATE, emailTemplate.getDescription(), verificationCode)
+        );
 
         return mailMessage;
     }

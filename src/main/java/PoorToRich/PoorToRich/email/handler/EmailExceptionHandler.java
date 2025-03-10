@@ -5,7 +5,8 @@ import PoorToRich.PoorToRich.email.enums.EmailResponse;
 import PoorToRich.PoorToRich.global.response.BaseResponse;
 import PoorToRich.PoorToRich.global.response.Response;
 import jakarta.mail.internet.AddressException;
-import java.util.Objects;
+import java.util.Optional;
+import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.MailSendException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -17,8 +18,12 @@ public class EmailExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<BaseResponse> handleEmailMethodArgumentNotValidException(
-            MethodArgumentNotValidException exception) {
-        String errorMessage = Objects.requireNonNull(exception.getBindingResult().getFieldError()).getDefaultMessage();
+            MethodArgumentNotValidException exception
+    ) {
+        String errorMessage = Optional.ofNullable(exception.getBindingResult().getFieldError())
+                .map(DefaultMessageSourceResolvable::getDefaultMessage)
+                .orElse(EmailResponse.DEFAULT.getMessage());
+
         Response response = EmailResponse.getResponseByIdentifier(errorMessage);
         return BaseResponse.toResponseEntity(response);
     }

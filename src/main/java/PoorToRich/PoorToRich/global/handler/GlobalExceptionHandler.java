@@ -8,7 +8,8 @@ import PoorToRich.PoorToRich.global.exceptions.InternalServerErrorException;
 import PoorToRich.PoorToRich.global.exceptions.NotFoundException;
 import PoorToRich.PoorToRich.global.exceptions.UnauthorizedException;
 import PoorToRich.PoorToRich.global.response.BaseResponse;
-import java.util.Objects;
+import java.util.Optional;
+import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -18,10 +19,16 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    private static final String DEFAULT_ERROR_MESSAGE = "잘못된 요청입니다.";
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<BaseResponse> handleMethodArgumentNotValidException(
-            MethodArgumentNotValidException exception) {
-        String errorMessage = Objects.requireNonNull(exception.getBindingResult().getFieldError()).getDefaultMessage();
+            MethodArgumentNotValidException exception
+    ) {
+        String errorMessage = Optional.ofNullable(exception.getBindingResult().getFieldError())
+                .map(DefaultMessageSourceResolvable::getDefaultMessage)
+                .orElse(DEFAULT_ERROR_MESSAGE);
+
         return BaseResponse.toResponseEntity(HttpStatus.BAD_REQUEST, errorMessage);
     }
 
@@ -41,7 +48,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(ConflictException.class)
-    public ResponseEntity<BaseResponse> handleConflicException(ConflictException exception) {
+    public ResponseEntity<BaseResponse> handleConflictException(ConflictException exception) {
         return BaseResponse.toResponseEntity(exception.getResponse());
     }
 
