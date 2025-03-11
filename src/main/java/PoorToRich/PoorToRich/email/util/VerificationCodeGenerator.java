@@ -2,7 +2,9 @@ package PoorToRich.PoorToRich.email.util;
 
 import java.security.SecureRandom;
 import lombok.NoArgsConstructor;
+import org.springframework.stereotype.Component;
 
+@Component
 @NoArgsConstructor
 public class VerificationCodeGenerator {
 
