@@ -2,6 +2,7 @@ package PoorToRich.PoorToRich.category.service;
 
 import PoorToRich.PoorToRich.category.entity.CategoryType;
 import PoorToRich.PoorToRich.category.repository.CategoryRepository;
+import PoorToRich.PoorToRich.category.response.CustomCategoryResponse;
 import PoorToRich.PoorToRich.category.response.DefaultCategoryResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -15,13 +16,24 @@ public class CategoryService {
 
     private final CategoryRepository categoryRepository;
 
-    public List<DefaultCategoryResponse> getCategories(CategoryType type) {
+    public List<DefaultCategoryResponse> getDefaultCategories(CategoryType type) {
         return categoryRepository.findAll().stream()
                 .filter(category -> category.getType() == type)
                 .map(category -> DefaultCategoryResponse.builder()
                         .name(category.getName())
                         .color(category.getColor())
                         .visibility(category.getVisibility())
+                        .build())
+                .collect(Collectors.toList());
+    }
+
+    public List<CustomCategoryResponse> getCustomCategories(CategoryType type) {
+        return categoryRepository.findAll().stream()
+                .filter(category -> category.getType() == type)
+                .map(category -> CustomCategoryResponse.builder()
+                        .id(category.getId())
+                        .color(category.getColor())
+                        .name(category.getName())
                         .build())
                 .collect(Collectors.toList());
     }
