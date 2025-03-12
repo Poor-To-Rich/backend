@@ -69,7 +69,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(TooManyRequestException.class)
-    public ResponseEntity<BaseResponse> handleTooManyRequest(TooManyRequestException exception) {
+    public ResponseEntity<BaseResponse> handleTooManyRequestException(TooManyRequestException exception) {
         return BaseResponse.toResponseEntity(exception.getResponse());
     }
 }
