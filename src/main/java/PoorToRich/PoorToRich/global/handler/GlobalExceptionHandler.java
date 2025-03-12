@@ -6,6 +6,7 @@ import PoorToRich.PoorToRich.global.exceptions.BadRequestException;
 import PoorToRich.PoorToRich.global.exceptions.ConflictException;
 import PoorToRich.PoorToRich.global.exceptions.InternalServerErrorException;
 import PoorToRich.PoorToRich.global.exceptions.NotFoundException;
+import PoorToRich.PoorToRich.global.exceptions.TooManyRequestException;
 import PoorToRich.PoorToRich.global.exceptions.UnauthorizedException;
 import PoorToRich.PoorToRich.global.response.BaseResponse;
 import java.util.Optional;
@@ -64,6 +65,11 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(UnauthorizedException.class)
     public ResponseEntity<BaseResponse> handleUnauthorizedException(UnauthorizedException exception) {
+        return BaseResponse.toResponseEntity(exception.getResponse());
+    }
+
+    @ExceptionHandler(TooManyRequestException.class)
+    public ResponseEntity<BaseResponse> handleTooManyRequest(TooManyRequestException exception) {
         return BaseResponse.toResponseEntity(exception.getResponse());
     }
 }
