@@ -43,6 +43,7 @@ public class EmailVerificationService {
 
         boolean isVerified = Objects.equals(getCode(mail, type), code);
         if (isVerified) {
+            verificationPolicyManager.checkAfterVerifiedSuccess(mail, purpose);
             setVerifiedEmail(mail);
         }
 

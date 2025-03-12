@@ -2,6 +2,7 @@ package PoorToRich.PoorToRich.email.util;
 
 import PoorToRich.PoorToRich.email.enums.EmailResponse;
 import PoorToRich.PoorToRich.email.enums.EmailVerificationType;
+import PoorToRich.PoorToRich.global.exceptions.BadRequestException;
 import PoorToRich.PoorToRich.global.exceptions.TooManyRequestException;
 import PoorToRich.PoorToRich.global.exceptions.UnauthorizedException;
 import jakarta.annotation.PostConstruct;
@@ -36,12 +37,16 @@ public class EmailVerificationPolicyManager {
 
     public void checkBeforeVerified(String mail, String purpose) {
         checkBlockPolicy(mail);
+        checkCodeIssued(mail);
         checkCodeExpiration(mail, purpose);
         checkFirstRequest(mail, EmailVerificationType.AUTH_ATTEMPT);
         checkExceedVerifiedCode(mail);
         increaseAttempts(mail, EmailVerificationType.AUTH_ATTEMPT);
     }
 
+    public void checkAfterVerifiedSuccess(String mail, String purpose) {
+        deleteAllPolicy(mail);
+    }
 
     private void checkFirstRequest(String mail, EmailVerificationType type) {
         if (valueOps.get(type.getKey(mail)) == null) {
@@ -49,11 +54,18 @@ public class EmailVerificationPolicyManager {
         }
     }
 
-    private void checkCodeExpiration(String mail, String purpose) {
+    private void checkCodeIssued(String mail) {
         String isVerified = valueOps.get(EmailVerificationType.EMAIL_VERIFICATION.getKey(mail));
+
+        if (isVerified == null) {
+            throw new BadRequestException(EmailResponse.VERIFICATION_CODE_REQUIRED);
+        }
+    }
+
+    private void checkCodeExpiration(String mail, String purpose) {
         String verificationCode = valueOps.get(EmailVerificationType.getByKey(purpose).getKey(mail));
 
-        if (isVerified != null && !Boolean.parseBoolean(isVerified) && verificationCode == null) {
+        if (verificationCode == null) {
             throw new UnauthorizedException(EmailResponse.VERIFICATION_CODE_EXPIRED);
         }
     }
@@ -109,6 +121,7 @@ public class EmailVerificationPolicyManager {
         deletePolicy(mail, EmailVerificationType.AUTH_BLOCK);
         deletePolicy(mail, EmailVerificationType.AUTH_ATTEMPT);
         deletePolicy(mail, EmailVerificationType.CODE_RESEND);
+        deletePolicy(mail, EmailVerificationType.EMAIL_VERIFICATION);
     }
 
     private void deletePolicy(String mail, EmailVerificationType type) {
