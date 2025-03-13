@@ -18,15 +18,15 @@ public enum EmailVerificationType {
 
     private static final String KEY_PATTERN = "%s:%s";
 
-    private final String key;
-    private final String minState;
-    private final String maxState;
+    private final String purpose;
+    private final String minStandard;
+    private final String maxStandard;
     private final Integer timeToLive;
     private final TimeUnit timeUnit;
 
-    public static EmailVerificationType getByKey(String key) {
+    public static EmailVerificationType getTypeByPurpose(String key) {
         for (EmailVerificationType type : EmailVerificationType.values()) {
-            if (type.key.equals(key)) {
+            if (type.purpose.equals(key)) {
                 return type;
             }
         }
@@ -34,6 +34,6 @@ public enum EmailVerificationType {
     }
 
     public String getKey(String mail) {
-        return String.format(KEY_PATTERN, mail, this.key);
+        return String.format(KEY_PATTERN, mail, this.purpose);
     }
 }

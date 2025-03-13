@@ -24,7 +24,7 @@ public class EmailVerificationService {
     }
 
     public void saveCode(String mail, String purpose, String code) {
-        EmailVerificationType type = EmailVerificationType.getByKey(purpose);
+        EmailVerificationType type = EmailVerificationType.getTypeByPurpose(purpose);
 
         verificationPolicyManager.checkBeforeCodeSaved(mail);
 
@@ -37,7 +37,7 @@ public class EmailVerificationService {
     }
 
     public boolean verifyCode(String mail, String purpose, String code) {
-        EmailVerificationType type = EmailVerificationType.getByKey(purpose);
+        EmailVerificationType type = EmailVerificationType.getTypeByPurpose(purpose);
 
         verificationPolicyManager.checkBeforeVerified(mail, purpose);
 
@@ -50,10 +50,10 @@ public class EmailVerificationService {
         return isVerified;
     }
 
-    public void setVerifiedEmail(String mail) {
+    private void setVerifiedEmail(String mail) {
         valueOps.set(
                 EmailVerificationType.EMAIL_VERIFICATION.getKey(mail),
-                EmailVerificationType.EMAIL_VERIFICATION.getMaxState(),
+                EmailVerificationType.EMAIL_VERIFICATION.getMaxStandard(),
                 EmailVerificationType.EMAIL_VERIFICATION.getTimeToLive(),
                 EmailVerificationType.EMAIL_VERIFICATION.getTimeUnit()
         );

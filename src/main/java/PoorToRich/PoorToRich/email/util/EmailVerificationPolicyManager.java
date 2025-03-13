@@ -31,7 +31,7 @@ public class EmailVerificationPolicyManager {
         setPolicy(
                 mail,
                 EmailVerificationType.EMAIL_VERIFICATION,
-                EmailVerificationType.EMAIL_VERIFICATION.getMinState()
+                EmailVerificationType.EMAIL_VERIFICATION.getMinStandard()
         );
     }
 
@@ -45,53 +45,38 @@ public class EmailVerificationPolicyManager {
     }
 
     public void checkAfterVerifiedSuccess(String mail, String purpose) {
+        deletePolicy(mail, EmailVerificationType.getTypeByPurpose(purpose));
         deleteAllPolicy(mail);
+    }
+
+    private void checkBlockPolicy(String mail) {
+        if (Boolean.parseBoolean(valueOps.get(EmailVerificationType.AUTH_BLOCK.getKey(mail)))) {
+            throw new TooManyRequestException(EmailResponse.TOO_MANY_REQUEST_MAIL);
+        }
     }
 
     private void checkFirstRequest(String mail, EmailVerificationType type) {
         if (valueOps.get(type.getKey(mail)) == null) {
-            setPolicy(mail, type, type.getMinState());
-        }
-    }
-
-    private void checkCodeIssued(String mail) {
-        String isVerified = valueOps.get(EmailVerificationType.EMAIL_VERIFICATION.getKey(mail));
-
-        if (isVerified == null) {
-            throw new BadRequestException(EmailResponse.VERIFICATION_CODE_REQUIRED);
-        }
-    }
-
-    private void checkCodeExpiration(String mail, String purpose) {
-        String verificationCode = valueOps.get(EmailVerificationType.getByKey(purpose).getKey(mail));
-
-        if (verificationCode == null) {
-            throw new UnauthorizedException(EmailResponse.VERIFICATION_CODE_EXPIRED);
-        }
-    }
-
-    private void checkExceedVerifiedCode(String mail) {
-        String authAttempts = valueOps.get(EmailVerificationType.AUTH_ATTEMPT.getKey(mail));
-
-        if (EmailVerificationType.AUTH_ATTEMPT.getMaxState().equals(authAttempts)) {
-            deleteAllPolicy(mail);
-            setBlockPolicy(mail);
-            throw new TooManyRequestException(EmailResponse.TOO_MANY_VERIFICATION_REQUESTS);
+            setPolicy(mail, type, type.getMinStandard());
         }
     }
 
     private void checkExceedCodeResend(String mail) {
         String codeResendAttempts = valueOps.get(EmailVerificationType.CODE_RESEND.getKey(mail));
-        if (EmailVerificationType.CODE_RESEND.getMaxState().equals(codeResendAttempts)) {
+        if (EmailVerificationType.CODE_RESEND.getMaxStandard().equals(codeResendAttempts)) {
             deleteAllPolicy(mail);
             setBlockPolicy(mail);
             throw new TooManyRequestException(EmailResponse.TOO_MANY_CODE_RESEND_REQUESTS);
         }
     }
 
-    private void checkBlockPolicy(String mail) {
-        if (Boolean.parseBoolean(valueOps.get(EmailVerificationType.AUTH_BLOCK.getKey(mail)))) {
-            throw new TooManyRequestException(EmailResponse.TOO_MANY_REQUEST_MAIL);
+    private void checkExceedVerifiedCode(String mail) {
+        String authAttempts = valueOps.get(EmailVerificationType.AUTH_ATTEMPT.getKey(mail));
+
+        if (EmailVerificationType.AUTH_ATTEMPT.getMaxStandard().equals(authAttempts)) {
+            deleteAllPolicy(mail);
+            setBlockPolicy(mail);
+            throw new TooManyRequestException(EmailResponse.TOO_MANY_VERIFICATION_REQUESTS);
         }
     }
 
@@ -104,8 +89,24 @@ public class EmailVerificationPolicyManager {
         }
     }
 
+    private void checkCodeIssued(String mail) {
+        String isVerified = valueOps.get(EmailVerificationType.EMAIL_VERIFICATION.getKey(mail));
+
+        if (isVerified == null) {
+            throw new BadRequestException(EmailResponse.VERIFICATION_CODE_REQUIRED);
+        }
+    }
+
+    private void checkCodeExpiration(String mail, String purpose) {
+        String verificationCode = valueOps.get(EmailVerificationType.getTypeByPurpose(purpose).getKey(mail));
+
+        if (verificationCode == null) {
+            throw new UnauthorizedException(EmailResponse.VERIFICATION_CODE_EXPIRED);
+        }
+    }
+
     private void setBlockPolicy(String mail) {
-        setPolicy(mail, EmailVerificationType.AUTH_BLOCK, EmailVerificationType.AUTH_BLOCK.getMaxState());
+        setPolicy(mail, EmailVerificationType.AUTH_BLOCK, EmailVerificationType.AUTH_BLOCK.getMaxStandard());
     }
 
     private void setPolicy(String mail, EmailVerificationType type, String value) {
