@@ -44,7 +44,7 @@ public class CategoryController {
 
     @GetMapping("/income/custom")
     public ResponseEntity<CustomCategoriesResponse> getIncomeCustomCategories() {
-        List<CustomCategoryResponse> incomeCategories = categoryService.getCustomCategories(CategoryType.CUSTOM_EXPENSE);
+        List<CustomCategoryResponse> incomeCategories = categoryService.getCustomCategories(CategoryType.CUSTOM_INCOME);
         CustomCategoriesResponse response = new CustomCategoriesResponse(incomeCategories);
         return ResponseEntity.ok(response);
     }
