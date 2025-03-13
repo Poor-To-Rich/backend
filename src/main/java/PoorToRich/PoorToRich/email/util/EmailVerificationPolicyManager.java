@@ -50,19 +50,19 @@ public class EmailVerificationPolicyManager {
     }
 
     private void checkBlockPolicy(String mail) {
-        if (Boolean.parseBoolean(valueOps.get(EmailVerificationType.AUTH_BLOCK.getKey(mail)))) {
+        if (Boolean.parseBoolean(valueOps.get(EmailVerificationType.AUTH_BLOCK.getRedisKey(mail)))) {
             throw new TooManyRequestException(EmailResponse.TOO_MANY_REQUEST_MAIL);
         }
     }
 
     private void checkFirstRequest(String mail, EmailVerificationType type) {
-        if (valueOps.get(type.getKey(mail)) == null) {
+        if (valueOps.get(type.getRedisKey(mail)) == null) {
             setPolicy(mail, type, type.getMinStandard());
         }
     }
 
     private void checkExceedCodeResend(String mail) {
-        String codeResendAttempts = valueOps.get(EmailVerificationType.CODE_RESEND.getKey(mail));
+        String codeResendAttempts = valueOps.get(EmailVerificationType.CODE_RESEND.getRedisKey(mail));
         if (EmailVerificationType.CODE_RESEND.getMaxStandard().equals(codeResendAttempts)) {
             deleteAllPolicy(mail);
             setBlockPolicy(mail);
@@ -71,7 +71,7 @@ public class EmailVerificationPolicyManager {
     }
 
     private void checkExceedVerifiedCode(String mail) {
-        String authAttempts = valueOps.get(EmailVerificationType.AUTH_ATTEMPT.getKey(mail));
+        String authAttempts = valueOps.get(EmailVerificationType.AUTH_ATTEMPT.getRedisKey(mail));
 
         if (EmailVerificationType.AUTH_ATTEMPT.getMaxStandard().equals(authAttempts)) {
             deleteAllPolicy(mail);
@@ -81,7 +81,7 @@ public class EmailVerificationPolicyManager {
     }
 
     private void increaseAttempts(String mail, EmailVerificationType type) {
-        String attempts = valueOps.get(type.getKey(mail));
+        String attempts = valueOps.get(type.getRedisKey(mail));
 
         if (attempts != null) {
             int newAttempts = Integer.parseInt(attempts);
@@ -90,7 +90,7 @@ public class EmailVerificationPolicyManager {
     }
 
     private void checkCodeIssued(String mail) {
-        String isVerified = valueOps.get(EmailVerificationType.EMAIL_VERIFICATION.getKey(mail));
+        String isVerified = valueOps.get(EmailVerificationType.EMAIL_VERIFICATION.getRedisKey(mail));
 
         if (isVerified == null) {
             throw new BadRequestException(EmailResponse.VERIFICATION_CODE_REQUIRED);
@@ -98,7 +98,7 @@ public class EmailVerificationPolicyManager {
     }
 
     private void checkCodeExpiration(String mail, String purpose) {
-        String verificationCode = valueOps.get(EmailVerificationType.getTypeByPurpose(purpose).getKey(mail));
+        String verificationCode = valueOps.get(EmailVerificationType.getTypeByPurpose(purpose).getRedisKey(mail));
 
         if (verificationCode == null) {
             throw new UnauthorizedException(EmailResponse.VERIFICATION_CODE_EXPIRED);
@@ -111,7 +111,7 @@ public class EmailVerificationPolicyManager {
 
     private void setPolicy(String mail, EmailVerificationType type, String value) {
         valueOps.set(
-                type.getKey(mail),
+                type.getRedisKey(mail),
                 value,
                 type.getTimeToLive(),
                 type.getTimeUnit()
@@ -126,6 +126,6 @@ public class EmailVerificationPolicyManager {
     }
 
     private void deletePolicy(String mail, EmailVerificationType type) {
-        valueOps.getOperations().delete(type.getKey(mail));
+        valueOps.getOperations().delete(type.getRedisKey(mail));
     }
 }

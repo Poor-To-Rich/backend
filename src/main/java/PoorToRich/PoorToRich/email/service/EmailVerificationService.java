@@ -29,7 +29,7 @@ public class EmailVerificationService {
         verificationPolicyManager.checkBeforeCodeSaved(mail);
 
         valueOps.set(
-                type.getKey(mail),
+                type.getRedisKey(mail),
                 code,
                 type.getTimeToLive(),
                 type.getTimeUnit()
@@ -52,7 +52,7 @@ public class EmailVerificationService {
 
     private void setVerifiedEmail(String mail) {
         valueOps.set(
-                EmailVerificationType.EMAIL_VERIFICATION.getKey(mail),
+                EmailVerificationType.EMAIL_VERIFICATION.getRedisKey(mail),
                 EmailVerificationType.EMAIL_VERIFICATION.getMaxStandard(),
                 EmailVerificationType.EMAIL_VERIFICATION.getTimeToLive(),
                 EmailVerificationType.EMAIL_VERIFICATION.getTimeUnit()
@@ -60,7 +60,7 @@ public class EmailVerificationService {
     }
 
     private String getCode(String mail, EmailVerificationType type) {
-        return valueOps.get(type.getKey(mail));
+        return valueOps.get(type.getRedisKey(mail));
     }
 
 }

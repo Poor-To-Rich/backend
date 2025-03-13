@@ -16,7 +16,7 @@ public enum EmailVerificationType {
     AUTH_BLOCK("block", "false", "true", 30, TimeUnit.MINUTES),
     EMAIL_VERIFICATION("verified", "false", "true", 1, TimeUnit.DAYS);
 
-    private static final String KEY_PATTERN = "%s:%s";
+    private static final String REDIS_KEY_PATTERN = "%s:%s";
 
     private final String purpose;
     private final String minStandard;
@@ -33,7 +33,7 @@ public enum EmailVerificationType {
         throw new BadRequestException(EmailResponse.INVALID_PURPOSE);
     }
 
-    public String getKey(String mail) {
-        return String.format(KEY_PATTERN, mail, this.purpose);
+    public String getRedisKey(String mail) {
+        return String.format(REDIS_KEY_PATTERN, mail, this.purpose);
     }
 }
