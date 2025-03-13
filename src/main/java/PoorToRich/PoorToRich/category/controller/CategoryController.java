@@ -1,14 +1,18 @@
 package PoorToRich.PoorToRich.category.controller;
 
 import PoorToRich.PoorToRich.category.entity.CategoryType;
+import PoorToRich.PoorToRich.category.request.CustomCategoryRequest;
 import PoorToRich.PoorToRich.category.response.CustomCategoriesResponse;
 import PoorToRich.PoorToRich.category.response.CustomCategoryResponse;
 import PoorToRich.PoorToRich.category.response.DefaultCategoriesResponse;
 import PoorToRich.PoorToRich.category.response.DefaultCategoryResponse;
 import PoorToRich.PoorToRich.category.service.CategoryService;
+import PoorToRich.PoorToRich.global.response.BaseResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -47,5 +51,10 @@ public class CategoryController {
         List<CustomCategoryResponse> incomeCategories = categoryService.getCustomCategories(CategoryType.CUSTOM_INCOME);
         CustomCategoriesResponse response = new CustomCategoriesResponse(incomeCategories);
         return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/expense")
+    public ResponseEntity<BaseResponse> createExpenseCategory(@RequestBody CustomCategoryRequest categoryRequest) {
+        return categoryService.createCategory(categoryRequest, CategoryType.CUSTOM_EXPENSE);
     }
 }
