@@ -7,8 +7,10 @@ import PoorToRich.PoorToRich.global.exceptions.ConflictException;
 import PoorToRich.PoorToRich.global.exceptions.InternalServerErrorException;
 import PoorToRich.PoorToRich.global.exceptions.NotFoundException;
 import PoorToRich.PoorToRich.global.exceptions.UnauthorizedException;
+import PoorToRich.PoorToRich.global.exceptions.ConstraintViolationException;
 import PoorToRich.PoorToRich.global.response.BaseResponse;
 import java.util.Optional;
+
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -64,6 +66,11 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(UnauthorizedException.class)
     public ResponseEntity<BaseResponse> handleUnauthorizedException(UnauthorizedException exception) {
+        return BaseResponse.toResponseEntity(exception.getResponse());
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<BaseResponse> handleConstraintViolationException(ConstraintViolationException exception) {
         return BaseResponse.toResponseEntity(exception.getResponse());
     }
 }
