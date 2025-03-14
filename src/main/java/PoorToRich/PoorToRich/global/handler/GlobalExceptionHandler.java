@@ -4,7 +4,6 @@ import PoorToRich.PoorToRich.global.exceptions.AuthenticationException;
 import PoorToRich.PoorToRich.global.exceptions.AuthorizationException;
 import PoorToRich.PoorToRich.global.exceptions.BadRequestException;
 import PoorToRich.PoorToRich.global.exceptions.ConflictException;
-import PoorToRich.PoorToRich.global.exceptions.ConstraintViolationException;
 import PoorToRich.PoorToRich.global.exceptions.InternalServerErrorException;
 import PoorToRich.PoorToRich.global.exceptions.NotFoundException;
 import PoorToRich.PoorToRich.global.exceptions.TooManyRequestException;
@@ -71,11 +70,6 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(TooManyRequestException.class)
     public ResponseEntity<BaseResponse> handleTooManyRequestException(TooManyRequestException exception) {
-        return BaseResponse.toResponseEntity(exception.getResponse());
-    }
-
-    @ExceptionHandler(ConstraintViolationException.class)
-    public ResponseEntity<BaseResponse> handleConstraintViolationException(ConstraintViolationException exception) {
         return BaseResponse.toResponseEntity(exception.getResponse());
     }
 }
