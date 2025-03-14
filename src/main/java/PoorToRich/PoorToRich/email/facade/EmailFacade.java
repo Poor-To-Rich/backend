@@ -1,8 +1,10 @@
 package PoorToRich.PoorToRich.email.facade;
 
 import PoorToRich.PoorToRich.email.enums.EmailResponse;
+import PoorToRich.PoorToRich.email.enums.EmailVerificationType;
 import PoorToRich.PoorToRich.email.request.EmailVerificationRequest;
 import PoorToRich.PoorToRich.email.request.VerifyEmailCodeRequest;
+import PoorToRich.PoorToRich.email.response.VerificationResendCodeStatusResponse;
 import PoorToRich.PoorToRich.email.service.EmailVerificationService;
 import PoorToRich.PoorToRich.email.service.MailService;
 import PoorToRich.PoorToRich.email.util.VerificationCodeGenerator;
@@ -42,5 +44,11 @@ public class EmailFacade {
             return EmailResponse.INVALID_VERIFICATION_CODE;
         }
         return EmailResponse.EMAIL_VERIFICATION_SUCCESS;
+    }
+
+    public VerificationResendCodeStatusResponse getResendStatus(String mail) {
+        Integer remainAttempts = verificationService
+                .getRemainingAttemptsByVerificationType(mail, EmailVerificationType.CODE_RESEND);
+        return new VerificationResendCodeStatusResponse(remainAttempts);
     }
 }
