@@ -8,6 +8,7 @@ import PoorToRich.PoorToRich.category.response.DefaultCategoriesResponse;
 import PoorToRich.PoorToRich.category.response.DefaultCategoryResponse;
 import PoorToRich.PoorToRich.category.service.CategoryService;
 import PoorToRich.PoorToRich.global.response.BaseResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -54,7 +55,7 @@ public class CategoryController {
     }
 
     @PostMapping("/expense")
-    public ResponseEntity<BaseResponse> createExpenseCategory(@RequestBody CustomCategoryRequest categoryRequest) {
-        return categoryService.createCategory(categoryRequest, CategoryType.CUSTOM_EXPENSE);
+    public ResponseEntity<BaseResponse> createExpenseCategory(@RequestBody @Valid CustomCategoryRequest categoryRequest) {
+        return BaseResponse.toResponseEntity(categoryService.createCategory(categoryRequest, CategoryType.CUSTOM_EXPENSE));
     }
 }
