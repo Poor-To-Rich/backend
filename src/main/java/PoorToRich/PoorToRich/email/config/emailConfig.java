@@ -1,6 +1,5 @@
 package PoorToRich.PoorToRich.email.config;
 
-import PoorToRich.PoorToRich.email.util.VerificationCodeGenerator;
 import java.util.Properties;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -66,10 +65,5 @@ public class emailConfig {
         mailSender.setJavaMailProperties(getMailProperties());
 
         return mailSender;
-    }
-
-    @Bean
-    public VerificationCodeGenerator verificationCodeGenerator() {
-        return new VerificationCodeGenerator();
     }
 }
