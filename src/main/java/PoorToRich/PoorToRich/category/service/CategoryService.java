@@ -1,9 +1,14 @@
 package PoorToRich.PoorToRich.category.service;
 
+import PoorToRich.PoorToRich.category.entity.Category;
 import PoorToRich.PoorToRich.category.entity.CategoryType;
 import PoorToRich.PoorToRich.category.repository.CategoryRepository;
+import PoorToRich.PoorToRich.category.request.CustomCategoryRequest;
+import PoorToRich.PoorToRich.category.response.CategoryResponse;
 import PoorToRich.PoorToRich.category.response.CustomCategoryResponse;
 import PoorToRich.PoorToRich.category.response.DefaultCategoryResponse;
+import PoorToRich.PoorToRich.category.validator.CategoryValidator;
+import PoorToRich.PoorToRich.global.response.Response;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +20,7 @@ import java.util.stream.Collectors;
 public class CategoryService {
 
     private final CategoryRepository categoryRepository;
+    private final CategoryValidator categoryValidator;
 
     public List<DefaultCategoryResponse> getDefaultCategories(CategoryType type) {
         return categoryRepository.findAll().stream()
@@ -36,5 +42,23 @@ public class CategoryService {
                         .name(category.getName())
                         .build())
                 .collect(Collectors.toList());
+    }
+
+    public Response createCategory(CustomCategoryRequest customCategory, CategoryType type) {
+        if (categoryValidator.isNameUsed(customCategory.getName())) {
+            return CategoryResponse.DUPLICATION_CATEGORY_NAME;
+        }
+
+        categoryRepository.save(buildCategory(customCategory, type));
+        return CategoryResponse.SUCCESS_CREATE_CATEGORY;
+    }
+
+    private Category buildCategory(CustomCategoryRequest customCategory, CategoryType type) {
+        return Category.builder()
+                .type(type)
+                .name(customCategory.getName())
+                .color(customCategory.getColor())
+                .visibility(true)
+                .build();
     }
 }
