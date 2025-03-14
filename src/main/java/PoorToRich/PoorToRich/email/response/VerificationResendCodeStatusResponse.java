@@ -10,7 +10,7 @@ public class VerificationResendCodeStatusResponse {
     private final Integer remainAttempts;
     private final String message;
 
-    public VerificationResendCodeStatusResponse(Integer remainAttempts) {
+    public VerificationResendCodeStatusResponse(int remainAttempts) {
         this.remainAttempts = remainAttempts;
         this.message = String.format(messageForm, remainAttempts);
     }

@@ -64,7 +64,7 @@ public class EmailVerificationService {
         return valueOps.get(type.getRedisKey(mail));
     }
 
-    public Integer getRemainingAttemptsByVerificationType(String mail, EmailVerificationType verificationType) {
+    public int getRemainingAttemptsByVerificationType(String mail, EmailVerificationType verificationType) {
         int attemptCount = Integer.parseInt(
                 Optional.ofNullable(valueOps.get(verificationType.getRedisKey(mail)))
                         .orElse(verificationType.getMinStandard())
