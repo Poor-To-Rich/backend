@@ -58,4 +58,9 @@ public class CategoryController {
     public ResponseEntity<BaseResponse> createExpenseCategory(@RequestBody @Valid CustomCategoryRequest categoryRequest) {
         return BaseResponse.toResponseEntity(categoryService.createCategory(categoryRequest, CategoryType.CUSTOM_EXPENSE));
     }
+
+    @PostMapping("/income")
+    public ResponseEntity<BaseResponse> createIncomeCategory(@RequestBody @Valid CustomCategoryRequest categoryRequest) {
+        return BaseResponse.toResponseEntity(categoryService.createCategory(categoryRequest, CategoryType.CUSTOM_INCOME));
+    }
 }
