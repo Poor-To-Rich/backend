@@ -4,6 +4,7 @@ import com.poortorich.email.enums.EmailVerificationType;
 import com.poortorich.email.util.EmailVerificationPolicyManager;
 import jakarta.annotation.PostConstruct;
 import java.util.Objects;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
@@ -63,4 +64,12 @@ public class EmailVerificationService {
         return valueOps.get(type.getRedisKey(mail));
     }
 
+    public int getRemainingAttemptsByVerificationType(String mail, EmailVerificationType verificationType) {
+        int attemptCount = Integer.parseInt(
+                Optional.ofNullable(valueOps.get(verificationType.getRedisKey(mail)))
+                        .orElse(verificationType.getMinStandard())
+        );
+
+        return Integer.parseInt(verificationType.getMaxStandard()) - attemptCount;
+    }
 }

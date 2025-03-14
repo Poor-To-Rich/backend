@@ -43,4 +43,10 @@ public class EmailFacade {
         }
         return EmailResponse.EMAIL_VERIFICATION_SUCCESS;
     }
+
+    public VerificationResendCodeStatusResponse getResendStatus(String mail) {
+        Integer remainAttempts = verificationService
+                .getRemainingAttemptsByVerificationType(mail, EmailVerificationType.CODE_RESEND);
+        return new VerificationResendCodeStatusResponse(remainAttempts);
+    }
 }
