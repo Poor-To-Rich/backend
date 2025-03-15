@@ -1,4 +1,4 @@
-package PoorToRich.PoorToRich.email.response;
+package com.poortorich.email.response;
 
 import lombok.Data;
 

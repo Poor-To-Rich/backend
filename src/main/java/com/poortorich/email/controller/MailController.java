@@ -3,6 +3,7 @@ package com.poortorich.email.controller;
 import com.poortorich.email.facade.EmailFacade;
 import com.poortorich.email.request.EmailVerificationRequest;
 import com.poortorich.email.request.VerifyEmailCodeRequest;
+import com.poortorich.email.response.VerificationResendCodeStatusResponse;
 import com.poortorich.global.response.BaseResponse;
 import com.poortorich.global.response.Response;
 import jakarta.validation.Valid;

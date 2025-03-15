@@ -1,8 +1,10 @@
 package com.poortorich.email.facade;
 
 import com.poortorich.email.enums.EmailResponse;
+import com.poortorich.email.enums.EmailVerificationType;
 import com.poortorich.email.request.EmailVerificationRequest;
 import com.poortorich.email.request.VerifyEmailCodeRequest;
+import com.poortorich.email.response.VerificationResendCodeStatusResponse;
 import com.poortorich.email.service.EmailVerificationService;
 import com.poortorich.email.service.MailService;
 import com.poortorich.email.util.VerificationCodeGenerator;
