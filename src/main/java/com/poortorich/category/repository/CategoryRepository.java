@@ -7,6 +7,6 @@ import org.springframework.stereotype.Repository;
 import java.math.BigInteger;
 
 @Repository
-public interface CategoryRepository extends JpaRepository<Category, BigInteger> {
+public interface CategoryRepository extends JpaRepository<Category, Long> {
 
 }
