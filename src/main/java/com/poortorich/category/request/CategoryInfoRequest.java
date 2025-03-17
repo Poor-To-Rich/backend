@@ -6,7 +6,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class CustomCategoryRequest {
+public class CategoryInfoRequest {
 
     @NotBlank
     private String name;

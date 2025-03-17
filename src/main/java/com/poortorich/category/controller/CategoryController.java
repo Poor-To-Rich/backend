@@ -1,7 +1,8 @@
 package com.poortorich.category.controller;
 
 import com.poortorich.category.entity.CategoryType;
-import com.poortorich.category.request.CustomCategoryRequest;
+import com.poortorich.category.request.CategoryInfoRequest;
+import com.poortorich.category.response.CategoryInfoResponse;
 import com.poortorich.category.response.CustomCategoriesResponse;
 import com.poortorich.category.response.CustomCategoryResponse;
 import com.poortorich.category.response.DefaultCategoriesResponse;
@@ -12,6 +13,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -55,12 +57,17 @@ public class CategoryController {
     }
 
     @PostMapping("/expense")
-    public ResponseEntity<BaseResponse> createExpenseCategory(@RequestBody @Valid CustomCategoryRequest categoryRequest) {
+    public ResponseEntity<BaseResponse> createExpenseCategory(@RequestBody @Valid CategoryInfoRequest categoryRequest) {
         return BaseResponse.toResponseEntity(categoryService.createCategory(categoryRequest, CategoryType.CUSTOM_EXPENSE));
     }
 
     @PostMapping("/income")
-    public ResponseEntity<BaseResponse> createIncomeCategory(@RequestBody @Valid CustomCategoryRequest categoryRequest) {
+    public ResponseEntity<BaseResponse> createIncomeCategory(@RequestBody @Valid CategoryInfoRequest categoryRequest) {
         return BaseResponse.toResponseEntity(categoryService.createCategory(categoryRequest, CategoryType.CUSTOM_INCOME));
+    }
+
+    @GetMapping("/{categoryId}")
+    public ResponseEntity<CategoryInfoResponse> getCategory(@PathVariable Long categoryId) {
+        return ResponseEntity.ok(categoryService.getCategory(categoryId));
     }
 }
