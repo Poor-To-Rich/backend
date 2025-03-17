@@ -49,4 +49,9 @@ public class Category {
     private Timestamp updatedDate;
 
     // User 외래키
+
+    public void updateCategory(String name, String color) {
+        this.name = name;
+        this.color = color;
+    }
 }

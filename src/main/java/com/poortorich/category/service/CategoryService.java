@@ -70,6 +70,20 @@ public class CategoryService {
                         .name(category.getName())
                         .color(category.getColor())
                         .build())
-                .findAny().orElseThrow(() -> new NotFoundException(CategoryResponse.NON_EXISTENT_ID));
+                .findAny().orElseThrow(() -> new NotFoundException(CategoryResponse.NON_EXISTENT_CATEGORY));
+    }
+
+    public Response modifyCategory(Long id, CategoryInfoRequest categoryRequest) {
+        if (categoryValidator.isNameUsed(categoryRequest.getName(), id)) {
+            return CategoryResponse.DUPLICATION_CATEGORY_NAME;
+        }
+
+        Category category = categoryRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException(CategoryResponse.NON_EXISTENT_CATEGORY));
+
+        category.updateCategory(categoryRequest.getName(), categoryRequest.getColor());
+        categoryRepository.save(category);
+
+        return CategoryResponse.SUCCESS_MODIFY_CATEGORY;
     }
 }
