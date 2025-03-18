@@ -67,7 +67,7 @@ public class CategoryService {
 
     public CategoryInfoResponse getCategory(Long id) {
         Category category = getCategoryOrThrow(id);
-        
+
         return CategoryInfoResponse.builder()
                 .name(category.getName())
                 .color(category.getColor())
@@ -84,6 +84,13 @@ public class CategoryService {
         category.updateCategory(categoryRequest.getName(), categoryRequest.getColor());
 
         return CategoryResponse.SUCCESS_MODIFY_CATEGORY;
+    }
+
+    public Response deleteCategory(Long id) {
+        Category category = getCategoryOrThrow(id);
+        categoryRepository.delete(category);
+
+        return CategoryResponse.SUCCESS_DELETE_CATEGORY;
     }
 
     private Category getCategoryOrThrow(Long id) {
