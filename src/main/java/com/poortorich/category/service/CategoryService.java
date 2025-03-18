@@ -11,6 +11,7 @@ import com.poortorich.category.response.DefaultCategoryResponse;
 import com.poortorich.category.validator.CategoryValidator;
 import com.poortorich.global.exceptions.NotFoundException;
 import com.poortorich.global.response.Response;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -73,6 +74,7 @@ public class CategoryService {
                 .findAny().orElseThrow(() -> new NotFoundException(CategoryResponse.NON_EXISTENT_CATEGORY));
     }
 
+    @Transactional
     public Response modifyCategory(Long id, CategoryInfoRequest categoryRequest) {
         if (categoryValidator.isNameUsed(categoryRequest.getName(), id)) {
             return CategoryResponse.DUPLICATION_CATEGORY_NAME;
@@ -80,9 +82,7 @@ public class CategoryService {
 
         Category category = categoryRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(CategoryResponse.NON_EXISTENT_CATEGORY));
-
         category.updateCategory(categoryRequest.getName(), categoryRequest.getColor());
-        categoryRepository.save(category);
 
         return CategoryResponse.SUCCESS_MODIFY_CATEGORY;
     }
