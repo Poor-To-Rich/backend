@@ -15,11 +15,13 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.UpdateTimestamp;
 
 @Entity
 @Getter
 @Builder
+@DynamicUpdate
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "category")
@@ -49,4 +51,9 @@ public class Category {
     private Timestamp updatedDate;
 
     // User 외래키
+
+    public void updateCategory(String name, String color) {
+        this.name = name;
+        this.color = color;
+    }
 }

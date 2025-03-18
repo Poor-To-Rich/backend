@@ -15,4 +15,10 @@ public class CategoryValidator {
                 .stream()
                 .anyMatch(category -> category.getName().equals(name));
     }
+
+    public Boolean isNameUsed(String name, Long id) {
+        return categoryRepository.findAll()
+                .stream()
+                .anyMatch(category -> category.getName().equals(name) && !category.getId().equals(id));
+    }
 }
