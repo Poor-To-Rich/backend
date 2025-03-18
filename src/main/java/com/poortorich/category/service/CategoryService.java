@@ -66,12 +66,12 @@ public class CategoryService {
     }
 
     public CategoryInfoResponse getCategory(Long id) {
-        return categoryRepository.findById(id).stream()
-                .map(category -> CategoryInfoResponse.builder()
-                        .name(category.getName())
-                        .color(category.getColor())
-                        .build())
-                .findAny().orElseThrow(() -> new NotFoundException(CategoryResponse.NON_EXISTENT_CATEGORY));
+        Category category = getCategoryOrThrow(id);
+        
+        return CategoryInfoResponse.builder()
+                .name(category.getName())
+                .color(category.getColor())
+                .build();
     }
 
     @Transactional
@@ -80,10 +80,14 @@ public class CategoryService {
             return CategoryResponse.DUPLICATION_CATEGORY_NAME;
         }
 
-        Category category = categoryRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException(CategoryResponse.NON_EXISTENT_CATEGORY));
+        Category category = getCategoryOrThrow(id);
         category.updateCategory(categoryRequest.getName(), categoryRequest.getColor());
 
         return CategoryResponse.SUCCESS_MODIFY_CATEGORY;
+    }
+
+    private Category getCategoryOrThrow(Long id) {
+        return categoryRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException(CategoryResponse.NON_EXISTENT_CATEGORY));
     }
 }
