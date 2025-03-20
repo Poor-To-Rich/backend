@@ -4,6 +4,7 @@ import com.poortorich.category.entity.Category;
 import com.poortorich.category.entity.CategoryType;
 import com.poortorich.category.repository.CategoryRepository;
 import com.poortorich.category.request.CategoryInfoRequest;
+import com.poortorich.category.response.CategoriesResponse;
 import com.poortorich.category.response.CategoryInfoResponse;
 import com.poortorich.category.response.CategoryResponse;
 import com.poortorich.category.response.CustomCategoryResponse;
@@ -25,6 +26,10 @@ public class CategoryService {
     private final CategoryRepository categoryRepository;
     private final CategoryValidator categoryValidator;
 
+    private void addCategory() {
+        categoryRepository.save(new Category());
+    }
+
     public List<DefaultCategoryResponse> getDefaultCategories(CategoryType type) {
         return categoryRepository.findAll().stream()
                 .filter(category -> category.getType() == type)
@@ -33,7 +38,7 @@ public class CategoryService {
                         .color(category.getColor())
                         .visibility(category.getVisibility())
                         .build())
-                .collect(Collectors.toList());
+                .toList();
     }
 
     public List<CustomCategoryResponse> getCustomCategories(CategoryType type) {
@@ -44,7 +49,18 @@ public class CategoryService {
                         .color(category.getColor())
                         .name(category.getName())
                         .build())
-                .collect(Collectors.toList());
+                .toList();
+    }
+
+    public CategoriesResponse getActiveCategories(String type) {
+        List<String> categories = categoryRepository.findAll().stream()
+                .filter(category -> category.getType() == CategoryType.from(type) && category.getVisibility())
+                .map(Category::getName)
+                .toList();
+
+        return CategoriesResponse.builder()
+                .categories(categories)
+                .build();
     }
 
     public Response createCategory(CategoryInfoRequest customCategory, CategoryType type) {
