@@ -28,6 +28,7 @@ public class UserConstant {
         public static final String USERNAME_CONTAINS_INVALID_CHAR = "아이디는 영문자와 숫자로만 작성해야 합니다.";
         public static final String USERNAME_CONTAINS_BLANK = "아이디는 공백없이 작성해야 합니다.";
         public static final String USERNAME_LENGTH_INVALID = "아이디는 4 ~ 10자리로 작성해야 합니다.";
+        public static final String USERNAME_DUPLICATE = "이미 사용 중인 아이디입니다.";
 
         public static final String PASSWORD_REQUIRED = "비밀번호를 입력해주세요.";
         public static final String PASSWORD_CONTAINS_KOREAN = "비밀번호에 한글은 사용할 수 없습니다.";
