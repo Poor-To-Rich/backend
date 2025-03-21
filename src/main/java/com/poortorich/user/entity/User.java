@@ -20,11 +20,13 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.DynamicUpdate;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 @Entity
 @Table(name = Database.USER_TABLE)
+@DynamicUpdate
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
@@ -42,6 +44,9 @@ public class User implements UserDetails {
     @Column(name = Database.PASSWORD_COLUMN, nullable = false)
     private String password;
 
+    @Column(name = Database.NAME_COLUMN, nullable = false)
+    private String name;
+
     @Column(name = Database.NICKNAME_COLUMN, nullable = false, unique = true)
     private String nickname;
 
@@ -52,11 +57,14 @@ public class User implements UserDetails {
     @Enumerated(EnumType.STRING)
     private Gender gender;
 
-    @Column(name = Database.BIRTHDAY_COLUMN)
+    @Column(name = Database.BIRTHDAY_COLUMN, nullable = false)
     private LocalDate birth;
 
-    @Column(name = Database.PROFILE_IMAGE_COLUMN)
+    @Column(name = Database.PROFILE_IMAGE_COLUMN, nullable = false)
     private String profileImage;
+
+    @Column(name = Database.JOB_COLUMN)
+    private String job;
 
     @Column(name = Database.CREATED_DATE_COLUMN)
     private LocalDateTime createdDate;
