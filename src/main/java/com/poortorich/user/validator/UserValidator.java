@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 public class UserValidator {
 
     private final UserRepository userRepository;
-
+    
     public void validateUsername(String username) {
         if (userRepository.existsByUsername(username)) {
             throw new ConflictException(UserResponse.USERNAME_DUPLICATE);

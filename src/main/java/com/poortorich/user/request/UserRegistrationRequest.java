@@ -1,5 +1,8 @@
 package com.poortorich.user.request;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonFormat.Shape;
+import com.poortorich.user.constants.UserConstant;
 import com.poortorich.user.constants.UserConstant.ValidationConstraints;
 import com.poortorich.user.constants.UserConstant.ValidationMessages;
 import com.poortorich.user.entity.enums.Gender;
@@ -17,6 +20,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserRegistrationRequest {
+
+    @Nullable
+    private String profileImage;
 
     @NotBlank(message = ValidationMessages.NAME_REQUIRED)
     @Size(max = ValidationConstraints.NAME_MAX_LENGTH, message = ValidationMessages.NAME_TOO_LONG)
@@ -71,6 +77,7 @@ public class UserRegistrationRequest {
 
     @NotBlank(message = ValidationMessages.BIRTHDAY_REQUIRED)
     @Pattern(regexp = ValidationConstraints.BIRTHDAY_FORMAT_REGEX, message = ValidationMessages.BIRTHDAY_INVALID)
+    @JsonFormat(shape = Shape.STRING, pattern = UserConstant.Pattern.BIRTHDAY_PATTERN)
     private LocalDate birth;
 
     @NotBlank(message = ValidationMessages.EMAIL_REQUIRED)

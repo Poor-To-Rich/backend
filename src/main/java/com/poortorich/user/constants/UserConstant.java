@@ -71,6 +71,11 @@ public class UserConstant {
         public static final String NO_BLANK_REGEX = "^\\S*$";
     }
 
+    public static final class Pattern {
+
+        public static final String BIRTHDAY_PATTERN = "yyyy.mm.dd";
+    }
+
     public static final class Database {
 
         public static final String USER_TABLE = "user";
