@@ -19,6 +19,7 @@ public class S3Constants {
     public static final class ValidationMessages {
         public static final String INVALID_FILE_TYPE = "지원되지 않는 이미지 형식입니다. JPG, JPEG, PNG 파일만 허용됩니다.";
         public static final String FILE_SIZE_INVALID = "파일 크기가 너무 큽니다. 5MB 이하의 파일만 허용됩니다.";
+        public static final String IMAGE_UPLOAD_FAILURE = "이미지 업로드에 실패했습니다.";
     }
 
     public static final class ValidationConstraints {
@@ -27,5 +28,10 @@ public class S3Constants {
         );
 
         public static final long FILE_MAX_SIZE = 5 * 1024 * 1024;
+    }
+
+    public static final class FileUtils {
+        public static final String EXTENSION_SEPARATOR = ".";
+        public static final String PATH_SEPARATOR = "/";
     }
 }
