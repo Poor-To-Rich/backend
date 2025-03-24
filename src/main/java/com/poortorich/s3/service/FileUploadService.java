@@ -1,5 +1,6 @@
 package com.poortorich.s3.service;
 
+import com.amazonaws.AmazonClientException;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
@@ -25,7 +26,7 @@ public class FileUploadService {
     @Value("${cloud.aws.s3.bucket}")
     private String bucketName;
 
-    public String uploadImage(MultipartFile imageFile) {
+    public String uploadImage(MultipartFile imageFile) throws IOException {
         fileValidator.validateFileType(imageFile);
         fileValidator.validateFileSize(imageFile);
 
@@ -43,14 +44,14 @@ public class FileUploadService {
         amazonS3Client.deleteObject(bucketName, fileName);
     }
 
-    private void uploadToS3(MultipartFile file, String fileName) {
+    private void uploadToS3(MultipartFile file, String fileName) throws IOException {
         ObjectMetadata metadata = new ObjectMetadata();
         metadata.setContentType(file.getContentType());
         metadata.setContentLength(file.getSize());
 
         try (InputStream inputStream = file.getInputStream()) {
             amazonS3Client.putObject(new PutObjectRequest(bucketName, fileName, inputStream, metadata));
-        } catch (IOException exception) {
+        } catch (AmazonClientException | IOException exception) {
             throw new InternalServerErrorException(S3Response.FILE_UPLOAD_FAILURE);
         }
     }

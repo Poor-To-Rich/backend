@@ -22,8 +22,12 @@ public class S3FileUtils {
     }
 
     private static String extractExtension(String originalFileName) {
-        return originalFileName.substring(
-                originalFileName.lastIndexOf(EXTENSION_SEPARATOR)
-        );
+        try {
+            return originalFileName.substring(
+                    originalFileName.lastIndexOf(EXTENSION_SEPARATOR)
+            );
+        } catch (StringIndexOutOfBoundsException exception) {
+            return originalFileName;
+        }
     }
 }
