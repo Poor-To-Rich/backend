@@ -2,6 +2,7 @@ package com.poortorich.category.controller;
 
 import com.poortorich.category.entity.CategoryType;
 import com.poortorich.category.request.CategoryInfoRequest;
+import com.poortorich.category.response.ActiveCategoriesResponse;
 import com.poortorich.category.response.CategoryInfoResponse;
 import com.poortorich.category.response.CustomCategoriesResponse;
 import com.poortorich.category.response.CustomCategoryResponse;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -56,6 +58,11 @@ public class CategoryController {
         List<CustomCategoryResponse> incomeCategories = categoryService.getCustomCategories(CategoryType.CUSTOM_INCOME);
         CustomCategoriesResponse response = new CustomCategoriesResponse(incomeCategories);
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/active")
+    public ResponseEntity<ActiveCategoriesResponse> getActiveCategories(@RequestParam String type) {
+        return ResponseEntity.ok(categoryService.getActiveCategories(type));
     }
 
     @PostMapping("/expense")

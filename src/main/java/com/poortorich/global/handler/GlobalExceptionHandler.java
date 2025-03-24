@@ -14,6 +14,7 @@ import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class GlobalExceptionHandler {
 
     private static final String DEFAULT_ERROR_MESSAGE = "잘못된 요청입니다.";
+    private static final String MISSING_PARAMETER = "요청 파라미터가 존재하지 않습니다.";
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<BaseResponse> handleMethodArgumentNotValidException(
@@ -31,6 +33,12 @@ public class GlobalExceptionHandler {
                 .orElse(DEFAULT_ERROR_MESSAGE);
 
         return BaseResponse.toResponseEntity(HttpStatus.BAD_REQUEST, errorMessage);
+    }
+
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    public ResponseEntity<BaseResponse> handleMissingServletRequestParameterException(
+            MissingServletRequestParameterException exception) {
+        return BaseResponse.toResponseEntity(HttpStatus.BAD_REQUEST, MISSING_PARAMETER);
     }
 
     @ExceptionHandler(AuthorizationException.class)

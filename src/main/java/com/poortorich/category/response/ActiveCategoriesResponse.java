@@ -1,16 +1,16 @@
 package com.poortorich.category.response;
 
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
-@Data
+@Getter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class DefaultCategoriesResponse {
-    private List<DefaultCategoryResponse> defaultCategories;
+public class ActiveCategoriesResponse {
+    private List<String> activeCategories;
 }
