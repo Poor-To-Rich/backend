@@ -41,7 +41,6 @@ public class GlobalExceptionHandler {
         return BaseResponse.toResponseEntity(HttpStatus.BAD_REQUEST, MISSING_PARAMETER);
     }
 
-
     @ExceptionHandler(AuthorizationException.class)
     public ResponseEntity<BaseResponse> handleAuthorizationException(AuthorizationException exception) {
         return BaseResponse.toResponseEntity(exception.getResponse());

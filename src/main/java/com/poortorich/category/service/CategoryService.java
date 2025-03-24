@@ -4,7 +4,7 @@ import com.poortorich.category.entity.Category;
 import com.poortorich.category.entity.CategoryType;
 import com.poortorich.category.repository.CategoryRepository;
 import com.poortorich.category.request.CategoryInfoRequest;
-import com.poortorich.category.response.CategoriesResponse;
+import com.poortorich.category.response.ActiveCategoriesResponse;
 import com.poortorich.category.response.CategoryInfoResponse;
 import com.poortorich.category.response.CategoryResponse;
 import com.poortorich.category.response.CustomCategoryResponse;
@@ -17,7 +17,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -25,10 +24,6 @@ public class CategoryService {
 
     private final CategoryRepository categoryRepository;
     private final CategoryValidator categoryValidator;
-
-    private void addCategory() {
-        categoryRepository.save(new Category());
-    }
 
     public List<DefaultCategoryResponse> getDefaultCategories(CategoryType type) {
         return categoryRepository.findAll().stream()
@@ -52,14 +47,14 @@ public class CategoryService {
                 .toList();
     }
 
-    public CategoriesResponse getActiveCategories(String type) {
+    public ActiveCategoriesResponse getActiveCategories(String type) {
         List<String> categories = categoryRepository.findAll().stream()
                 .filter(category -> category.getType() == CategoryType.from(type) && category.getVisibility())
                 .map(Category::getName)
                 .toList();
 
-        return CategoriesResponse.builder()
-                .categories(categories)
+        return ActiveCategoriesResponse.builder()
+                .activeCategories(categories)
                 .build();
     }
 

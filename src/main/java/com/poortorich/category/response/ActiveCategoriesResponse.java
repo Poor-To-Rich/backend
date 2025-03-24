@@ -11,6 +11,6 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CategoriesResponse {
-    private List<String> categories;
+public class ActiveCategoriesResponse {
+    private List<String> activeCategories;
 }

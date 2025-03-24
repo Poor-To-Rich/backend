@@ -2,7 +2,7 @@ package com.poortorich.category.controller;
 
 import com.poortorich.category.entity.CategoryType;
 import com.poortorich.category.request.CategoryInfoRequest;
-import com.poortorich.category.response.CategoriesResponse;
+import com.poortorich.category.response.ActiveCategoriesResponse;
 import com.poortorich.category.response.CategoryInfoResponse;
 import com.poortorich.category.response.CustomCategoriesResponse;
 import com.poortorich.category.response.CustomCategoryResponse;
@@ -61,7 +61,7 @@ public class CategoryController {
     }
 
     @GetMapping("/active")
-    public ResponseEntity<CategoriesResponse> getActiveCategories(@RequestParam String type) {
+    public ResponseEntity<ActiveCategoriesResponse> getActiveCategories(@RequestParam String type) {
         return ResponseEntity.ok(categoryService.getActiveCategories(type));
     }
 

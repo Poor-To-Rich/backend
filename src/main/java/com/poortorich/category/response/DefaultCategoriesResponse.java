@@ -7,7 +7,6 @@ import lombok.AllArgsConstructor;
 
 import java.util.List;
 
-
 @Data
 @Builder
 @NoArgsConstructor
