@@ -4,7 +4,6 @@ import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
-import com.poortorich.s3.constants.S3Constants.Config;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,16 +11,16 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class S3Config {
 
-    @Value(Config.BUCKET)
+    @Value("${cloud.aws.s3.bucket}")
     private String bucketName;
 
-    @Value(Config.REGION)
+    @Value("${cloud.aws.region.static}")
     private String region;
 
-    @Value(Config.ACCESS_KEY)
+    @Value("${cloud.aws.credentials.accessKey}")
     private String accessKey;
 
-    @Value(Config.SECRET_KEY)
+    @Value("${cloud.aws.credentials.secretKey}")
     private String secretKey;
 
     @Bean

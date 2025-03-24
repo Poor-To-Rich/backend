@@ -1,10 +1,13 @@
 package com.poortorich.s3.util;
 
-import com.poortorich.s3.constants.S3Constants.FileUtils;
 import java.util.UUID;
 import org.springframework.web.multipart.MultipartFile;
 
 public class S3FileUtils {
+
+    public static final String EXTENSION_SEPARATOR = ".";
+    public static final String PATH_SEPARATOR = "/";
+    public static final int NEXT_CHARACTER_OFFSET = 1;
 
     private S3FileUtils() {
     }
@@ -20,7 +23,7 @@ public class S3FileUtils {
 
     private static String extractExtension(String originalFileName) {
         return originalFileName.substring(
-                originalFileName.lastIndexOf(FileUtils.EXTENSION_SEPARATOR)
+                originalFileName.lastIndexOf(EXTENSION_SEPARATOR)
         );
     }
 }

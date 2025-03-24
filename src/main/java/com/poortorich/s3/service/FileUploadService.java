@@ -4,9 +4,6 @@ import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.poortorich.global.exceptions.InternalServerErrorException;
-import com.poortorich.s3.constants.S3Constants.Config;
-import com.poortorich.s3.constants.S3Constants.FileUtils;
-import com.poortorich.s3.constants.S3Constants.FileUtils.Index;
 import com.poortorich.s3.response.enums.S3Response;
 import com.poortorich.s3.util.S3FileUtils;
 import com.poortorich.s3.validator.FileValidator;
@@ -25,28 +22,28 @@ public class FileUploadService {
 
     private final FileValidator fileValidator;
 
-    @Value(Config.BUCKET)
+    @Value("${cloud.aws.s3.bucket}")
     private String bucketName;
 
     public String uploadImage(MultipartFile imageFile) {
-        fileValidator.validatoeFileType(imageFile);
+        fileValidator.validateFileType(imageFile);
         fileValidator.validateFileSize(imageFile);
 
         String fileName = S3FileUtils.generateUniqueFileName(imageFile);
 
-        uploadFileToS3(imageFile, fileName);
+        uploadToS3(imageFile, fileName);
 
         return amazonS3Client.getUrl(bucketName, fileName).toString();
     }
 
     public void deleteImage(String imageUrl) {
         String fileName = imageUrl.substring(
-                imageUrl.lastIndexOf(FileUtils.PATH_SEPARATOR) + Index.NEXT_ELEMENT
+                imageUrl.lastIndexOf(S3FileUtils.PATH_SEPARATOR) + S3FileUtils.NEXT_CHARACTER_OFFSET
         );
         amazonS3Client.deleteObject(bucketName, fileName);
     }
 
-    private void uploadFileToS3(MultipartFile file, String fileName) {
+    private void uploadToS3(MultipartFile file, String fileName) {
         ObjectMetadata metadata = new ObjectMetadata();
         metadata.setContentType(file.getContentType());
         metadata.setContentLength(file.getSize());
