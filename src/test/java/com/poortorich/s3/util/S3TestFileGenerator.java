@@ -32,7 +32,6 @@ public final class S3TestFileGenerator {
                 S3TestFile.PDF_FILE_NAME,
                 S3TestFile.PDF_CONTENT_TYPE,
                 new byte[S3TestFile.ONE_MB]
-
         );
     }
 

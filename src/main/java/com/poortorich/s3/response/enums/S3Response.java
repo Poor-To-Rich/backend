@@ -11,7 +11,7 @@ import org.springframework.http.HttpStatus;
 public enum S3Response implements Response {
 
     INVALID_FILE_TYPES(HttpStatus.BAD_REQUEST, S3ResponseMessages.INVALID_FILE_TYPE),
-    FILE_SIZE_INVALID(HttpStatus.BAD_REQUEST, S3ResponseMessages.FILE_SIZE_INVALID),
+    INVALID_FILE_SIZE(HttpStatus.BAD_REQUEST, S3ResponseMessages.INVALID_FILE_SIZE),
     FILE_UPLOAD_FAILURE(HttpStatus.INTERNAL_SERVER_ERROR, S3ResponseMessages.FILE_UPLOAD_FAILURE);
 
     private final HttpStatus httpStatus;

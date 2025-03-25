@@ -19,14 +19,13 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 public class FileUploadService {
 
-    private final AmazonS3Client amazonS3Client;
+    @Value("${cloud.aws.s3.bucket}")
+    private final String bucketName;
 
+    private final AmazonS3Client amazonS3Client;
     private final FileValidator fileValidator;
 
-    @Value("${cloud.aws.s3.bucket}")
-    private String bucketName;
-
-    public String uploadImage(MultipartFile imageFile) throws IOException {
+    public String uploadImage(MultipartFile imageFile) {
         fileValidator.validateFileType(imageFile);
         fileValidator.validateFileSize(imageFile);
 
@@ -38,13 +37,11 @@ public class FileUploadService {
     }
 
     public void deleteImage(String imageUrl) {
-        String fileName = imageUrl.substring(
-                imageUrl.lastIndexOf(S3FileUtils.PATH_SEPARATOR) + S3FileUtils.NEXT_CHARACTER_OFFSET
-        );
+        String fileName = S3FileUtils.extractFileNameFromUrl(imageUrl);
         amazonS3Client.deleteObject(bucketName, fileName);
     }
 
-    private void uploadToS3(MultipartFile file, String fileName) throws IOException {
+    private void uploadToS3(MultipartFile file, String fileName) {
         ObjectMetadata metadata = new ObjectMetadata();
         metadata.setContentType(file.getContentType());
         metadata.setContentLength(file.getSize());

@@ -20,6 +20,12 @@ public class S3FileUtils {
         String extension = extractExtension(originalFileName);
         return UUID.randomUUID() + extension;
     }
+    
+    public static String extractFileNameFromUrl(String urlString) {
+        return urlString.substring(
+                urlString.lastIndexOf(PATH_SEPARATOR) + NEXT_CHARACTER_OFFSET
+        );
+    }
 
     private static String extractExtension(String originalFileName) {
         try {
