@@ -12,6 +12,7 @@ public enum CategoryResponse implements Response {
 
     DUPLICATION_CATEGORY_NAME(HttpStatus.CONFLICT, "이미 사용중인 카테고리 이름입니다."),
     NON_EXISTENT_CATEGORY(HttpStatus.NOT_FOUND, "존재하지 않는 카테고리입니다."),
+    INVALID_CATEGORY_TYPE(HttpStatus.BAD_REQUEST,"카테고리의 타입이 적절하지 않습니다."),
 
     DEFAULT(HttpStatus.INTERNAL_SERVER_ERROR, "알 수 없는 에러 발생");
 
