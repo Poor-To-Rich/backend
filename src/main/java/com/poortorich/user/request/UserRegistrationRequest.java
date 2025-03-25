@@ -19,8 +19,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class UserRegistrationRequest {
 
-    private String profileImage;
-
     @NotBlank(message = UserResponseMessages.NAME_REQUIRED)
     @Size(max = UserValidationRules.NAME_MAX_LENGTH, message = UserResponseMessages.NAME_TOO_LONG)
     @Pattern(regexp = UserValidationRules.NO_BLANK_REGEX, message = UserResponseMessages.NAME_CONTAINS_BLANK)

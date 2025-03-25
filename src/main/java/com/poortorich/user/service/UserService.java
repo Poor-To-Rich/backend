@@ -1,10 +1,8 @@
 package com.poortorich.user.service;
 
-import com.poortorich.global.response.Response;
 import com.poortorich.user.entity.User;
 import com.poortorich.user.repository.UserRepository;
 import com.poortorich.user.request.UserRegistrationRequest;
-import com.poortorich.user.response.enums.UserResponse;
 import com.poortorich.user.validator.UserValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -19,17 +17,9 @@ public class UserService {
 
     private final PasswordEncoder passwordEncoder;
 
-    public Response registerUser(UserRegistrationRequest userRegistrationRequest) {
-        userValidator.validateUsername(userRegistrationRequest.getUsername());
-        userValidator.validateNickname(userRegistrationRequest.getNickname());
-        userValidator.validateEmail(userRegistrationRequest.getEmail());
-        userValidator.validatePasswordMatch(
-                userRegistrationRequest.getPassword(),
-                userRegistrationRequest.getUserValidationConstraints()
-        );
-
+    public void save(UserRegistrationRequest userRegistrationRequest, String profileImageUrl) {
         User user = User.builder()
-                .profileImage(userRegistrationRequest.getProfileImage())
+                .profileImage(profileImageUrl)
                 .username(userRegistrationRequest.getUsername())
                 .password(passwordEncoder.encode(userRegistrationRequest.getPassword()))
                 .name(userRegistrationRequest.getName())
@@ -41,7 +31,5 @@ public class UserService {
                 .build();
 
         userRepository.save(user);
-
-        return UserResponse.REGISTRATION_SUCCESS;
     }
 }

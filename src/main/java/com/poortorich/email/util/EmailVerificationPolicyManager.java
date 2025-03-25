@@ -49,6 +49,10 @@ public class EmailVerificationPolicyManager {
         deleteAllPolicy(mail);
     }
 
+    public boolean isVerifiedMail(String mail) {
+        return Boolean.parseBoolean(valueOps.get(EmailVerificationType.EMAIL_VERIFICATION.getRedisKey(mail)));
+    }
+
     private void checkBlockPolicy(String mail) {
         if (Boolean.parseBoolean(valueOps.get(EmailVerificationType.AUTH_BLOCK.getRedisKey(mail)))) {
             throw new TooManyRequestException(EmailResponse.TOO_MANY_REQUEST_MAIL);
