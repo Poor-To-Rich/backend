@@ -2,11 +2,9 @@ package com.poortorich.user.request;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonFormat.Shape;
-import com.poortorich.user.constants.UserConstant;
-import com.poortorich.user.constants.UserConstant.ValidationConstraints;
-import com.poortorich.user.constants.UserConstant.ValidationMessages;
+import com.poortorich.user.constants.UserResponseMessages;
+import com.poortorich.user.constants.UserValidationRules;
 import com.poortorich.user.entity.enums.Gender;
-import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -21,72 +19,70 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class UserRegistrationRequest {
 
-    @Nullable
     private String profileImage;
 
-    @NotBlank(message = ValidationMessages.NAME_REQUIRED)
-    @Size(max = ValidationConstraints.NAME_MAX_LENGTH, message = ValidationMessages.NAME_TOO_LONG)
-    @Pattern(regexp = ValidationConstraints.NO_BLANK_REGEX, message = ValidationMessages.NAME_CONTAINS_BLANK)
+    @NotBlank(message = UserResponseMessages.NAME_REQUIRED)
+    @Size(max = UserValidationRules.NAME_MAX_LENGTH, message = UserResponseMessages.NAME_TOO_LONG)
+    @Pattern(regexp = UserValidationRules.NO_BLANK_REGEX, message = UserResponseMessages.NAME_CONTAINS_BLANK)
     private String name;
 
-    @NotBlank(message = ValidationMessages.NICKNAME_REQUIRED)
-    @Size(max = ValidationConstraints.NICKNAME_MAX_LENGTH, message = ValidationMessages.NICKNAME_TOO_LONG)
-    @Pattern(regexp = ValidationConstraints.NO_BLANK_REGEX, message = ValidationMessages.NICKNAME_CONTAINS_BLANK)
-    @Pattern(regexp = ValidationConstraints.NICKNAME_START_REGEX, message = ValidationMessages.NICKNAME_INVALID_START_CHAR)
+    @NotBlank(message = UserResponseMessages.NICKNAME_REQUIRED)
+    @Size(max = UserValidationRules.NICKNAME_MAX_LENGTH, message = UserResponseMessages.NICKNAME_TOO_LONG)
+    @Pattern(regexp = UserValidationRules.NO_BLANK_REGEX, message = UserResponseMessages.NICKNAME_CONTAINS_BLANK)
+    @Pattern(regexp = UserValidationRules.NICKNAME_START_REGEX, message = UserResponseMessages.NICKNAME_INVALID_START_CHAR)
     @Pattern(
-            regexp = ValidationConstraints.NICKNAME_ALLOWED_CHARS_REGEX,
-            message = ValidationMessages.NICKNAME_CONTAINS_SPECIAL_CHAR
+            regexp = UserValidationRules.NICKNAME_ALLOWED_CHARS_REGEX,
+            message = UserResponseMessages.NICKNAME_CONTAINS_SPECIAL_CHAR
     )
     private String nickname;
 
-    @NotBlank(message = ValidationMessages.USERNAME_REQUIRED)
+    @NotBlank(message = UserResponseMessages.USERNAME_REQUIRED)
     @Size(
-            max = ValidationConstraints.USERNAME_MAX_LENGTH,
-            min = ValidationConstraints.USERNAME_MIN_LENGTH,
-            message = ValidationMessages.USERNAME_LENGTH_INVALID
+            max = UserValidationRules.USERNAME_MAX_LENGTH,
+            min = UserValidationRules.USERNAME_MIN_LENGTH,
+            message = UserResponseMessages.USERNAME_LENGTH_INVALID
     )
-    @Pattern(regexp = ValidationConstraints.NO_BLANK_REGEX, message = ValidationMessages.USERNAME_CONTAINS_BLANK)
+    @Pattern(regexp = UserValidationRules.NO_BLANK_REGEX, message = UserResponseMessages.USERNAME_CONTAINS_BLANK)
     @Pattern(
-            regexp = ValidationConstraints.USERNAME_ALLOWED_CHARS_REGEX,
-            message = ValidationMessages.USERNAME_CONTAINS_INVALID_CHAR
+            regexp = UserValidationRules.USERNAME_ALLOWED_CHARS_REGEX,
+            message = UserResponseMessages.USERNAME_CONTAINS_INVALID_CHAR
     )
     private String username;
 
-    @NotBlank(message = ValidationMessages.PASSWORD_REQUIRED)
+    @NotBlank(message = UserResponseMessages.PASSWORD_REQUIRED)
     @Size(
-            max = ValidationConstraints.PASSWORD_MAX_LENGTH,
-            min = ValidationConstraints.PASSWORD_MIN_LENGTH,
-            message = ValidationMessages.PASSWORD_LENGTH_INVALID
+            max = UserValidationRules.PASSWORD_MAX_LENGTH,
+            min = UserValidationRules.PASSWORD_MIN_LENGTH,
+            message = UserResponseMessages.PASSWORD_LENGTH_INVALID
     )
     @Pattern(
-            regexp = ValidationConstraints.NO_BLANK_REGEX,
-            message = ValidationMessages.PASSWORD_CONTAINS_BLANK
+            regexp = UserValidationRules.NO_BLANK_REGEX,
+            message = UserResponseMessages.PASSWORD_CONTAINS_BLANK
     )
     @Pattern(
-            regexp = ValidationConstraints.PASSWORD_NO_KOREAN_REGEX,
-            message = ValidationMessages.PASSWORD_CONTAINS_KOREAN
+            regexp = UserValidationRules.PASSWORD_NO_KOREAN_REGEX,
+            message = UserResponseMessages.PASSWORD_CONTAINS_KOREAN
     )
     @Pattern(
-            regexp = ValidationConstraints.PASSWORD_REGEX,
-            message = ValidationMessages.PASSWORD_INVALID
+            regexp = UserValidationRules.PASSWORD_REGEX,
+            message = UserResponseMessages.PASSWORD_INVALID
     )
     private String password;
 
-    @NotBlank(message = ValidationMessages.PASSWORD_CONFIRM_REQUIRED)
-    private String passwordConfirm;
+    @NotBlank(message = UserResponseMessages.PASSWORD_CONFIRM_REQUIRED)
+    private String UserValidationConstraints;
 
-    @NotBlank(message = ValidationMessages.BIRTHDAY_REQUIRED)
-    @Pattern(regexp = ValidationConstraints.BIRTHDAY_FORMAT_REGEX, message = ValidationMessages.BIRTHDAY_INVALID)
-    @JsonFormat(shape = Shape.STRING, pattern = UserConstant.Pattern.BIRTHDAY_PATTERN)
+    @NotBlank(message = UserResponseMessages.BIRTHDAY_REQUIRED)
+    @Pattern(regexp = UserValidationRules.BIRTHDAY_FORMAT_REGEX, message = UserResponseMessages.BIRTHDAY_INVALID)
+    @JsonFormat(shape = Shape.STRING, pattern = UserValidationRules.BIRTHDAY_PATTERN)
     private LocalDate birth;
 
-    @NotBlank(message = ValidationMessages.EMAIL_REQUIRED)
-    @Email(message = ValidationMessages.EMAIL_INVALID)
+    @NotBlank(message = UserResponseMessages.EMAIL_REQUIRED)
+    @Email(message = UserResponseMessages.EMAIL_INVALID)
     private String email;
 
-    @NotBlank(message = ValidationMessages.GENDER_REQUIRED)
+    @NotBlank(message = UserResponseMessages.GENDER_REQUIRED)
     private Gender gender;
 
-    @Nullable
     private String job;
 }

@@ -25,7 +25,7 @@ public class UserService {
         userValidator.validateEmail(userRegistrationRequest.getEmail());
         userValidator.validatePasswordMatch(
                 userRegistrationRequest.getPassword(),
-                userRegistrationRequest.getPasswordConfirm()
+                userRegistrationRequest.getUserValidationConstraints()
         );
 
         User user = User.builder()
