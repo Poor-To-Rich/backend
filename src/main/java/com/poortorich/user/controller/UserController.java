@@ -6,7 +6,8 @@ import com.poortorich.user.constants.UserResponseMessages;
 import com.poortorich.user.facade.UserFacade;
 import com.poortorich.user.request.UserRegistrationRequest;
 import com.poortorich.user.response.enums.UserResponse;
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,14 +24,15 @@ public class UserController {
     @PostMapping(UserControllerConstants.REGISTER_PATH)
     public ResponseEntity<BaseResponse> register(
             @RequestPart(UserControllerConstants.USER_REGISTRATION_REQUEST)
-            @NotBlank(message = UserResponseMessages.REGISTRATION_REQUEST_REQUIRED)
+            @Valid
+            @NotNull(message = UserResponseMessages.REGISTRATION_REQUEST_REQUIRED)
             UserRegistrationRequest userRegistrationRequest,
 
             @RequestPart(UserControllerConstants.PROFILE_IMAGE_FORM_DATA)
-            @NotBlank(message = UserResponseMessages.PROFILE_IMAGE_REQUIRED)
+            @NotNull(message = UserResponseMessages.PROFILE_IMAGE_REQUIRED)
             MultipartFile profileImage
     ) {
-        userFacade.register(userRegistrationRequest, profileImage);
+        userFacade.registerNewUser(userRegistrationRequest, profileImage);
         return BaseResponse.toResponseEntity(UserResponse.REGISTRATION_SUCCESS);
     }
 }

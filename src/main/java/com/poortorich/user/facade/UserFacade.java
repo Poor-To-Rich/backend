@@ -18,11 +18,11 @@ public class UserFacade {
     private final FileUploadService fileUploadService;
 
     @Transactional
-    public void register(
+    public void registerNewUser(
             UserRegistrationRequest userRegistrationRequest,
             MultipartFile profileImage
     ) {
-        userValidationService.validateUserRegistrationRequest(userRegistrationRequest);
+        userValidationService.validateRegistration(userRegistrationRequest);
 
         String profileImageUrl = fileUploadService.uploadImage(profileImage);
         userService.save(userRegistrationRequest, profileImageUrl);

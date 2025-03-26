@@ -66,10 +66,10 @@ public class User implements UserDetails {
     @Column(name = UserDatabase.JOB_COLUMN)
     private String job;
 
-    @Column(name = UserDatabase.CREATED_DATE_COLUMN)
+    @Column(name = UserDatabase.CREATED_DATE_COLUMN, nullable = false)
     private LocalDateTime createdDate;
 
-    @Column(name = UserDatabase.UPDATED_DATE_COLUMN)
+    @Column(name = UserDatabase.UPDATED_DATE_COLUMN, nullable = false)
     private LocalDateTime updatedDate;
 
     @PrePersist
@@ -79,7 +79,7 @@ public class User implements UserDetails {
     }
 
     @PreUpdate
-    public void preUpdated() {
+    public void preUpdate() {
         this.updatedDate = LocalDateTime.now();
     }
 

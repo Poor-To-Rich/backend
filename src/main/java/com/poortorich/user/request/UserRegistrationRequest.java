@@ -21,15 +21,15 @@ public class UserRegistrationRequest {
 
     @NotBlank(message = UserResponseMessages.NAME_REQUIRED)
     @Size(max = UserValidationRules.NAME_MAX_LENGTH, message = UserResponseMessages.NAME_TOO_LONG)
-    @Pattern(regexp = UserValidationRules.NO_BLANK_REGEX, message = UserResponseMessages.NAME_CONTAINS_BLANK)
+    @Pattern(regexp = UserValidationRules.NO_BLANK_PATTERN, message = UserResponseMessages.NAME_CONTAINS_BLANK)
     private String name;
 
     @NotBlank(message = UserResponseMessages.NICKNAME_REQUIRED)
     @Size(max = UserValidationRules.NICKNAME_MAX_LENGTH, message = UserResponseMessages.NICKNAME_TOO_LONG)
-    @Pattern(regexp = UserValidationRules.NO_BLANK_REGEX, message = UserResponseMessages.NICKNAME_CONTAINS_BLANK)
-    @Pattern(regexp = UserValidationRules.NICKNAME_START_REGEX, message = UserResponseMessages.NICKNAME_INVALID_START_CHAR)
+    @Pattern(regexp = UserValidationRules.NO_BLANK_PATTERN, message = UserResponseMessages.NICKNAME_CONTAINS_BLANK)
+    @Pattern(regexp = UserValidationRules.NICKNAME_START_PATTERN, message = UserResponseMessages.NICKNAME_INVALID_START_CHAR)
     @Pattern(
-            regexp = UserValidationRules.NICKNAME_ALLOWED_CHARS_REGEX,
+            regexp = UserValidationRules.NICKNAME_ALLOWED_CHARS_PATTERN,
             message = UserResponseMessages.NICKNAME_CONTAINS_SPECIAL_CHAR
     )
     private String nickname;
@@ -40,9 +40,9 @@ public class UserRegistrationRequest {
             min = UserValidationRules.USERNAME_MIN_LENGTH,
             message = UserResponseMessages.USERNAME_LENGTH_INVALID
     )
-    @Pattern(regexp = UserValidationRules.NO_BLANK_REGEX, message = UserResponseMessages.USERNAME_CONTAINS_BLANK)
+    @Pattern(regexp = UserValidationRules.NO_BLANK_PATTERN, message = UserResponseMessages.USERNAME_CONTAINS_BLANK)
     @Pattern(
-            regexp = UserValidationRules.USERNAME_ALLOWED_CHARS_REGEX,
+            regexp = UserValidationRules.USERNAME_ALLOWED_CHARS_PATTERN,
             message = UserResponseMessages.USERNAME_CONTAINS_INVALID_CHAR
     )
     private String username;
@@ -54,25 +54,25 @@ public class UserRegistrationRequest {
             message = UserResponseMessages.PASSWORD_LENGTH_INVALID
     )
     @Pattern(
-            regexp = UserValidationRules.NO_BLANK_REGEX,
+            regexp = UserValidationRules.NO_BLANK_PATTERN,
             message = UserResponseMessages.PASSWORD_CONTAINS_BLANK
     )
     @Pattern(
-            regexp = UserValidationRules.PASSWORD_NO_KOREAN_REGEX,
+            regexp = UserValidationRules.PASSWORD_NO_KOREAN_PATTERN,
             message = UserResponseMessages.PASSWORD_CONTAINS_KOREAN
     )
     @Pattern(
-            regexp = UserValidationRules.PASSWORD_REGEX,
+            regexp = UserValidationRules.PASSWORD_PATTERN,
             message = UserResponseMessages.PASSWORD_INVALID
     )
     private String password;
 
     @NotBlank(message = UserResponseMessages.PASSWORD_CONFIRM_REQUIRED)
-    private String UserValidationConstraints;
+    private String passwordConfirm;
 
     @NotBlank(message = UserResponseMessages.BIRTHDAY_REQUIRED)
-    @Pattern(regexp = UserValidationRules.BIRTHDAY_FORMAT_REGEX, message = UserResponseMessages.BIRTHDAY_INVALID)
-    @JsonFormat(shape = Shape.STRING, pattern = UserValidationRules.BIRTHDAY_PATTERN)
+    @Pattern(regexp = UserValidationRules.BIRTHDAY_FORMAT_PATTERN, message = UserResponseMessages.BIRTHDAY_FORMAT_INVALID)
+    @JsonFormat(shape = Shape.STRING, pattern = UserValidationRules.BIRTHDAY_DATE_FORMAT)
     private LocalDate birth;
 
     @NotBlank(message = UserResponseMessages.EMAIL_REQUIRED)

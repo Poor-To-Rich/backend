@@ -2,6 +2,7 @@ package com.poortorich.user.entity.enums;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
+import java.util.Objects;
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
@@ -20,10 +21,15 @@ public enum Gender {
     @JsonCreator
     public static Gender from(String value) {
         for (Gender gender : Gender.values()) {
-            if (gender.value.equals(value)) {
+            if (Objects.equals(gender.value, value)) {
                 return gender;
             }
         }
         return OTHER;
+    }
+
+    @Override
+    public String toString() {
+        return value;
     }
 }

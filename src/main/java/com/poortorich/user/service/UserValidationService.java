@@ -15,12 +15,12 @@ public class UserValidationService {
     private final UserValidator userValidator;
     private final EmailVerificationPolicyManager emailVerificationPolicyManager;
 
-    public void validateUserRegistrationRequest(UserRegistrationRequest userRegistrationRequest) {
+    public void validateRegistration(UserRegistrationRequest userRegistrationRequest) {
         userValidator.validateUsername(userRegistrationRequest.getUsername());
         userValidator.validateNickname(userRegistrationRequest.getNickname());
         userValidator.validatePasswordMatch(
                 userRegistrationRequest.getPassword(),
-                userRegistrationRequest.getUserValidationConstraints()
+                userRegistrationRequest.getPasswordConfirm()
         );
         userValidator.validateEmail(userRegistrationRequest.getEmail());
 
