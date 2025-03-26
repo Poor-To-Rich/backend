@@ -3,7 +3,6 @@ package com.poortorich.user.service;
 import com.poortorich.user.entity.User;
 import com.poortorich.user.repository.UserRepository;
 import com.poortorich.user.request.UserRegistrationRequest;
-import com.poortorich.user.validator.UserValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -13,8 +12,6 @@ import org.springframework.stereotype.Service;
 public class UserService {
 
     private final UserRepository userRepository;
-    private final UserValidator userValidator;
-
     private final PasswordEncoder passwordEncoder;
 
     public void save(UserRegistrationRequest userRegistrationRequest, String profileImageUrl) {
