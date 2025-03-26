@@ -1,9 +1,7 @@
 package com.poortorich.user.facade;
 
-import com.poortorich.global.response.Response;
 import com.poortorich.s3.service.FileUploadService;
 import com.poortorich.user.request.UserRegistrationRequest;
-import com.poortorich.user.response.enums.UserResponse;
 import com.poortorich.user.service.UserService;
 import com.poortorich.user.service.UserValidationService;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +18,7 @@ public class UserFacade {
     private final FileUploadService fileUploadService;
 
     @Transactional
-    public Response register(
+    public void register(
             UserRegistrationRequest userRegistrationRequest,
             MultipartFile profileImage
     ) {
@@ -28,7 +26,5 @@ public class UserFacade {
 
         String profileImageUrl = fileUploadService.uploadImage(profileImage);
         userService.save(userRegistrationRequest, profileImageUrl);
-
-        return UserResponse.REGISTRATION_SUCCESS;
     }
 }

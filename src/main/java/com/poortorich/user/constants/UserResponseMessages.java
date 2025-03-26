@@ -1,6 +1,8 @@
 package com.poortorich.user.constants;
 
 public class UserResponseMessages {
+
+    public static final String PROFILE_IMAGE_REQUIRED = "프로필 이미지를 등록해주세요.";
     public static final String NAME_REQUIRED = "이름을 입력해주세요.";
     public static final String NAME_TOO_LONG = "이름은 10자 이하로 작성해야 합니다.";
     public static final String NAME_CONTAINS_BLANK = "이름은 공백없이 작성해야 합니다.";
@@ -37,6 +39,7 @@ public class UserResponseMessages {
     public static final String GENDER_REQUIRED = "성별을 입력해주세요.";
 
     public static final String REGISTRATION_SUCCESS = "회원 가입 성공";
+    public static final String REGISTRATION_REQUEST_REQUIRED = "회원가입 요청 정보를 입력해주세요.";
 
     private UserResponseMessages() {
     }
