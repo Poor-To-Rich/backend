@@ -1,6 +1,6 @@
 package com.poortorich.user.request;
 
-import com.poortorich.global.TestCase;
+import com.poortorich.global.testcases.TestCase;
 import com.poortorich.user.fixture.enums.BirthValidationCase;
 import com.poortorich.user.fixture.enums.EmailValidationCase;
 import com.poortorich.user.fixture.enums.NameValidationCase;

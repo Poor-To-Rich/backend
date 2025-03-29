@@ -1,4 +1,4 @@
-package com.poortorich.global;
+package com.poortorich.global.testcases;
 
 import java.util.stream.Stream;
 import org.junit.jupiter.params.provider.Arguments;

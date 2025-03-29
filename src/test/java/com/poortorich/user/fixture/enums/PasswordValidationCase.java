@@ -1,6 +1,6 @@
 package com.poortorich.user.fixture.enums;
 
-import com.poortorich.global.TestCase;
+import com.poortorich.global.testcases.TestCase;
 import com.poortorich.user.constants.UserResponseMessages;
 
 public enum PasswordValidationCase implements TestCase<String, String> {
@@ -14,7 +14,7 @@ public enum PasswordValidationCase implements TestCase<String, String> {
     NO_NUMBER("Password!", UserResponseMessages.PASSWORD_INVALID),
     NO_SPECIAL_CHAR("Password123", UserResponseMessages.PASSWORD_INVALID),
     KOREAN("한글123!", UserResponseMessages.PASSWORD_CONTAINS_KOREAN);
-    
+
     private final String password;
     private final String expectedErrorMessage;
 

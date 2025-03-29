@@ -1,6 +1,6 @@
 package com.poortorich.user.fixture.enums;
 
-import com.poortorich.global.TestCase;
+import com.poortorich.global.testcases.TestCase;
 import com.poortorich.user.constants.UserResponseMessages;
 
 public enum UsernameValidationCase implements TestCase<String, String> {
