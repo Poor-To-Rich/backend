@@ -1,7 +1,5 @@
 package com.poortorich.user.request;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonFormat.Shape;
 import com.poortorich.user.constants.UserResponseMessages;
 import com.poortorich.user.constants.UserValidationRules;
 import com.poortorich.user.entity.enums.Gender;
@@ -10,6 +8,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -72,15 +71,22 @@ public class UserRegistrationRequest {
 
     @NotBlank(message = UserResponseMessages.BIRTHDAY_REQUIRED)
     @Pattern(regexp = UserValidationRules.BIRTHDAY_FORMAT_PATTERN, message = UserResponseMessages.BIRTHDAY_FORMAT_INVALID)
-    @JsonFormat(shape = Shape.STRING, pattern = UserValidationRules.BIRTHDAY_DATE_FORMAT)
-    private LocalDate birth;
+    private String birth;
 
     @NotBlank(message = UserResponseMessages.EMAIL_REQUIRED)
     @Email(message = UserResponseMessages.EMAIL_INVALID)
     private String email;
 
     @NotBlank(message = UserResponseMessages.GENDER_REQUIRED)
-    private Gender gender;
+    private String gender;
 
     private String job;
+
+    public LocalDate getBirth() {
+        return LocalDate.parse(birth, DateTimeFormatter.ofPattern(UserValidationRules.BIRTHDAY_DATE_FORMAT));
+    }
+
+    public Gender getGender() {
+        return Gender.from(gender);
+    }
 }

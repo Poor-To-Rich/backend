@@ -26,11 +26,11 @@ public class UserResponseMessages {
     public static final String PASSWORD_INVALID = "비밀번호는 영문자, 숫자, 특수문자를 최소 하나 이상 포함해야 합니다.";
     public static final String PASSWORD_LENGTH_INVALID = "비밀번호는 8 ~ 15자리로 작성해야 합니다.";
     public static final String PASSWORD_DO_NOT_MATCH = "비밀번호와 비밀번호 재입력이 일치하지 않습니다.";
-
     public static final String PASSWORD_CONFIRM_REQUIRED = "비밀번호 재입력칸을 입력해주세요.";
 
     public static final String BIRTHDAY_REQUIRED = "생년월일을 입력해주세요.";
     public static final String BIRTHDAY_FORMAT_INVALID = "yyyy.mm.dd 형식이어야 합니다.";
+    public static final String BIRTHDAY_IN_FUTURE = "생년월일은 오늘 이전 날짜여야 합니다.";
 
     public static final String EMAIL_REQUIRED = "이메일을 입력해주세요.";
     public static final String EMAIL_INVALID = "잘못된 이메일 형식입니다.";

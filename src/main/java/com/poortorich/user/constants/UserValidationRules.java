@@ -13,8 +13,8 @@ public class UserValidationRules {
 
     public static final int PASSWORD_MIN_LENGTH = 8;
     public static final int PASSWORD_MAX_LENGTH = 15;
-    public static final String PASSWORD_PATTERN = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[\\W_]).+$";
-    public static final String PASSWORD_NO_KOREAN_PATTERN = "^[가-힣]*$";
+    public static final String PASSWORD_PATTERN = "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[\\W_]).+$";
+    public static final String PASSWORD_NO_KOREAN_PATTERN = "^[^가-힣]*$";
 
     public static final String BIRTHDAY_DATE_FORMAT = "yyyy.MM.dd";
     public static final String BIRTHDAY_FORMAT_PATTERN = "^\\d{4}\\.\\d{2}\\.\\d{2}$";
