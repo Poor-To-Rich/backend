@@ -23,7 +23,7 @@ public class UserValidationService {
                 userRegistrationRequest.getPasswordConfirm()
         );
         userValidator.validateEmail(userRegistrationRequest.getEmail());
-        userValidator.validateBirth(userRegistrationRequest.getBirth());
+        userValidator.validateBirth(userRegistrationRequest.getBirthday());
 
         if (!emailVerificationPolicyManager.isVerifiedMail(userRegistrationRequest.getEmail())) {
             throw new ForbiddenException(EmailResponse.EMAIL_NOT_VERIFIED);

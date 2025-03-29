@@ -53,7 +53,7 @@ public class UserValidationServiceTest {
         Mockito.verify(userValidator).validateNickname(request.getNickname());
         Mockito.verify(userValidator).validatePasswordMatch(request.getPassword(), request.getPasswordConfirm());
         Mockito.verify(userValidator).validateEmail(request.getEmail());
-        Mockito.verify(userValidator).validateBirth(request.getBirth());
+        Mockito.verify(userValidator).validateBirth(request.getBirthday());
         Mockito.verify(emailVerificationPolicyManager).isVerifiedMail(request.getEmail());
     }
 
@@ -72,7 +72,7 @@ public class UserValidationServiceTest {
         Mockito.verify(userValidator).validateNickname(request.getNickname());
         Mockito.verify(userValidator).validatePasswordMatch(request.getPassword(), request.getPasswordConfirm());
         Mockito.verify(userValidator).validateEmail(request.getEmail());
-        Mockito.verify(userValidator).validateBirth(request.getBirth());
+        Mockito.verify(userValidator).validateBirth(request.getBirthday());
     }
 
     @Test
@@ -170,7 +170,7 @@ public class UserValidationServiceTest {
 
         Mockito.doThrow(new BadRequestException(UserResponse.BIRTHDAY_IN_FUTURE))
                 .when(userValidator)
-                .validateBirth(request.getBirth());
+                .validateBirth(request.getBirthday());
 
         Assertions.assertThatThrownBy(() -> userValidationService.validateRegistration(request))
                 .isInstanceOf(BadRequestException.class)
@@ -180,7 +180,7 @@ public class UserValidationServiceTest {
         Mockito.verify(userValidator).validateNickname(request.getNickname());
         Mockito.verify(userValidator).validatePasswordMatch(request.getPassword(), request.getPasswordConfirm());
         Mockito.verify(userValidator).validateEmail(request.getEmail());
-        Mockito.verify(userValidator).validateBirth(request.getBirth());
+        Mockito.verify(userValidator).validateBirth(request.getBirthday());
         Mockito.verify(emailVerificationPolicyManager, Mockito.never()).isVerifiedMail(Mockito.any());
     }
 }

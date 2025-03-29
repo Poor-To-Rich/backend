@@ -1,5 +1,6 @@
 package com.poortorich.user.request;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.poortorich.user.constants.UserResponseMessages;
 import com.poortorich.user.constants.UserValidationRules;
 import com.poortorich.user.entity.enums.Gender;
@@ -82,10 +83,12 @@ public class UserRegistrationRequest {
 
     private String job;
 
-    public LocalDate getBirth() {
+    @JsonIgnore
+    public LocalDate getBirthday() {
         return LocalDate.parse(birth, DateTimeFormatter.ofPattern(UserValidationRules.BIRTHDAY_DATE_FORMAT));
     }
 
+    @JsonIgnore
     public Gender getGender() {
         return Gender.from(gender);
     }

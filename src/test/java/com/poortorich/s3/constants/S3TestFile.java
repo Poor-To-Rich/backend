@@ -2,7 +2,7 @@ package com.poortorich.s3.constants;
 
 public class S3TestFile {
 
-    public static final String FILE_NAME = "testFile";
+    public static final String FILE_NAME = "profileImage";
     public static final String JPEG_FILE_NAME = "original.jpg";
     public static final String PNG_FILE_NAME = "test-image.png";
     public static final String PDF_FILE_NAME = "document.pdf";
