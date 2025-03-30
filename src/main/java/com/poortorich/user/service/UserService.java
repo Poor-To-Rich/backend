@@ -22,7 +22,7 @@ public class UserService {
                 .name(userRegistrationRequest.getName())
                 .nickname(userRegistrationRequest.getNickname())
                 .email(userRegistrationRequest.getEmail())
-                .gender(userRegistrationRequest.getGender())
+                .gender(userRegistrationRequest.parseGender())
                 .birth(userRegistrationRequest.parseBirthday())
                 .job(userRegistrationRequest.getJob())
                 .build();

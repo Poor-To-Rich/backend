@@ -22,7 +22,7 @@ public class UserController {
     private final UserFacade userFacade;
 
     @PostMapping(UserControllerConstants.REGISTER_PATH)
-    public ResponseEntity<BaseResponse> register(
+    public ResponseEntity<BaseResponse> registerUser(
             @RequestPart(UserControllerConstants.USER_REGISTRATION_REQUEST)
             @Valid
             @NotNull(message = UserResponseMessages.REGISTRATION_REQUEST_REQUIRED)

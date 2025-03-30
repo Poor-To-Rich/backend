@@ -18,6 +18,7 @@ import com.poortorich.user.request.UserRegistrationRequest;
 import com.poortorich.user.response.enums.UserResponse;
 import com.poortorich.user.util.UserRegistrationRequestTestBuilder;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -59,7 +60,8 @@ class UserControllerTest {
     }
 
     @Test
-    public void register_whenValidInput_thenNoException() throws Exception {
+    @DisplayName("유효한 회원 가입 데이터로 registerUser 호출 시 기대했던 응답이 반환된다.")
+    public void registerUser_whenValidInput_thenNoException() throws Exception {
         doNothing().when(userFacade).registerNewUser(any(UserRegistrationRequest.class), any(MultipartFile.class));
 
         mockMvc.perform(MockMvcRequestBuilders.multipart(UserControllerConstants.REGISTER_PATH)
@@ -70,7 +72,29 @@ class UserControllerTest {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.resultMessage").value(UserResponse.REGISTRATION_SUCCESS.getMessage()));
 
-        // verify userFacade.registerNewUser was called
+        verify(userFacade, times(1)).registerNewUser(any(UserRegistrationRequest.class), any());
+    }
+
+    @Test
+    @DisplayName("직업이 없는 유효한 회원가입 데이터로 registerUser api 호출 시 기대했던 응답이 반한된다.")
+    public void registerUser_whenValidInputWithoutJob_thenNoException() throws Exception {
+        userRegistrationRequest = new MockMultipartFile(
+                UserControllerConstants.USER_REGISTRATION_REQUEST,
+                "userRegistrationRequest.json",
+                MediaType.APPLICATION_JSON_VALUE,
+                objectMapper.writeValueAsString(new UserRegistrationRequestTestBuilder().job(null).build()).getBytes()
+        );
+
+        doNothing().when(userFacade).registerNewUser(any(UserRegistrationRequest.class), any(MultipartFile.class));
+
+        mockMvc.perform(MockMvcRequestBuilders.multipart(UserControllerConstants.REGISTER_PATH)
+                        .file(userRegistrationRequest)
+                        .file(profileImage)
+                        .with(csrf())
+                        .contentType(MediaType.MULTIPART_FORM_DATA_VALUE))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.resultMessage").value(UserResponse.REGISTRATION_SUCCESS.getMessage()));
+
         verify(userFacade, times(1)).registerNewUser(any(UserRegistrationRequest.class), any());
     }
 

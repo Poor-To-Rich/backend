@@ -60,7 +60,7 @@ public class UserServiceTest {
         assertThat(savedUser.getName()).isEqualTo(userRegistrationRequest.getName());
         assertThat(savedUser.getNickname()).isEqualTo(userRegistrationRequest.getNickname());
         assertThat(savedUser.getEmail()).isEqualTo(userRegistrationRequest.getEmail());
-        assertThat(savedUser.getGender()).isEqualTo(userRegistrationRequest.getGender());
+        assertThat(savedUser.getGender()).isEqualTo(userRegistrationRequest.parseGender());
         assertThat(savedUser.getBirth()).isEqualTo(userRegistrationRequest.parseBirthday());
         assertThat(savedUser.getJob()).isEqualTo(userRegistrationRequest.getJob());
     }

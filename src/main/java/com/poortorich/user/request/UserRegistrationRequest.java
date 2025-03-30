@@ -12,17 +12,15 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 @Getter
-@NoArgsConstructor
 @AllArgsConstructor
 public class UserRegistrationRequest {
 
     @NotBlank(message = UserResponseMessages.NAME_REQUIRED)
     @Size(max = UserValidationRules.NAME_MAX_LENGTH, message = UserResponseMessages.NAME_TOO_LONG)
     @Pattern(regexp = UserValidationRules.NO_BLANK_PATTERN, message = UserResponseMessages.NAME_CONTAINS_BLANK)
-    private String name;
+    private final String name;
 
     @NotBlank(message = UserResponseMessages.NICKNAME_REQUIRED)
     @Size(max = UserValidationRules.NICKNAME_MAX_LENGTH, message = UserResponseMessages.NICKNAME_TOO_LONG)
@@ -32,7 +30,7 @@ public class UserRegistrationRequest {
             regexp = UserValidationRules.NICKNAME_ALLOWED_CHARS_PATTERN,
             message = UserResponseMessages.NICKNAME_CONTAINS_SPECIAL_CHAR
     )
-    private String nickname;
+    private final String nickname;
 
     @NotBlank(message = UserResponseMessages.USERNAME_REQUIRED)
     @Size(
@@ -45,7 +43,7 @@ public class UserRegistrationRequest {
             regexp = UserValidationRules.USERNAME_ALLOWED_CHARS_PATTERN,
             message = UserResponseMessages.USERNAME_CONTAINS_INVALID_CHAR
     )
-    private String username;
+    private final String username;
 
     @NotBlank(message = UserResponseMessages.PASSWORD_REQUIRED)
     @Size(
@@ -65,23 +63,23 @@ public class UserRegistrationRequest {
             regexp = UserValidationRules.PASSWORD_PATTERN,
             message = UserResponseMessages.PASSWORD_INVALID
     )
-    private String password;
+    private final String password;
 
     @NotBlank(message = UserResponseMessages.PASSWORD_CONFIRM_REQUIRED)
-    private String passwordConfirm;
+    private final String passwordConfirm;
 
     @NotBlank(message = UserResponseMessages.BIRTHDAY_REQUIRED)
     @Pattern(regexp = UserValidationRules.BIRTHDAY_FORMAT_PATTERN, message = UserResponseMessages.BIRTHDAY_FORMAT_INVALID)
-    private String birth;
+    private final String birth;
 
     @NotBlank(message = UserResponseMessages.EMAIL_REQUIRED)
     @Email(message = UserResponseMessages.EMAIL_INVALID)
-    private String email;
+    private final String email;
 
     @NotBlank(message = UserResponseMessages.GENDER_REQUIRED)
-    private String gender;
+    private final String gender;
 
-    private String job;
+    private final String job;
 
     @JsonIgnore
     public LocalDate parseBirthday() {
@@ -89,7 +87,7 @@ public class UserRegistrationRequest {
     }
 
     @JsonIgnore
-    public Gender getGender() {
+    public Gender parseGender() {
         return Gender.from(gender);
     }
 }
