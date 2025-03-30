@@ -35,7 +35,6 @@ public class SecurityConfig {
                                 "/email/verify",
                                 "/email/block"
                         ).permitAll()
-
                         .anyRequest().denyAll()
                 );
 

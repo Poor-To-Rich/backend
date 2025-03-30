@@ -84,7 +84,7 @@ public class UserRegistrationRequest {
     private String job;
 
     @JsonIgnore
-    public LocalDate getBirthday() {
+    public LocalDate parseBirthday() {
         return LocalDate.parse(birth, DateTimeFormatter.ofPattern(UserValidationRules.BIRTHDAY_DATE_FORMAT));
     }
 
