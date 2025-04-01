@@ -6,8 +6,8 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 
-@RequiredArgsConstructor
 @Getter
+@RequiredArgsConstructor
 public enum UserResponse implements Response {
 
     REGISTRATION_SUCCESS(HttpStatus.CREATED, UserResponseMessages.REGISTRATION_SUCCESS),
@@ -15,7 +15,7 @@ public enum UserResponse implements Response {
     USERNAME_DUPLICATE(HttpStatus.CONFLICT, UserResponseMessages.USERNAME_DUPLICATE),
     NICKNAME_DUPLICATE(HttpStatus.CONFLICT, UserResponseMessages.NICKNAME_DUPLICATE),
     EMAIL_DUPLICATE(HttpStatus.CONFLICT, UserResponseMessages.EMAIL_DUPLICATE),
-    PASSWORD_NOT_MATCH(HttpStatus.BAD_REQUEST, UserResponseMessages.PASSWORD_DO_NOT_MATCH),
+    PASSWORD_DO_NOT_MATCH(HttpStatus.BAD_REQUEST, UserResponseMessages.PASSWORD_DO_NOT_MATCH),
     BIRTHDAY_IN_FUTURE(HttpStatus.BAD_REQUEST, UserResponseMessages.BIRTHDAY_IN_FUTURE);
 
     private final HttpStatus httpStatus;

@@ -1,6 +1,5 @@
 package com.poortorich.user.entity;
 
-import com.poortorich.user.constants.UserDatabase;
 import com.poortorich.user.entity.enums.Gender;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -9,8 +8,6 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.PrePersist;
-import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -20,12 +17,14 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 @Entity
-@Table(name = UserDatabase.USER_TABLE)
+@Table(name = "user")
 @DynamicUpdate
 @Getter
 @NoArgsConstructor
@@ -35,53 +34,44 @@ public class User implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = UserDatabase.ID_COLUMN)
+    @Column(name = "id")
     private Long id;
 
-    @Column(name = UserDatabase.USERNAME_COLUMN, nullable = false, unique = true)
+    @Column(name = "username", nullable = false, unique = true)
     private String username;
 
-    @Column(name = UserDatabase.PASSWORD_COLUMN, nullable = false)
+    @Column(name = "password", nullable = false)
     private String password;
 
-    @Column(name = UserDatabase.NAME_COLUMN, nullable = false)
+    @Column(name = "name", nullable = false)
     private String name;
 
-    @Column(name = UserDatabase.NICKNAME_COLUMN, nullable = false, unique = true)
+    @Column(name = "nickname", nullable = false, unique = true)
     private String nickname;
 
-    @Column(name = UserDatabase.EMAIL_COLUMN, nullable = false, unique = true)
+    @Column(name = "email", nullable = false, unique = true)
     private String email;
 
-    @Column(name = UserDatabase.GENDER_COLUMN, nullable = false)
+    @Column(name = "gender", nullable = false)
     @Enumerated(EnumType.STRING)
     private Gender gender;
 
-    @Column(name = UserDatabase.BIRTHDAY_COLUMN, nullable = false)
+    @Column(name = "birth", nullable = false)
     private LocalDate birth;
 
-    @Column(name = UserDatabase.PROFILE_IMAGE_COLUMN, nullable = false)
+    @Column(name = "profileImage", nullable = false)
     private String profileImage;
 
-    @Column(name = UserDatabase.JOB_COLUMN)
+    @Column(name = "job")
     private String job;
 
-    @Column(name = UserDatabase.CREATED_DATE_COLUMN, nullable = false)
+    @Column(name = "createdDate", nullable = false)
+    @CreationTimestamp
     private LocalDateTime createdDate;
 
-    @Column(name = UserDatabase.UPDATED_DATE_COLUMN, nullable = false)
+    @Column(name = "updatedDate", nullable = false)
+    @UpdateTimestamp
     private LocalDateTime updatedDate;
-
-    @PrePersist
-    public void prePersist() {
-        this.createdDate = LocalDateTime.now();
-        this.updatedDate = LocalDateTime.now();
-    }
-
-    @PreUpdate
-    public void preUpdate() {
-        this.updatedDate = LocalDateTime.now();
-    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -107,4 +97,5 @@ public class User implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
+
 }

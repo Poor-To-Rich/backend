@@ -49,11 +49,11 @@ public class UserValidationServiceTest {
 
         userValidationService.validateRegistration(request);
 
-        Mockito.verify(userValidator).validateUsername(request.getUsername());
-        Mockito.verify(userValidator).validateNickname(request.getNickname());
+        Mockito.verify(userValidator).validateUsernameDuplicate(request.getUsername());
+        Mockito.verify(userValidator).validateNicknameDuplicate(request.getNickname());
         Mockito.verify(userValidator).validatePasswordMatch(request.getPassword(), request.getPasswordConfirm());
-        Mockito.verify(userValidator).validateEmail(request.getEmail());
-        Mockito.verify(userValidator).validateBirth(request.parseBirthday());
+        Mockito.verify(userValidator).validateEmailDuplicate(request.getEmail());
+        Mockito.verify(userValidator).validateBirthIsInFuture(request.parseBirthday());
         Mockito.verify(emailVerificationPolicyManager).isVerifiedMail(request.getEmail());
     }
 
@@ -68,11 +68,11 @@ public class UserValidationServiceTest {
                 .isInstanceOf(ForbiddenException.class)
                 .hasMessage(EmailResponse.EMAIL_NOT_VERIFIED.getMessage());
 
-        Mockito.verify(userValidator).validateUsername(request.getUsername());
-        Mockito.verify(userValidator).validateNickname(request.getNickname());
+        Mockito.verify(userValidator).validateUsernameDuplicate(request.getUsername());
+        Mockito.verify(userValidator).validateNicknameDuplicate(request.getNickname());
         Mockito.verify(userValidator).validatePasswordMatch(request.getPassword(), request.getPasswordConfirm());
-        Mockito.verify(userValidator).validateEmail(request.getEmail());
-        Mockito.verify(userValidator).validateBirth(request.parseBirthday());
+        Mockito.verify(userValidator).validateEmailDuplicate(request.getEmail());
+        Mockito.verify(userValidator).validateBirthIsInFuture(request.parseBirthday());
     }
 
     @Test
@@ -82,17 +82,17 @@ public class UserValidationServiceTest {
 
         Mockito.doThrow(new ConflictException(UserResponse.USERNAME_DUPLICATE))
                 .when(userValidator)
-                .validateUsername(request.getUsername());
+                .validateUsernameDuplicate(request.getUsername());
 
         Assertions.assertThatThrownBy(() -> userValidationService.validateRegistration(request))
                 .isInstanceOf(ConflictException.class)
                 .hasMessage(UserResponseMessages.USERNAME_DUPLICATE);
 
-        Mockito.verify(userValidator).validateUsername(request.getUsername());
-        Mockito.verify(userValidator, Mockito.never()).validateNickname(Mockito.any());
+        Mockito.verify(userValidator).validateUsernameDuplicate(request.getUsername());
+        Mockito.verify(userValidator, Mockito.never()).validateNicknameDuplicate(Mockito.any());
         Mockito.verify(userValidator, Mockito.never()).validatePasswordMatch(Mockito.any(), Mockito.any());
-        Mockito.verify(userValidator, Mockito.never()).validateEmail(Mockito.any());
-        Mockito.verify(userValidator, Mockito.never()).validateBirth(Mockito.any());
+        Mockito.verify(userValidator, Mockito.never()).validateEmailDuplicate(Mockito.any());
+        Mockito.verify(userValidator, Mockito.never()).validateBirthIsInFuture(Mockito.any());
         Mockito.verify(emailVerificationPolicyManager, Mockito.never()).isVerifiedMail(Mockito.any());
     }
 
@@ -103,17 +103,17 @@ public class UserValidationServiceTest {
 
         Mockito.doThrow(new ConflictException(UserResponse.NICKNAME_DUPLICATE))
                 .when(userValidator)
-                .validateNickname(request.getNickname());
+                .validateNicknameDuplicate(request.getNickname());
 
         Assertions.assertThatThrownBy(() -> userValidationService.validateRegistration(request))
                 .isInstanceOf(ConflictException.class)
                 .hasMessage(UserResponseMessages.NICKNAME_DUPLICATE);
 
-        Mockito.verify(userValidator).validateUsername(request.getUsername());
-        Mockito.verify(userValidator).validateNickname(request.getNickname());
+        Mockito.verify(userValidator).validateUsernameDuplicate(request.getUsername());
+        Mockito.verify(userValidator).validateNicknameDuplicate(request.getNickname());
         Mockito.verify(userValidator, Mockito.never()).validatePasswordMatch(Mockito.any(), Mockito.any());
-        Mockito.verify(userValidator, Mockito.never()).validateEmail(Mockito.any());
-        Mockito.verify(userValidator, Mockito.never()).validateBirth(Mockito.any());
+        Mockito.verify(userValidator, Mockito.never()).validateEmailDuplicate(Mockito.any());
+        Mockito.verify(userValidator, Mockito.never()).validateBirthIsInFuture(Mockito.any());
         Mockito.verify(emailVerificationPolicyManager, Mockito.never()).isVerifiedMail(Mockito.any());
     }
 
@@ -124,7 +124,7 @@ public class UserValidationServiceTest {
                 .passwordConfirm(UserRegistrationFixture.MISMATCH_PASSWORD_CONFIRM)
                 .build();
 
-        Mockito.doThrow(new BadRequestException(UserResponse.PASSWORD_NOT_MATCH))
+        Mockito.doThrow(new BadRequestException(UserResponse.PASSWORD_DO_NOT_MATCH))
                 .when(userValidator)
                 .validatePasswordMatch(request.getPassword(), request.getPasswordConfirm());
 
@@ -132,11 +132,11 @@ public class UserValidationServiceTest {
                 .isInstanceOf(BadRequestException.class)
                 .hasMessage(UserResponseMessages.PASSWORD_DO_NOT_MATCH);
 
-        Mockito.verify(userValidator).validateUsername(request.getUsername());
-        Mockito.verify(userValidator).validateNickname(request.getNickname());
+        Mockito.verify(userValidator).validateUsernameDuplicate(request.getUsername());
+        Mockito.verify(userValidator).validateNicknameDuplicate(request.getNickname());
         Mockito.verify(userValidator).validatePasswordMatch(request.getPassword(), request.getPasswordConfirm());
-        Mockito.verify(userValidator, Mockito.never()).validateEmail(Mockito.any());
-        Mockito.verify(userValidator, Mockito.never()).validateBirth(Mockito.any());
+        Mockito.verify(userValidator, Mockito.never()).validateEmailDuplicate(Mockito.any());
+        Mockito.verify(userValidator, Mockito.never()).validateBirthIsInFuture(Mockito.any());
         Mockito.verify(emailVerificationPolicyManager, Mockito.never()).isVerifiedMail(Mockito.any());
     }
 
@@ -147,17 +147,17 @@ public class UserValidationServiceTest {
 
         Mockito.doThrow(new ConflictException(UserResponse.EMAIL_DUPLICATE))
                 .when(userValidator)
-                .validateEmail(request.getEmail());
+                .validateEmailDuplicate(request.getEmail());
 
         Assertions.assertThatThrownBy(() -> userValidationService.validateRegistration(request))
                 .isInstanceOf(ConflictException.class)
                 .hasMessage(UserResponseMessages.EMAIL_DUPLICATE);
 
-        Mockito.verify(userValidator).validateUsername(request.getUsername());
-        Mockito.verify(userValidator).validateNickname(request.getNickname());
+        Mockito.verify(userValidator).validateUsernameDuplicate(request.getUsername());
+        Mockito.verify(userValidator).validateNicknameDuplicate(request.getNickname());
         Mockito.verify(userValidator).validatePasswordMatch(request.getPassword(), request.getPasswordConfirm());
-        Mockito.verify(userValidator).validateEmail(request.getEmail());
-        Mockito.verify(userValidator, Mockito.never()).validateBirth(Mockito.any());
+        Mockito.verify(userValidator).validateEmailDuplicate(request.getEmail());
+        Mockito.verify(userValidator, Mockito.never()).validateBirthIsInFuture(Mockito.any());
         Mockito.verify(emailVerificationPolicyManager, Mockito.never()).isVerifiedMail(Mockito.any());
     }
 
@@ -170,17 +170,17 @@ public class UserValidationServiceTest {
 
         Mockito.doThrow(new BadRequestException(UserResponse.BIRTHDAY_IN_FUTURE))
                 .when(userValidator)
-                .validateBirth(request.parseBirthday());
+                .validateBirthIsInFuture(request.parseBirthday());
 
         Assertions.assertThatThrownBy(() -> userValidationService.validateRegistration(request))
                 .isInstanceOf(BadRequestException.class)
                 .hasMessage(UserResponseMessages.BIRTHDAY_IN_FUTURE);
 
-        Mockito.verify(userValidator).validateUsername(request.getUsername());
-        Mockito.verify(userValidator).validateNickname(request.getNickname());
+        Mockito.verify(userValidator).validateUsernameDuplicate(request.getUsername());
+        Mockito.verify(userValidator).validateNicknameDuplicate(request.getNickname());
         Mockito.verify(userValidator).validatePasswordMatch(request.getPassword(), request.getPasswordConfirm());
-        Mockito.verify(userValidator).validateEmail(request.getEmail());
-        Mockito.verify(userValidator).validateBirth(request.parseBirthday());
+        Mockito.verify(userValidator).validateEmailDuplicate(request.getEmail());
+        Mockito.verify(userValidator).validateBirthIsInFuture(request.parseBirthday());
         Mockito.verify(emailVerificationPolicyManager, Mockito.never()).isVerifiedMail(Mockito.any());
     }
 }

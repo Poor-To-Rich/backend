@@ -16,14 +16,14 @@ public class UserValidationService {
     private final EmailVerificationPolicyManager emailVerificationPolicyManager;
 
     public void validateRegistration(UserRegistrationRequest userRegistrationRequest) {
-        userValidator.validateUsername(userRegistrationRequest.getUsername());
-        userValidator.validateNickname(userRegistrationRequest.getNickname());
+        userValidator.validateUsernameDuplicate(userRegistrationRequest.getUsername());
+        userValidator.validateNicknameDuplicate(userRegistrationRequest.getNickname());
         userValidator.validatePasswordMatch(
                 userRegistrationRequest.getPassword(),
                 userRegistrationRequest.getPasswordConfirm()
         );
-        userValidator.validateEmail(userRegistrationRequest.getEmail());
-        userValidator.validateBirth(userRegistrationRequest.parseBirthday());
+        userValidator.validateEmailDuplicate(userRegistrationRequest.getEmail());
+        userValidator.validateBirthIsInFuture(userRegistrationRequest.parseBirthday());
 
         if (!emailVerificationPolicyManager.isVerifiedMail(userRegistrationRequest.getEmail())) {
             throw new ForbiddenException(EmailResponse.EMAIL_NOT_VERIFIED);

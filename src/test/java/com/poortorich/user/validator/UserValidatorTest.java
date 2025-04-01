@@ -35,7 +35,7 @@ class UserValidatorTest {
             String existingUsername = UserRegistrationFixture.VALID_USERNAME;
             Mockito.when(userRepository.existsByUsername(existingUsername)).thenReturn(true);
 
-            Assertions.assertThatThrownBy(() -> userValidator.validateUsername(existingUsername))
+            Assertions.assertThatThrownBy(() -> userValidator.validateUsernameDuplicate(existingUsername))
                     .isInstanceOf(ConflictException.class)
                     .hasMessage(UserResponseMessages.USERNAME_DUPLICATE);
         }
@@ -46,7 +46,7 @@ class UserValidatorTest {
             String newUsername = UserRegistrationFixture.VALID_USERNAME;
             Mockito.when(userRepository.existsByUsername(newUsername)).thenReturn(false);
 
-            userValidator.validateUsername(newUsername);
+            userValidator.validateUsernameDuplicate(newUsername);
         }
     }
 
@@ -60,7 +60,7 @@ class UserValidatorTest {
             String existingEmail = UserRegistrationFixture.VALID_EMAIL;
             Mockito.when(userRepository.existsByEmail(existingEmail)).thenReturn(true);
 
-            Assertions.assertThatThrownBy(() -> userValidator.validateEmail(existingEmail))
+            Assertions.assertThatThrownBy(() -> userValidator.validateEmailDuplicate(existingEmail))
                     .isInstanceOf(ConflictException.class)
                     .hasMessage(UserResponseMessages.EMAIL_DUPLICATE);
         }
@@ -71,7 +71,7 @@ class UserValidatorTest {
             String newEmail = UserRegistrationFixture.VALID_EMAIL;
             Mockito.when(userRepository.existsByEmail(newEmail)).thenReturn(false);
 
-            userValidator.validateEmail(newEmail);
+            userValidator.validateEmailDuplicate(newEmail);
         }
     }
 
@@ -85,7 +85,7 @@ class UserValidatorTest {
             String existingNickname = UserRegistrationFixture.VALID_NICKNAME;
             Mockito.when(userRepository.existsByNickname(existingNickname)).thenReturn(true);
 
-            Assertions.assertThatThrownBy(() -> userValidator.validateNickname(existingNickname))
+            Assertions.assertThatThrownBy(() -> userValidator.validateNicknameDuplicate(existingNickname))
                     .isInstanceOf(ConflictException.class)
                     .hasMessage(UserResponseMessages.NICKNAME_DUPLICATE);
         }
@@ -96,7 +96,7 @@ class UserValidatorTest {
             String newNickname = UserRegistrationFixture.VALID_NICKNAME;
             Mockito.when(userRepository.existsByNickname(newNickname)).thenReturn(false);
 
-            userValidator.validateNickname(newNickname);
+            userValidator.validateNicknameDuplicate(newNickname);
         }
     }
 
@@ -136,7 +136,7 @@ class UserValidatorTest {
         void validateBirth_whenBirthdayIsInFuture_thenThrowBadRequestException() {
             LocalDate futureBirthday = LocalDate.now().plusDays(ONE_DAY);
 
-            Assertions.assertThatThrownBy(() -> userValidator.validateBirth(futureBirthday))
+            Assertions.assertThatThrownBy(() -> userValidator.validateBirthIsInFuture(futureBirthday))
                     .isInstanceOf(BadRequestException.class)
                     .hasMessage(UserResponseMessages.BIRTHDAY_IN_FUTURE);
         }
@@ -146,7 +146,7 @@ class UserValidatorTest {
         void validateBirth_whenBirthdayIsInPast_thenNoException() {
             LocalDate pastBirthday = LocalDate.now().minusDays(ONE_DAY);
 
-            userValidator.validateBirth(pastBirthday);
+            userValidator.validateBirthIsInFuture(pastBirthday);
         }
 
         @Test
@@ -154,7 +154,7 @@ class UserValidatorTest {
         void validateBirth_whenBirthdayIsToday_thenNoException() {
             LocalDate todayBirthday = LocalDate.now();
 
-            userValidator.validateBirth(todayBirthday);
+            userValidator.validateBirthIsInFuture(todayBirthday);
         }
     }
 }

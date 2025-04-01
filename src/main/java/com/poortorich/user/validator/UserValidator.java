@@ -14,19 +14,19 @@ public class UserValidator {
 
     private final UserRepository userRepository;
 
-    public void validateUsername(String username) {
+    public void validateUsernameDuplicate(String username) {
         if (userRepository.existsByUsername(username)) {
             throw new ConflictException(UserResponse.USERNAME_DUPLICATE);
         }
     }
 
-    public void validateEmail(String email) {
+    public void validateEmailDuplicate(String email) {
         if (userRepository.existsByEmail(email)) {
             throw new ConflictException((UserResponse.EMAIL_DUPLICATE));
         }
     }
 
-    public void validateNickname(String nickname) {
+    public void validateNicknameDuplicate(String nickname) {
         if (userRepository.existsByNickname(nickname)) {
             throw new ConflictException(UserResponse.NICKNAME_DUPLICATE);
         }
@@ -34,11 +34,11 @@ public class UserValidator {
 
     public void validatePasswordMatch(String password, String passwordConfirm) {
         if (!password.equals(passwordConfirm)) {
-            throw new BadRequestException(UserResponse.PASSWORD_NOT_MATCH);
+            throw new BadRequestException(UserResponse.PASSWORD_DO_NOT_MATCH);
         }
     }
 
-    public void validateBirth(LocalDate birthday) {
+    public void validateBirthIsInFuture(LocalDate birthday) {
         if (birthday.isAfter(LocalDate.now())) {
             throw new BadRequestException(UserResponse.BIRTHDAY_IN_FUTURE);
         }
