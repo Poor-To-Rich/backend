@@ -19,11 +19,11 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 public class FileUploadService {
 
-    @Value("${cloud.aws.s3.bucket}")
-    private final String bucketName;
-
     private final AmazonS3Client amazonS3Client;
     private final FileValidator fileValidator;
+    
+    @Value("${cloud.aws.s3.bucket}")
+    private String bucketName;
 
     public String uploadImage(MultipartFile imageFile) {
         fileValidator.validateFileType(imageFile);
