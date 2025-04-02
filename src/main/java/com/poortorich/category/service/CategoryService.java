@@ -108,4 +108,9 @@ public class CategoryService {
         return categoryRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(CategoryResponse.NON_EXISTENT_CATEGORY));
     }
+
+    public Category findCategoryByName(String name) {
+        return categoryRepository.findByName(name)
+                .orElseThrow(() -> new NotFoundException(CategoryResponse.NON_EXISTENT_CATEGORY));
+    }
 }
