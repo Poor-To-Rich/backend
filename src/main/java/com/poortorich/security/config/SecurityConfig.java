@@ -1,7 +1,6 @@
 package com.poortorich.security.config;
 
 import com.poortorich.security.constants.SecurityConstants;
-import com.poortorich.user.constants.UserControllerConstants;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -29,8 +28,8 @@ public class SecurityConfig {
                 )
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(
-                                UserControllerConstants.REGISTER_PATH,
-                                UserControllerConstants.CHECK_USERNAME_DUPLICATE_PATH,
+                                "user/register",
+                                "user/register/username/exists",
                                 "/email/send",
                                 "/email/verify",
                                 "/email/block"

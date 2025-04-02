@@ -1,7 +1,6 @@
 package com.poortorich.user.controller;
 
 import com.poortorich.global.response.BaseResponse;
-import com.poortorich.user.constants.UserControllerConstants;
 import com.poortorich.user.constants.UserResponseMessages;
 import com.poortorich.user.facade.UserFacade;
 import com.poortorich.user.request.UserRegistrationRequest;
@@ -11,24 +10,26 @@ import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/user")
 public class UserController {
 
     private final UserFacade userFacade;
 
-    @PostMapping(UserControllerConstants.REGISTER_PATH)
+    @PostMapping("/register")
     public ResponseEntity<BaseResponse> registerUser(
-            @RequestPart(UserControllerConstants.USER_REGISTRATION_REQUEST)
+            @RequestPart("userRegistrationRequest")
             @Valid
             @NotNull(message = UserResponseMessages.REGISTRATION_REQUEST_REQUIRED)
             UserRegistrationRequest userRegistrationRequest,
 
-            @RequestPart(UserControllerConstants.PROFILE_IMAGE_FORM_DATA)
+            @RequestPart("profileImage")
             @NotNull(message = UserResponseMessages.PROFILE_IMAGE_REQUIRED)
             MultipartFile profileImage
     ) {

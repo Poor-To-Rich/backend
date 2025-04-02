@@ -12,8 +12,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.poortorich.s3.util.S3TestFileGenerator;
 import com.poortorich.security.config.SecurityConfig;
-import com.poortorich.user.constants.UserControllerConstants;
 import com.poortorich.user.facade.UserFacade;
+import com.poortorich.user.fixture.UserRegisterApiFixture;
 import com.poortorich.user.request.UserRegistrationRequest;
 import com.poortorich.user.response.enums.UserResponse;
 import com.poortorich.user.util.UserRegistrationRequestTestBuilder;
@@ -50,12 +50,7 @@ class UserControllerTest {
     @BeforeEach
     void setUp() throws JsonProcessingException {
         objectMapper = new ObjectMapper();
-        userRegistrationRequest = new MockMultipartFile(
-                UserControllerConstants.USER_REGISTRATION_REQUEST,
-                "userRegistrationRequest.json",
-                MediaType.APPLICATION_JSON_VALUE,
-                getUserRegistrationRequestJson().getBytes()
-        );
+        userRegistrationRequest = UserRegisterApiFixture.createValidUserRegistrationRequest();
         profileImage = S3TestFileGenerator.createJpegFile();
     }
 
@@ -64,7 +59,7 @@ class UserControllerTest {
     public void registerUser_whenValidInput_thenNoException() throws Exception {
         doNothing().when(userFacade).registerNewUser(any(UserRegistrationRequest.class), any(MultipartFile.class));
 
-        mockMvc.perform(MockMvcRequestBuilders.multipart(UserControllerConstants.REGISTER_PATH)
+        mockMvc.perform(MockMvcRequestBuilders.multipart(UserRegisterApiFixture.REGISTER_PATH)
                         .file(userRegistrationRequest)
                         .file(profileImage)
                         .with(csrf())
@@ -78,16 +73,11 @@ class UserControllerTest {
     @Test
     @DisplayName("직업이 없는 유효한 회원가입 데이터로 registerUser api 호출 시 기대했던 응답이 반한된다.")
     public void registerUser_whenValidInputWithoutJob_thenNoException() throws Exception {
-        userRegistrationRequest = new MockMultipartFile(
-                UserControllerConstants.USER_REGISTRATION_REQUEST,
-                "userRegistrationRequest.json",
-                MediaType.APPLICATION_JSON_VALUE,
-                objectMapper.writeValueAsString(new UserRegistrationRequestTestBuilder().job(null).build()).getBytes()
-        );
+        userRegistrationRequest = UserRegisterApiFixture.createValidUserRegistrationRequestWithoutJob();
 
         doNothing().when(userFacade).registerNewUser(any(UserRegistrationRequest.class), any(MultipartFile.class));
 
-        mockMvc.perform(MockMvcRequestBuilders.multipart(UserControllerConstants.REGISTER_PATH)
+        mockMvc.perform(MockMvcRequestBuilders.multipart(UserRegisterApiFixture.REGISTER_PATH)
                         .file(userRegistrationRequest)
                         .file(profileImage)
                         .with(csrf())
