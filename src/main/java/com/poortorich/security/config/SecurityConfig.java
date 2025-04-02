@@ -32,7 +32,8 @@ public class SecurityConfig {
                                 "user/register/username/exists",
                                 "/email/send",
                                 "/email/verify",
-                                "/email/block"
+                                "/email/block",
+                                "/expense"
                         ).permitAll()
                         .anyRequest().denyAll()
                 );
