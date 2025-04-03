@@ -12,6 +12,7 @@ import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -57,6 +58,7 @@ public class ExpenseRequestValidTest {
 
     @ParameterizedTest
     @MethodSource("dateValidationCases")
+    @DisplayName("Valid date")
     void invalidDate_shouldFailValidation(LocalDate date, String expectedErrorMessage) {
         ExpenseRequest request = expenseRequestTestBuilder.date(date).build();
 
@@ -68,6 +70,7 @@ public class ExpenseRequestValidTest {
 
     @ParameterizedTest
     @MethodSource("categoryNameValidationCases")
+    @DisplayName("Valid categoryName")
     void invalidCategoryName_shouldFailValidation(String categoryName, String expectedErrorMessage) {
         ExpenseRequest request = expenseRequestTestBuilder.categoryName(categoryName).build();
 
@@ -79,6 +82,7 @@ public class ExpenseRequestValidTest {
 
     @ParameterizedTest
     @MethodSource("titleValidationCases")
+    @DisplayName("Valid title")
     void invalidTitle_shouldFailValidation(String title, String expectedErrorMessage) {
         ExpenseRequest request = expenseRequestTestBuilder.title(title).build();
 
@@ -90,6 +94,7 @@ public class ExpenseRequestValidTest {
 
     @ParameterizedTest
     @MethodSource("costValidationCases")
+    @DisplayName("Valid cost")
     void invalidCost_shouldFailValidation(Long cost, String expectedErrorMessage) {
         ExpenseRequest request = expenseRequestTestBuilder.cost(cost).build();
 
@@ -101,6 +106,7 @@ public class ExpenseRequestValidTest {
 
     @ParameterizedTest
     @MethodSource("memoValidationCases")
+    @DisplayName("Valid memo")
     void invalidMemo_shouldFailValidation(String memo, String expectedErrorMessage) {
         ExpenseRequest request = expenseRequestTestBuilder.memo(memo).build();
 
