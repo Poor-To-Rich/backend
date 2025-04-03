@@ -23,8 +23,8 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import java.sql.Timestamp;
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -42,7 +42,7 @@ public class Expense {
 
     @NotNull
     @Column(name = "expenseDate", nullable = false)
-    private Date expenseDate;
+    private LocalDate expenseDate;
 
     @Column(name = "title")
     private String title;
@@ -65,11 +65,11 @@ public class Expense {
 
     @CreationTimestamp
     @Column(name = "createdDate")
-    private Timestamp createdDate;
+    private LocalDateTime createdDate;
 
     @UpdateTimestamp
     @Column(name = "updateDate")
-    private Timestamp updatedDate;
+    private LocalDateTime updatedDate;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "categoryId")
