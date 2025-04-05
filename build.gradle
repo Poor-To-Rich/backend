@@ -31,6 +31,10 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
+    implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+    implementation 'io.jsonwebtoken:jjwt-impl:0.11.5'
+    implementation 'io.jsonwebtoken:jjwt-jackson:0.11.5'
+    implementation 'io.jakarta.xml.bind:jakarta.xml.bind-api:4.0.0'
     implementation 'com.fasterxml.jackson.core:jackson-databind'
     implementation 'io.jsonwebtoken:jjwt-api:0.12.3'
 
@@ -51,8 +55,11 @@ dependencies {
     testImplementation 'org.mockito:mockito-junit-jupiter:5.7.0'
     testImplementation 'org.assertj:assertj-core:3.24.2'
     testImplementation 'com.h2database:h2:2.2.224'
+    testImplementation 'io.jsonwebtoken:jjwt-api:0.11.5'
 
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    testRuntimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
+    testRuntimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
 }
 
 test {
