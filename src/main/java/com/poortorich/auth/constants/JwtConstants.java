@@ -1,5 +1,9 @@
 package com.poortorich.auth.constants;
 
+import io.jsonwebtoken.security.Keys;
+import javax.crypto.SecretKey;
+import org.apache.commons.codec.binary.Base64;
+
 public class JwtConstants {
 
     // 1시간
@@ -14,6 +18,14 @@ public class JwtConstants {
     public static final String ACCESS_TOKEN_COOKIE_NAME = "access_token";
     public static final String REFRESH_TOKEN_COOKIE_NAME = "refresh_token";
 
+    public static final String COOKIE_PATH = "/";
+
     private JwtConstants() {
+    }
+
+    public static SecretKey getSecretKey() {
+        return Keys.hmacShaKeyFor(
+                Base64.decodeBase64(SECRET_KEY)
+        );
     }
 }

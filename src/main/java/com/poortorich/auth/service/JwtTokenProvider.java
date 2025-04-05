@@ -2,11 +2,8 @@ package com.poortorich.auth.service;
 
 import com.poortorich.auth.constants.JwtConstants;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.security.Keys;
 import java.util.Date;
-import javax.crypto.SecretKey;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.codec.binary.Base64;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 
@@ -24,7 +21,7 @@ public class JwtTokenProvider {
                 .subject(username)
                 .issuedAt(now)
                 .expiration(expiryDate)
-                .signWith(getSecretKey())
+                .signWith(JwtConstants.getSecretKey())
                 .compact();
     }
 
@@ -36,12 +33,7 @@ public class JwtTokenProvider {
                 .subject(username)
                 .issuedAt(now)
                 .expiration(expiryDate)
-                .signWith(getSecretKey())
+                .signWith(JwtConstants.getSecretKey())
                 .compact();
-    }
-    
-    private SecretKey getSecretKey() {
-        byte[] keyBytes = Base64.decodeBase64(JwtConstants.SECRET_KEY);
-        return Keys.hmacShaKeyFor(keyBytes);
     }
 }
