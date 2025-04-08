@@ -7,10 +7,6 @@ import com.poortorich.expense.fixture.enums.MemoValidationCase;
 import com.poortorich.expense.fixture.enums.TitleValidationCase;
 import com.poortorich.expense.util.ExpenseRequestTestBuilder;
 import com.poortorich.global.testcases.TestCase;
-import jakarta.validation.ConstraintViolation;
-import jakarta.validation.Validation;
-import jakarta.validation.Validator;
-import jakarta.validation.ValidatorFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -18,14 +14,12 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import java.time.LocalDate;
-import java.util.Set;
 import java.util.stream.Stream;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static com.poortorich.global.util.RequestValidTestHelper.assertValidationMessage;
 
 public class ExpenseRequestValidTest {
 
-    private Validator validator;
     private ExpenseRequestTestBuilder expenseRequestTestBuilder;
 
     static Stream<Arguments> dateValidationCases() {
@@ -50,9 +44,6 @@ public class ExpenseRequestValidTest {
 
     @BeforeEach
     void setUp() {
-        try (ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory()) {
-            validator = validatorFactory.getValidator();
-        }
         expenseRequestTestBuilder = new ExpenseRequestTestBuilder();
     }
 
@@ -60,64 +51,49 @@ public class ExpenseRequestValidTest {
     @MethodSource("dateValidationCases")
     @DisplayName("Valid date")
     void invalidDate_shouldFailValidation(LocalDate date, String expectedErrorMessage) {
-        ExpenseRequest request = expenseRequestTestBuilder.date(date).build();
-
-        Set<ConstraintViolation<ExpenseRequest>> violations = validator.validate(request);
-
-        assertThat(violations)
-                .anyMatch(v -> v.getMessage().equals(expectedErrorMessage));
+        assertValidationMessage(
+                expenseRequestTestBuilder.date(date).build(),
+                expectedErrorMessage
+        );
     }
 
     @ParameterizedTest
     @MethodSource("categoryNameValidationCases")
     @DisplayName("Valid categoryName")
     void invalidCategoryName_shouldFailValidation(String categoryName, String expectedErrorMessage) {
-        ExpenseRequest request = expenseRequestTestBuilder.categoryName(categoryName).build();
-
-        Set<ConstraintViolation<ExpenseRequest>> violations = validator.validate(request);
-
-        assertThat(violations)
-                .anyMatch(v -> v.getMessage().equals(expectedErrorMessage));
+        assertValidationMessage(
+                expenseRequestTestBuilder.categoryName(categoryName).build(),
+                expectedErrorMessage
+        );
     }
 
     @ParameterizedTest
     @MethodSource("titleValidationCases")
     @DisplayName("Valid title")
     void invalidTitle_shouldFailValidation(String title, String expectedErrorMessage) {
-        ExpenseRequest request = expenseRequestTestBuilder.title(title).build();
-
-        Set<ConstraintViolation<ExpenseRequest>> violations = validator.validate(request);
-
-        assertThat(violations)
-                .anyMatch(v -> v.getMessage().equals(expectedErrorMessage));
+        assertValidationMessage(
+                expenseRequestTestBuilder.title(title).build(),
+                expectedErrorMessage
+        );
     }
 
     @ParameterizedTest
     @MethodSource("costValidationCases")
     @DisplayName("Valid cost")
     void invalidCost_shouldFailValidation(Long cost, String expectedErrorMessage) {
-        ExpenseRequest request = expenseRequestTestBuilder.cost(cost).build();
-
-        Set<ConstraintViolation<ExpenseRequest>> violations = validator.validate(request);
-
-        assertThat(violations)
-                .anyMatch(v -> v.getMessage().equals(expectedErrorMessage));
+        assertValidationMessage(
+                expenseRequestTestBuilder.cost(cost).build(),
+                expectedErrorMessage
+        );
     }
 
     @ParameterizedTest
     @MethodSource("memoValidationCases")
     @DisplayName("Valid memo")
     void invalidMemo_shouldFailValidation(String memo, String expectedErrorMessage) {
-        ExpenseRequest request = expenseRequestTestBuilder.memo(memo).build();
-
-        Set<ConstraintViolation<ExpenseRequest>> violations = validator.validate(request);
-
-        violations.forEach(v -> {
-            System.out.println(v.getMessage());
-            System.out.println(v.getMessageTemplate());
-        });
-
-        assertThat(violations)
-                .anyMatch(v -> v.getMessage().equals(expectedErrorMessage));
+        assertValidationMessage(
+                expenseRequestTestBuilder.memo(memo).build(),
+                expectedErrorMessage
+        );
     }
 }

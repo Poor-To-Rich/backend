@@ -9,14 +9,13 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public enum IterationType {
 
-    DEFAULT("반복없음"),
+    DEFAULT("반복 없음"),
     EVERY_DAY("매일"),
-    EVERY_DAY_OF_THE_WEEK("주중 매일"),
     EVERY_WEEK("매주"),
-    EVERY_SECOND_WEEK("2주마다"),
     EVERY_MONTH("매달"),
-    LAST_DAY_OF_EVERY_MONTH("매달 말일"),
-    EVERY_YEAR("매년");
+    EVERY_YEAR("매년"),
+    EVERY_WEEKDAYS("주중 매일"),
+    USER_FRIENDLY("사용자화");
 
     public final String type;
 

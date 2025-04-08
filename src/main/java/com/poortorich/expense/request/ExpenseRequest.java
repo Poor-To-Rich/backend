@@ -35,7 +35,7 @@ public class ExpenseRequest {
 
     @NotNull(message = ExpenseResponseMessages.COST_REQUIRED)
     @Positive(message = ExpenseResponseMessages.COST_NEGATIVE)
-    @Max(value = ExpenseValidationConstraints.COST_MAX_SIZE,
+    @Max(value = ExpenseValidationConstraints.COST_LIMIT,
             message = ExpenseResponseMessages.COST_TOO_BIG)
     private Long cost;
 
