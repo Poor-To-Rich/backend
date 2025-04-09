@@ -17,7 +17,7 @@ public class ExpenseFixture {
 
     public static final String VALID_MEMO = "월세 너무 비싸다";
 
-    public static final String VALID_ITERATION_TYPE_STRING = "매달";
+    public static final String VALID_ITERATION_TYPE_STRING = "monthly";
 
     private ExpenseFixture() {}
 }
