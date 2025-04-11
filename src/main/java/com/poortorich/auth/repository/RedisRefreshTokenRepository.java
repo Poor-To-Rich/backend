@@ -1,7 +1,7 @@
-package com.poortorich.auth.jwt.repository;
+package com.poortorich.auth.repository;
 
 import com.poortorich.auth.jwt.constants.JwtConstants;
-import com.poortorich.auth.jwt.repository.interfaces.RefreshTokenRepository;
+import com.poortorich.auth.repository.interfaces.RefreshTokenRepository;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +15,7 @@ public class RedisRefreshTokenRepository implements RefreshTokenRepository {
     private final RedisTemplate<String, String> redisTemplate;
 
     @Override
-    public void saveRefreshToken(Long userId, String token) {
+    public void save(Long userId, String token) {
         String key = getRedisKey(userId, token);
         redisTemplate.opsForValue().set(
                 key,

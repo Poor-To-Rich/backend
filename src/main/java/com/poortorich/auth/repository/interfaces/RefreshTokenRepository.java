@@ -1,8 +1,8 @@
-package com.poortorich.auth.jwt.repository.interfaces;
+package com.poortorich.auth.repository.interfaces;
 
 public interface RefreshTokenRepository {
 
-    void saveRefreshToken(Long userId, String token);
+    void save(Long userId, String token);
 
     boolean existsByUserIdAndToken(Long userId, String token);
 
