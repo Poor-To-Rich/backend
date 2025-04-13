@@ -16,7 +16,7 @@ public class JwtConstants {
     public static final int REFRESH_TOKEN_COOKIE_EXPIRY = 7 * 24 * 60 * 60;
     public static final String COOKIE_SAME_SITE = "Strict";
     public static final String ACCESS_TOKEN_COOKIE_PATH = "/";
-    public static final String REFRESH_TOKEN_COOKIE_PATH = "/auth/refresh";
+    public static final String REFRESH_TOKEN_COOKIE_PATH = "/user/refresh";
 
     public static final String TOKEN_ISSUER = "poorToRich";
     public static final String TOKEN_AUDIENCE = "poorToRich-Users";
