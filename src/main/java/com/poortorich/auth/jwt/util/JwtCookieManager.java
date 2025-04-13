@@ -25,7 +25,7 @@ public class JwtCookieManager {
                 .build();
     }
 
-    public ResponseCookie createRefreshCookie(String token) {
+    public ResponseCookie createRefreshTokenCookie(String token) {
         return ResponseCookie.from(JwtConstants.REFRESH_TOKEN_COOKIE_NAME, token)
                 .httpOnly(true)
                 .secure(true)
@@ -82,7 +82,7 @@ public class JwtCookieManager {
 
     public void setAuthCookie(HttpServletResponse response, String accessToken, String refreshToken) {
         ResponseCookie accessTokenCookie = createAccessTokenCookie(accessToken);
-        ResponseCookie refreshTokenCookie = createRefreshCookie(refreshToken);
+        ResponseCookie refreshTokenCookie = createRefreshTokenCookie(refreshToken);
 
         response.addHeader(HttpHeaders.SET_COOKIE, accessTokenCookie.toString());
         response.addHeader(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString());
