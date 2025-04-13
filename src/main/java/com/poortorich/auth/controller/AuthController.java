@@ -8,6 +8,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -38,7 +40,8 @@ public class AuthController {
 
     @PostMapping("/logout")
     public ResponseEntity<BaseResponse> logout(
-            HttpServletResponse response
+            HttpServletResponse response,
+            @AuthenticationPrincipal UserDetails userDetails
     ) {
         return BaseResponse.toResponseEntity(authService.logout(response));
     }
