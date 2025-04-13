@@ -10,6 +10,7 @@ import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.security.SignatureException;
 import javax.crypto.SecretKey;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -40,7 +41,7 @@ public class JwtTokenValidator {
 
         } catch (SecurityException | MalformedJwtException |
                  ExpiredJwtException | UnsupportedJwtException |
-                 IllegalArgumentException e) {
+                 IllegalArgumentException | SignatureException e) {
             throw new UnauthorizedException(AuthResponse.TOKEN_INVALID);
         }
     }
@@ -54,7 +55,8 @@ public class JwtTokenValidator {
                     .parseSignedClaims(token)
                     .getPayload();
         } catch (SecurityException | MalformedJwtException |
-                 UnsupportedJwtException | IllegalArgumentException e) {
+                 UnsupportedJwtException | IllegalArgumentException
+                 | SignatureException e) {
             throw new UnauthorizedException(AuthResponse.TOKEN_INVALID);
         } catch (ExpiredJwtException e) {
             return true;
