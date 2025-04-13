@@ -16,6 +16,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -24,6 +25,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AuthService {
 
     private final RefreshTokenRepository refreshTokenRepository;
@@ -64,10 +66,10 @@ public class AuthService {
 
         String refreshToken = refreshTokenOpt.get();
         tokenValidator.validateToken(refreshToken);
-        try {
-            User user = userRepository.findById(tokenExtractor.extractUserId(refreshToken))
-                    .orElseThrow(() -> new UnauthorizedException(AuthResponse.TOKEN_INVALID));
 
+        User user = userRepository.findByUsername(tokenExtractor.extractUsername(refreshToken))
+                .orElseThrow(() -> new UnauthorizedException(AuthResponse.TOKEN_INVALID));
+        try {
             String accessToken = tokenGenerator.generateAccessToken(user);
             String newRefreshToken = tokenGenerator.generateRefreshToken(user);
 
@@ -77,6 +79,7 @@ public class AuthService {
             cookieManager.setAuthCookie(response, accessToken, newRefreshToken);
 
         } catch (DataAccessException e) {
+            log.error("Redis 데이터 접근 중 예외 발생 {}", e.getMessage());
             throw new InternalServerErrorException(AuthResponse.REDIS_SERVER_ERROR);
         }
 
