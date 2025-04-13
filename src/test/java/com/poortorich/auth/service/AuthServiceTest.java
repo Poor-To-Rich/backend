@@ -128,8 +128,8 @@ public class AuthServiceTest {
         String newRefreshToken = "new-refresh-token";
 
         when(cookieManager.extractRefreshTokenFromCookies(request)).thenReturn(Optional.of(refreshToken));
-        when(tokenExtractor.extractUserId(refreshToken)).thenReturn(JwtUserFixture.TEST_ID);
-        when(userRepository.findById(JwtUserFixture.TEST_ID)).thenReturn(Optional.of(testUser));
+        when(tokenExtractor.extractUsername(refreshToken)).thenReturn(JwtUserFixture.TEST_USERNAME);
+        when(userRepository.findByUsername(JwtUserFixture.TEST_USERNAME)).thenReturn(Optional.of(testUser));
         when(tokenGenerator.generateAccessToken(testUser)).thenReturn(newAccessToken);
         when(tokenGenerator.generateRefreshToken(testUser)).thenReturn(newRefreshToken);
 
@@ -157,8 +157,8 @@ public class AuthServiceTest {
     @DisplayName("토큰 갱신 실패 - 사용자를 찾을 수 없으면 예외를 발생시켜야 함")
     void refreshToken_ShouldThrowException_WhenUserIsNotFound() {
         when(cookieManager.extractRefreshTokenFromCookies(request)).thenReturn(Optional.of(refreshToken));
-        when(tokenExtractor.extractUserId(refreshToken)).thenReturn(JwtUserFixture.TEST_ID);
-        when(userRepository.findById(JwtUserFixture.TEST_ID)).thenReturn(Optional.empty());
+        when(tokenExtractor.extractUsername(refreshToken)).thenReturn(JwtUserFixture.TEST_USERNAME);
+        when(userRepository.findByUsername(JwtUserFixture.TEST_USERNAME)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> authService.refreshToken(request, response))
                 .isInstanceOf(UnauthorizedException.class)
@@ -175,8 +175,8 @@ public class AuthServiceTest {
         String newRefreshToken = "new-refresh-token";
 
         when(cookieManager.extractRefreshTokenFromCookies(request)).thenReturn(Optional.of(refreshToken));
-        when(tokenExtractor.extractUserId(refreshToken)).thenReturn(JwtUserFixture.TEST_ID);
-        when(userRepository.findById(JwtUserFixture.TEST_ID)).thenReturn(Optional.of(testUser));
+        when(tokenExtractor.extractUsername(refreshToken)).thenReturn(JwtUserFixture.TEST_USERNAME);
+        when(userRepository.findByUsername(JwtUserFixture.TEST_USERNAME)).thenReturn(Optional.of(testUser));
         when(tokenGenerator.generateAccessToken(testUser)).thenReturn(newAccessToken);
         when(tokenGenerator.generateRefreshToken(testUser)).thenReturn(newRefreshToken);
         doThrow(new DataAccessException("Database error") {
