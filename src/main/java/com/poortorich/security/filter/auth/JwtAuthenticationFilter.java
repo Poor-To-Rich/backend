@@ -28,16 +28,17 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 @Component
-@Slf4j
 @RequiredArgsConstructor
+@Slf4j
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private static final ObjectMapper objectMapper = new ObjectMapper();
+
     private final JwtTokenValidator tokenValidator;
     private final JwtTokenExtractor tokenExtractor;
     private final JwtCookieManager cookieManager;
     private final UserDetailsService userDetailsService;
-    
+
     @Override
     protected void doFilterInternal(
             HttpServletRequest request,
@@ -51,7 +52,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         try {
-            processAccessToken(request);
+            if (!processAccessToken(request, response)) {
+                processRefreshToken(request, response);
+            }
         } catch (UnauthorizedException exception) {
             cookieManager.clearAuthCookie(response);
             setResponseMessage(response, exception.getResponse());
@@ -60,19 +63,39 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
-    private void processAccessToken(HttpServletRequest request) {
+    private void processRefreshToken(HttpServletRequest request, HttpServletResponse response) {
+        Optional<String> refreshToken = cookieManager.extractRefreshTokenFromCookies(request);
+
+        if (refreshToken.isEmpty()) {
+            throw new UnauthorizedException(AuthResponse.TOKEN_INVALID);
+        }
+
+        tokenValidator.validateToken(refreshToken.get());
+        UserDetails userDetails = loadUserDetailsFromToken(refreshToken.get());
+        setAuthentication(userDetails, request);
+    }
+
+    private boolean processAccessToken(HttpServletRequest request, HttpServletResponse response) {
         Optional<String> accessToken = cookieManager.extractAccessTokenFromCookies(request);
 
         if (accessToken.isEmpty()) {
             throw new UnauthorizedException(AuthResponse.TOKEN_INVALID);
         }
 
-        if (tokenValidator.isTokenExpired(accessToken.get())) {
-            throw new UnauthorizedException(AuthResponse.ACCESS_TOKEN_EXPIRED);
+        try {
+            if (tokenValidator.isTokenExpired(accessToken.get())) {
+                throw new UnauthorizedException(AuthResponse.ACCESS_TOKEN_EXPIRED);
+            }
+            UserDetails userDetails = loadUserDetailsFromToken(accessToken.get());
+            setAuthentication(userDetails, request);
+        } catch (UnauthorizedException exception) {
+            if (exception.getResponse().equals(AuthResponse.ACCESS_TOKEN_EXPIRED)) {
+                throw exception;
+            }
+            return false;
         }
 
-        UserDetails userDetails = loadUserDetailsFromToken(accessToken.get());
-        setAuthentication(userDetails, request);
+        return true;
     }
 
 
