@@ -29,7 +29,7 @@ public class JwtTokenValidator {
         try {
             Claims claims = Jwts
                     .parser()
-                    .verifyWith(getSingingKey())
+                    .verifyWith(getSigningKey())
                     .build()
                     .parseSignedClaims(token)
                     .getPayload();
@@ -50,13 +50,13 @@ public class JwtTokenValidator {
         try {
             Jwts
                     .parser()
-                    .verifyWith(getSingingKey())
+                    .verifyWith(getSigningKey())
                     .build()
                     .parseSignedClaims(token)
                     .getPayload();
         } catch (SecurityException | MalformedJwtException |
-                 UnsupportedJwtException | IllegalArgumentException
-                 | SignatureException e) {
+                 UnsupportedJwtException | IllegalArgumentException |
+                 SignatureException e) {
             throw new UnauthorizedException(AuthResponse.TOKEN_INVALID);
         } catch (ExpiredJwtException e) {
             return true;
@@ -64,7 +64,7 @@ public class JwtTokenValidator {
         return false;
     }
 
-    private SecretKey getSingingKey() {
+    private SecretKey getSigningKey() {
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         return Keys.hmacShaKeyFor(keyBytes);
     }

@@ -45,7 +45,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             HttpServletResponse response,
             FilterChain filterChain
     ) throws ServletException, IOException {
-
         if (Arrays.asList(SecurityConstants.PERMIT_ALL_ENDPOINTS).contains(request.getRequestURI())) {
             filterChain.doFilter(request, response);
             return;
@@ -60,6 +59,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             setResponseMessage(response, exception.getResponse());
             return;
         }
+
         filterChain.doFilter(request, response);
     }
 
@@ -97,7 +97,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         return true;
     }
-
 
     private UserDetails loadUserDetailsFromToken(String token) {
         String username = tokenExtractor.extractUsername(token);
