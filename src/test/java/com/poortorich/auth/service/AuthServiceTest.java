@@ -198,5 +198,4 @@ public class AuthServiceTest {
         assertThat(result).isEqualTo(AuthResponse.LOGOUT_SUCCESS);
         verify(cookieManager).clearAuthCookie(response);
     }
-
 }

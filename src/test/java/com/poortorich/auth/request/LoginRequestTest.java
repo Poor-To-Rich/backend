@@ -42,5 +42,4 @@ public class LoginRequestTest {
 
         RequestValidTestHelper.assertValidationMessage(request, expectedErrorMessage);
     }
-    
 }
