@@ -1,5 +1,12 @@
 package com.poortorich.user.service;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import com.poortorich.email.enums.EmailResponse;
 import com.poortorich.email.util.EmailVerificationPolicyManager;
 import com.poortorich.global.exceptions.BadRequestException;
@@ -11,7 +18,6 @@ import com.poortorich.user.request.UserRegistrationRequest;
 import com.poortorich.user.response.enums.UserResponse;
 import com.poortorich.user.util.UserRegistrationRequestTestBuilder;
 import com.poortorich.user.validator.UserValidator;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -30,6 +36,9 @@ public class UserValidationServiceTest {
     @Mock
     EmailVerificationPolicyManager emailVerificationPolicyManager;
 
+    @Mock
+    RedisUserReservationService userReservationService;
+
     @InjectMocks
     UserValidationService userValidationService;
 
@@ -45,16 +54,20 @@ public class UserValidationServiceTest {
     void validateRegistration_whenAllValidationsPassAndEmailIsVerified_thenNoException() {
         UserRegistrationRequest request = userRegistrationBuilder.build();
 
-        Mockito.when(emailVerificationPolicyManager.isVerifiedMail(Mockito.anyString())).thenReturn(true);
+        when(emailVerificationPolicyManager.isVerifiedMail(Mockito.anyString())).thenReturn(true);
+        when(userReservationService.existsByUsername(request.getUsername())).thenReturn(true);
+        when(userReservationService.existsByNickname(request.getNickname())).thenReturn(true);
 
         userValidationService.validateRegistration(request);
 
-        Mockito.verify(userValidator).validateUsernameDuplicate(request.getUsername());
-        Mockito.verify(userValidator).validateNicknameDuplicate(request.getNickname());
-        Mockito.verify(userValidator).validatePasswordMatch(request.getPassword(), request.getPasswordConfirm());
-        Mockito.verify(userValidator).validateEmailDuplicate(request.getEmail());
-        Mockito.verify(userValidator).validateBirthIsInFuture(request.parseBirthday());
-        Mockito.verify(emailVerificationPolicyManager).isVerifiedMail(request.getEmail());
+        verify(userValidator).validateUsernameDuplicate(request.getUsername());
+        verify(userValidator).validateNicknameDuplicate(request.getNickname());
+        verify(userValidator).validatePasswordMatch(request.getPassword(), request.getPasswordConfirm());
+        verify(userValidator).validateEmailDuplicate(request.getEmail());
+        verify(userValidator).validateBirthIsInFuture(request.parseBirthday());
+        verify(userReservationService).existsByUsername(request.getUsername());
+        verify(userReservationService).existsByNickname(request.getNickname());
+        verify(emailVerificationPolicyManager).isVerifiedMail(request.getEmail());
     }
 
     @Test
@@ -62,17 +75,22 @@ public class UserValidationServiceTest {
     void validateRegistration_whenEmailIsNotVerified_thenThrowForbiddenException() {
         UserRegistrationRequest request = userRegistrationBuilder.build();
 
-        Mockito.when(emailVerificationPolicyManager.isVerifiedMail(Mockito.any())).thenReturn(false);
+        when(emailVerificationPolicyManager.isVerifiedMail(any())).thenReturn(false);
+        when(userReservationService.existsByUsername(request.getUsername())).thenReturn(true);
+        when(userReservationService.existsByNickname(request.getNickname())).thenReturn(true);
 
-        Assertions.assertThatThrownBy(() -> userValidationService.validateRegistration(request))
+        assertThatThrownBy(() -> userValidationService.validateRegistration(request))
                 .isInstanceOf(ForbiddenException.class)
                 .hasMessage(EmailResponse.EMAIL_NOT_VERIFIED.getMessage());
 
-        Mockito.verify(userValidator).validateUsernameDuplicate(request.getUsername());
-        Mockito.verify(userValidator).validateNicknameDuplicate(request.getNickname());
-        Mockito.verify(userValidator).validatePasswordMatch(request.getPassword(), request.getPasswordConfirm());
-        Mockito.verify(userValidator).validateEmailDuplicate(request.getEmail());
-        Mockito.verify(userValidator).validateBirthIsInFuture(request.parseBirthday());
+        verify(userValidator).validateUsernameDuplicate(request.getUsername());
+        verify(userValidator).validateNicknameDuplicate(request.getNickname());
+        verify(userValidator).validatePasswordMatch(request.getPassword(), request.getPasswordConfirm());
+        verify(userValidator).validateEmailDuplicate(request.getEmail());
+        verify(userValidator).validateBirthIsInFuture(request.parseBirthday());
+        verify(userReservationService).existsByUsername(request.getUsername());
+        verify(userReservationService).existsByNickname(request.getNickname());
+        verify(emailVerificationPolicyManager).isVerifiedMail(request.getEmail());
     }
 
     @Test
@@ -80,20 +98,22 @@ public class UserValidationServiceTest {
     void validateRegistration_whenUsernameDuplicate_thenThrowException() {
         UserRegistrationRequest request = userRegistrationBuilder.build();
 
-        Mockito.doThrow(new ConflictException(UserResponse.USERNAME_DUPLICATE))
+        doThrow(new ConflictException(UserResponse.USERNAME_DUPLICATE))
                 .when(userValidator)
                 .validateUsernameDuplicate(request.getUsername());
 
-        Assertions.assertThatThrownBy(() -> userValidationService.validateRegistration(request))
+        assertThatThrownBy(() -> userValidationService.validateRegistration(request))
                 .isInstanceOf(ConflictException.class)
                 .hasMessage(UserResponseMessages.USERNAME_DUPLICATE);
 
-        Mockito.verify(userValidator).validateUsernameDuplicate(request.getUsername());
-        Mockito.verify(userValidator, Mockito.never()).validateNicknameDuplicate(Mockito.any());
-        Mockito.verify(userValidator, Mockito.never()).validatePasswordMatch(Mockito.any(), Mockito.any());
-        Mockito.verify(userValidator, Mockito.never()).validateEmailDuplicate(Mockito.any());
-        Mockito.verify(userValidator, Mockito.never()).validateBirthIsInFuture(Mockito.any());
-        Mockito.verify(emailVerificationPolicyManager, Mockito.never()).isVerifiedMail(Mockito.any());
+        verify(userValidator).validateUsernameDuplicate(request.getUsername());
+        verify(userValidator, never()).validateNicknameDuplicate(any());
+        verify(userValidator, never()).validatePasswordMatch(any(), any());
+        verify(userValidator, never()).validateEmailDuplicate(any());
+        verify(userValidator, never()).validateBirthIsInFuture(any());
+        verify(userReservationService, never()).existsByUsername(any());
+        verify(userReservationService, never()).existsByNickname(any());
+        verify(emailVerificationPolicyManager, never()).isVerifiedMail(any());
     }
 
     @Test
@@ -101,20 +121,22 @@ public class UserValidationServiceTest {
     void validateRegistration_whenNicknameDuplicate_thenThrowConflictException() {
         UserRegistrationRequest request = userRegistrationBuilder.build();
 
-        Mockito.doThrow(new ConflictException(UserResponse.NICKNAME_DUPLICATE))
+        doThrow(new ConflictException(UserResponse.NICKNAME_DUPLICATE))
                 .when(userValidator)
                 .validateNicknameDuplicate(request.getNickname());
 
-        Assertions.assertThatThrownBy(() -> userValidationService.validateRegistration(request))
+        assertThatThrownBy(() -> userValidationService.validateRegistration(request))
                 .isInstanceOf(ConflictException.class)
                 .hasMessage(UserResponseMessages.NICKNAME_DUPLICATE);
 
-        Mockito.verify(userValidator).validateUsernameDuplicate(request.getUsername());
-        Mockito.verify(userValidator).validateNicknameDuplicate(request.getNickname());
-        Mockito.verify(userValidator, Mockito.never()).validatePasswordMatch(Mockito.any(), Mockito.any());
-        Mockito.verify(userValidator, Mockito.never()).validateEmailDuplicate(Mockito.any());
-        Mockito.verify(userValidator, Mockito.never()).validateBirthIsInFuture(Mockito.any());
-        Mockito.verify(emailVerificationPolicyManager, Mockito.never()).isVerifiedMail(Mockito.any());
+        verify(userValidator).validateUsernameDuplicate(request.getUsername());
+        verify(userValidator).validateNicknameDuplicate(request.getNickname());
+        verify(userValidator, never()).validatePasswordMatch(any(), any());
+        verify(userValidator, never()).validateEmailDuplicate(any());
+        verify(userValidator, never()).validateBirthIsInFuture(any());
+        verify(userReservationService, never()).existsByUsername(any());
+        verify(userReservationService, never()).existsByNickname(any());
+        verify(emailVerificationPolicyManager, never()).isVerifiedMail(any());
     }
 
     @Test
@@ -124,20 +146,22 @@ public class UserValidationServiceTest {
                 .passwordConfirm(UserRegistrationFixture.MISMATCH_PASSWORD_CONFIRM)
                 .build();
 
-        Mockito.doThrow(new BadRequestException(UserResponse.PASSWORD_DO_NOT_MATCH))
+        doThrow(new BadRequestException(UserResponse.PASSWORD_DO_NOT_MATCH))
                 .when(userValidator)
                 .validatePasswordMatch(request.getPassword(), request.getPasswordConfirm());
 
-        Assertions.assertThatThrownBy(() -> userValidationService.validateRegistration(request))
+        assertThatThrownBy(() -> userValidationService.validateRegistration(request))
                 .isInstanceOf(BadRequestException.class)
                 .hasMessage(UserResponseMessages.PASSWORD_DO_NOT_MATCH);
 
-        Mockito.verify(userValidator).validateUsernameDuplicate(request.getUsername());
-        Mockito.verify(userValidator).validateNicknameDuplicate(request.getNickname());
-        Mockito.verify(userValidator).validatePasswordMatch(request.getPassword(), request.getPasswordConfirm());
-        Mockito.verify(userValidator, Mockito.never()).validateEmailDuplicate(Mockito.any());
-        Mockito.verify(userValidator, Mockito.never()).validateBirthIsInFuture(Mockito.any());
-        Mockito.verify(emailVerificationPolicyManager, Mockito.never()).isVerifiedMail(Mockito.any());
+        verify(userValidator).validateUsernameDuplicate(request.getUsername());
+        verify(userValidator).validateNicknameDuplicate(request.getNickname());
+        verify(userValidator).validatePasswordMatch(request.getPassword(), request.getPasswordConfirm());
+        verify(userValidator, never()).validateEmailDuplicate(any());
+        verify(userValidator, never()).validateBirthIsInFuture(any());
+        verify(userReservationService, never()).existsByUsername(any());
+        verify(userReservationService, never()).existsByNickname(any());
+        verify(emailVerificationPolicyManager, never()).isVerifiedMail(any());
     }
 
     @Test
@@ -145,20 +169,22 @@ public class UserValidationServiceTest {
     void validateRegistration_whenEmailDuplicate_thenThrowConflictException() {
         UserRegistrationRequest request = userRegistrationBuilder.build();
 
-        Mockito.doThrow(new ConflictException(UserResponse.EMAIL_DUPLICATE))
+        doThrow(new ConflictException(UserResponse.EMAIL_DUPLICATE))
                 .when(userValidator)
                 .validateEmailDuplicate(request.getEmail());
 
-        Assertions.assertThatThrownBy(() -> userValidationService.validateRegistration(request))
+        assertThatThrownBy(() -> userValidationService.validateRegistration(request))
                 .isInstanceOf(ConflictException.class)
                 .hasMessage(UserResponseMessages.EMAIL_DUPLICATE);
 
-        Mockito.verify(userValidator).validateUsernameDuplicate(request.getUsername());
-        Mockito.verify(userValidator).validateNicknameDuplicate(request.getNickname());
-        Mockito.verify(userValidator).validatePasswordMatch(request.getPassword(), request.getPasswordConfirm());
-        Mockito.verify(userValidator).validateEmailDuplicate(request.getEmail());
-        Mockito.verify(userValidator, Mockito.never()).validateBirthIsInFuture(Mockito.any());
-        Mockito.verify(emailVerificationPolicyManager, Mockito.never()).isVerifiedMail(Mockito.any());
+        verify(userValidator).validateUsernameDuplicate(request.getUsername());
+        verify(userValidator).validateNicknameDuplicate(request.getNickname());
+        verify(userValidator).validatePasswordMatch(request.getPassword(), request.getPasswordConfirm());
+        verify(userValidator).validateEmailDuplicate(request.getEmail());
+        verify(userValidator, never()).validateBirthIsInFuture(any());
+        verify(userReservationService, never()).existsByUsername(any());
+        verify(userReservationService, never()).existsByNickname(any());
+        verify(emailVerificationPolicyManager, never()).isVerifiedMail(any());
     }
 
     @Test
@@ -168,19 +194,154 @@ public class UserValidationServiceTest {
                 .email(UserRegistrationFixture.FUTURE_BIRTH)
                 .build();
 
-        Mockito.doThrow(new BadRequestException(UserResponse.BIRTHDAY_IN_FUTURE))
+        doThrow(new BadRequestException(UserResponse.BIRTHDAY_IN_FUTURE))
                 .when(userValidator)
                 .validateBirthIsInFuture(request.parseBirthday());
 
-        Assertions.assertThatThrownBy(() -> userValidationService.validateRegistration(request))
+        assertThatThrownBy(() -> userValidationService.validateRegistration(request))
                 .isInstanceOf(BadRequestException.class)
                 .hasMessage(UserResponseMessages.BIRTHDAY_IN_FUTURE);
 
-        Mockito.verify(userValidator).validateUsernameDuplicate(request.getUsername());
-        Mockito.verify(userValidator).validateNicknameDuplicate(request.getNickname());
-        Mockito.verify(userValidator).validatePasswordMatch(request.getPassword(), request.getPasswordConfirm());
-        Mockito.verify(userValidator).validateEmailDuplicate(request.getEmail());
-        Mockito.verify(userValidator).validateBirthIsInFuture(request.parseBirthday());
-        Mockito.verify(emailVerificationPolicyManager, Mockito.never()).isVerifiedMail(Mockito.any());
+        verify(userValidator).validateUsernameDuplicate(request.getUsername());
+        verify(userValidator).validateNicknameDuplicate(request.getNickname());
+        verify(userValidator).validatePasswordMatch(request.getPassword(), request.getPasswordConfirm());
+        verify(userValidator).validateEmailDuplicate(request.getEmail());
+        verify(userValidator).validateBirthIsInFuture(request.parseBirthday());
+        verify(userReservationService, never()).existsByUsername(any());
+        verify(userReservationService, never()).existsByNickname(any());
+        verify(emailVerificationPolicyManager, never()).isVerifiedMail(any());
+    }
+
+    @Test
+    @DisplayName("회원가입 데이터 검증 - 사용자명 중복 검사를 수행하지 않은 경우")
+    void validateRegistration_whenUsernameIsNotReserved_thenThrowBadRequestException() {
+        UserRegistrationRequest request = userRegistrationBuilder.build();
+
+        when(userReservationService.existsByUsername(any())).thenReturn(false);
+
+        assertThatThrownBy(() -> userValidationService.validateRegistration(request))
+                .isInstanceOf(BadRequestException.class)
+                .hasMessage(UserResponseMessages.USERNAME_NOT_RESERVED);
+
+        verify(userValidator).validateUsernameDuplicate(request.getUsername());
+        verify(userValidator).validateNicknameDuplicate(request.getNickname());
+        verify(userValidator).validatePasswordMatch(request.getPassword(), request.getPasswordConfirm());
+        verify(userValidator).validateEmailDuplicate(request.getEmail());
+        verify(userValidator).validateBirthIsInFuture(request.parseBirthday());
+        verify(userReservationService).existsByUsername(request.getUsername());
+        verify(userReservationService, never()).existsByNickname(any());
+        verify(emailVerificationPolicyManager, never()).isVerifiedMail(any());
+    }
+
+    @Test
+    @DisplayName("회원가입 데이터 검증 - 닉네임 중복 검사를 수행하지 않은 경우")
+    void validateRegistration_whenNicknameIsNotReserved_thenThrowBadRequestException() {
+        UserRegistrationRequest request = userRegistrationBuilder.build();
+
+        when(userReservationService.existsByUsername(any())).thenReturn(true);
+        when(userReservationService.existsByNickname(any())).thenReturn(false);
+
+        assertThatThrownBy(() -> userValidationService.validateRegistration(request))
+                .isInstanceOf(BadRequestException.class)
+                .hasMessage(UserResponseMessages.NICKNAME_NOT_RESERVED);
+
+        verify(userValidator).validateUsernameDuplicate(request.getUsername());
+        verify(userValidator).validateNicknameDuplicate(request.getNickname());
+        verify(userValidator).validatePasswordMatch(request.getPassword(), request.getPasswordConfirm());
+        verify(userValidator).validateEmailDuplicate(request.getEmail());
+        verify(userValidator).validateBirthIsInFuture(request.parseBirthday());
+        verify(userReservationService).existsByUsername(request.getUsername());
+        verify(userReservationService).existsByNickname(request.getNickname());
+        verify(emailVerificationPolicyManager, never()).isVerifiedMail(any());
+    }
+
+    @Test
+    @DisplayName("사용자명 중복검사 검증 - 성공")
+    void validateCheckUsername_whenAllValidationPass_thenDoNothing() {
+        String username = userRegistrationBuilder.build().getUsername();
+
+        when(userReservationService.existsByUsername(username)).thenReturn(false);
+
+        userValidationService.validateCheckUsername(username);
+
+        verify(userValidator).validateUsernameDuplicate(username);
+        verify(userReservationService).existsByUsername(username);
+    }
+
+    @Test
+    @DisplayName("사용자명 중복 검사 검증 - 사용자명으로 회원가입한 사용자가 있는 경우")
+    void validateCheckUsername_whenUsernameDuplicated_thenThrowConflictException() {
+        String username = userRegistrationBuilder.build().getUsername();
+
+        doThrow(new ConflictException(UserResponse.USERNAME_DUPLICATE))
+                .when(userValidator)
+                .validateUsernameDuplicate(username);
+
+        assertThatThrownBy(() -> userValidationService.validateCheckUsername(username))
+                .isInstanceOf(ConflictException.class)
+                .hasMessage(UserResponseMessages.USERNAME_DUPLICATE);
+
+        verify(userValidator).validateUsernameDuplicate(username);
+        verify(userReservationService, never()).existsByUsername(username);
+    }
+
+    @Test
+    @DisplayName("사용자명 중복 검사 검증 - 사용자명이 이미 예약되어 있을 때")
+    void validateCheckUsername_whenUsernameReserved_thenThrowConflicException() {
+        String username = userRegistrationBuilder.build().getUsername();
+
+        when(userReservationService.existsByUsername(username)).thenReturn(true);
+
+        assertThatThrownBy(() -> userValidationService.validateCheckUsername(username))
+                .isInstanceOf(ConflictException.class)
+                .hasMessage(UserResponseMessages.USERNAME_DUPLICATE);
+
+        verify(userValidator).validateUsernameDuplicate(username);
+        verify(userReservationService).existsByUsername(username);
+    }
+
+    @Test
+    @DisplayName("닉네임 증복 검사 검증 - 성공")
+    void validateCheckNickname_whenAllValidationPass_thenDoNothing() {
+        String nickname = userRegistrationBuilder.build().getNickname();
+
+        when(userReservationService.existsByNickname(nickname)).thenReturn(false);
+
+        userValidationService.validateCheckNickname(nickname);
+
+        verify(userValidator).validateNicknameDuplicate(nickname);
+        verify(userReservationService).existsByNickname(nickname);
+    }
+
+    @Test
+    @DisplayName("닉네임 중복 검사 검증 - 이미 사용중인 닉네임인 경우")
+    void validateCheckNickname_whenNicknameDuplicated_thenThrowConflicException() {
+        String nickname = userRegistrationBuilder.build().getNickname();
+
+        doThrow(new ConflictException(UserResponse.NICKNAME_DUPLICATE))
+                .when(userValidator)
+                .validateNicknameDuplicate(nickname);
+
+        assertThatThrownBy(() -> userValidationService.validateCheckNickname(nickname))
+                .isInstanceOf(ConflictException.class)
+                .hasMessage(UserResponseMessages.NICKNAME_DUPLICATE);
+
+        verify(userValidator).validateNicknameDuplicate(nickname);
+        verify(userReservationService, never()).existsByNickname(nickname);
+    }
+
+    @Test
+    @DisplayName("닉네임 중복 검사 검증 - 이미 예약중인 닉네임인 경우")
+    void validateCheckNickname_whenNicknameReserved_thenThrowConflictException() {
+        String nickname = userRegistrationBuilder.build().getNickname();
+
+        when(userReservationService.existsByNickname(nickname)).thenReturn(true);
+
+        assertThatThrownBy(() -> userValidationService.validateCheckNickname(nickname))
+                .isInstanceOf(ConflictException.class)
+                .hasMessage(UserResponseMessages.NICKNAME_DUPLICATE);
+
+        verify(userValidator).validateNicknameDuplicate(nickname);
+        verify(userReservationService).existsByNickname(nickname);
     }
 }
