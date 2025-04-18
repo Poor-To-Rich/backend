@@ -11,6 +11,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.poortorich.global.config.BaseSecurityTest;
 import com.poortorich.s3.util.S3TestFileGenerator;
 import com.poortorich.security.config.SecurityConfig;
 import com.poortorich.user.constants.UserResponseMessages;
@@ -39,7 +40,7 @@ import org.springframework.web.multipart.MultipartFile;
 @WebMvcTest(UserController.class)
 @Import(SecurityConfig.class)
 @ExtendWith(MockitoExtension.class)
-class UserControllerTest {
+class UserControllerTest extends BaseSecurityTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -99,7 +100,7 @@ class UserControllerTest {
 
         when(userFacade.checkUsernameAndReservation(any())).thenReturn(UserResponse.USERNAME_AVAILABLE);
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/exists/username")
+        mockMvc.perform(MockMvcRequestBuilders.post("/user/exists/username")
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .content(objectMapper.writeValueAsString(request))
                         .with(csrf()))
@@ -116,7 +117,7 @@ class UserControllerTest {
 
         when(userFacade.checkNicknameAndReservation(any())).thenReturn(UserResponse.NICKNAME_AVAILABLE);
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/exists/nickname")
+        mockMvc.perform(MockMvcRequestBuilders.post("/user/exists/nickname")
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .content(objectMapper.writeValueAsString(request))
                         .with(csrf()))
