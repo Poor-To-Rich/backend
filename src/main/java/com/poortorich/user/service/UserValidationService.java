@@ -30,11 +30,11 @@ public class UserValidationService {
         userValidator.validateBirthIsInFuture(userRegistrationRequest.parseBirthday());
 
         if (!userReservationService.existsByUsername(userRegistrationRequest.getUsername())) {
-            throw new BadRequestException(UserResponse.USERNAME_NOT_RESERVED);
+            throw new BadRequestException(UserResponse.USERNAME_RESERVE_CHECK_REQUIRED);
         }
 
         if (!userReservationService.existsByNickname(userRegistrationRequest.getNickname())) {
-            throw new BadRequestException(UserResponse.NICKNAME_NOT_RESERVED);
+            throw new BadRequestException(UserResponse.NICKNAME_RESERVE_CHECK_REQUIRED);
         }
 
         if (!emailVerificationPolicyManager.isVerifiedMail(userRegistrationRequest.getEmail())) {

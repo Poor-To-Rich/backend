@@ -221,7 +221,7 @@ public class UserValidationServiceTest {
 
         assertThatThrownBy(() -> userValidationService.validateRegistration(request))
                 .isInstanceOf(BadRequestException.class)
-                .hasMessage(UserResponseMessages.USERNAME_NOT_RESERVED);
+                .hasMessage(UserResponseMessages.USERNAME_RESERVE_CHECK_REQUIRED);
 
         verify(userValidator).validateUsernameDuplicate(request.getUsername());
         verify(userValidator).validateNicknameDuplicate(request.getNickname());
@@ -243,7 +243,7 @@ public class UserValidationServiceTest {
 
         assertThatThrownBy(() -> userValidationService.validateRegistration(request))
                 .isInstanceOf(BadRequestException.class)
-                .hasMessage(UserResponseMessages.NICKNAME_NOT_RESERVED);
+                .hasMessage(UserResponseMessages.NICKNAME_RESERVE_CHECK_REQUIRED);
 
         verify(userValidator).validateUsernameDuplicate(request.getUsername());
         verify(userValidator).validateNicknameDuplicate(request.getNickname());
