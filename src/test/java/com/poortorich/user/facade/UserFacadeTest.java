@@ -6,7 +6,10 @@ import static org.mockito.Mockito.when;
 import com.poortorich.s3.service.FileUploadService;
 import com.poortorich.s3.util.S3TestFileGenerator;
 import com.poortorich.user.fixture.UserRegistrationFixture;
+import com.poortorich.user.request.NicknameCheckRequest;
 import com.poortorich.user.request.UserRegistrationRequest;
+import com.poortorich.user.request.UsernameCheckRequest;
+import com.poortorich.user.service.RedisUserReservationService;
 import com.poortorich.user.service.UserService;
 import com.poortorich.user.service.UserValidationService;
 import com.poortorich.user.util.UserRegistrationRequestTestBuilder;
@@ -31,6 +34,9 @@ public class UserFacadeTest {
     @Mock
     private FileUploadService fileUploadService;
 
+    @Mock
+    private RedisUserReservationService userReservationService;
+
     @InjectMocks
     private UserFacade userFacade;
 
@@ -53,7 +59,31 @@ public class UserFacadeTest {
         userFacade.registerNewUser(request, profileImage);
 
         verify(userValidationService).validateRegistration(request);
+        verify(userReservationService).removeUsernameReservation(request.getUsername());
+        verify(userReservationService).removeNicknameReservation(request.getNickname());
         verify(fileUploadService).uploadImage(profileImage);
         verify(userService).save(request, profileImageUrl);
+    }
+
+    @Test
+    @DisplayName("Facade에서 사용자명 중복 검사 시 서비스들이 적절히 호출되는지 검증")
+    void checkUsernameAndReservation_shouldCallServiceMethods() {
+        UsernameCheckRequest usernameCheckRequest = new UsernameCheckRequest("user1234");
+
+        userFacade.checkUsernameAndReservation(usernameCheckRequest);
+
+        verify(userValidationService).validateCheckUsername(usernameCheckRequest.getUsername());
+        verify(userReservationService).reservedUsername(usernameCheckRequest.getUsername());
+    }
+
+    @Test
+    @DisplayName("Facade에서 닉네임 중복 검사 시 서비스들이 적절히 호출되는지 검증")
+    void checkNicknameAndReservation_shouldCallServiceMethods() {
+        NicknameCheckRequest nicknameCheckRequest = new NicknameCheckRequest("happy123");
+
+        userFacade.checkNicknameAndReservation(nicknameCheckRequest);
+
+        verify(userValidationService).validateCheckNickname(nicknameCheckRequest.getNickname());
+        verify(userReservationService).reservedNickname(nicknameCheckRequest.getNickname());
     }
 }

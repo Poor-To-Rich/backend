@@ -2,8 +2,11 @@ package com.poortorich.user.service;
 
 import com.poortorich.email.enums.EmailResponse;
 import com.poortorich.email.util.EmailVerificationPolicyManager;
+import com.poortorich.global.exceptions.BadRequestException;
+import com.poortorich.global.exceptions.ConflictException;
 import com.poortorich.global.exceptions.ForbiddenException;
 import com.poortorich.user.request.UserRegistrationRequest;
+import com.poortorich.user.response.enums.UserResponse;
 import com.poortorich.user.validator.UserValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -14,6 +17,7 @@ public class UserValidationService {
 
     private final UserValidator userValidator;
     private final EmailVerificationPolicyManager emailVerificationPolicyManager;
+    private final RedisUserReservationService userReservationService;
 
     public void validateRegistration(UserRegistrationRequest userRegistrationRequest) {
         userValidator.validateUsernameDuplicate(userRegistrationRequest.getUsername());
@@ -25,8 +29,30 @@ public class UserValidationService {
         userValidator.validateEmailDuplicate(userRegistrationRequest.getEmail());
         userValidator.validateBirthIsInFuture(userRegistrationRequest.parseBirthday());
 
+        if (!userReservationService.existsByUsername(userRegistrationRequest.getUsername())) {
+            throw new BadRequestException(UserResponse.USERNAME_RESERVE_CHECK_REQUIRED);
+        }
+
+        if (!userReservationService.existsByNickname(userRegistrationRequest.getNickname())) {
+            throw new BadRequestException(UserResponse.NICKNAME_RESERVE_CHECK_REQUIRED);
+        }
+
         if (!emailVerificationPolicyManager.isVerifiedMail(userRegistrationRequest.getEmail())) {
             throw new ForbiddenException(EmailResponse.EMAIL_NOT_VERIFIED);
+        }
+    }
+
+    public void validateCheckUsername(String username) {
+        userValidator.validateUsernameDuplicate(username);
+        if (userReservationService.existsByUsername(username)) {
+            throw new ConflictException(UserResponse.USERNAME_DUPLICATE);
+        }
+    }
+
+    public void validateCheckNickname(String nickname) {
+        userValidator.validateNicknameDuplicate(nickname);
+        if (userReservationService.existsByNickname(nickname)) {
+            throw new ConflictException(UserResponse.NICKNAME_DUPLICATE);
         }
     }
 }

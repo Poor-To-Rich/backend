@@ -4,17 +4,22 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.poortorich.global.config.BaseSecurityTest;
 import com.poortorich.s3.util.S3TestFileGenerator;
 import com.poortorich.security.config.SecurityConfig;
+import com.poortorich.user.constants.UserResponseMessages;
 import com.poortorich.user.facade.UserFacade;
 import com.poortorich.user.fixture.UserRegisterApiFixture;
+import com.poortorich.user.request.NicknameCheckRequest;
 import com.poortorich.user.request.UserRegistrationRequest;
+import com.poortorich.user.request.UsernameCheckRequest;
 import com.poortorich.user.response.enums.UserResponse;
 import com.poortorich.user.util.UserRegistrationRequestTestBuilder;
 import org.junit.jupiter.api.BeforeEach;
@@ -35,7 +40,7 @@ import org.springframework.web.multipart.MultipartFile;
 @WebMvcTest(UserController.class)
 @Import(SecurityConfig.class)
 @ExtendWith(MockitoExtension.class)
-class UserControllerTest {
+class UserControllerTest extends BaseSecurityTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -86,6 +91,40 @@ class UserControllerTest {
                 .andExpect(jsonPath("$.resultMessage").value(UserResponse.REGISTRATION_SUCCESS.getMessage()));
 
         verify(userFacade, times(1)).registerNewUser(any(UserRegistrationRequest.class), any());
+    }
+
+    @Test
+    @DisplayName("유효한 사용자명으로 중복 검사 api를 호출")
+    public void checkUsername_whenValidUsername_thenNoException() throws Exception {
+        UsernameCheckRequest request = new UsernameCheckRequest("user123");
+
+        when(userFacade.checkUsernameAndReservation(any())).thenReturn(UserResponse.USERNAME_AVAILABLE);
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/user/exists/username")
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(objectMapper.writeValueAsString(request))
+                        .with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.resultMessage").value(UserResponse.USERNAME_AVAILABLE.getMessage()));
+
+        verify(userFacade, times(1)).checkUsernameAndReservation(any(UsernameCheckRequest.class));
+    }
+
+    @Test
+    @DisplayName("유효한 닉네임으로 중복 검사 api를 호출")
+    public void checkNickname_whenValidNickname_thenNoException() throws Exception {
+        NicknameCheckRequest request = new NicknameCheckRequest("happy123");
+
+        when(userFacade.checkNicknameAndReservation(any())).thenReturn(UserResponse.NICKNAME_AVAILABLE);
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/user/exists/nickname")
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(objectMapper.writeValueAsString(request))
+                        .with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.resultMessage").value(UserResponseMessages.NICKNAME_AVAILABLE));
+
+        verify(userFacade, times(1)).checkNicknameAndReservation(any(NicknameCheckRequest.class));
     }
 
     private String getUserRegistrationRequestJson() throws JsonProcessingException {
