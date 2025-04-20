@@ -14,6 +14,7 @@ public class AuthResponseMessage {
     public static final String LOGOUT_SUCCESS = "로그아웃 성공";
 
     public static final String REDIS_SERVER_EXCEPTION = "요청을 처리하던 중 서버에 오류가 발생했습니다. 잠시 후 다시 시도해주세요.";
+    public static final String HEALTH_CHECK = "HTTPS HEALTH CHECK";
 
     private AuthResponseMessage() {
     }

@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 
 @AllArgsConstructor
 public enum AuthResponse implements Response {
+    HEALTH_CHECK(HttpStatus.OK, AuthResponseMessage.HEALTH_CHECK),
 
     TOKEN_INVALID(HttpStatus.UNAUTHORIZED, AuthResponseMessage.TOKEN_INVALID),
     CREDENTIALS_INVALID(HttpStatus.BAD_REQUEST, AuthResponseMessage.CREDENTIALS_INVALID),
