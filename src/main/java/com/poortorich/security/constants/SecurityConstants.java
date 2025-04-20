@@ -11,9 +11,9 @@ public class SecurityConstants {
     public static final List<String> ALLOWED_HEADERS = List.of("authorization", "content-type", "x-auth-token");
     public static final String[] PERMIT_ALL_ENDPOINTS = {
             "/auth/health",
-            "/user/login",
-            "/user/refresh",
-            "/user/register",
+            "/auth/login",
+            "/auth/refresh",
+            "/auth/register",
             "/user/exists/username",
             "/user/exists/nickname",
             "/email/send",
