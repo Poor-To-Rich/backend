@@ -11,7 +11,6 @@ public class SecurityConstants {
             "/user/login",
             "/user/refresh",
             "/user/register",
-            "/user/register/username/exists",
             "/user/exists/username",
             "/user/exists/nickname",
             "/email/send",
