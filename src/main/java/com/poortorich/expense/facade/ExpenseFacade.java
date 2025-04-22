@@ -37,6 +37,8 @@ public class ExpenseFacade {
     public void createIterationExpense(ExpenseRequest expenseRequest, Expense expense) {
         List<Expense> iterationExpenses = iterationService.createIterationExpenses(expenseRequest.getCustomIteration(), expense);
         List<Expense> savedExpenses = expenseService.createExpenseAll(iterationExpenses);
-        iterationService.createIterationInfo(expenseRequest.getCustomIteration(), expense, savedExpenses);
+        if (expense.getIterationType() == IterationType.CUSTOM) {
+            iterationService.createIterationInfo(expenseRequest.getCustomIteration(), expense, savedExpenses);
+        }
     }
 }

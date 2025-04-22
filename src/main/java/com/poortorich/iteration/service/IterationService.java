@@ -36,37 +36,81 @@ public class IterationService {
     private final IterationExpensesRepository iterationExpensesRepository;
     private final IterationInfoRepository iterationInfoRepository;
 
-    public List<Expense> createIterationExpenses(CustomIteration customIteration, Expense expense) {
+    public List<Expense> createIterationExpenses(CustomIteration customIteration,
+                                                 Expense expense) {
         LocalDate startDate = expense.getExpenseDate();
         return getIterationExpenses(
-                customIteration.getCycle(),
-                customIteration.getEnd(),
+                customIteration,
                 startDate,
-                expense,
-                customIteration.getIterationRule()
+                expense
         );
     }
 
-    private List<Expense> getIterationExpenses(int cycle, End end, LocalDate startDate, Expense expense, IterationRule rule) {
+    private List<Expense> getIterationExpenses(CustomIteration customIteration, LocalDate startDate, Expense expense) {
         List<Expense> iterationExpenses = new ArrayList<>();
-
-        LocalDate date = calculateDateByRuleType(cycle, startDate, rule, rule.getMonthlyOption());
-        LocalDate endDate = calculateEndDate(expense, end, startDate, rule);
-
+        LocalDate date = getDateByIterationType(customIteration, startDate, expense.getIterationType());
+        LocalDate endDate = calculateEndDate(customIteration, expense, startDate);
         int maxIterations = 0;
+        int allowedIterations = getAllowedIterations(expense.getIterationType(), customIteration);
+
         while (!date.isAfter(endDate)) {
-            if (maxIterations > rule.parseIterationType().maxIterations) {
+            if (maxIterations > allowedIterations) {
                 throw new BadRequestException(IterationResponse.ITERATIONS_TOO_LONG);
             }
             Expense generatedExpense = buildIterationExpense(expense, date);
             iterationExpenses.add(generatedExpense);
-            date = calculateDateByRuleType(cycle, date, rule, rule.getMonthlyOption());
+            date = getDateByIterationType(customIteration, date, expense.getIterationType());
+            maxIterations++;
         }
 
         return iterationExpenses;
     }
 
-    private LocalDate calculateDateByRuleType(int count, LocalDate date, IterationRule rule, MonthlyOption monthlyOption) {
+    private LocalDate getDateByIterationType(CustomIteration customIteration, LocalDate date, IterationType type) {
+        if (type == IterationType.CUSTOM) {
+            IterationRule rule = customIteration.getIterationRule();
+            return calculateDateByRuleType(customIteration.getCycle(), date, rule, rule.getMonthlyOption());
+        }
+
+        return calculateDateByIterationType(type, date);
+    }
+
+    private int getAllowedIterations(IterationType type, CustomIteration customIteration) {
+        if (type == IterationType.CUSTOM) {
+            return customIteration.getIterationRule().parseIterationType().maxIterations;
+        }
+
+        return IterationRuleType.DAILY.maxIterations;
+    }
+
+    private LocalDate calculateDateByIterationType(IterationType type, LocalDate date) {
+        if (type == IterationType.DAILY) {
+            return dateCalculator.dailyTypeDate(date, 1);
+        }
+
+        if (type == IterationType.WEEKLY) {
+            return dateCalculator.weeklyTypeDate(date, 1);
+        }
+
+        if (type == IterationType.MONTHLY) {
+            return dateCalculator.monthlyTypeDate(date, 1);
+        }
+
+        if (type == IterationType.YEARLY) {
+            return dateCalculator.yearlyTypeDate(date, 1);
+        }
+
+        if (type == IterationType.WEEKDAY) {
+            return dateCalculator.weeklyTypeDate(date, 1, List.of(Weekday.MONDAY, Weekday.TUESDAY, Weekday.WEDNESDAY, Weekday.THURSDAY, Weekday.FRIDAY, Weekday.SATURDAY, Weekday.SUNDAY));
+        }
+
+        return dateCalculator.monthlyTypeEndModeDate(date);
+    }
+
+    private LocalDate calculateDateByRuleType(int count,
+                                              LocalDate date,
+                                              IterationRule rule,
+                                              MonthlyOption monthlyOption) {
         if (rule.parseIterationType() == IterationRuleType.DAILY) {
             return dateCalculator.dailyTypeDate(date, count);
         }
@@ -89,7 +133,12 @@ public class IterationService {
         return dateCalculator.yearlyTypeDate(date, count);
     }
 
-    private LocalDate processCalculatorByMonthlyRule(LocalDate date, int count, int day, int week, MonthlyMode mode, Weekday weekday) {
+    private LocalDate processCalculatorByMonthlyRule(LocalDate date,
+                                                     int count,
+                                                     int day,
+                                                     int week,
+                                                     MonthlyMode mode,
+                                                     Weekday weekday) {
         LocalDate targetDate = date.plusMonths(count);
 
         if (mode == MonthlyMode.DAY) {
@@ -107,13 +156,25 @@ public class IterationService {
         return targetDate;
     }
 
-    private LocalDate calculateEndDate(Expense expense, End end, LocalDate startDate, IterationRule rule) {
-        if (end.parseEndType() == EndType.NEVER || expense.getIterationType() != IterationType.CUSTOM) {
-            return startDate.plusYears(10);
+    private LocalDate calculateEndDate(CustomIteration customIteration, Expense expense, LocalDate startDate) {
+        if (expense.getIterationType() == IterationType.CUSTOM) {
+            return calculateEndDate(customIteration.getEnd(), customIteration, startDate);
+        }
+
+        if (expense.getIterationType() == IterationType.DAILY) {
+            return dateCalculator.yearlyTypeDate(startDate, 3);
+        }
+
+        return dateCalculator.yearlyTypeDate(startDate, 10);
+    }
+
+    private LocalDate calculateEndDate(End end, CustomIteration customIteration, LocalDate startDate) {
+        if (end.parseEndType() == EndType.NEVER) {
+            return dateCalculator.yearlyTypeDate(startDate, 10);
         }
 
         if (end.parseEndType() == EndType.AFTER) {
-            return calculateDateByRuleType(end.getCount(), startDate, rule, null);
+            return calculateDateByRuleType(end.getCount() * customIteration.getCycle(), startDate, customIteration.getIterationRule(), customIteration.getIterationRule().getMonthlyOption());
         }
 
         return end.getDate();

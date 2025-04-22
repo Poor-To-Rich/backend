@@ -48,6 +48,10 @@ public class IterationDateCalculator {
         return date.plusWeeks(count - 1).plusDays(daysUntilNext);
     }
 
+    public LocalDate weeklyTypeDate(LocalDate date, int count) {
+        return date.plusWeeks(count);
+    }
+
     public LocalDate monthlyTypeDayModeDate(LocalDate date, int day) {
         while (day > date.lengthOfMonth()) {
             date = date.plusMonths(1);
@@ -69,6 +73,10 @@ public class IterationDateCalculator {
 
     public LocalDate monthlyTypeEndModeDate(LocalDate date) {
         return date.withDayOfMonth(date.lengthOfMonth());
+    }
+
+    public LocalDate monthlyTypeDate(LocalDate date, int count) {
+        return date.plusMonths(count);
     }
 
     public LocalDate yearlyTypeDate(LocalDate date, int count) {
