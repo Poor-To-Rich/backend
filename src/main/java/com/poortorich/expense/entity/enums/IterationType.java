@@ -15,15 +15,12 @@ public enum IterationType {
     MONTHLY("monthly"),
     YEARLY("yearly"),
     WEEKDAY("weekday"),
+    END_OF_MONTH("endOfMonth"),
     CUSTOM("custom");
 
     public final String type;
 
     public static IterationType from(String type) {
-        if (type == null || type.trim().isEmpty()) {
-            return DEFAULT;
-        }
-
         for (IterationType iteration : IterationType.values()) {
             if (Objects.equals(iteration.type, type)) {
                 return iteration;
