@@ -1,6 +1,6 @@
 package com.poortorich.iteration.request;
 
-import com.poortorich.iteration.entity.enums.DayOfWeek;
+import com.poortorich.iteration.entity.enums.Weekday;
 import com.poortorich.iteration.entity.enums.MonthlyMode;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -21,7 +21,7 @@ public class MonthlyOption {
         return MonthlyMode.from(mode);
     }
 
-    public DayOfWeek parseDayOfWeek() {
-        return DayOfWeek.from(dayOfWeek);
+    public Weekday parseDayOfWeek() {
+        return Weekday.from(dayOfWeek);
     }
 }

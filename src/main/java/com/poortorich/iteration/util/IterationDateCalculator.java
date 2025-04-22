@@ -1,8 +1,9 @@
 package com.poortorich.iteration.util;
 
-import com.poortorich.iteration.entity.enums.DayOfWeek;
+import com.poortorich.iteration.entity.enums.Weekday;
 import org.springframework.stereotype.Component;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.temporal.TemporalAdjusters;
 import java.util.List;
@@ -14,11 +15,11 @@ public class IterationDateCalculator {
         return date.plusDays(count);
     }
 
-    public LocalDate weeklyTypeDate(LocalDate date, int count, List<DayOfWeek> selectDays) {
-        java.time.DayOfWeek currentDayOfWeek = date.getDayOfWeek();
+    public LocalDate weeklyTypeDate(LocalDate date, int count, List<Weekday> selectDays) {
+        DayOfWeek currentDayOfWeek = date.getDayOfWeek();
 
         LocalDate nextDate;
-        for (DayOfWeek day : selectDays) {
+        for (Weekday day : selectDays) {
             nextDate = weeklyTypeFoundNextDate(date, day, currentDayOfWeek);
             if (nextDate != null) {
                 return nextDate;
@@ -28,8 +29,8 @@ public class IterationDateCalculator {
         return weeklyTypeFoundDateByFirstDay(date, count, selectDays.getFirst().name(), currentDayOfWeek);
     }
 
-    private LocalDate weeklyTypeFoundNextDate(LocalDate date, DayOfWeek day, java.time.DayOfWeek currentDayOfWeek) {
-        java.time.DayOfWeek targetDay = java.time.DayOfWeek.valueOf(day.name());
+    private LocalDate weeklyTypeFoundNextDate(LocalDate date, Weekday day, DayOfWeek currentDayOfWeek) {
+        DayOfWeek targetDay = DayOfWeek.valueOf(day.name());
         int daysUntilTarget = targetDay.getValue() - currentDayOfWeek.getValue();
         if (daysUntilTarget > 0) {
             return date.plusDays(daysUntilTarget);
@@ -38,8 +39,8 @@ public class IterationDateCalculator {
         return null;
     }
 
-    private LocalDate weeklyTypeFoundDateByFirstDay(LocalDate date, int count, String firstDay, java.time.DayOfWeek currentDayOfWeek) {
-        java.time.DayOfWeek firstSelectDay = java.time.DayOfWeek.valueOf(firstDay);
+    private LocalDate weeklyTypeFoundDateByFirstDay(LocalDate date, int count, String firstDay, DayOfWeek currentDayOfWeek) {
+        DayOfWeek firstSelectDay = DayOfWeek.valueOf(firstDay);
         int daysUntilNext = firstSelectDay.getValue() - currentDayOfWeek.getValue();
         if (daysUntilNext <= 0) {
             daysUntilNext += 7;
@@ -55,8 +56,8 @@ public class IterationDateCalculator {
         return date.withDayOfMonth(day);
     }
 
-    public LocalDate monthlyTypeWeekDayModeDate(LocalDate date, int week, DayOfWeek dayOfWeek) {
-        java.time.DayOfWeek targetDayOfWeek = java.time.DayOfWeek.valueOf(dayOfWeek.name());
+    public LocalDate monthlyTypeWeekDayModeDate(LocalDate date, int week, Weekday weekday) {
+        DayOfWeek targetDayOfWeek = DayOfWeek.valueOf(weekday.name());
 
         if (week == 0) {
             return date.with(TemporalAdjusters.lastInMonth(targetDayOfWeek));

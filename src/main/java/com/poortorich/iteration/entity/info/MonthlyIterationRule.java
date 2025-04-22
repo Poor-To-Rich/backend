@@ -1,6 +1,6 @@
 package com.poortorich.iteration.entity.info;
 
-import com.poortorich.iteration.entity.enums.DayOfWeek;
+import com.poortorich.iteration.entity.enums.Weekday;
 import com.poortorich.iteration.entity.enums.MonthlyMode;
 import jakarta.persistence.Column;
 import jakarta.persistence.DiscriminatorValue;
@@ -34,5 +34,5 @@ public class MonthlyIterationRule extends IterationInfo {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "monthlyDayOfWeek")
-    private DayOfWeek monthlyDayOfWeek;
+    private Weekday monthlyDayOfWeek;
 }

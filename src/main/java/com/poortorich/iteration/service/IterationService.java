@@ -4,7 +4,7 @@ import com.poortorich.expense.entity.Expense;
 import com.poortorich.expense.entity.enums.IterationType;
 import com.poortorich.global.exceptions.BadRequestException;
 import com.poortorich.iteration.entity.IterationExpenses;
-import com.poortorich.iteration.entity.enums.DayOfWeek;
+import com.poortorich.iteration.entity.enums.Weekday;
 import com.poortorich.iteration.entity.enums.EndType;
 import com.poortorich.iteration.entity.enums.IterationRuleType;
 import com.poortorich.iteration.entity.enums.MonthlyMode;
@@ -89,7 +89,7 @@ public class IterationService {
         return dateCalculator.yearlyTypeDate(date, count);
     }
 
-    private LocalDate processCalculatorByMonthlyRule(LocalDate date, int count, int day, int week, MonthlyMode mode, DayOfWeek dayOfWeek) {
+    private LocalDate processCalculatorByMonthlyRule(LocalDate date, int count, int day, int week, MonthlyMode mode, Weekday weekday) {
         LocalDate targetDate = date.plusMonths(count);
 
         if (mode == MonthlyMode.DAY) {
@@ -97,7 +97,7 @@ public class IterationService {
         }
 
         if (mode == MonthlyMode.WEEKDAY) {
-            return dateCalculator.monthlyTypeWeekDayModeDate(targetDate, week, dayOfWeek);
+            return dateCalculator.monthlyTypeWeekDayModeDate(targetDate, week, weekday);
         }
 
         if (mode == MonthlyMode.END) {

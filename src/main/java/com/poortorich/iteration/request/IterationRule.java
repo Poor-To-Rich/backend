@@ -1,7 +1,7 @@
 package com.poortorich.iteration.request;
 
 import com.poortorich.iteration.constants.IterationResponseMessages;
-import com.poortorich.iteration.entity.enums.DayOfWeek;
+import com.poortorich.iteration.entity.enums.Weekday;
 import com.poortorich.iteration.entity.enums.IterationRuleType;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
@@ -26,13 +26,13 @@ public class IterationRule {
         return IterationRuleType.from(type);
     }
 
-    public List<DayOfWeek> DaysOfWeekToList() {
+    public List<Weekday> DaysOfWeekToList() {
         if (daysOfWeek.isEmpty()) {
             return new ArrayList<>();
         }
 
         return daysOfWeek.stream()
-                .map(DayOfWeek::from)
+                .map(Weekday::from)
                 .toList();
     }
 
@@ -42,8 +42,8 @@ public class IterationRule {
         }
 
         return daysOfWeek.stream()
-                .map(DayOfWeek::from)
-                .map(DayOfWeek::name)
+                .map(Weekday::from)
+                .map(Weekday::name)
                 .collect(Collectors.joining(","));
     }
 }
