@@ -7,6 +7,7 @@ import com.poortorich.expense.entity.enums.PaymentMethod;
 import com.poortorich.expense.response.ExpenseResponse;
 import com.poortorich.global.constants.DatePattern;
 import com.poortorich.global.exceptions.BadRequestException;
+import com.poortorich.iteration.request.CustomIteration;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -47,6 +48,8 @@ public class ExpenseRequest {
     private String memo;
 
     private String iterationType;
+
+    private CustomIteration customIteration;
 
     public PaymentMethod parsePaymentMethod() {
         return PaymentMethod.from(paymentMethod);

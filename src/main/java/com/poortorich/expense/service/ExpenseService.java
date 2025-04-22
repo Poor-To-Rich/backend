@@ -7,14 +7,23 @@ import com.poortorich.expense.request.ExpenseRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class ExpenseService {
 
     private final ExpenseRepository expenseRepository;
 
-    public void createExpense(ExpenseRequest expenseRequest, Category category) {
-        expenseRepository.save(buildExpense(expenseRequest, category));
+    public Expense createExpense(ExpenseRequest expenseRequest, Category category) {
+        Expense expense = buildExpense(expenseRequest, category);
+        expenseRepository.save(expense);
+        return expense;
+    }
+
+    public List<Expense> createExpenseAll(List<Expense> expenses) {
+        return expenseRepository.saveAll(expenses);
     }
 
     private Expense buildExpense(ExpenseRequest expenseRequest, Category category) {
