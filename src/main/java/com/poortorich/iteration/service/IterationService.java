@@ -118,7 +118,7 @@ public class IterationService {
         }
 
         if (rule.parseIterationType() == IterationRuleType.WEEKLY) {
-            return dateCalculator.weeklyTypeDate(date, count, rule.DaysOfWeekToList());
+            return dateCalculator.weeklyTypeDate(date, count, rule.daysOfWeekToList());
         }
 
         if (rule.parseIterationType() == IterationRuleType.MONTHLY) {

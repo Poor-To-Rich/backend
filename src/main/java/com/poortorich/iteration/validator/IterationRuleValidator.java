@@ -14,19 +14,28 @@ public class IterationRuleValidator implements ConstraintValidator<IterationRule
 
     @Override
     public boolean isValid(IterationRule rule, ConstraintValidatorContext context) {
+        if (rule.getType() == null) {
+            buildCustomMessage(
+                    context,
+                    IterationResponseMessages.ITERATION_RULE_TYPE_REQUIRED,
+                    IterationValidationConstraints.ITERATION_RULE_TYPE_FIELD_NAME
+            );
+            return false;
+        }
+
         IterationRuleType type = rule.parseIterationType();
 
         boolean daysOfWeekValid = validateDaysOfWeek(type, rule.getDaysOfWeek(), context);
         boolean monthlyOptionValid = validateMonthlyOption(type, rule.getMonthlyOption(), context);
 
-        return daysOfWeekValid && monthlyOptionValid;
+        return  daysOfWeekValid && monthlyOptionValid;
     }
 
     private boolean validateDaysOfWeek(IterationRuleType type, List<String> daysOfWeek, ConstraintValidatorContext context) {
         if (type == IterationRuleType.WEEKLY && (daysOfWeek == null || daysOfWeek.isEmpty())) {
             buildCustomMessage(
                     context,
-                    IterationResponseMessages.DAY_OF_WEEK_REQUIRED_WEEKLY_TYPE,
+                    IterationResponseMessages.DAYS_OF_WEEK_REQUIRED_WEEKLY_TYPE,
                     IterationValidationConstraints.DAYS_OF_WEEK_FIELD_NAME
             );
             return false;

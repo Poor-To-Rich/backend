@@ -7,16 +7,23 @@ import com.poortorich.iteration.request.End;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 
-import java.time.LocalDate;
-
 public class EndValidator implements ConstraintValidator<EndCheck, End> {
 
     @Override
     public boolean isValid(End end, ConstraintValidatorContext context) {
+        if (end.getType() == null) {
+            buildCustomMessage(
+                    context,
+                    IterationResponseMessages.END_TYPE_REQUIRED,
+                    IterationValidationConstraints.END_TYPE_FILED_NAME
+            );
+            return false;
+        }
+
         EndType type = end.parseEndType();
 
         boolean countValid = countValid(type, end.getCount(), context);
-        boolean dateValid = dateValid(type, end.parseDate(), context);
+        boolean dateValid = dateValid(type, end.getDate(), context);
 
         return countValid && dateValid;
     }
@@ -34,7 +41,7 @@ public class EndValidator implements ConstraintValidator<EndCheck, End> {
         return true;
     }
 
-    private boolean dateValid(EndType type, LocalDate date, ConstraintValidatorContext context) {
+    private boolean dateValid(EndType type, String date, ConstraintValidatorContext context) {
         if (type == EndType.UNTIL && date == null) {
             buildCustomMessage(
                     context,

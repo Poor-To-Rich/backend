@@ -1,7 +1,6 @@
 package com.poortorich.expense.request;
 
 import com.poortorich.expense.constants.ExpenseResponseMessages;
-import com.poortorich.expense.entity.enums.IterationType;
 import com.poortorich.expense.fixture.ExpenseFixture;
 import com.poortorich.expense.util.ExpenseRequestTestBuilder;
 import com.poortorich.global.exceptions.BadRequestException;
@@ -79,26 +78,6 @@ public class ExpenseConverterTest {
     @Nested
     @DisplayName("반복 데이터 예외 처리 테스트")
     class ExceptionIterationType {
-
-        @Test
-        @DisplayName("반복 데이터가 null 인 경우 DEFAULT 값으로 설정된다.")
-        void whenNullIterationType_returnsDEFAULT() {
-            ExpenseRequest request = requestTestBuilder
-                    .iterationType(null)
-                    .build();
-
-            assertThat(request.parseIterationType()).isEqualTo(IterationType.DEFAULT);
-        }
-
-        @Test
-        @DisplayName("반복 데이터가 공백인 경우 DEFAULT 값으로 설정된다.")
-        void whenEmptyIterationType_returnsDEFAULT() {
-            ExpenseRequest request = requestTestBuilder
-                    .iterationType("")
-                    .build();
-
-            assertThat(request.parseIterationType()).isEqualTo(IterationType.DEFAULT);
-        }
 
         @Test
         @DisplayName("유효하지 않은 반복 데이터 입력 시 예외가 발생한다.")

@@ -18,7 +18,6 @@ import java.util.stream.Collectors;
 @IterationRuleCheck
 public class IterationRule {
 
-    @NotBlank(message = IterationResponseMessages.ITERATION_RULE_TYPE_REQUIRED)
     private String type;
 
     private List<String> daysOfWeek;
@@ -30,7 +29,7 @@ public class IterationRule {
         return IterationRuleType.from(type);
     }
 
-    public List<Weekday> DaysOfWeekToList() {
+    public List<Weekday> daysOfWeekToList() {
         if (daysOfWeek == null) {
             return new ArrayList<>();
         }

@@ -13,7 +13,8 @@ public enum IterationResponse implements Response {
     DAY_OF_WEEK_INVALID(HttpStatus.BAD_REQUEST, IterationResponseMessages.DAY_OF_WEEK_INVALID),
     MONTHLY_MODE_INVALID(HttpStatus.BAD_REQUEST, IterationResponseMessages.MONTHLY_MODE_INVALID),
     END_TYPE_INVALID(HttpStatus.BAD_REQUEST, IterationResponseMessages.END_TYPE_INVALID),
-    END_DATE_INVALID(HttpStatus.BAD_REQUEST, IterationResponseMessages.END_DATE_INVALID);
+    END_DATE_INVALID(HttpStatus.BAD_REQUEST, IterationResponseMessages.END_DATE_INVALID),
+    END_DATE_NOT_BEFORE(HttpStatus.BAD_REQUEST, IterationResponseMessages.END_DATE_NOT_BEFORE);
 
     private final HttpStatus httpStatus;
     private final String message;
