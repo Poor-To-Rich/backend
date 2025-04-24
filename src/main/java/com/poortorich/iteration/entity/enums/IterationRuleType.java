@@ -9,10 +9,10 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public enum IterationRuleType {
 
-    DAILY("daily", 3655),
-    WEEKLY("weekly", 525),
-    MONTHLY("monthly", 125),
-    YEARLY("yearly", 15);
+    DAILY("daily", 3700),
+    WEEKLY("weekly", 3700),
+    MONTHLY("monthly", 150),
+    YEARLY("yearly", 50);
 
     public final String type;
     public final int maxIterations;
