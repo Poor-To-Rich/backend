@@ -1,14 +1,19 @@
 package com.poortorich.email.facade;
 
+import com.poortorich.email.constants.EmailResponseMessage;
 import com.poortorich.email.enums.EmailResponse;
 import com.poortorich.email.enums.EmailVerificationType;
+import com.poortorich.email.request.EmailBlockTimeResponse;
 import com.poortorich.email.request.EmailVerificationRequest;
 import com.poortorich.email.request.VerifyEmailCodeRequest;
+import com.poortorich.email.response.VerificationAttemptStatusResponse;
 import com.poortorich.email.response.VerificationResendCodeStatusResponse;
 import com.poortorich.email.service.EmailVerificationService;
 import com.poortorich.email.service.MailService;
 import com.poortorich.email.util.VerificationCodeGenerator;
 import com.poortorich.global.response.Response;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -47,8 +52,24 @@ public class EmailFacade {
     }
 
     public VerificationResendCodeStatusResponse getResendStatus(String mail) {
-        Integer remainAttempts = verificationService
+        int remainAttempts = verificationService
                 .getRemainingAttemptsByVerificationType(mail, EmailVerificationType.CODE_RESEND);
         return new VerificationResendCodeStatusResponse(remainAttempts);
+    }
+
+    public VerificationAttemptStatusResponse getAttemptStatus(String email) {
+        int remainAttempts = verificationService
+                .getRemainingAttemptsByVerificationType(email, EmailVerificationType.AUTH_ATTEMPT);
+        return new VerificationAttemptStatusResponse(remainAttempts);
+    }
+
+    public EmailBlockTimeResponse getBlockTime(
+            @Valid @NotBlank(message = EmailResponseMessage.INVALID_EMAIL) String email) {
+        long blockTime = verificationService.getBlockTimeByEmail(email);
+
+        if (blockTime > 0L) {
+            return new EmailBlockTimeResponse(blockTime);
+        }
+        return new EmailBlockTimeResponse();
     }
 }

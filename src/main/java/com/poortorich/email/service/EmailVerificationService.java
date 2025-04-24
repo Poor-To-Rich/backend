@@ -5,6 +5,7 @@ import com.poortorich.email.util.EmailVerificationPolicyManager;
 import jakarta.annotation.PostConstruct;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
@@ -15,9 +16,8 @@ import org.springframework.stereotype.Service;
 public class EmailVerificationService {
 
     private final StringRedisTemplate redisTemplate;
-    private ValueOperations<String, String> valueOps;
-
     private final EmailVerificationPolicyManager verificationPolicyManager;
+    private ValueOperations<String, String> valueOps;
 
     @PostConstruct
     public void init() {
@@ -71,5 +71,9 @@ public class EmailVerificationService {
         );
 
         return Integer.parseInt(verificationType.getMaxStandard()) - attemptCount;
+    }
+
+    public long getBlockTimeByEmail(String email) {
+        return redisTemplate.getExpire(EmailVerificationType.AUTH_BLOCK.getRedisKey(email), TimeUnit.MINUTES);
     }
 }

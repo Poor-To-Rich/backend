@@ -55,7 +55,7 @@ public class EmailVerificationPolicyManager {
 
     private void checkBlockPolicy(String mail) {
         if (Boolean.parseBoolean(valueOps.get(EmailVerificationType.AUTH_BLOCK.getRedisKey(mail)))) {
-            throw new TooManyRequestException(EmailResponse.TOO_MANY_REQUEST_MAIL);
+            throw new TooManyRequestException(EmailResponse.TOO_MANY_REQUEST_EMAIL);
         }
     }
 
