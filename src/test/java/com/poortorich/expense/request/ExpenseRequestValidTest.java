@@ -50,7 +50,7 @@ public class ExpenseRequestValidTest {
     @ParameterizedTest
     @MethodSource("dateValidationCases")
     @DisplayName("Valid date")
-    void invalidDate_shouldFailValidation(LocalDate date, String expectedErrorMessage) {
+    void invalidDate_shouldFailValidation(String date, String expectedErrorMessage) {
         assertValidationMessage(
                 expenseRequestTestBuilder.date(date).build(),
                 expectedErrorMessage

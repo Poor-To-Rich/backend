@@ -12,7 +12,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import java.time.DateTimeException;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 @Getter
 @AllArgsConstructor
@@ -28,10 +30,17 @@ public class End {
             message = IterationResponseMessages.END_COUNT_TOO_BIG)
     private Integer count;
 
-    @DateTimeFormat(pattern = DatePattern.BASIC_PATTERN)
-    private LocalDate date;
+    private String date;
 
     public EndType parseEndType() {
         return EndType.from(type);
+    }
+
+    public LocalDate parseDate() {
+        try {
+            return LocalDate.parse(date, DateTimeFormatter.ofPattern(DatePattern.BASIC_PATTERN));
+        } catch (DateTimeException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

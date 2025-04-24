@@ -175,7 +175,7 @@ public class IterationService {
             return calculateDateByRuleType(end.getCount() * customIteration.getCycle(), startDate, customIteration.getIterationRule(), customIteration.getIterationRule().getMonthlyOption());
         }
 
-        return end.getDate();
+        return end.parseDate();
     }
 
     private LocalDate calculateEndDateByIterationRule(IterationRuleType rule, LocalDate startDate) {
@@ -238,7 +238,7 @@ public class IterationService {
                 .cycle(customIteration.getCycle())
                 .endType(customIteration.getEnd().parseEndType())
                 .endCount(customIteration.getEnd().getCount())
-                .endDate(customIteration.getEnd().getDate())
+                .endDate(customIteration.getEnd().parseDate())
                 .build();
     }
 
@@ -248,7 +248,7 @@ public class IterationService {
                 .cycle(customIteration.getCycle())
                 .endType(customIteration.getEnd().parseEndType())
                 .endCount(customIteration.getEnd().getCount())
-                .endDate(customIteration.getEnd().getDate())
+                .endDate(customIteration.getEnd().parseDate())
                 .build();
     }
 
@@ -262,7 +262,7 @@ public class IterationService {
                 .cycle(customIteration.getCycle())
                 .endType(customIteration.getEnd().parseEndType())
                 .endCount(customIteration.getEnd().getCount())
-                .endDate(customIteration.getEnd().getDate())
+                .endDate(customIteration.getEnd().parseDate())
                 .build();
     }
 
@@ -271,7 +271,7 @@ public class IterationService {
                 .cycle(customIteration.getCycle())
                 .endType(customIteration.getEnd().parseEndType())
                 .endCount(customIteration.getEnd().getCount())
-                .endDate(customIteration.getEnd().getDate())
+                .endDate(customIteration.getEnd().parseDate())
                 .build();
     }
 

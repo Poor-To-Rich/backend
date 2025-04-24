@@ -18,15 +18,16 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import java.time.DateTimeException;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 @Getter
 @AllArgsConstructor
 public class ExpenseRequest {
 
-    @DateTimeFormat(pattern = DatePattern.BASIC_PATTERN)
     @NotNull(message = ExpenseResponseMessages.DATE_REQUIRED)
-    private LocalDate date;
+    private String date;
 
     @NotBlank(message = ExpenseResponseMessages.CATEGORY_NAME_REQUIRED)
     private String categoryName;
@@ -52,6 +53,14 @@ public class ExpenseRequest {
 
     @Valid
     private CustomIteration customIteration;
+
+    public LocalDate parseDate() {
+        try {
+            return LocalDate.parse(date, DateTimeFormatter.ofPattern(DatePattern.BASIC_PATTERN));
+        } catch (DateTimeException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     public PaymentMethod parsePaymentMethod() {
         return PaymentMethod.from(paymentMethod);

@@ -1,10 +1,12 @@
 package com.poortorich.expense.fixture;
 
+import com.poortorich.iteration.request.CustomIteration;
+
 import java.time.LocalDate;
 
 public class ExpenseFixture {
 
-    public static final LocalDate VALID_DATE = LocalDate.of(2025, 1, 1);
+    public static final String VALID_DATE = "2025-01-01";
 
     public static final String VALID_CATEGORY_NAME = "주거비";
 
@@ -18,6 +20,8 @@ public class ExpenseFixture {
     public static final String VALID_MEMO = "월세 너무 비싸다";
 
     public static final String VALID_ITERATION_TYPE_STRING = "monthly";
+
+    public static final CustomIteration VALID_CUSTOM_ITERATION = null;
 
     private ExpenseFixture() {}
 }

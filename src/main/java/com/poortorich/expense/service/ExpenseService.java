@@ -28,7 +28,7 @@ public class ExpenseService {
 
     private Expense buildExpense(ExpenseRequest expenseRequest, Category category) {
         return Expense.builder()
-                .expenseDate(expenseRequest.getDate())
+                .expenseDate(expenseRequest.parseDate())
                 .category(category)
                 .title(expenseRequest.trimTitle())
                 .cost(expenseRequest.getCost())

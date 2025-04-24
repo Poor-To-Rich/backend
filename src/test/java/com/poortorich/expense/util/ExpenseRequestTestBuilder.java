@@ -2,20 +2,22 @@ package com.poortorich.expense.util;
 
 import com.poortorich.expense.fixture.ExpenseFixture;
 import com.poortorich.expense.request.ExpenseRequest;
+import com.poortorich.iteration.request.CustomIteration;
 
 import java.time.LocalDate;
 
 public class ExpenseRequestTestBuilder {
 
-    private LocalDate date = ExpenseFixture.VALID_DATE;
+    private String date = ExpenseFixture.VALID_DATE;
     private String categoryName = ExpenseFixture.VALID_CATEGORY_NAME;
     private String title = ExpenseFixture.VALID_TITLE;
     private Long cost = ExpenseFixture.VALID_COST;
     private String paymentMethod = ExpenseFixture.VALID_PAYMENT_METHOD_STRING;
     private String memo = ExpenseFixture.VALID_MEMO;
     private String iterationType = ExpenseFixture.VALID_ITERATION_TYPE_STRING;
+    private CustomIteration customIteration = ExpenseFixture.VALID_CUSTOM_ITERATION;
 
-    public ExpenseRequestTestBuilder date(LocalDate date) {
+    public ExpenseRequestTestBuilder date(String date) {
         this.date = date;
         return this;
     }
@@ -50,6 +52,11 @@ public class ExpenseRequestTestBuilder {
         return this;
     }
 
+    public ExpenseRequestTestBuilder customIteration(CustomIteration customIteration) {
+        this.customIteration = customIteration;
+        return this;
+    }
+
     public ExpenseRequest build() {
         return new ExpenseRequest(
                 date,
@@ -58,7 +65,8 @@ public class ExpenseRequestTestBuilder {
                 cost,
                 paymentMethod,
                 memo,
-                iterationType
+                iterationType,
+                customIteration
         );
     }
 }

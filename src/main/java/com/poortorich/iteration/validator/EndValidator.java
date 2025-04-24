@@ -16,7 +16,7 @@ public class EndValidator implements ConstraintValidator<EndCheck, End> {
         EndType type = end.parseEndType();
 
         boolean countValid = countValid(type, end.getCount(), context);
-        boolean dateValid = dateValid(type, end.getDate(), context);
+        boolean dateValid = dateValid(type, end.parseDate(), context);
 
         return countValid && dateValid;
     }
