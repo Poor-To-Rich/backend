@@ -2,18 +2,21 @@ package com.poortorich.iteration.request;
 
 import com.poortorich.iteration.entity.enums.Weekday;
 import com.poortorich.iteration.entity.enums.MonthlyMode;
+import com.poortorich.iteration.validator.MonthlyOptionCheck;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
+@MonthlyOptionCheck
 public class MonthlyOption {
 
     private String mode;
 
-    private int day;
+    private Integer day;
 
-    private int week;
+    private Integer week;
 
     private String dayOfWeek;
 

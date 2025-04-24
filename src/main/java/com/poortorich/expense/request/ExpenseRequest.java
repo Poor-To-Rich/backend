@@ -8,6 +8,7 @@ import com.poortorich.expense.response.ExpenseResponse;
 import com.poortorich.global.constants.DatePattern;
 import com.poortorich.global.exceptions.BadRequestException;
 import com.poortorich.iteration.request.CustomIteration;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -49,6 +50,7 @@ public class ExpenseRequest {
 
     private String iterationType;
 
+    @Valid
     private CustomIteration customIteration;
 
     public PaymentMethod parsePaymentMethod() {

@@ -4,6 +4,7 @@ import com.poortorich.global.constants.DatePattern;
 import com.poortorich.iteration.constants.IterationResponseMessages;
 import com.poortorich.iteration.constants.IterationValidationConstraints;
 import com.poortorich.iteration.entity.enums.EndType;
+import com.poortorich.iteration.validator.EndCheck;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -15,6 +16,7 @@ import java.time.LocalDate;
 
 @Getter
 @AllArgsConstructor
+@EndCheck
 public class End {
 
     @NotBlank(message = IterationResponseMessages.END_TYPE_REQUIRED)
