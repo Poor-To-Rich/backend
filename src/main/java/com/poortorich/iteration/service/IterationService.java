@@ -26,6 +26,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 
 @Service
@@ -101,7 +102,8 @@ public class IterationService {
         }
 
         if (type == IterationType.WEEKDAY) {
-            return dateCalculator.weeklyTypeDate(date, 1, List.of(Weekday.MONDAY, Weekday.TUESDAY, Weekday.WEDNESDAY, Weekday.THURSDAY, Weekday.FRIDAY, Weekday.SATURDAY, Weekday.SUNDAY));
+            List<Weekday> allWeekdays = new ArrayList<>(EnumSet.allOf(Weekday.class));
+            return dateCalculator.weeklyTypeDate(date, 1, allWeekdays);
         }
 
         return dateCalculator.monthlyTypeEndModeDate(date);
@@ -123,10 +125,8 @@ public class IterationService {
             return processCalculatorByMonthlyRule(
                     date,
                     count,
-                    monthlyOption.getDay(),
-                    monthlyOption.getWeek(),
-                    monthlyOption.parseMonthlyMode(),
-                    monthlyOption.parseDayOfWeek()
+                    monthlyOption,
+                    monthlyOption.parseMonthlyMode()
             );
         }
 
@@ -135,18 +135,16 @@ public class IterationService {
 
     private LocalDate processCalculatorByMonthlyRule(LocalDate date,
                                                      int count,
-                                                     int day,
-                                                     int week,
-                                                     MonthlyMode mode,
-                                                     Weekday weekday) {
+                                                     MonthlyOption option,
+                                                     MonthlyMode mode) {
         LocalDate targetDate = date.plusMonths(count);
 
         if (mode == MonthlyMode.DAY) {
-            return dateCalculator.monthlyTypeDayModeDate(targetDate, day);
+            return dateCalculator.monthlyTypeDayModeDate(targetDate, option.getDay());
         }
 
         if (mode == MonthlyMode.WEEKDAY) {
-            return dateCalculator.monthlyTypeWeekDayModeDate(targetDate, week, weekday);
+            return dateCalculator.monthlyTypeWeekDayModeDate(targetDate, option.getWeek(), option.parseDayOfWeek());
         }
 
         if (mode == MonthlyMode.END) {
@@ -161,7 +159,7 @@ public class IterationService {
             return calculateEndDate(customIteration.getEnd(), customIteration, startDate);
         }
 
-        if (expense.getIterationType() == IterationType.DAILY) {
+        if (expense.getIterationType() == IterationType.DAILY || expense.getIterationType() == IterationType.WEEKDAY) {
             return dateCalculator.yearlyTypeDate(startDate, 3);
         }
 
@@ -170,7 +168,7 @@ public class IterationService {
 
     private LocalDate calculateEndDate(End end, CustomIteration customIteration, LocalDate startDate) {
         if (end.parseEndType() == EndType.NEVER) {
-            return dateCalculator.yearlyTypeDate(startDate, 10);
+            return calculateEndDateByIterationRule(customIteration.getIterationRule().parseIterationType(), startDate);
         }
 
         if (end.parseEndType() == EndType.AFTER) {
@@ -178,6 +176,18 @@ public class IterationService {
         }
 
         return end.getDate();
+    }
+
+    private LocalDate calculateEndDateByIterationRule(IterationRuleType rule, LocalDate startDate) {
+        if (rule == IterationRuleType.DAILY) {
+            return dateCalculator.yearlyTypeDate(startDate, 3);
+        }
+
+        if (rule == IterationRuleType.WEEKLY) {
+            return dateCalculator.yearlyTypeDate(startDate, 5);
+        }
+
+        return dateCalculator.yearlyTypeDate(startDate, 10);
     }
 
     private Expense buildIterationExpense(Expense originalExpense, LocalDate date) {
