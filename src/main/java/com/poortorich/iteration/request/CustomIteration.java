@@ -2,7 +2,6 @@ package com.poortorich.iteration.request;
 
 import com.poortorich.iteration.constants.IterationResponseMessages;
 import com.poortorich.iteration.constants.IterationValidationConstraints;
-import com.poortorich.iteration.entity.enums.MonthlyMode;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;

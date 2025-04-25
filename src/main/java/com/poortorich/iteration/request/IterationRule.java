@@ -1,11 +1,9 @@
 package com.poortorich.iteration.request;
 
-import com.poortorich.iteration.constants.IterationResponseMessages;
 import com.poortorich.iteration.entity.enums.Weekday;
 import com.poortorich.iteration.entity.enums.IterationRuleType;
 import com.poortorich.iteration.validator.IterationRuleCheck;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
