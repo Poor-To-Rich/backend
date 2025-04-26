@@ -29,7 +29,7 @@ public class IterationResponseMessages {
     public static final String END_COUNT_REQUIRED = "반복 종료 타입이 횟수인 경우 숫자 값은 필수입니다.";
     public static final String END_COUNT_TOO_SMALL = "반복 종료 최소 횟수는 " + IterationValidationConstraints.END_COUNT_MIN + "회 입니다.";
     public static final String END_COUNT_TOO_BIG = "반복 종료 최대 횟수는 " + IterationValidationConstraints.END_COUNT_MAX + "회 입니다.";
-    public static final String END_DATE_INVALID = "반복 종료 날짜 형식이 유효하지 않습니다.";
+    public static final String END_DATE_INVALID = "반복 종료 날짜 형식이 적절하지 않습니다..";
     public static final String END_DATE_REQUIRED = "반복 종료 타입이 날짜인 경우 날짜 값은 필수입니다.";
     public static final String END_DATE_NOT_BEFORE = "반복 종료 날짜는 이전일 수 없습니다.";
 

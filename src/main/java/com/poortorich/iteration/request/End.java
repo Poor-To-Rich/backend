@@ -36,6 +36,10 @@ public class End {
     }
 
     public LocalDate parseDate() {
+        if (date == null) {
+            return null;
+        }
+
         try {
             return LocalDate.parse(date, DateTimeFormatter.ofPattern(DatePattern.BASIC_PATTERN));
         } catch (DateTimeException e) {

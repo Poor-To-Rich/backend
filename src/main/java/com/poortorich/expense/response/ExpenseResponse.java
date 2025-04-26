@@ -12,7 +12,8 @@ public enum ExpenseResponse implements Response {
 
     TITLE_TOO_SHORT(HttpStatus.BAD_REQUEST, ExpenseResponseMessages.TITLE_TOO_SHORT),
     PAYMENT_METHOD_INVALID(HttpStatus.BAD_REQUEST, ExpenseResponseMessages.PAYMENT_METHOD_INVALID),
-    ITERATION_TYPE_INVALID(HttpStatus.BAD_REQUEST, ExpenseResponseMessages.ITERATION_TYPE_INVALID);
+    ITERATION_TYPE_INVALID(HttpStatus.BAD_REQUEST, ExpenseResponseMessages.ITERATION_TYPE_INVALID),
+    DATE_INVALID(HttpStatus.BAD_REQUEST, ExpenseResponseMessages.DATE_INVALID);
 
     private final HttpStatus httpStatus;
     private final String message;
