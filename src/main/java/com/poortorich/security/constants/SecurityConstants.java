@@ -13,7 +13,7 @@ public class SecurityConstants {
             "/auth/health",
             "/auth/login",
             "/auth/refresh",
-            "/auth/register",
+            "/user/register",
             "/user/exists/username",
             "/user/exists/nickname",
             "/email/send",
