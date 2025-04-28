@@ -68,7 +68,7 @@ public class AuthControllerTest extends BaseSecurityTest {
         given(authService.login(any(LoginRequest.class), any(HttpServletResponse.class)))
                 .willReturn(successResponse);
 
-        ResultActions actions = mockMvc.perform(post("/user/login")
+        ResultActions actions = mockMvc.perform(post("/auth/login")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(validLoginRequest))
                 .with(csrf()));
@@ -89,7 +89,7 @@ public class AuthControllerTest extends BaseSecurityTest {
         given(authService.login(any(LoginRequest.class), any(HttpServletResponse.class)))
                 .willReturn(AuthResponse.CREDENTIALS_INVALID);
 
-        ResultActions actions = mockMvc.perform(post("/user/login")
+        ResultActions actions = mockMvc.perform(post("/auth/login")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(validLoginRequest))
                 .with(csrf()));
@@ -108,7 +108,7 @@ public class AuthControllerTest extends BaseSecurityTest {
     void login_ShouldUsernameRequiredMessage_WhenUsernameIsNull() throws Exception {
         LoginRequest loginRequestWithNullUsername = LoginRequestTestBuilder.builder().username(null).build();
 
-        ResultActions actions = mockMvc.perform(post("/user/login")
+        ResultActions actions = mockMvc.perform(post("/auth/login")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(loginRequestWithNullUsername))
                 .with(csrf()));
@@ -127,7 +127,7 @@ public class AuthControllerTest extends BaseSecurityTest {
     void login_ShouldReturnPasswordRequiredMessage_WhenPasswordIsNull() throws Exception {
         LoginRequest loginRequestWithNullPassword = LoginRequestTestBuilder.builder().password(null).build();
 
-        ResultActions actions = mockMvc.perform(post("/user/login")
+        ResultActions actions = mockMvc.perform(post("/auth/login")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(loginRequestWithNullPassword))
                 .with(csrf()));
@@ -147,7 +147,7 @@ public class AuthControllerTest extends BaseSecurityTest {
         given(authService.refreshToken(any(HttpServletRequest.class), any(HttpServletResponse.class)))
                 .willReturn(AuthResponse.TOKEN_REFRESH_SUCCESS);
 
-        ResultActions actions = mockMvc.perform(post("/user/refresh"));
+        ResultActions actions = mockMvc.perform(post("/auth/refresh"));
 
         actions
                 .andDo(print())
@@ -164,7 +164,7 @@ public class AuthControllerTest extends BaseSecurityTest {
         given(authService.refreshToken(any(HttpServletRequest.class), any(HttpServletResponse.class)))
                 .willReturn(AuthResponse.TOKEN_INVALID);
 
-        ResultActions actions = mockMvc.perform(post("/user/refresh"));
+        ResultActions actions = mockMvc.perform(post("/auth/refresh"));
 
         actions
                 .andDo(print())
@@ -206,7 +206,7 @@ public class AuthControllerTest extends BaseSecurityTest {
         given(authService.logout(any(HttpServletResponse.class)))
                 .willReturn(AuthResponse.LOGOUT_SUCCESS);
 
-        ResultActions actions = mockMvc.perform(post("/user/logout").cookie(accessTokenCookie));
+        ResultActions actions = mockMvc.perform(post("/auth/logout").cookie(accessTokenCookie));
 
         actions
                 .andDo(print())
