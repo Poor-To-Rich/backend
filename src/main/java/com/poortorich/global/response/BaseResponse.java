@@ -1,11 +1,11 @@
 package com.poortorich.global.response;
 
-import lombok.Builder;
 import lombok.Getter;
+import lombok.experimental.SuperBuilder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-@Builder
+@SuperBuilder
 @Getter
 public class BaseResponse {
 
