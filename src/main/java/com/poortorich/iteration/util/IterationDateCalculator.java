@@ -11,45 +11,40 @@ import java.util.List;
 @Component
 public class IterationDateCalculator {
 
-    public LocalDate dailyTypeDate(LocalDate date, int count) {
-        return date.plusDays(count);
+    public LocalDate dailyTypeDate(LocalDate date, int cycle) {
+        return date.plusDays(cycle);
     }
 
-    public LocalDate weeklyTypeDate(LocalDate date, int count, List<Weekday> selectDays) {
-        DayOfWeek currentDayOfWeek = date.getDayOfWeek();
+    public LocalDate weeklyEndDate(LocalDate startDate, int count, List<Weekday> selectDays) {
+        Weekday lastDayOfWeek = selectDays.getLast();
+        Weekday startDayOfWeek = Weekday.fromDayOfWeek(startDate.getDayOfWeek());
 
-        LocalDate nextDate;
+        int dayToAdd = Math.max(lastDayOfWeek.ordinal() - startDayOfWeek.ordinal(), 0);
+
+        return startDate.plusWeeks(count).plusDays(dayToAdd);
+    }
+
+    public LocalDate weeklyTypeDate(LocalDate date, int cycle, List<Weekday> selectDays) {
+        Weekday currentDayOfWeek = Weekday.fromDayOfWeek(date.getDayOfWeek());
+
         for (Weekday day : selectDays) {
-            nextDate = weeklyTypeFoundNextDate(date, day, currentDayOfWeek);
-            if (nextDate != null) {
-                return nextDate;
+            int dayToAdd = day.ordinal() - currentDayOfWeek.ordinal();
+            if (dayToAdd > 0) {
+                return date.plusDays(dayToAdd);
             }
         }
 
-        return weeklyTypeFoundDateByFirstDay(date, count, selectDays.getFirst().name(), currentDayOfWeek);
+        LocalDate cycleDate = date.plusWeeks(cycle - 1);
+        return weeklyTypeNextWeekFirstDay(cycleDate, selectDays.getFirst());
     }
 
-    private LocalDate weeklyTypeFoundNextDate(LocalDate date, Weekday day, DayOfWeek currentDayOfWeek) {
-        DayOfWeek targetDay = DayOfWeek.valueOf(day.name());
-        int daysUntilTarget = targetDay.getValue() - currentDayOfWeek.getValue();
-        if (daysUntilTarget > 0) {
-            return date.plusDays(daysUntilTarget);
-        }
-
-        return null;
+    private LocalDate weeklyTypeNextWeekFirstDay(LocalDate date, Weekday firstDay) {
+        Weekday currentDay = Weekday.fromDayOfWeek(date.getDayOfWeek());
+        return date.plusDays((7 - currentDay.ordinal()) + firstDay.ordinal());
     }
 
-    private LocalDate weeklyTypeFoundDateByFirstDay(LocalDate date, int count, String firstDay, DayOfWeek currentDayOfWeek) {
-        DayOfWeek firstSelectDay = DayOfWeek.valueOf(firstDay);
-        int daysUntilNext = firstSelectDay.getValue() - currentDayOfWeek.getValue();
-        if (daysUntilNext <= 0) {
-            daysUntilNext += 7;
-        }
-        return date.plusWeeks(count - 1).plusDays(daysUntilNext);
-    }
-
-    public LocalDate weeklyTypeDate(LocalDate date, int count) {
-        return date.plusWeeks(count);
+    public LocalDate weeklyTypeDate(LocalDate date, int cycle) {
+        return date.plusWeeks(cycle);
     }
 
     public LocalDate monthlyTypeDayModeDate(LocalDate date, int day) {
@@ -75,11 +70,11 @@ public class IterationDateCalculator {
         return date.withDayOfMonth(date.lengthOfMonth());
     }
 
-    public LocalDate monthlyTypeDate(LocalDate date, int count) {
-        return date.plusMonths(count);
+    public LocalDate monthlyTypeDate(LocalDate date, int cycle) {
+        return date.plusMonths(cycle);
     }
 
-    public LocalDate yearlyTypeDate(LocalDate date, int count) {
-        return date.plusYears(count);
+    public LocalDate yearlyTypeDate(LocalDate date, int cycle) {
+        return date.plusYears(cycle);
     }
 }
