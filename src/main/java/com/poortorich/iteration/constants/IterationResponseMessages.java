@@ -14,9 +14,9 @@ public class IterationResponseMessages {
     public static final String MONTHLY_MODE_INVALID = "매달 타입이 적절하지 않습니다.";
     public static final String MONTHLY_OPTION_REQUIRED_MONTHLY_TYPE = "매달 반복하는 경우 옵션을 필수로 선택해야 합니다.";
 
-    public static final String MONTHLY_OPTION_DAY_INVALID = "매달 날짜 옵션을 선택한 경우 날짜 값는 필수입니다.";
-    public static final String MONTHLY_OPTION_WEEK_INVALID = "매달 요일 옵션을 선택한 경우 주차 값은 필수입니다.";
-    public static final String MONTHLY_OPTION_DAY_OF_WEEK_INVALID = "매달 요일 옵션을 선택한 경우 요일 옵션은 필수로 선택해야 합니다.";
+    public static final String MONTHLY_OPTION_DAY_REQUIRED = "매달 날짜 옵션을 선택한 경우 날짜 값는 필수입니다.";
+    public static final String MONTHLY_OPTION_WEEK_REQUIRED = "매달 요일 옵션을 선택한 경우 주차 값은 필수입니다.";
+    public static final String MONTHLY_OPTION_DAY_OF_WEEK_REQUIRED = "매달 요일 옵션을 선택한 경우 요일 옵션은 필수로 선택해야 합니다.";
 
     public static final String CYCLE_REQUIRED = "반복 주기는 필수로 입력해야 합니다.";
     public static final String CYCLE_TOO_SMALL = "반복 주기는 " + IterationValidationConstraints.CYCLE_MIN + " 이상이어야 합니다.";
@@ -29,6 +29,7 @@ public class IterationResponseMessages {
     public static final String END_COUNT_REQUIRED = "반복 종료 타입이 횟수인 경우 숫자 값은 필수입니다.";
     public static final String END_COUNT_TOO_SMALL = "반복 종료 최소 횟수는 " + IterationValidationConstraints.END_COUNT_MIN + "회 입니다.";
     public static final String END_COUNT_TOO_BIG = "반복 종료 최대 횟수는 " + IterationValidationConstraints.END_COUNT_MAX + "회 입니다.";
+
     public static final String END_DATE_INVALID = "반복 종료 날짜 형식이 적절하지 않습니다..";
     public static final String END_DATE_REQUIRED = "반복 종료 타입이 날짜인 경우 날짜 값은 필수입니다.";
     public static final String END_DATE_NOT_BEFORE = "반복 종료 날짜는 이전일 수 없습니다.";

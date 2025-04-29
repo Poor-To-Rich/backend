@@ -8,11 +8,11 @@ public enum MonthlyOptionValidationCase implements TestCase<MonthlyOption, Strin
 
     DAY_MODE_DAY_NULL(
             new MonthlyOption("dayOfMonth", null, null, null),
-            IterationResponseMessages.MONTHLY_OPTION_DAY_INVALID
+            IterationResponseMessages.MONTHLY_OPTION_DAY_REQUIRED
     ),
     WEEKDAY_MODE_WEEK_NULL(
             new MonthlyOption("weekdayOfMonth", null, null, "월"),
-            IterationResponseMessages.MONTHLY_OPTION_WEEK_INVALID
+            IterationResponseMessages.MONTHLY_OPTION_WEEK_REQUIRED
     );
 
     private final MonthlyOption monthlyOption;

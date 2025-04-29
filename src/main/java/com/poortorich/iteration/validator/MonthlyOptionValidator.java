@@ -23,7 +23,7 @@ public class MonthlyOptionValidator implements ConstraintValidator<MonthlyOption
         if (mode == MonthlyMode.DAY && day == null) {
             buildCustomMessage(
                     context,
-                    IterationResponseMessages.MONTHLY_OPTION_DAY_INVALID,
+                    IterationResponseMessages.MONTHLY_OPTION_DAY_REQUIRED,
                     IterationValidationConstraints.MONTHLY_OPTION_DAY_FIELD_NAME
             );
             return false;
@@ -47,7 +47,7 @@ public class MonthlyOptionValidator implements ConstraintValidator<MonthlyOption
         if (week == null) {
             buildCustomMessage(
                     context,
-                    IterationResponseMessages.MONTHLY_OPTION_WEEK_INVALID,
+                    IterationResponseMessages.MONTHLY_OPTION_WEEK_REQUIRED,
                     IterationValidationConstraints.MONTHLY_OPTION_WEEK_FIELD_NAME
             );
             return false;
@@ -60,7 +60,7 @@ public class MonthlyOptionValidator implements ConstraintValidator<MonthlyOption
         if (dayOfWeek == null) {
             buildCustomMessage(
                     context,
-                    IterationResponseMessages.MONTHLY_OPTION_DAY_OF_WEEK_INVALID,
+                    IterationResponseMessages.MONTHLY_OPTION_DAY_OF_WEEK_REQUIRED,
                     IterationValidationConstraints.MONTHLY_OPTION_DAY_OF_WEEK_FIELD_NAME
             );
             return false;
