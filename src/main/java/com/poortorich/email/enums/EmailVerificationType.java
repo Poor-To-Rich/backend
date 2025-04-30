@@ -24,9 +24,9 @@ public enum EmailVerificationType {
     private final Integer timeToLive;
     private final TimeUnit timeUnit;
 
-    public static EmailVerificationType getTypeByPurpose(String key) {
+    public static EmailVerificationType from(String purpose) {
         for (EmailVerificationType type : EmailVerificationType.values()) {
-            if (type.purpose.equals(key)) {
+            if (type.purpose.equals(purpose)) {
                 return type;
             }
         }
