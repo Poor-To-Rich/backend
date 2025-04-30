@@ -3,17 +3,14 @@ package com.poortorich.email.facade;
 import com.poortorich.email.constants.EmailResponseMessage;
 import com.poortorich.email.enums.EmailResponse;
 import com.poortorich.email.enums.EmailVerificationType;
-import com.poortorich.email.request.EmailBlockTimeResponse;
 import com.poortorich.email.request.EmailVerificationRequest;
 import com.poortorich.email.request.VerifyEmailCodeRequest;
-import com.poortorich.email.response.VerificationAttemptStatusResponse;
-import com.poortorich.email.response.VerificationResendCodeStatusResponse;
+import com.poortorich.email.response.EmailPolicyResponse;
 import com.poortorich.email.service.EmailVerificationService;
 import com.poortorich.email.service.MailService;
+import com.poortorich.email.util.EmailVerificationPolicyManager;
 import com.poortorich.email.util.VerificationCodeGenerator;
 import com.poortorich.global.response.Response;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,15 +22,27 @@ public class EmailFacade {
     private final MailService mailService;
     private final EmailVerificationService verificationService;
     private final VerificationCodeGenerator codeGenerator;
+    private final EmailVerificationPolicyManager verificationPolicyManager;
 
     @Transactional
     public Response sendVerificationCode(EmailVerificationRequest emailVerificationRequest) {
-        String toEmail = emailVerificationRequest.getEmail();
+        String email = emailVerificationRequest.getEmail();
         String verificationPurpose = emailVerificationRequest.getPurpose();
         String verificationCode = codeGenerator.generate();
 
-        verificationService.saveCode(toEmail, verificationPurpose, verificationCode);
-        mailService.sendEmail(toEmail, verificationPurpose, verificationCode);
+        if (verificationPolicyManager.isMailBlocked(email)) {
+            return EmailResponse.EMAIL_AUTH_REQUEST_BLOCKED;
+        }
+
+        if (verificationPolicyManager.isExceedMailCodeResendAttempts(email)) {
+            verificationPolicyManager.deleteAllPolicy(email);
+            verificationPolicyManager.setMailBlock(email);
+            return EmailResponse.TOO_MANY_CODE_RESEND_REQUESTS;
+        }
+        verificationPolicyManager.increaseAuthCodeResendAttempts(email);
+
+        verificationService.saveCode(email, verificationPurpose, verificationCode);
+        mailService.sendEmail(email, verificationPurpose, verificationCode);
 
         return EmailResponse.VERIFICATION_CODE_SENT;
     }
@@ -41,35 +50,57 @@ public class EmailFacade {
 
     @Transactional
     public Response verifyEmailCode(VerifyEmailCodeRequest verifyEmailCodeRequest) {
-        String toMail = verifyEmailCodeRequest.getEmail();
+        String email = verifyEmailCodeRequest.getEmail();
         String verificationPurpose = verifyEmailCodeRequest.getPurpose();
         String verificationCode = verifyEmailCodeRequest.getVerificationCode();
 
-        if (!verificationService.verifyCode(toMail, verificationPurpose, verificationCode)) {
+        if (verificationPolicyManager.isMailBlocked(email)) {
+            return EmailResponse.EMAIL_AUTH_REQUEST_BLOCKED;
+        }
+
+        if (verificationPolicyManager.isCodeIssued(email, EmailVerificationType.from(verificationPurpose))) {
+            return EmailResponse.VERIFICATION_CODE_REQUIRED;
+        }
+
+        if (verificationPolicyManager.isExceedMailVerificationAttempts(email)) {
+            verificationPolicyManager.deleteAllPolicy(email);
+            verificationPolicyManager.setMailBlock(email);
+            return EmailResponse.TOO_MANY_VERIFICATION_REQUESTS;
+        }
+        verificationPolicyManager.increaseMailVerificationAttempts(email);
+
+        if (!verificationService.verifyCode(email, verificationPurpose, verificationCode)) {
             return EmailResponse.INVALID_VERIFICATION_CODE;
         }
+
         return EmailResponse.EMAIL_VERIFICATION_SUCCESS;
     }
 
-    public VerificationResendCodeStatusResponse getResendStatus(String mail) {
-        int remainAttempts = verificationService
-                .getRemainingAttemptsByVerificationType(mail, EmailVerificationType.CODE_RESEND);
-        return new VerificationResendCodeStatusResponse(remainAttempts);
+    public EmailPolicyResponse getEmailVerificationAttempts(String mail) {
+        int verificationAttempts = verificationPolicyManager.getMailVerificationAttempts(mail);
+        int remainingVerificationAttempts =
+                Integer.parseInt(EmailVerificationType.AUTH_ATTEMPT.getMaxStandard()) - verificationAttempts;
+        String notificationMessage = String.format(
+                EmailResponseMessage.VERIFICATION_ATTEMPTS_MESSAGE_TEMPLATE,
+                remainingVerificationAttempts);
+
+        return new EmailPolicyResponse(notificationMessage);
     }
 
-    public VerificationAttemptStatusResponse getAttemptStatus(String email) {
-        int remainAttempts = verificationService
-                .getRemainingAttemptsByVerificationType(email, EmailVerificationType.AUTH_ATTEMPT);
-        return new VerificationAttemptStatusResponse(remainAttempts);
+    public EmailPolicyResponse getResendCodeAttempts(String mail) {
+        int verificationAttempts = verificationPolicyManager.getMailCodeResendAttempts(mail);
+        int remainingVerificationAttempts =
+                Integer.parseInt(EmailVerificationType.CODE_RESEND.getMaxStandard()) - verificationAttempts;
+        String notificationMessage = String.format(
+                EmailResponseMessage.RESEND_CODE_ATTEMPTS_MESSAGE_TEMPLATE,
+                remainingVerificationAttempts);
+
+        return new EmailPolicyResponse(notificationMessage);
     }
 
-    public EmailBlockTimeResponse getBlockTime(
-            @Valid @NotBlank(message = EmailResponseMessage.INVALID_EMAIL) String email) {
-        long blockTime = verificationService.getBlockTimeByEmail(email);
-
-        if (blockTime > 0L) {
-            return new EmailBlockTimeResponse(blockTime);
-        }
-        return new EmailBlockTimeResponse();
+    public EmailPolicyResponse getBlockExpired(String mail) {
+        long expiredTime = verificationPolicyManager.getMailBlockExpiredTime(mail);
+        String notificationMessage = String.format(EmailResponseMessage.BLOCK_RETRY_MESSAGE_TEMPLATE, expiredTime);
+        return new EmailPolicyResponse(notificationMessage);
     }
 }
