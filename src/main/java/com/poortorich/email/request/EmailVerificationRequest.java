@@ -14,6 +14,5 @@ public class EmailVerificationRequest {
     private String email;
 
     @NotBlank(message = EmailResponseMessage.INVALID_PURPOSE)
-    @Email
     private String purpose;
 }
