@@ -1,7 +1,7 @@
 package com.poortorich.category.service;
 
 import com.poortorich.category.entity.Category;
-import com.poortorich.category.entity.CategoryType;
+import com.poortorich.category.entity.enums.CategoryType;
 import com.poortorich.category.repository.CategoryRepository;
 import com.poortorich.category.request.CategoryInfoRequest;
 import com.poortorich.category.response.ActiveCategoriesResponse;
@@ -26,8 +26,7 @@ public class CategoryService {
     private final CategoryValidator categoryValidator;
 
     public List<DefaultCategoryResponse> getDefaultCategories(CategoryType type) {
-        return categoryRepository.findAll().stream()
-                .filter(category -> category.getType() == type)
+        return categoryRepository.findByType(type).stream()
                 .map(category -> DefaultCategoryResponse.builder()
                         .name(category.getName())
                         .color(category.getColor())
@@ -37,8 +36,7 @@ public class CategoryService {
     }
 
     public List<CustomCategoryResponse> getCustomCategories(CategoryType type) {
-        return categoryRepository.findAll().stream()
-                .filter(category -> category.getType() == type)
+        return categoryRepository.findByType(type).stream()
                 .map(category -> CustomCategoryResponse.builder()
                         .id(category.getId())
                         .color(category.getColor())
@@ -48,8 +46,8 @@ public class CategoryService {
     }
 
     public ActiveCategoriesResponse getActiveCategories(String type) {
-        List<String> categories = categoryRepository.findAll().stream()
-                .filter(category -> category.getType() == CategoryType.from(type) && category.getVisibility())
+        List<String> categories = categoryRepository.findByType(CategoryType.from(type)).stream()
+                .filter(Category::getVisibility)
                 .map(Category::getName)
                 .toList();
 

@@ -1,5 +1,6 @@
 package com.poortorich.category.entity;
 
+import com.poortorich.category.entity.enums.CategoryType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;

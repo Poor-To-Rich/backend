@@ -1,6 +1,6 @@
 package com.poortorich.category.controller;
 
-import com.poortorich.category.entity.CategoryType;
+import com.poortorich.category.entity.enums.CategoryType;
 import com.poortorich.category.request.CategoryInfoRequest;
 import com.poortorich.category.response.ActiveCategoriesResponse;
 import com.poortorich.category.response.CategoryInfoResponse;

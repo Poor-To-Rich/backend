@@ -1,4 +1,4 @@
-package com.poortorich.category.entity;
+package com.poortorich.category.entity.enums;
 
 import com.poortorich.category.response.CategoryResponse;
 import com.poortorich.global.exceptions.BadRequestException;
