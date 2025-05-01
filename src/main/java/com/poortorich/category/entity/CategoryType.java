@@ -2,25 +2,27 @@ package com.poortorich.category.entity;
 
 import com.poortorich.category.response.CategoryResponse;
 import com.poortorich.global.exceptions.BadRequestException;
+import lombok.RequiredArgsConstructor;
 
-import java.util.Map;
+import java.util.Objects;
 
+@RequiredArgsConstructor
 public enum CategoryType {
-    DEFAULT_EXPENSE,
-    DEFAULT_INCOME,
-    CUSTOM_EXPENSE,
-    CUSTOM_INCOME;
 
-    public static final Map<String, CategoryType> TYPE_MAP = Map.of(
-            "income", DEFAULT_INCOME,
-            "expense", DEFAULT_EXPENSE
-    );
+    DEFAULT_EXPENSE("expense"),
+    DEFAULT_INCOME("income"),
+    CUSTOM_EXPENSE("expense"),
+    CUSTOM_INCOME("income");
+
+    private final String type;
 
     public static CategoryType from(String type) {
-        if (!TYPE_MAP.containsKey(type)) {
-            throw new BadRequestException(CategoryResponse.INVALID_CATEGORY_TYPE);
+        for (CategoryType category : CategoryType.values()) {
+            if (Objects.equals(category.type, type)) {
+                return category;
+            }
         }
 
-        return TYPE_MAP.get(type);
+        throw new BadRequestException(CategoryResponse.INVALID_CATEGORY_TYPE);
     }
 }
