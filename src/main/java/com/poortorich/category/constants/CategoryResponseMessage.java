@@ -2,6 +2,13 @@ package com.poortorich.category.constants;
 
 public class CategoryResponseMessage {
 
+    public static final String GET_DEFAULT_EXPENSE_CATEGORIES_SUCCESS = "기본 지출 카테고리 목록을 성공적으로 조회했습니다.";
+    public static final String GET_DEFAULT_INCOME_CATEGORIES_SUCCESS = "기본 수입 카테고리 목록을 성공적으로 조회했습니다.";
+    public static final String GET_CUSTOM_EXPENSE_CATEGORIES_SUCCESS = "사용자화 지출 카테고리 목록을 성공적으로 조회했습니다.";
+    public static final String GET_CUSTOM_INCOME_CATEGORIES_SUCCESS = "사용자화 수입 카테고리 목록을 성공적으로 조회했습니다.";
+    public static final String GET_CUSTOM_CATEGORY_SUCCESS = "사용자화 카테고리를 성공적으로 조회했습니다.";
+    public static final String GET_ACTIVE_CATEGORIES_SUCCESS = "활성화된 카테고리 목록을 성공적으로 조회했습니다.";
+
     public static final String CREATE_CATEGORY_SUCCESS = "카테고리를 성공적으로 등록하였습니다.";
     public static final String MODIFY_CATEGORY_SUCCESS = "카테고리를 성공적으로 편집하였습니다.";
     public static final String DELETE_CATEGORY_SUCCESS = "카테고리를 성공적으로 삭제하였습니다.";
