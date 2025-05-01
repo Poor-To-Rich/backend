@@ -37,7 +37,7 @@ public class UserValidationService {
             throw new BadRequestException(UserResponse.NICKNAME_RESERVE_CHECK_REQUIRED);
         }
 
-        if (!emailVerificationPolicyManager.isVerifiedMail(userRegistrationRequest.getEmail())) {
+        if (!emailVerificationPolicyManager.isEmailVerified(userRegistrationRequest.getEmail())) {
             throw new ForbiddenException(EmailResponse.EMAIL_NOT_VERIFIED);
         }
     }

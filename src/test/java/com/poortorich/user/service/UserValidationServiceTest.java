@@ -54,7 +54,7 @@ public class UserValidationServiceTest {
     void validateRegistration_whenAllValidationsPassAndEmailIsVerified_thenNoException() {
         UserRegistrationRequest request = userRegistrationBuilder.build();
 
-        when(emailVerificationPolicyManager.isVerifiedMail(Mockito.anyString())).thenReturn(true);
+        when(emailVerificationPolicyManager.isEmailVerified(Mockito.anyString())).thenReturn(true);
         when(userReservationService.existsByUsername(request.getUsername())).thenReturn(true);
         when(userReservationService.existsByNickname(request.getNickname())).thenReturn(true);
 
@@ -67,7 +67,7 @@ public class UserValidationServiceTest {
         verify(userValidator).validateBirthIsInFuture(request.parseBirthday());
         verify(userReservationService).existsByUsername(request.getUsername());
         verify(userReservationService).existsByNickname(request.getNickname());
-        verify(emailVerificationPolicyManager).isVerifiedMail(request.getEmail());
+        verify(emailVerificationPolicyManager).isEmailVerified(request.getEmail());
     }
 
     @Test
@@ -75,7 +75,7 @@ public class UserValidationServiceTest {
     void validateRegistration_whenEmailIsNotVerified_thenThrowForbiddenException() {
         UserRegistrationRequest request = userRegistrationBuilder.build();
 
-        when(emailVerificationPolicyManager.isVerifiedMail(any())).thenReturn(false);
+        when(emailVerificationPolicyManager.isEmailVerified(any())).thenReturn(false);
         when(userReservationService.existsByUsername(request.getUsername())).thenReturn(true);
         when(userReservationService.existsByNickname(request.getNickname())).thenReturn(true);
 
@@ -90,7 +90,7 @@ public class UserValidationServiceTest {
         verify(userValidator).validateBirthIsInFuture(request.parseBirthday());
         verify(userReservationService).existsByUsername(request.getUsername());
         verify(userReservationService).existsByNickname(request.getNickname());
-        verify(emailVerificationPolicyManager).isVerifiedMail(request.getEmail());
+        verify(emailVerificationPolicyManager).isEmailVerified(request.getEmail());
     }
 
     @Test
@@ -113,7 +113,7 @@ public class UserValidationServiceTest {
         verify(userValidator, never()).validateBirthIsInFuture(any());
         verify(userReservationService, never()).existsByUsername(any());
         verify(userReservationService, never()).existsByNickname(any());
-        verify(emailVerificationPolicyManager, never()).isVerifiedMail(any());
+        verify(emailVerificationPolicyManager, never()).isEmailVerified(any());
     }
 
     @Test
@@ -136,7 +136,7 @@ public class UserValidationServiceTest {
         verify(userValidator, never()).validateBirthIsInFuture(any());
         verify(userReservationService, never()).existsByUsername(any());
         verify(userReservationService, never()).existsByNickname(any());
-        verify(emailVerificationPolicyManager, never()).isVerifiedMail(any());
+        verify(emailVerificationPolicyManager, never()).isEmailVerified(any());
     }
 
     @Test
@@ -161,7 +161,7 @@ public class UserValidationServiceTest {
         verify(userValidator, never()).validateBirthIsInFuture(any());
         verify(userReservationService, never()).existsByUsername(any());
         verify(userReservationService, never()).existsByNickname(any());
-        verify(emailVerificationPolicyManager, never()).isVerifiedMail(any());
+        verify(emailVerificationPolicyManager, never()).isEmailVerified(any());
     }
 
     @Test
@@ -184,7 +184,7 @@ public class UserValidationServiceTest {
         verify(userValidator, never()).validateBirthIsInFuture(any());
         verify(userReservationService, never()).existsByUsername(any());
         verify(userReservationService, never()).existsByNickname(any());
-        verify(emailVerificationPolicyManager, never()).isVerifiedMail(any());
+        verify(emailVerificationPolicyManager, never()).isEmailVerified(any());
     }
 
     @Test
@@ -209,7 +209,7 @@ public class UserValidationServiceTest {
         verify(userValidator).validateBirthIsInFuture(request.parseBirthday());
         verify(userReservationService, never()).existsByUsername(any());
         verify(userReservationService, never()).existsByNickname(any());
-        verify(emailVerificationPolicyManager, never()).isVerifiedMail(any());
+        verify(emailVerificationPolicyManager, never()).isEmailVerified(any());
     }
 
     @Test
@@ -230,7 +230,7 @@ public class UserValidationServiceTest {
         verify(userValidator).validateBirthIsInFuture(request.parseBirthday());
         verify(userReservationService).existsByUsername(request.getUsername());
         verify(userReservationService, never()).existsByNickname(any());
-        verify(emailVerificationPolicyManager, never()).isVerifiedMail(any());
+        verify(emailVerificationPolicyManager, never()).isEmailVerified(any());
     }
 
     @Test
@@ -252,7 +252,7 @@ public class UserValidationServiceTest {
         verify(userValidator).validateBirthIsInFuture(request.parseBirthday());
         verify(userReservationService).existsByUsername(request.getUsername());
         verify(userReservationService).existsByNickname(request.getNickname());
-        verify(emailVerificationPolicyManager, never()).isVerifiedMail(any());
+        verify(emailVerificationPolicyManager, never()).isEmailVerified(any());
     }
 
     @Test
