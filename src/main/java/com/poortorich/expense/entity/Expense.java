@@ -68,7 +68,7 @@ public class Expense {
     private LocalDateTime createdDate;
 
     @UpdateTimestamp
-    @Column(name = "updateDate")
+    @Column(name = "updatedDate")
     private LocalDateTime updatedDate;
 
     @ManyToOne(fetch = FetchType.LAZY)
