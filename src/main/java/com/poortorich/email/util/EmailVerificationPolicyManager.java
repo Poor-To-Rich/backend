@@ -21,48 +21,16 @@ public class EmailVerificationPolicyManager {
         valueOps = redisTemplate.opsForValue();
     }
 
-    public void increaseMailVerificationAttempts(String mail) {
-        this.increaseMailAuthAttempts(mail, EmailVerificationType.AUTH_ATTEMPT);
+    public void increaseEmailVerificationAttempts(String mail) {
+        this.increaseEmailVerificationAttemptsByType(mail, EmailVerificationType.AUTH_ATTEMPT);
     }
 
     public void increaseAuthCodeResendAttempts(String mail) {
-        this.increaseMailAuthAttempts(mail, EmailVerificationType.CODE_RESEND);
+        this.increaseEmailVerificationAttemptsByType(mail, EmailVerificationType.CODE_RESEND);
     }
 
-    public boolean isMailBlocked(String mail) {
-        return Boolean.parseBoolean(getPolicy(mail, EmailVerificationType.AUTH_BLOCK));
-    }
-
-    public int getMailVerificationAttempts(String mail) {
-        return Integer.parseInt(getPolicy(mail, EmailVerificationType.AUTH_ATTEMPT));
-    }
-
-    public int getMailCodeResendAttempts(String mail) {
-        return Integer.parseInt(getPolicy(mail, EmailVerificationType.CODE_RESEND));
-    }
-
-    public long getMailBlockExpiredTime(String mail) {
-        return redisTemplate.getExpire(
-                EmailVerificationType.AUTH_BLOCK.getRedisKey(mail),
-                EmailVerificationType.AUTH_BLOCK.getTimeUnit());
-    }
-
-    public boolean isVerifiedMail(String mail) {
-        return Boolean.parseBoolean(getPolicy(mail, EmailVerificationType.EMAIL_VERIFICATION));
-    }
-
-    public boolean isExceedMailVerificationAttempts(String mail) {
-        return isExceedMailAuthAttempts(mail, EmailVerificationType.AUTH_ATTEMPT);
-    }
-
-    public boolean isExceedMailCodeResendAttempts(String mail) {
-        return isExceedMailAuthAttempts(mail, EmailVerificationType.CODE_RESEND);
-    }
-
-    public boolean isCodeIssued(String mail, EmailVerificationType type) {
-        return (type == EmailVerificationType.CHANGE_EMAIL
-                || type == EmailVerificationType.EMAIL_VERIFICATION)
-                && getPolicy(mail, type) != null;
+    public void blockEmail(String mail) {
+        setPolicy(mail, EmailVerificationType.AUTH_BLOCK.getMaxStandard(), EmailVerificationType.AUTH_BLOCK);
     }
 
     public void deleteAllPolicy(String mail) {
@@ -72,8 +40,40 @@ public class EmailVerificationPolicyManager {
         deletePolicy(mail, EmailVerificationType.EMAIL_VERIFICATION);
     }
 
-    public void setMailBlock(String mail) {
-        setPolicy(mail, EmailVerificationType.AUTH_BLOCK.getMaxStandard(), EmailVerificationType.AUTH_BLOCK);
+    public boolean isEmailBlocked(String mail) {
+        return Boolean.parseBoolean(getPolicy(mail, EmailVerificationType.AUTH_BLOCK));
+    }
+
+    public boolean isEmailVerified(String mail) {
+        return Boolean.parseBoolean(getPolicy(mail, EmailVerificationType.EMAIL_VERIFICATION));
+    }
+
+    public boolean isVerificationCodeIssued(String mail, EmailVerificationType type) {
+        return (type == EmailVerificationType.CHANGE_EMAIL
+                || type == EmailVerificationType.EMAIL_VERIFICATION)
+                && getPolicy(mail, type) != null;
+    }
+
+    public boolean hasExceededEmailVerificationAttempts(String mail) {
+        return hasExceededEmailAttemptsByType(mail, EmailVerificationType.AUTH_ATTEMPT);
+    }
+
+    public boolean hasExceededAuthCodeResendAttempts(String mail) {
+        return hasExceededEmailAttemptsByType(mail, EmailVerificationType.CODE_RESEND);
+    }
+
+    public int getEmailVerificationAttempts(String mail) {
+        return Integer.parseInt(getPolicy(mail, EmailVerificationType.AUTH_ATTEMPT));
+    }
+
+    public int getAuthCodeResendAttempts(String mail) {
+        return Integer.parseInt(getPolicy(mail, EmailVerificationType.CODE_RESEND));
+    }
+
+    public long getMailBlockExpirationTime(String mail) {
+        return redisTemplate.getExpire(
+                EmailVerificationType.AUTH_BLOCK.getRedisKey(mail),
+                EmailVerificationType.AUTH_BLOCK.getTimeUnit());
     }
 
     private void setPolicy(String mail, String value, EmailVerificationType type) {
@@ -93,14 +93,14 @@ public class EmailVerificationPolicyManager {
         valueOps.getOperations().delete(type.getRedisKey(mail));
     }
 
-    private void increaseMailAuthAttempts(String mail, EmailVerificationType verificationType) {
+    private void increaseEmailVerificationAttemptsByType(String mail, EmailVerificationType verificationType) {
         String verificationAttempts = getPolicy(mail, verificationType);
 
         int increasedAttempts = Integer.parseInt(verificationAttempts);
         setPolicy(mail, String.valueOf(++increasedAttempts), verificationType);
     }
 
-    private boolean isExceedMailAuthAttempts(String mail, EmailVerificationType verificationType) {
+    private boolean hasExceededEmailAttemptsByType(String mail, EmailVerificationType verificationType) {
         return Objects.equals(verificationType.getMaxStandard(), getPolicy(mail, verificationType));
     }
 
