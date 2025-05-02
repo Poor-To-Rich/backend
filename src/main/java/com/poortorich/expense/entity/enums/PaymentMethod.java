@@ -4,6 +4,7 @@ import com.poortorich.expense.response.ExpenseResponse;
 import com.poortorich.global.exceptions.BadRequestException;
 import lombok.RequiredArgsConstructor;
 
+import java.util.Arrays;
 import java.util.Objects;
 
 @RequiredArgsConstructor
@@ -17,12 +18,9 @@ public enum PaymentMethod {
     public final String type;
 
     public static PaymentMethod from(String type) {
-        for (PaymentMethod payment : PaymentMethod.values()) {
-            if (Objects.equals(payment.type, type)) {
-                return payment;
-            }
-        }
-
-        throw new BadRequestException(ExpenseResponse.PAYMENT_METHOD_INVALID);
+        return Arrays.stream(PaymentMethod.values())
+                .filter(paymentMethod -> Objects.equals(paymentMethod.type, type))
+                .findFirst()
+                .orElseThrow(() -> new BadRequestException(ExpenseResponse.PAYMENT_METHOD_INVALID));
     }
 }

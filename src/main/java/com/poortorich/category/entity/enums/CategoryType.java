@@ -4,6 +4,7 @@ import com.poortorich.category.response.CategoryResponse;
 import com.poortorich.global.exceptions.BadRequestException;
 import lombok.RequiredArgsConstructor;
 
+import java.util.Arrays;
 import java.util.Objects;
 
 @RequiredArgsConstructor
@@ -17,12 +18,9 @@ public enum CategoryType {
     private final String type;
 
     public static CategoryType from(String type) {
-        for (CategoryType category : CategoryType.values()) {
-            if (Objects.equals(category.type, type)) {
-                return category;
-            }
-        }
-
-        throw new BadRequestException(CategoryResponse.INVALID_CATEGORY_TYPE);
+        return Arrays.stream(CategoryType.values())
+                .filter(category -> Objects.equals(category.type, type))
+                .findFirst()
+                .orElseThrow(() -> new BadRequestException(CategoryResponse.INVALID_CATEGORY_TYPE));
     }
 }
