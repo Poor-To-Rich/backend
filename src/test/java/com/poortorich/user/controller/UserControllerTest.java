@@ -17,6 +17,7 @@ import com.poortorich.security.config.SecurityConfig;
 import com.poortorich.user.constants.UserResponseMessages;
 import com.poortorich.user.facade.UserFacade;
 import com.poortorich.user.fixture.UserRegisterApiFixture;
+import com.poortorich.user.fixture.UserRegistrationFixture;
 import com.poortorich.user.request.NicknameCheckRequest;
 import com.poortorich.user.request.UserRegistrationRequest;
 import com.poortorich.user.request.UsernameCheckRequest;
@@ -35,7 +36,6 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.web.multipart.MultipartFile;
 
 @WebMvcTest(UserController.class)
 @Import(SecurityConfig.class)
@@ -62,17 +62,25 @@ class UserControllerTest extends BaseSecurityTest {
     @Test
     @DisplayName("유효한 회원 가입 데이터로 registerUser 호출 시 기대했던 응답이 반환된다.")
     public void registerUser_whenValidInput_thenNoException() throws Exception {
-        doNothing().when(userFacade).registerNewUser(any(UserRegistrationRequest.class), any(MultipartFile.class));
+        doNothing().when(userFacade).registerNewUser(any(UserRegistrationRequest.class));
 
         mockMvc.perform(MockMvcRequestBuilders.multipart(UserRegisterApiFixture.REGISTER_PATH)
-                        .file(userRegistrationRequest)
                         .file(profileImage)
+                        .param("name", UserRegistrationFixture.VALID_NAME)
+                        .param("nickname", UserRegistrationFixture.VALID_NICKNAME)
+                        .param("username", UserRegistrationFixture.VALID_USERNAME)
+                        .param("password", UserRegistrationFixture.VALID_PASSWORD)
+                        .param("passwordConfirm", UserRegistrationFixture.VALID_PASSWORD)
+                        .param("birth", UserRegistrationFixture.VALID_BIRTH)
+                        .param("email", UserRegistrationFixture.VALID_EMAIL)
+                        .param("gender", UserRegistrationFixture.VALID_MALE)
+                        .param("job", UserRegistrationFixture.VALID_JOB)
                         .with(csrf())
                         .contentType(MediaType.MULTIPART_FORM_DATA_VALUE))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.resultMessage").value(UserResponse.REGISTRATION_SUCCESS.getMessage()));
 
-        verify(userFacade, times(1)).registerNewUser(any(UserRegistrationRequest.class), any());
+        verify(userFacade, times(1)).registerNewUser(any(UserRegistrationRequest.class));
     }
 
     @Test
@@ -80,17 +88,24 @@ class UserControllerTest extends BaseSecurityTest {
     public void registerUser_whenValidInputWithoutJob_thenNoException() throws Exception {
         userRegistrationRequest = UserRegisterApiFixture.createValidUserRegistrationRequestWithoutJob();
 
-        doNothing().when(userFacade).registerNewUser(any(UserRegistrationRequest.class), any(MultipartFile.class));
+        doNothing().when(userFacade).registerNewUser(any(UserRegistrationRequest.class));
 
         mockMvc.perform(MockMvcRequestBuilders.multipart(UserRegisterApiFixture.REGISTER_PATH)
-                        .file(userRegistrationRequest)
                         .file(profileImage)
+                        .param("name", UserRegistrationFixture.VALID_NAME)
+                        .param("nickname", UserRegistrationFixture.VALID_NICKNAME)
+                        .param("username", UserRegistrationFixture.VALID_USERNAME)
+                        .param("password", UserRegistrationFixture.VALID_PASSWORD)
+                        .param("passwordConfirm", UserRegistrationFixture.VALID_PASSWORD)
+                        .param("birth", UserRegistrationFixture.VALID_BIRTH)
+                        .param("email", UserRegistrationFixture.VALID_EMAIL)
+                        .param("gender", UserRegistrationFixture.VALID_MALE)
                         .with(csrf())
                         .contentType(MediaType.MULTIPART_FORM_DATA_VALUE))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.resultMessage").value(UserResponse.REGISTRATION_SUCCESS.getMessage()));
 
-        verify(userFacade, times(1)).registerNewUser(any(UserRegistrationRequest.class), any());
+        verify(userFacade, times(1)).registerNewUser(any(UserRegistrationRequest.class));
     }
 
     @Test
