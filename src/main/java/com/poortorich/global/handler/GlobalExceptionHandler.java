@@ -4,12 +4,14 @@ import com.poortorich.global.exceptions.AuthenticationException;
 import com.poortorich.global.exceptions.AuthorizationException;
 import com.poortorich.global.exceptions.BadRequestException;
 import com.poortorich.global.exceptions.ConflictException;
+import com.poortorich.global.exceptions.ForbiddenException;
 import com.poortorich.global.exceptions.InternalServerErrorException;
 import com.poortorich.global.exceptions.NotFoundException;
 import com.poortorich.global.exceptions.TooManyRequestException;
 import com.poortorich.global.exceptions.UnauthorizedException;
 import com.poortorich.global.response.BaseResponse;
 import java.util.Optional;
+import org.springframework.context.MessageSourceResolvable;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.HandlerMethodValidationException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -30,6 +33,16 @@ public class GlobalExceptionHandler {
     ) {
         String errorMessage = Optional.ofNullable(exception.getBindingResult().getFieldError())
                 .map(DefaultMessageSourceResolvable::getDefaultMessage)
+                .orElse(DEFAULT_ERROR_MESSAGE);
+
+        return BaseResponse.toResponseEntity(HttpStatus.BAD_REQUEST, errorMessage);
+    }
+
+    @ExceptionHandler(HandlerMethodValidationException.class)
+    public ResponseEntity<BaseResponse> handleValidation(HandlerMethodValidationException exception) {
+        String errorMessage = exception.getAllErrors().stream()
+                .findFirst()
+                .map(MessageSourceResolvable::getDefaultMessage)
                 .orElse(DEFAULT_ERROR_MESSAGE);
 
         return BaseResponse.toResponseEntity(HttpStatus.BAD_REQUEST, errorMessage);
@@ -78,6 +91,11 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(TooManyRequestException.class)
     public ResponseEntity<BaseResponse> handleTooManyRequestException(TooManyRequestException exception) {
+        return BaseResponse.toResponseEntity(exception.getResponse());
+    }
+
+    @ExceptionHandler(ForbiddenException.class)
+    public ResponseEntity<BaseResponse> handleForbiddenException(ForbiddenException exception) {
         return BaseResponse.toResponseEntity(exception.getResponse());
     }
 }
