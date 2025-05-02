@@ -41,6 +41,7 @@ public class UserResponseMessages {
     public static final String EMAIL_DUPLICATE = "이미 사용중인 이메일입니다.";
 
     public static final String GENDER_REQUIRED = "성별을 입력해주세요.";
+    public static final String GENDER_INVALID = "잘못된 성별입니다.";
 
     public static final String REGISTRATION_SUCCESS = "회원 가입 성공";
     public static final String REGISTRATION_REQUEST_REQUIRED = "회원가입을 위해 필요한 정보를 입력해주세요.";

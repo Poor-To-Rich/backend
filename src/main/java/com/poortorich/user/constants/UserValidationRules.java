@@ -16,7 +16,7 @@ public class UserValidationRules {
     public static final String PASSWORD_PATTERN = "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[\\W_]).+$";
     public static final String PASSWORD_NO_KOREAN_PATTERN = "^[^가-힣]*$";
 
-    public static final String BIRTHDAY_DATE_FORMAT = "yyyy.MM.dd";
-    public static final String BIRTHDAY_FORMAT_PATTERN = "^\\d{4}\\.\\d{2}\\.\\d{2}$";
+    public static final String BIRTHDAY_DATE_FORMAT = "yyyy-MM-dd";
+    public static final String BIRTHDAY_FORMAT_PATTERN = "^\\d{4}\\-\\d{2}\\-\\d{2}$";
     public static final String NO_BLANK_PATTERN = "^\\S*$";
 }
