@@ -4,6 +4,7 @@ import com.poortorich.global.exceptions.BadRequestException;
 import com.poortorich.iteration.response.IterationResponse;
 import lombok.RequiredArgsConstructor;
 
+import java.util.Arrays;
 import java.util.Objects;
 
 @RequiredArgsConstructor
@@ -14,16 +15,13 @@ public enum IterationRuleType {
     MONTHLY("monthly", 150),
     YEARLY("yearly", 50);
 
-    public final String type;
+    private final String type;
     public final int maxIterations;
 
     public static IterationRuleType from(String type) {
-        for (IterationRuleType iteration : IterationRuleType.values()) {
-            if (Objects.equals(iteration.type, type)) {
-                return iteration;
-            }
-        }
-
-        throw new BadRequestException(IterationResponse.ITERATION_RULE_TYPE_INVALID);
+        return Arrays.stream(IterationRuleType.values())
+                .filter(iterationRule -> Objects.equals(iterationRule.type, type))
+                .findFirst()
+                .orElseThrow(() -> new BadRequestException(IterationResponse.ITERATION_RULE_TYPE_INVALID));
     }
 }

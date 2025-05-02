@@ -5,6 +5,7 @@ import com.poortorich.iteration.response.IterationResponse;
 import lombok.RequiredArgsConstructor;
 
 import java.time.DayOfWeek;
+import java.util.Arrays;
 import java.util.Objects;
 
 @RequiredArgsConstructor
@@ -25,13 +26,10 @@ public enum Weekday {
             return null;
         }
 
-        for (Weekday weekday : Weekday.values()) {
-            if (Objects.equals(weekday.type, type)) {
-                return weekday;
-            }
-        }
-
-        throw new BadRequestException(IterationResponse.DAY_OF_WEEK_INVALID);
+        return Arrays.stream(Weekday.values())
+                .filter(weekday -> Objects.equals(weekday.type, type))
+                .findFirst()
+                .orElseThrow(() -> new BadRequestException(IterationResponse.DAY_OF_WEEK_INVALID));
     }
 
     public DayOfWeek toDayOfWeek() {

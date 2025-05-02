@@ -4,6 +4,7 @@ import com.poortorich.global.exceptions.BadRequestException;
 import com.poortorich.iteration.response.IterationResponse;
 import lombok.RequiredArgsConstructor;
 
+import java.util.Arrays;
 import java.util.Objects;
 
 @RequiredArgsConstructor
@@ -16,12 +17,9 @@ public enum EndType {
     private final String type;
 
     public static EndType from(String type) {
-        for (EndType end : EndType.values()) {
-            if (Objects.equals(end.type, type)) {
-                return end;
-            }
-        }
-
-        throw new BadRequestException(IterationResponse.END_TYPE_INVALID);
+        return Arrays.stream(EndType.values())
+                .filter(end -> Objects.equals(end.type, type))
+                .findFirst()
+                .orElseThrow(() -> new BadRequestException(IterationResponse.END_TYPE_INVALID));
     }
 }
