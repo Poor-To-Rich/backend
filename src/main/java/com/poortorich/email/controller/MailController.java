@@ -1,11 +1,10 @@
 package com.poortorich.email.controller;
 
-import com.poortorich.email.enums.EmailResponse;
 import com.poortorich.email.facade.EmailFacade;
 import com.poortorich.email.request.EmailVerificationRequest;
 import com.poortorich.email.request.VerifyEmailCodeRequest;
+import com.poortorich.email.util.EmailResponseMapper;
 import com.poortorich.global.response.BaseResponse;
-import com.poortorich.global.response.DataResponse;
 import com.poortorich.global.response.Response;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -31,13 +30,7 @@ public class MailController {
         Response response = emailFacade.sendVerificationCode(emailVerificationRequest);
 
         String email = emailVerificationRequest.getEmail();
-        if (response == EmailResponse.EMAIL_AUTH_REQUEST_BLOCKED) {
-            return DataResponse.toResponseEntity(response, emailFacade.getBlockExpired(email));
-        }
-        if (response == EmailResponse.TOO_MANY_CODE_RESEND_REQUESTS) {
-            return BaseResponse.toResponseEntity(response);
-        }
-        return DataResponse.toResponseEntity(response, emailFacade.getResendCodeAttempts(email));
+        return EmailResponseMapper.mapToResponseEntity(response, email, emailFacade);
     }
 
     @PostMapping("/verify")
@@ -47,12 +40,6 @@ public class MailController {
         Response response = emailFacade.verifyEmailCode(verifyEmailCodeRequest);
 
         String email = verifyEmailCodeRequest.getEmail();
-        if (response == EmailResponse.EMAIL_AUTH_REQUEST_BLOCKED) {
-            return DataResponse.toResponseEntity(response, emailFacade.getBlockExpired(email));
-        }
-        if (response == EmailResponse.TOO_MANY_VERIFICATION_REQUESTS) {
-            return BaseResponse.toResponseEntity(response);
-        }
-        return DataResponse.toResponseEntity(response, emailFacade.getEmailVerificationAttempts(email));
+        return EmailResponseMapper.mapToResponseEntity(response, email, emailFacade);
     }
 }
