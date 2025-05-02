@@ -13,12 +13,16 @@ public class UserResponseMessages {
     public static final String NICKNAME_CONTAINS_SPECIAL_CHAR = "닉네임에 특수문자를 사용할 수 없습니다.";
     public static final String NICKNAME_INVALID_START_CHAR = "닉네임은 한글/영문자로 시작해야 합니다.";
     public static final String NICKNAME_DUPLICATE = "이미 사용 중인 닉네임입니다.";
+    public static final String NICKNAME_AVAILABLE = "사용 가능한 닉네임입니다.";
+    public static final String NICKNAME_RESERVE_CHECK_REQUIRED = "닉네임 중복 검사를 먼저 진행해주세요.";
 
     public static final String USERNAME_REQUIRED = "아이디를 입력해주세요.";
     public static final String USERNAME_CONTAINS_INVALID_CHAR = "아이디는 영문자와 숫자로만 작성해야 합니다.";
     public static final String USERNAME_CONTAINS_BLANK = "아이디는 공백없이 작성해야 합니다.";
     public static final String USERNAME_LENGTH_INVALID = "아이디는 4 ~ 10자리로 작성해야 합니다.";
     public static final String USERNAME_DUPLICATE = "이미 사용 중인 아이디입니다.";
+    public static final String USERNAME_AVAILABLE = "사용 가능한 아이디입니다.";
+    public static final String USERNAME_RESERVE_CHECK_REQUIRED = "아이디 중복 검사를 먼저 진행해주세요.";
 
     public static final String PASSWORD_REQUIRED = "비밀번호를 입력해주세요.";
     public static final String PASSWORD_CONTAINS_KOREAN = "비밀번호에 한글은 사용할 수 없습니다.";

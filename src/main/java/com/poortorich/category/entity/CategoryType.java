@@ -18,7 +18,7 @@ public enum CategoryType {
 
     public static CategoryType from(String type) {
         if (!TYPE_MAP.containsKey(type)) {
-            throw new BadRequestException(CategoryResponse.INVALID_CATEGORY_TYPE);
+            throw new BadRequestException(CategoryResponse.CATEGORY_TYPE_INVALID);
         }
 
         return TYPE_MAP.get(type);

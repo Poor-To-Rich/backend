@@ -2,14 +2,14 @@ package com.poortorich.category.controller;
 
 import com.poortorich.category.entity.CategoryType;
 import com.poortorich.category.request.CategoryInfoRequest;
-import com.poortorich.category.response.ActiveCategoriesResponse;
-import com.poortorich.category.response.CategoryInfoResponse;
+import com.poortorich.category.response.CategoryResponse;
 import com.poortorich.category.response.CustomCategoriesResponse;
 import com.poortorich.category.response.CustomCategoryResponse;
 import com.poortorich.category.response.DefaultCategoriesResponse;
 import com.poortorich.category.response.DefaultCategoryResponse;
 import com.poortorich.category.service.CategoryService;
 import com.poortorich.global.response.BaseResponse;
+import com.poortorich.global.response.DataResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -33,36 +33,39 @@ public class CategoryController {
     private final CategoryService categoryService;
 
     @GetMapping("/expense/default")
-    public ResponseEntity<DefaultCategoriesResponse> getExpenseDefaultCategories() {
+    public ResponseEntity<DataResponse> getExpenseDefaultCategories() {
         List<DefaultCategoryResponse> expenseCategories = categoryService.getDefaultCategories(CategoryType.DEFAULT_EXPENSE);
         DefaultCategoriesResponse response = new DefaultCategoriesResponse(expenseCategories);
-        return ResponseEntity.ok(response);
+        return DataResponse.toResponseEntity(CategoryResponse.GET_DEFAULT_EXPENSE_CATEGORIES_SUCCESS, response);
     }
 
     @GetMapping("/income/default")
-    public ResponseEntity<DefaultCategoriesResponse> getIncomeDefaultCategories() {
+    public ResponseEntity<DataResponse> getIncomeDefaultCategories() {
         List<DefaultCategoryResponse> incomeCategories = categoryService.getDefaultCategories(CategoryType.DEFAULT_INCOME);
         DefaultCategoriesResponse response = new DefaultCategoriesResponse(incomeCategories);
-        return ResponseEntity.ok(response);
+        return DataResponse.toResponseEntity(CategoryResponse.GET_DEFAULT_INCOME_CATEGORIES_SUCCESS, response);
     }
 
     @GetMapping("/expense/custom")
-    public ResponseEntity<CustomCategoriesResponse> getExpenseCustomCategories() {
+    public ResponseEntity<DataResponse> getExpenseCustomCategories() {
         List<CustomCategoryResponse> expenseCategories = categoryService.getCustomCategories(CategoryType.CUSTOM_EXPENSE);
         CustomCategoriesResponse response = new CustomCategoriesResponse(expenseCategories);
-        return ResponseEntity.ok(response);
+        return DataResponse.toResponseEntity(CategoryResponse.GET_CUSTOM_EXPENSE_CATEGORIES_SUCCESS, response);
     }
 
     @GetMapping("/income/custom")
-    public ResponseEntity<CustomCategoriesResponse> getIncomeCustomCategories() {
+    public ResponseEntity<DataResponse> getIncomeCustomCategories() {
         List<CustomCategoryResponse> incomeCategories = categoryService.getCustomCategories(CategoryType.CUSTOM_INCOME);
         CustomCategoriesResponse response = new CustomCategoriesResponse(incomeCategories);
-        return ResponseEntity.ok(response);
+        return DataResponse.toResponseEntity(CategoryResponse.GET_CUSTOM_INCOME_CATEGORIES_SUCCESS, response);
     }
 
     @GetMapping("/active")
-    public ResponseEntity<ActiveCategoriesResponse> getActiveCategories(@RequestParam String type) {
-        return ResponseEntity.ok(categoryService.getActiveCategories(type));
+    public ResponseEntity<DataResponse> getActiveCategories(@RequestParam String type) {
+        return DataResponse.toResponseEntity(
+                CategoryResponse.GET_ACTIVE_CATEGORIES_SUCCESS,
+                categoryService.getActiveCategories(type)
+        );
     }
 
     @PostMapping("/expense")
@@ -76,8 +79,11 @@ public class CategoryController {
     }
 
     @GetMapping("/{categoryId}")
-    public ResponseEntity<CategoryInfoResponse> getCategory(@PathVariable Long categoryId) {
-        return ResponseEntity.ok(categoryService.getCategory(categoryId));
+    public ResponseEntity<DataResponse> getCategory(@PathVariable Long categoryId) {
+        return DataResponse.toResponseEntity(
+                CategoryResponse.GET_CUSTOM_CATEGORY_SUCCESS,
+                categoryService.getCategory(categoryId)
+        );
     }
 
     @PutMapping("/{categoryId}")
