@@ -12,7 +12,6 @@ import com.poortorich.user.service.UserValidationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
@@ -25,14 +24,13 @@ public class UserFacade {
 
     @Transactional
     public void registerNewUser(
-            UserRegistrationRequest userRegistrationRequest,
-            MultipartFile profileImage
+            UserRegistrationRequest userRegistrationRequest
     ) {
         userValidationService.validateRegistration(userRegistrationRequest);
         userReservationService.removeUsernameReservation(userRegistrationRequest.getUsername());
         userReservationService.removeNicknameReservation(userRegistrationRequest.getNickname());
-        
-        String profileImageUrl = fileUploadService.uploadImage(profileImage);
+
+        String profileImageUrl = fileUploadService.uploadImage(userRegistrationRequest.getProfileImage());
         userService.save(userRegistrationRequest, profileImageUrl);
     }
 
