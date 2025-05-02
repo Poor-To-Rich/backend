@@ -58,11 +58,11 @@ public class CategoryService {
 
     public Response createCategory(CategoryInfoRequest customCategory, CategoryType type) {
         if (categoryValidator.isNameUsed(customCategory.getName())) {
-            return CategoryResponse.DUPLICATION_CATEGORY_NAME;
+            return CategoryResponse.CATEGORY_NAME_DUPLICATE;
         }
 
         categoryRepository.save(buildCategory(customCategory, type));
-        return CategoryResponse.SUCCESS_CREATE_CATEGORY;
+        return CategoryResponse.CREATE_CATEGORY_SUCCESS;
     }
 
     private Category buildCategory(CategoryInfoRequest customCategory, CategoryType type) {
@@ -86,29 +86,29 @@ public class CategoryService {
     @Transactional
     public Response modifyCategory(Long id, CategoryInfoRequest categoryRequest) {
         if (categoryValidator.isNameUsed(categoryRequest.getName(), id)) {
-            return CategoryResponse.DUPLICATION_CATEGORY_NAME;
+            return CategoryResponse.CATEGORY_NAME_DUPLICATE;
         }
 
         Category category = getCategoryOrThrow(id);
         category.updateCategory(categoryRequest.getName(), categoryRequest.getColor());
 
-        return CategoryResponse.SUCCESS_MODIFY_CATEGORY;
+        return CategoryResponse.MODIFY_CATEGORY_SUCCESS;
     }
 
     public Response deleteCategory(Long id) {
         Category category = getCategoryOrThrow(id);
         categoryRepository.delete(category);
 
-        return CategoryResponse.SUCCESS_DELETE_CATEGORY;
+        return CategoryResponse.DELETE_CATEGORY_SUCCESS;
     }
 
     private Category getCategoryOrThrow(Long id) {
         return categoryRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException(CategoryResponse.NON_EXISTENT_CATEGORY));
+                .orElseThrow(() -> new NotFoundException(CategoryResponse.CATEGORY_NON_EXISTENT));
     }
 
     public Category findCategoryByName(String name) {
         return categoryRepository.findByName(name)
-                .orElseThrow(() -> new NotFoundException(CategoryResponse.NON_EXISTENT_CATEGORY));
+                .orElseThrow(() -> new NotFoundException(CategoryResponse.CATEGORY_NON_EXISTENT));
     }
 }
