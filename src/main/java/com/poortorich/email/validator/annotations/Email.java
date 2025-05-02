@@ -14,7 +14,7 @@ import java.lang.annotation.Target;
 @Constraint(validatedBy = EmailValidator.class)
 public @interface Email {
 
-    String message() default EmailResponseMessage.INVALID_EMAIL;
+    String message() default EmailResponseMessage.EMAIL_INVALID;
 
     Class<?>[] groups() default {};
 

@@ -1,6 +1,6 @@
 package com.poortorich.user.service;
 
-import com.poortorich.email.enums.EmailResponse;
+import com.poortorich.email.response.enums.EmailResponse;
 import com.poortorich.email.util.EmailVerificationPolicyManager;
 import com.poortorich.global.exceptions.BadRequestException;
 import com.poortorich.global.exceptions.ConflictException;

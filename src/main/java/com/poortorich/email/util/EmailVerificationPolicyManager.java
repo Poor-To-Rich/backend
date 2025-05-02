@@ -22,11 +22,11 @@ public class EmailVerificationPolicyManager {
     }
 
     public void increaseEmailVerificationAttempts(String mail) {
-        this.increaseEmailVerificationAttemptsByType(mail, EmailVerificationType.AUTH_ATTEMPT);
+        increaseEmailVerificationAttemptsByType(mail, EmailVerificationType.AUTH_ATTEMPT);
     }
 
     public void increaseAuthCodeResendAttempts(String mail) {
-        this.increaseEmailVerificationAttemptsByType(mail, EmailVerificationType.CODE_RESEND);
+        increaseEmailVerificationAttemptsByType(mail, EmailVerificationType.CODE_RESEND);
     }
 
     public void blockEmail(String mail) {
@@ -103,5 +103,4 @@ public class EmailVerificationPolicyManager {
     private boolean hasExceededEmailAttemptsByType(String mail, EmailVerificationType verificationType) {
         return Objects.equals(verificationType.getMaxStandard(), getPolicy(mail, verificationType));
     }
-
 }

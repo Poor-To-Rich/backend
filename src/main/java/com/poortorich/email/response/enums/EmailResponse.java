@@ -1,4 +1,4 @@
-package com.poortorich.email.enums;
+package com.poortorich.email.response.enums;
 
 import com.poortorich.email.constants.EmailResponseMessage;
 import com.poortorich.global.response.Response;
@@ -9,14 +9,14 @@ import org.springframework.http.HttpStatus;
 public enum EmailResponse implements Response {
 
     VERIFICATION_CODE_SENT(HttpStatus.OK, EmailResponseMessage.VERIFICATION_CODE_SENT),
-    INVALID_PURPOSE(HttpStatus.BAD_REQUEST, EmailResponseMessage.PURPOSE_INVALID),
-    INVALID_VERIFICATION_CODE(HttpStatus.BAD_REQUEST, EmailResponseMessage.VERIFICATION_CODE_INVALID),
+    PURPOSE_INVALID(HttpStatus.BAD_REQUEST, EmailResponseMessage.PURPOSE_INVALID),
+    VERIFICATION_CODE_INVALID(HttpStatus.BAD_REQUEST, EmailResponseMessage.VERIFICATION_CODE_INVALID),
     VERIFICATION_CODE_EXPIRED(HttpStatus.UNAUTHORIZED, EmailResponseMessage.VERIFICATION_CODE_EXPIRED),
     TOO_MANY_VERIFICATION_REQUESTS(HttpStatus.TOO_MANY_REQUESTS, EmailResponseMessage.TOO_MANY_VERIFICATION_REQUESTS),
     VERIFICATION_CODE_REQUIRED(HttpStatus.BAD_REQUEST, EmailResponseMessage.VERIFICATION_CODE_REQUIRED),
 
     EMAIL_VERIFICATION_SUCCESS(HttpStatus.OK, EmailResponseMessage.EMAIL_VERIFICATION_SUCCESS),
-    INVALID_EMAIL(HttpStatus.BAD_REQUEST, EmailResponseMessage.EMAIL_INVALID),
+    EMAIL_INVALID(HttpStatus.BAD_REQUEST, EmailResponseMessage.EMAIL_INVALID),
     EMAIL_SEND_FAILURE(HttpStatus.INTERNAL_SERVER_ERROR, EmailResponseMessage.EMAIL_SEND_FAILURE),
     EMAIL_NOT_FOUND(HttpStatus.NOT_FOUND, EmailResponseMessage.EMAIL_NOT_FOUND),
     EMAIL_NOT_VERIFIED(HttpStatus.BAD_REQUEST, EmailResponseMessage.EMAIL_NOT_VERIFIED),

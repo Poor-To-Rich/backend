@@ -10,14 +10,15 @@ import org.hibernate.validator.constraints.Length;
 @Getter
 @AllArgsConstructor
 public class VerifyEmailCodeRequest {
-    @NotBlank(message = EmailResponseMessage.INVALID_EMAIL)
+    
+    @NotBlank(message = EmailResponseMessage.EMAIL_INVALID)
     @Email
     private String email;
 
-    @NotBlank(message = EmailResponseMessage.INVALID_PURPOSE)
+    @NotBlank(message = EmailResponseMessage.PURPOSE_INVALID)
     private String purpose;
 
-    @NotBlank(message = EmailResponseMessage.INVALID_VERIFICATION_CODE)
-    @Length(min = 6, max = 6, message = EmailResponseMessage.INVALID_VERIFICATION_CODE)
+    @NotBlank(message = EmailResponseMessage.VERIFICATION_CODE_INVALID)
+    @Length(min = 6, max = 6, message = EmailResponseMessage.VERIFICATION_CODE_INVALID)
     private String verificationCode;
 }

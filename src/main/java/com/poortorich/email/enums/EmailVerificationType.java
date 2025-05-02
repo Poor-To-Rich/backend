@@ -1,5 +1,6 @@
 package com.poortorich.email.enums;
 
+import com.poortorich.email.response.enums.EmailResponse;
 import com.poortorich.global.exceptions.BadRequestException;
 import java.util.concurrent.TimeUnit;
 import lombok.AllArgsConstructor;
@@ -30,7 +31,7 @@ public enum EmailVerificationType {
                 return type;
             }
         }
-        throw new BadRequestException(EmailResponse.INVALID_PURPOSE);
+        throw new BadRequestException(EmailResponse.PURPOSE_INVALID);
     }
 
     public String getRedisKey(String mail) {

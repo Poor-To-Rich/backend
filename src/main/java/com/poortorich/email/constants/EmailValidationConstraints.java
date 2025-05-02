@@ -1,6 +1,5 @@
 package com.poortorich.email.constants;
 
-
 import java.util.regex.Pattern;
 
 public class EmailValidationConstraints {

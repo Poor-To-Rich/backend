@@ -1,11 +1,11 @@
 package com.poortorich.email.facade;
 
 import com.poortorich.email.constants.EmailResponseMessage;
-import com.poortorich.email.enums.EmailResponse;
 import com.poortorich.email.enums.EmailVerificationType;
 import com.poortorich.email.request.EmailVerificationRequest;
 import com.poortorich.email.request.VerifyEmailCodeRequest;
 import com.poortorich.email.response.EmailPolicyResponse;
+import com.poortorich.email.response.enums.EmailResponse;
 import com.poortorich.email.service.EmailVerificationService;
 import com.poortorich.email.service.MailService;
 import com.poortorich.email.util.EmailVerificationPolicyManager;
@@ -47,7 +47,6 @@ public class EmailFacade {
         return EmailResponse.VERIFICATION_CODE_SENT;
     }
 
-
     @Transactional
     public Response verifyEmailCode(VerifyEmailCodeRequest verifyEmailCodeRequest) {
         String email = verifyEmailCodeRequest.getEmail();
@@ -71,7 +70,7 @@ public class EmailFacade {
         verificationPolicyManager.increaseEmailVerificationAttempts(email);
 
         if (!verificationService.verifyCode(email, verificationPurpose, verificationCode)) {
-            return EmailResponse.INVALID_VERIFICATION_CODE;
+            return EmailResponse.VERIFICATION_CODE_INVALID;
         }
 
         return EmailResponse.EMAIL_VERIFICATION_SUCCESS;

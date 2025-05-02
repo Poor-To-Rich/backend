@@ -1,7 +1,7 @@
 package com.poortorich.email.handler;
 
 import com.poortorich.email.controller.MailController;
-import com.poortorich.email.enums.EmailResponse;
+import com.poortorich.email.response.enums.EmailResponse;
 import com.poortorich.global.response.BaseResponse;
 import jakarta.mail.internet.AddressException;
 import org.springframework.http.ResponseEntity;
