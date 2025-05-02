@@ -1,10 +1,8 @@
 package com.poortorich.email.service;
 
 import com.poortorich.email.enums.EmailVerificationType;
-import com.poortorich.email.util.EmailVerificationPolicyManager;
 import jakarta.annotation.PostConstruct;
 import java.util.Objects;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
@@ -17,17 +15,13 @@ public class EmailVerificationService {
     private final StringRedisTemplate redisTemplate;
     private ValueOperations<String, String> valueOps;
 
-    private final EmailVerificationPolicyManager verificationPolicyManager;
-
     @PostConstruct
     public void init() {
         valueOps = redisTemplate.opsForValue();
     }
 
     public void saveCode(String mail, String purpose, String code) {
-        EmailVerificationType type = EmailVerificationType.getTypeByPurpose(purpose);
-
-        verificationPolicyManager.checkBeforeCodeSaved(mail);
+        EmailVerificationType type = EmailVerificationType.from(purpose);
 
         valueOps.set(
                 type.getRedisKey(mail),
@@ -38,13 +32,10 @@ public class EmailVerificationService {
     }
 
     public boolean verifyCode(String mail, String purpose, String code) {
-        EmailVerificationType type = EmailVerificationType.getTypeByPurpose(purpose);
-
-        verificationPolicyManager.checkBeforeVerified(mail, purpose);
+        EmailVerificationType type = EmailVerificationType.from(purpose);
 
         boolean isVerified = Objects.equals(getCode(mail, type), code);
         if (isVerified) {
-            verificationPolicyManager.checkAfterVerifiedSuccess(mail, purpose);
             setVerifiedEmail(mail);
         }
 
@@ -62,14 +53,5 @@ public class EmailVerificationService {
 
     private String getCode(String mail, EmailVerificationType type) {
         return valueOps.get(type.getRedisKey(mail));
-    }
-
-    public int getRemainingAttemptsByVerificationType(String mail, EmailVerificationType verificationType) {
-        int attemptCount = Integer.parseInt(
-                Optional.ofNullable(valueOps.get(verificationType.getRedisKey(mail)))
-                        .orElse(verificationType.getMinStandard())
-        );
-
-        return Integer.parseInt(verificationType.getMaxStandard()) - attemptCount;
     }
 }
