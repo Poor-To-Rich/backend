@@ -16,6 +16,7 @@ public enum IterationType {
     MONTHLY("monthly"),
     YEARLY("yearly"),
     WEEKDAY("weekday"),
+    END_OF_MONTH("endOfMonth"),
     CUSTOM("custom");
 
     public final String type;

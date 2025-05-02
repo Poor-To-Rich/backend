@@ -1,0 +1,35 @@
+package com.poortorich.iteration.response;
+
+import com.poortorich.global.response.Response;
+import com.poortorich.iteration.constants.IterationResponseMessages;
+import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
+
+@AllArgsConstructor
+public enum IterationResponse implements Response {
+
+    ITERATION_RULE_TYPE_INVALID(HttpStatus.BAD_REQUEST, IterationResponseMessages.ITERATION_RULE_TYPE_INVALID),
+
+    DAY_OF_WEEK_INVALID(HttpStatus.BAD_REQUEST, IterationResponseMessages.DAY_OF_WEEK_INVALID),
+
+    MONTHLY_MODE_INVALID(HttpStatus.BAD_REQUEST, IterationResponseMessages.MONTHLY_MODE_INVALID),
+
+    END_TYPE_INVALID(HttpStatus.BAD_REQUEST, IterationResponseMessages.END_TYPE_INVALID),
+    END_DATE_INVALID(HttpStatus.BAD_REQUEST, IterationResponseMessages.END_DATE_INVALID),
+    END_DATE_NOT_BEFORE(HttpStatus.BAD_REQUEST, IterationResponseMessages.END_DATE_NOT_BEFORE),
+
+    ITERATIONS_TOO_LONG(HttpStatus.BAD_REQUEST, IterationResponseMessages.ITERATIONS_TOO_LONG);
+
+    private final HttpStatus httpStatus;
+    private final String message;
+
+    @Override
+    public HttpStatus getHttpStatus() {
+        return httpStatus;
+    }
+
+    @Override
+    public String getMessage() {
+        return message;
+    }
+}

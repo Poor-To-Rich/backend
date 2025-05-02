@@ -13,7 +13,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import java.time.LocalDate;
 import java.util.stream.Stream;
 
 import static com.poortorich.global.util.RequestValidTestHelper.assertValidationMessage;
@@ -50,7 +49,7 @@ public class ExpenseRequestValidTest {
     @ParameterizedTest
     @MethodSource("dateValidationCases")
     @DisplayName("Valid date")
-    void invalidDate_shouldFailValidation(LocalDate date, String expectedErrorMessage) {
+    void invalidDate_shouldFailValidation(String date, String expectedErrorMessage) {
         assertValidationMessage(
                 expenseRequestTestBuilder.date(date).build(),
                 expectedErrorMessage
