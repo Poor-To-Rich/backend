@@ -1,6 +1,6 @@
 package com.poortorich.category.controller;
 
-import com.poortorich.category.entity.CategoryType;
+import com.poortorich.category.entity.enums.CategoryType;
 import com.poortorich.category.request.CategoryInfoRequest;
 import com.poortorich.category.response.CategoryResponse;
 import com.poortorich.category.response.CustomCategoriesResponse;
@@ -33,35 +33,35 @@ public class CategoryController {
     private final CategoryService categoryService;
 
     @GetMapping("/expense/default")
-    public ResponseEntity<DataResponse> getExpenseDefaultCategories() {
+    public ResponseEntity<BaseResponse> getExpenseDefaultCategories() {
         List<DefaultCategoryResponse> expenseCategories = categoryService.getDefaultCategories(CategoryType.DEFAULT_EXPENSE);
         DefaultCategoriesResponse response = new DefaultCategoriesResponse(expenseCategories);
         return DataResponse.toResponseEntity(CategoryResponse.GET_DEFAULT_EXPENSE_CATEGORIES_SUCCESS, response);
     }
 
     @GetMapping("/income/default")
-    public ResponseEntity<DataResponse> getIncomeDefaultCategories() {
+    public ResponseEntity<BaseResponse> getIncomeDefaultCategories() {
         List<DefaultCategoryResponse> incomeCategories = categoryService.getDefaultCategories(CategoryType.DEFAULT_INCOME);
         DefaultCategoriesResponse response = new DefaultCategoriesResponse(incomeCategories);
         return DataResponse.toResponseEntity(CategoryResponse.GET_DEFAULT_INCOME_CATEGORIES_SUCCESS, response);
     }
 
     @GetMapping("/expense/custom")
-    public ResponseEntity<DataResponse> getExpenseCustomCategories() {
+    public ResponseEntity<BaseResponse> getExpenseCustomCategories() {
         List<CustomCategoryResponse> expenseCategories = categoryService.getCustomCategories(CategoryType.CUSTOM_EXPENSE);
         CustomCategoriesResponse response = new CustomCategoriesResponse(expenseCategories);
         return DataResponse.toResponseEntity(CategoryResponse.GET_CUSTOM_EXPENSE_CATEGORIES_SUCCESS, response);
     }
 
     @GetMapping("/income/custom")
-    public ResponseEntity<DataResponse> getIncomeCustomCategories() {
+    public ResponseEntity<BaseResponse> getIncomeCustomCategories() {
         List<CustomCategoryResponse> incomeCategories = categoryService.getCustomCategories(CategoryType.CUSTOM_INCOME);
         CustomCategoriesResponse response = new CustomCategoriesResponse(incomeCategories);
         return DataResponse.toResponseEntity(CategoryResponse.GET_CUSTOM_INCOME_CATEGORIES_SUCCESS, response);
     }
 
     @GetMapping("/active")
-    public ResponseEntity<DataResponse> getActiveCategories(@RequestParam String type) {
+    public ResponseEntity<BaseResponse> getActiveCategories(@RequestParam String type) {
         return DataResponse.toResponseEntity(
                 CategoryResponse.GET_ACTIVE_CATEGORIES_SUCCESS,
                 categoryService.getActiveCategories(type)
@@ -79,7 +79,7 @@ public class CategoryController {
     }
 
     @GetMapping("/{categoryId}")
-    public ResponseEntity<DataResponse> getCategory(@PathVariable Long categoryId) {
+    public ResponseEntity<BaseResponse> getCategory(@PathVariable Long categoryId) {
         return DataResponse.toResponseEntity(
                 CategoryResponse.GET_CUSTOM_CATEGORY_SUCCESS,
                 categoryService.getCategory(categoryId)
