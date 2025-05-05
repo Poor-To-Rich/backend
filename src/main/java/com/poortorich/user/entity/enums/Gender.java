@@ -1,5 +1,7 @@
 package com.poortorich.user.entity.enums;
 
+import com.poortorich.global.exceptions.BadRequestException;
+import com.poortorich.user.response.enums.UserResponse;
 import java.util.Objects;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -7,9 +9,8 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum Gender {
-    MALE("남"),
-    FEMALE("여"),
-    OTHER("기타");
+    MALE("MALE"),
+    FEMALE("FEMALE");
 
     private final String value;
 
@@ -19,7 +20,8 @@ public enum Gender {
                 return gender;
             }
         }
-        return OTHER;
+
+        throw new BadRequestException(UserResponse.GENDER_INVALID);
     }
 
     @Override

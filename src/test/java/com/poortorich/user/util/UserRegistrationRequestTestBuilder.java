@@ -1,7 +1,9 @@
 package com.poortorich.user.util;
 
+import com.poortorich.s3.util.S3TestFileGenerator;
 import com.poortorich.user.fixture.UserRegistrationFixture;
 import com.poortorich.user.request.UserRegistrationRequest;
+import org.springframework.web.multipart.MultipartFile;
 
 public class UserRegistrationRequestTestBuilder {
 
@@ -14,6 +16,7 @@ public class UserRegistrationRequestTestBuilder {
     private String email = UserRegistrationFixture.VALID_EMAIL;
     private String gender = UserRegistrationFixture.VALID_MALE;
     private String job = UserRegistrationFixture.VALID_JOB;
+    private MultipartFile profileImage = S3TestFileGenerator.createJpegFile();
 
     public UserRegistrationRequestTestBuilder name(String name) {
         this.name = name;
@@ -60,6 +63,11 @@ public class UserRegistrationRequestTestBuilder {
         return this;
     }
 
+    public UserRegistrationRequestTestBuilder profileImage(MultipartFile profileImage) {
+        this.profileImage = profileImage;
+        return this;
+    }
+
     public UserRegistrationRequest build() {
         return new UserRegistrationRequest(
                 name,
@@ -70,7 +78,8 @@ public class UserRegistrationRequestTestBuilder {
                 birth,
                 email,
                 gender,
-                job
+                job,
+                profileImage
         );
     }
 }
