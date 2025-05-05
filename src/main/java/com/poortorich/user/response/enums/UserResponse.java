@@ -20,7 +20,8 @@ public enum UserResponse implements Response {
     NICKNAME_RESERVE_CHECK_REQUIRED(HttpStatus.BAD_REQUEST, UserResponseMessages.NICKNAME_RESERVE_CHECK_REQUIRED),
     EMAIL_DUPLICATE(HttpStatus.CONFLICT, UserResponseMessages.EMAIL_DUPLICATE),
     PASSWORD_DO_NOT_MATCH(HttpStatus.BAD_REQUEST, UserResponseMessages.PASSWORD_DO_NOT_MATCH),
-    BIRTHDAY_IN_FUTURE(HttpStatus.BAD_REQUEST, UserResponseMessages.BIRTHDAY_IN_FUTURE);
+    BIRTHDAY_IN_FUTURE(HttpStatus.BAD_REQUEST, UserResponseMessages.BIRTHDAY_IN_FUTURE),
+    GENDER_INVALID(HttpStatus.BAD_REQUEST, UserResponseMessages.GENDER_INVALID);
 
     private final HttpStatus httpStatus;
     private final String message;

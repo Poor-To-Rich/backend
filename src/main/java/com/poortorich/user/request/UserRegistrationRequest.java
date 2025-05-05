@@ -6,21 +6,27 @@ import com.poortorich.user.constants.UserValidationRules;
 import com.poortorich.user.entity.enums.Gender;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.springframework.web.multipart.MultipartFile;
 
 @Getter
+@Setter
 @AllArgsConstructor
+@NoArgsConstructor
 public class UserRegistrationRequest {
 
     @NotBlank(message = UserResponseMessages.NAME_REQUIRED)
     @Size(max = UserValidationRules.NAME_MAX_LENGTH, message = UserResponseMessages.NAME_TOO_LONG)
     @Pattern(regexp = UserValidationRules.NO_BLANK_PATTERN, message = UserResponseMessages.NAME_CONTAINS_BLANK)
-    private final String name;
+    private String name;
 
     @NotBlank(message = UserResponseMessages.NICKNAME_REQUIRED)
     @Size(max = UserValidationRules.NICKNAME_MAX_LENGTH, message = UserResponseMessages.NICKNAME_TOO_LONG)
@@ -30,7 +36,7 @@ public class UserRegistrationRequest {
             regexp = UserValidationRules.NICKNAME_ALLOWED_CHARS_PATTERN,
             message = UserResponseMessages.NICKNAME_CONTAINS_SPECIAL_CHAR
     )
-    private final String nickname;
+    private String nickname;
 
     @NotBlank(message = UserResponseMessages.USERNAME_REQUIRED)
     @Size(
@@ -43,7 +49,7 @@ public class UserRegistrationRequest {
             regexp = UserValidationRules.USERNAME_ALLOWED_CHARS_PATTERN,
             message = UserResponseMessages.USERNAME_CONTAINS_INVALID_CHAR
     )
-    private final String username;
+    private String username;
 
     @NotBlank(message = UserResponseMessages.PASSWORD_REQUIRED)
     @Size(
@@ -63,23 +69,27 @@ public class UserRegistrationRequest {
             regexp = UserValidationRules.PASSWORD_PATTERN,
             message = UserResponseMessages.PASSWORD_INVALID
     )
-    private final String password;
+    private String password;
 
     @NotBlank(message = UserResponseMessages.PASSWORD_CONFIRM_REQUIRED)
-    private final String passwordConfirm;
+    private String passwordConfirm;
 
     @NotBlank(message = UserResponseMessages.BIRTHDAY_REQUIRED)
     @Pattern(regexp = UserValidationRules.BIRTHDAY_FORMAT_PATTERN, message = UserResponseMessages.BIRTHDAY_FORMAT_INVALID)
-    private final String birth;
+    private String birth;
 
     @NotBlank(message = UserResponseMessages.EMAIL_REQUIRED)
     @Email(message = UserResponseMessages.EMAIL_INVALID)
-    private final String email;
+    private String email;
 
     @NotBlank(message = UserResponseMessages.GENDER_REQUIRED)
-    private final String gender;
+    private String gender;
 
-    private final String job;
+    private String job;
+
+    @JsonIgnore
+    @NotNull(message = UserResponseMessages.PROFILE_IMAGE_REQUIRED)
+    private MultipartFile profileImage;
 
     @JsonIgnore
     public LocalDate parseBirthday() {
