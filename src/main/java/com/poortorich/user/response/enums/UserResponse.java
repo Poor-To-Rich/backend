@@ -21,7 +21,9 @@ public enum UserResponse implements Response {
     EMAIL_DUPLICATE(HttpStatus.CONFLICT, UserResponseMessages.EMAIL_DUPLICATE),
     PASSWORD_DO_NOT_MATCH(HttpStatus.BAD_REQUEST, UserResponseMessages.PASSWORD_DO_NOT_MATCH),
     BIRTHDAY_IN_FUTURE(HttpStatus.BAD_REQUEST, UserResponseMessages.BIRTHDAY_IN_FUTURE),
-    GENDER_INVALID(HttpStatus.BAD_REQUEST, UserResponseMessages.GENDER_INVALID);
+    GENDER_INVALID(HttpStatus.BAD_REQUEST, UserResponseMessages.GENDER_INVALID),
+    USER_NOT_FOUND(HttpStatus.NOT_FOUND, UserResponseMessages.USER_NOT_FOUND),
+    USER_DETAIL_FIND_SUCCESS(HttpStatus.OK, UserResponseMessages.USER_DETAIL_FIND_SUCCESS);
 
     private final HttpStatus httpStatus;
     private final String message;

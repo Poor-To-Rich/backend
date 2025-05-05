@@ -46,6 +46,9 @@ public class UserResponseMessages {
     public static final String REGISTRATION_SUCCESS = "회원 가입 성공";
     public static final String REGISTRATION_REQUEST_REQUIRED = "회원가입을 위해 필요한 정보를 입력해주세요.";
 
+    public static final String USER_DETAIL_FIND_SUCCESS = "회원 상세 조회 성공";
+    public static final String USER_NOT_FOUND = "회원 정보를 찾을 수 없습니다.";
+
     private UserResponseMessages() {
     }
 }
