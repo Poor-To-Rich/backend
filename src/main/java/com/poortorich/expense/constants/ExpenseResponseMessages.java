@@ -3,6 +3,7 @@ package com.poortorich.expense.constants;
 public class ExpenseResponseMessages {
 
     public static final String DATE_REQUIRED = "날짜는 필수로 입력해야 합니다.";
+    public static final String DATE_INVALID = "날짜 형식이 적절하지 않습니다.";
 
     public static final String CATEGORY_NAME_REQUIRED = "카테고리는 필수로 선택해야 합니다.";
 

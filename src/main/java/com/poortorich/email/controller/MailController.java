@@ -3,20 +3,16 @@ package com.poortorich.email.controller;
 import com.poortorich.email.facade.EmailFacade;
 import com.poortorich.email.request.EmailVerificationRequest;
 import com.poortorich.email.request.VerifyEmailCodeRequest;
-import com.poortorich.email.response.VerificationResendCodeStatusResponse;
+import com.poortorich.email.util.EmailResponseMapper;
 import com.poortorich.global.response.BaseResponse;
 import com.poortorich.global.response.Response;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
@@ -32,7 +28,9 @@ public class MailController {
             @RequestBody @Valid EmailVerificationRequest emailVerificationRequest
     ) {
         Response response = emailFacade.sendVerificationCode(emailVerificationRequest);
-        return BaseResponse.toResponseEntity(response);
+
+        String email = emailVerificationRequest.getEmail();
+        return EmailResponseMapper.mapToResponseEntity(response, email, emailFacade);
     }
 
     @PostMapping("/verify")
@@ -40,18 +38,8 @@ public class MailController {
             @RequestBody @Valid VerifyEmailCodeRequest verifyEmailCodeRequest
     ) {
         Response response = emailFacade.verifyEmailCode(verifyEmailCodeRequest);
-        return BaseResponse.toResponseEntity(response);
-    }
 
-    @GetMapping("/send")
-    public ResponseEntity<VerificationResendCodeStatusResponse> getResendStatus(
-            @RequestParam
-            @Valid
-            @Email(message = "invalid_mail")
-            @NotBlank(message = "invalid_mail")
-            String email
-    ) {
-        VerificationResendCodeStatusResponse verificationCodeStatus = emailFacade.getResendStatus(email);
-        return ResponseEntity.ok(verificationCodeStatus);
+        String email = verifyEmailCodeRequest.getEmail();
+        return EmailResponseMapper.mapToResponseEntity(response, email, emailFacade);
     }
 }

@@ -3,6 +3,7 @@ package com.poortorich.expense.entity;
 import com.poortorich.category.entity.Category;
 import com.poortorich.expense.entity.enums.IterationType;
 import com.poortorich.expense.entity.enums.PaymentMethod;
+import com.poortorich.user.entity.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -68,12 +69,14 @@ public class Expense {
     private LocalDateTime createdDate;
 
     @UpdateTimestamp
-    @Column(name = "updateDate")
+    @Column(name = "updatedDate")
     private LocalDateTime updatedDate;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "categoryId")
     private Category category;
 
-    // User 외래키
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "userId")
+    private User user;
 }

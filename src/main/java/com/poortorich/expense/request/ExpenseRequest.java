@@ -7,6 +7,8 @@ import com.poortorich.expense.entity.enums.PaymentMethod;
 import com.poortorich.expense.response.ExpenseResponse;
 import com.poortorich.global.constants.DatePattern;
 import com.poortorich.global.exceptions.BadRequestException;
+import com.poortorich.iteration.request.CustomIteration;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -14,17 +16,17 @@ import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import org.springframework.format.annotation.DateTimeFormat;
 
+import java.time.DateTimeException;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 @Getter
 @AllArgsConstructor
 public class ExpenseRequest {
 
-    @DateTimeFormat(pattern = DatePattern.BASIC_PATTERN)
     @NotNull(message = ExpenseResponseMessages.DATE_REQUIRED)
-    private LocalDate date;
+    private String date;
 
     @NotBlank(message = ExpenseResponseMessages.CATEGORY_NAME_REQUIRED)
     private String categoryName;
@@ -47,6 +49,17 @@ public class ExpenseRequest {
     private String memo;
 
     private String iterationType;
+
+    @Valid
+    private CustomIteration customIteration;
+
+    public LocalDate parseDate() {
+        try {
+            return LocalDate.parse(date, DateTimeFormatter.ofPattern(DatePattern.BASIC_PATTERN));
+        } catch (DateTimeException e) {
+            throw new BadRequestException(ExpenseResponse.DATE_INVALID);
+        }
+    }
 
     public PaymentMethod parsePaymentMethod() {
         return PaymentMethod.from(paymentMethod);

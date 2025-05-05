@@ -1,5 +1,6 @@
 package com.poortorich.email.enums;
 
+import com.poortorich.email.response.enums.EmailResponse;
 import com.poortorich.global.exceptions.BadRequestException;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -35,6 +36,6 @@ public enum EmailTemplateType {
                 return templateType;
             }
         }
-        throw new BadRequestException(EmailResponse.INVALID_PURPOSE);
+        throw new BadRequestException(EmailResponse.PURPOSE_INVALID);
     }
 }
