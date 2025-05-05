@@ -1,6 +1,7 @@
 package com.poortorich.user.controller;
 
 import com.poortorich.global.response.BaseResponse;
+import com.poortorich.global.response.DataResponse;
 import com.poortorich.user.constants.UserResponseMessages;
 import com.poortorich.user.facade.UserFacade;
 import com.poortorich.user.request.NicknameCheckRequest;
@@ -12,6 +13,9 @@ import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -42,5 +46,13 @@ public class UserController {
     @PostMapping("/exists/nickname")
     public ResponseEntity<BaseResponse> checkNickname(@RequestBody @Valid NicknameCheckRequest nicknameCheckRequest) {
         return BaseResponse.toResponseEntity(userFacade.checkNicknameAndReservation(nicknameCheckRequest));
+    }
+
+    @GetMapping("/detail")
+    public ResponseEntity<BaseResponse> getUserDetails(@AuthenticationPrincipal UserDetails userDetails) {
+        return DataResponse.toResponseEntity(
+                UserResponse.USER_DETAIL_FIND_SUCCESS,
+                userFacade.getUserDetails(userDetails.getUsername())
+        );
     }
 }

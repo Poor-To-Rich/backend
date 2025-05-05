@@ -2,9 +2,11 @@ package com.poortorich.user.facade;
 
 import com.poortorich.global.response.Response;
 import com.poortorich.s3.service.FileUploadService;
+import com.poortorich.user.entity.User;
 import com.poortorich.user.request.NicknameCheckRequest;
 import com.poortorich.user.request.UserRegistrationRequest;
 import com.poortorich.user.request.UsernameCheckRequest;
+import com.poortorich.user.response.UserDetailResponse;
 import com.poortorich.user.response.enums.UserResponse;
 import com.poortorich.user.service.RedisUserReservationService;
 import com.poortorich.user.service.UserService;
@@ -42,5 +44,17 @@ public class UserFacade {
         userValidationService.validateCheckNickname(nicknameCheckRequest.getNickname());
         userReservationService.reservedNickname(nicknameCheckRequest.getNickname());
         return UserResponse.NICKNAME_AVAILABLE;
+    }
+
+    public UserDetailResponse getUserDetails(String username) {
+        User user = userService.findByUsername(username);
+        return UserDetailResponse.builder()
+                .profileImage(user.getProfileImage())
+                .name(user.getName())
+                .nickname(user.getNickname())
+                .birth(user.getBirth().toString())
+                .gender(user.getGender().toString())
+                .jobs(user.getJob())
+                .build();
     }
 }

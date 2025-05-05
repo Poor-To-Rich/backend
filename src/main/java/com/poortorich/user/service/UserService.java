@@ -1,8 +1,10 @@
 package com.poortorich.user.service;
 
+import com.poortorich.global.exceptions.NotFoundException;
 import com.poortorich.user.entity.User;
 import com.poortorich.user.repository.UserRepository;
 import com.poortorich.user.request.UserRegistrationRequest;
+import com.poortorich.user.response.enums.UserResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -28,5 +30,10 @@ public class UserService {
                 .build();
 
         userRepository.save(user);
+    }
+
+    public User findByUsername(String username) {
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new NotFoundException(UserResponse.USER_NOT_FOUND));
     }
 }
