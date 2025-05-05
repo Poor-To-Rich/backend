@@ -23,9 +23,7 @@ public class UserFacade {
     private final RedisUserReservationService userReservationService;
 
     @Transactional
-    public void registerNewUser(
-            UserRegistrationRequest userRegistrationRequest
-    ) {
+    public void registerNewUser(UserRegistrationRequest userRegistrationRequest) {
         userValidationService.validateRegistration(userRegistrationRequest);
         userReservationService.removeUsernameReservation(userRegistrationRequest.getUsername());
         userReservationService.removeNicknameReservation(userRegistrationRequest.getNickname());
