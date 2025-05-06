@@ -1,13 +1,17 @@
 package com.poortorich.category.entity;
 
 import com.poortorich.category.entity.enums.CategoryType;
+import com.poortorich.user.entity.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -59,7 +63,9 @@ public class Category {
     @Column(name = "updatedDate")
     private LocalDateTime updatedDate;
 
-    // User 외래키
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "userId")
+    private User user;
 
     public void updateCategory(String name, String color) {
         this.name = name;
