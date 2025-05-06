@@ -2,7 +2,6 @@ package com.poortorich.user.facade;
 
 import com.poortorich.global.response.Response;
 import com.poortorich.s3.service.FileUploadService;
-import com.poortorich.user.entity.User;
 import com.poortorich.user.request.NicknameCheckRequest;
 import com.poortorich.user.request.UserRegistrationRequest;
 import com.poortorich.user.request.UsernameCheckRequest;
@@ -47,14 +46,6 @@ public class UserFacade {
     }
 
     public UserDetailResponse getUserDetails(String username) {
-        User user = userService.findByUsername(username);
-        return UserDetailResponse.builder()
-                .profileImage(user.getProfileImage())
-                .name(user.getName())
-                .nickname(user.getNickname())
-                .birth(user.getBirth().toString())
-                .gender(user.getGender().toString())
-                .jobs(user.getJob())
-                .build();
+        return userService.findUserDetailByUsername(username);
     }
 }
