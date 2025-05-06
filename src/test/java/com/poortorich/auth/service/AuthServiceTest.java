@@ -10,9 +10,9 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import com.poortorich.auth.jwt.fixture.JwtUserFixture;
-import com.poortorich.auth.jwt.util.JwtCookieManager;
 import com.poortorich.auth.jwt.util.JwtTokenExtractor;
 import com.poortorich.auth.jwt.util.JwtTokenGenerator;
+import com.poortorich.auth.jwt.util.JwtTokenManager;
 import com.poortorich.auth.jwt.validator.JwtTokenValidator;
 import com.poortorich.auth.repository.interfaces.RefreshTokenRepository;
 import com.poortorich.auth.request.LoginRequest;
@@ -62,7 +62,7 @@ public class AuthServiceTest {
     private JwtTokenValidator tokenValidator;
 
     @Mock
-    private JwtCookieManager cookieManager;
+    private JwtTokenManager cookieManager;
 
     @Mock
     private HttpServletRequest request;
@@ -105,7 +105,7 @@ public class AuthServiceTest {
 
         assertThat(result).isEqualTo(AuthResponse.LOGIN_SUCCESS);
         verify(refreshTokenRepository).save(testUser.getId(), refreshToken);
-        verify(cookieManager).setAuthCookie(response, accessToken, refreshToken);
+        verify(cookieManager).setAuthTokens(response, accessToken, refreshToken);
     }
 
     @Test
@@ -139,7 +139,7 @@ public class AuthServiceTest {
         verify(tokenValidator).validateToken(refreshToken);
         verify(refreshTokenRepository).deleteByUserIdAndToken(testUser.getId(), refreshToken);
         verify(refreshTokenRepository).save(testUser.getId(), newRefreshToken);
-        verify(cookieManager).setAuthCookie(response, newAccessToken, newRefreshToken);
+        verify(cookieManager).setAuthTokens(response, newAccessToken, newRefreshToken);
     }
 
     @Test
@@ -196,6 +196,6 @@ public class AuthServiceTest {
         Response result = authService.logout(response);
 
         assertThat(result).isEqualTo(AuthResponse.LOGOUT_SUCCESS);
-        verify(cookieManager).clearAuthCookie(response);
+        verify(cookieManager).clearAuthTokens(response);
     }
 }

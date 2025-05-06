@@ -1,7 +1,7 @@
 package com.poortorich.global.config;
 
-import com.poortorich.auth.jwt.util.JwtCookieManager;
 import com.poortorich.auth.jwt.util.JwtTokenExtractor;
+import com.poortorich.auth.jwt.util.JwtTokenManager;
 import com.poortorich.auth.jwt.validator.JwtTokenValidator;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -18,7 +18,7 @@ public class BaseSecurityTest {
     protected JwtTokenExtractor tokenExtractor;
 
     @MockitoBean
-    protected JwtCookieManager cookieManager;
+    protected JwtTokenManager cookieManager;
 
     @MockitoBean
     protected UserDetailsService userDetailsService;

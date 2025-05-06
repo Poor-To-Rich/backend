@@ -13,8 +13,8 @@ import static org.mockito.Mockito.when;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.poortorich.auth.jwt.fixture.JwtUserFixture;
-import com.poortorich.auth.jwt.util.JwtCookieManager;
 import com.poortorich.auth.jwt.util.JwtTokenExtractor;
+import com.poortorich.auth.jwt.util.JwtTokenManager;
 import com.poortorich.auth.jwt.validator.JwtTokenValidator;
 import com.poortorich.auth.response.enums.AuthResponse;
 import com.poortorich.global.response.BaseResponse;
@@ -55,7 +55,7 @@ public class JwtAuthenticationFilterTest {
     private JwtTokenExtractor tokenExtractor;
 
     @Mock
-    private JwtCookieManager cookieManager;
+    private JwtTokenManager cookieManager;
 
     @Mock
     private UserDetailsService userDetailsService;
@@ -114,7 +114,7 @@ public class JwtAuthenticationFilterTest {
     @DisplayName("유효한 액세스 토큰이 있을 때 인증을 성공해야 함")
     void doFilterInternal_ShouldAuthenticateUser_WhenAccessTokenIsValid() throws ServletException, IOException {
         when(request.getRequestURI()).thenReturn("/api/protected");
-        when(cookieManager.extractAccessTokenFromCookies(request)).thenReturn(Optional.of(accessToken));
+        when(cookieManager.extractAccessTokenFromHeader(request)).thenReturn(Optional.of(accessToken));
         when(tokenValidator.isTokenExpired(accessToken)).thenReturn(false);
         when(tokenExtractor.extractUsername(accessToken)).thenReturn(JwtUserFixture.TEST_USERNAME);
         when(userDetailsService.loadUserByUsername(JwtUserFixture.TEST_USERNAME)).thenReturn(userDetails);
@@ -132,7 +132,7 @@ public class JwtAuthenticationFilterTest {
 
         verify(response, never()).setStatus(anyInt());
         verify(response, never()).getWriter();
-        verify(cookieManager, never()).clearAuthCookie(response);
+        verify(cookieManager, never()).clearAuthTokens(response);
     }
 
     @Test
@@ -140,7 +140,7 @@ public class JwtAuthenticationFilterTest {
     void doFilterInternal_ShouldReturnTokenInvalidResponse_WhenAccessTokenIsMissing()
             throws IOException, ServletException {
         when(request.getRequestURI()).thenReturn("/api/protected");
-        when(cookieManager.extractAccessTokenFromCookies(request)).thenReturn(Optional.empty());
+        when(cookieManager.extractAccessTokenFromHeader(request)).thenReturn(Optional.empty());
 
         String expectedJsonResponse = getExpectedJsonResponse(AuthResponse.TOKEN_INVALID);
 
@@ -157,7 +157,7 @@ public class JwtAuthenticationFilterTest {
     void doFilterInternal_ShouldReturnTokenExpiredResponse_WhenAccessTokenIsExpired()
             throws ServletException, IOException {
         when(request.getRequestURI()).thenReturn("/api/protected");
-        when(cookieManager.extractAccessTokenFromCookies(request)).thenReturn(Optional.of(accessToken));
+        when(cookieManager.extractAccessTokenFromHeader(request)).thenReturn(Optional.of(accessToken));
         when(tokenValidator.isTokenExpired(accessToken)).thenReturn(true);
 
         String expectedJsonResponse = getExpectedJsonResponse(AuthResponse.ACCESS_TOKEN_EXPIRED);
@@ -175,7 +175,7 @@ public class JwtAuthenticationFilterTest {
     void doFilterInternal_ShouldReturnTokenInvalidResponse_WhenUsernameExtractionFails()
             throws ServletException, IOException {
         when(request.getRequestURI()).thenReturn("/api/protected");
-        when(cookieManager.extractAccessTokenFromCookies(request)).thenReturn(Optional.of(accessToken));
+        when(cookieManager.extractAccessTokenFromHeader(request)).thenReturn(Optional.of(accessToken));
         when(tokenValidator.isTokenExpired(accessToken)).thenReturn(false);
         when(tokenExtractor.extractUsername(accessToken)).thenReturn(null);
 
@@ -207,7 +207,7 @@ public class JwtAuthenticationFilterTest {
     private void verifyErrorResponse(String expectedJsonResponse) {
         assertThat(getActualJsonResponse()).isEqualTo(expectedJsonResponse);
 
-        verify(cookieManager).clearAuthCookie(response);
+        verify(cookieManager).clearAuthTokens(response);
         verify(response).setStatus(HttpStatus.UNAUTHORIZED.value());
         verify(response).setContentType(MediaType.APPLICATION_JSON_VALUE);
         verify(response).setCharacterEncoding("UTF-8");

@@ -1,8 +1,8 @@
 package com.poortorich.auth.service;
 
-import com.poortorich.auth.jwt.util.JwtCookieManager;
 import com.poortorich.auth.jwt.util.JwtTokenExtractor;
 import com.poortorich.auth.jwt.util.JwtTokenGenerator;
+import com.poortorich.auth.jwt.util.JwtTokenManager;
 import com.poortorich.auth.jwt.validator.JwtTokenValidator;
 import com.poortorich.auth.repository.interfaces.RefreshTokenRepository;
 import com.poortorich.auth.request.LoginRequest;
@@ -37,7 +37,7 @@ public class AuthService {
     private final JwtTokenGenerator tokenGenerator;
     private final JwtTokenValidator tokenValidator;
     private final JwtTokenExtractor tokenExtractor;
-    private final JwtCookieManager cookieManager;
+    private final JwtTokenManager cookieManager;
 
     public Response login(LoginRequest loginRequest, HttpServletResponse response) {
         UserDetails userDetails = userDetailsService.loadUserByUsername(loginRequest.getUsername());
@@ -52,7 +52,7 @@ public class AuthService {
         String refreshToken = tokenGenerator.generateRefreshToken(user);
 
         refreshTokenRepository.save(user.getId(), refreshToken);
-        cookieManager.setAuthCookie(response, accessToken, refreshToken);
+        cookieManager.setAuthTokens(response, accessToken, refreshToken);
 
         return AuthResponse.LOGIN_SUCCESS;
     }
@@ -76,7 +76,7 @@ public class AuthService {
             refreshTokenRepository.deleteByUserIdAndToken(user.getId(), refreshToken);
             refreshTokenRepository.save(user.getId(), newRefreshToken);
 
-            cookieManager.setAuthCookie(response, accessToken, newRefreshToken);
+            cookieManager.setAuthTokens(response, accessToken, newRefreshToken);
 
         } catch (DataAccessException e) {
             log.error("Redis 데이터 접근 중 예외 발생 {}", e.getMessage());
@@ -87,7 +87,7 @@ public class AuthService {
     }
 
     public Response logout(HttpServletResponse response) {
-        cookieManager.clearAuthCookie(response);
+        cookieManager.clearAuthTokens(response);
         return AuthResponse.LOGOUT_SUCCESS;
     }
 }
