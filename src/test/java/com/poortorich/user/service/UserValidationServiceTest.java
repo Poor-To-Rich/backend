@@ -13,7 +13,7 @@ import com.poortorich.global.exceptions.BadRequestException;
 import com.poortorich.global.exceptions.ConflictException;
 import com.poortorich.global.exceptions.ForbiddenException;
 import com.poortorich.user.constants.UserResponseMessages;
-import com.poortorich.user.fixture.UserRegistrationFixture;
+import com.poortorich.user.fixture.UserFixture;
 import com.poortorich.user.request.UserRegistrationRequest;
 import com.poortorich.user.response.enums.UserResponse;
 import com.poortorich.user.util.UserRegistrationRequestTestBuilder;
@@ -143,7 +143,7 @@ public class UserValidationServiceTest {
     @DisplayName("회원가입 데이터 검증 - 비밀번호가 일치하지 않는 경우 예외 발생")
     void validateRegistration_whenPasswordsDoNotMatch_thenThrowBadRequestException() {
         UserRegistrationRequest request = userRegistrationBuilder
-                .passwordConfirm(UserRegistrationFixture.MISMATCH_PASSWORD_CONFIRM)
+                .passwordConfirm(UserFixture.MISMATCH_PASSWORD_CONFIRM)
                 .build();
 
         doThrow(new BadRequestException(UserResponse.PASSWORD_DO_NOT_MATCH))
@@ -191,7 +191,7 @@ public class UserValidationServiceTest {
     @DisplayName("회원가입 데이터 검증 - 생년월일이 미래인 경우 예외를 던진다.")
     void validateRegistration_whenBirthdayIsInFuture_thenThrowBadRequestException() {
         UserRegistrationRequest request = userRegistrationBuilder
-                .email(UserRegistrationFixture.FUTURE_BIRTH)
+                .email(UserFixture.FUTURE_BIRTH)
                 .build();
 
         doThrow(new BadRequestException(UserResponse.BIRTHDAY_IN_FUTURE))

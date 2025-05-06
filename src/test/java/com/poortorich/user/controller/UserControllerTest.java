@@ -15,12 +15,14 @@ import com.poortorich.global.config.BaseSecurityTest;
 import com.poortorich.s3.util.S3TestFileGenerator;
 import com.poortorich.security.config.SecurityConfig;
 import com.poortorich.user.constants.UserResponseMessages;
+import com.poortorich.user.entity.User;
 import com.poortorich.user.facade.UserFacade;
+import com.poortorich.user.fixture.UserFixture;
 import com.poortorich.user.fixture.UserRegisterApiFixture;
-import com.poortorich.user.fixture.UserRegistrationFixture;
 import com.poortorich.user.request.NicknameCheckRequest;
 import com.poortorich.user.request.UserRegistrationRequest;
 import com.poortorich.user.request.UsernameCheckRequest;
+import com.poortorich.user.response.UserDetailResponse;
 import com.poortorich.user.response.enums.UserResponse;
 import com.poortorich.user.util.UserRegistrationRequestTestBuilder;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,8 +33,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -57,6 +62,7 @@ class UserControllerTest extends BaseSecurityTest {
         objectMapper = new ObjectMapper();
         userRegistrationRequest = UserRegisterApiFixture.createValidUserRegistrationRequest();
         profileImage = S3TestFileGenerator.createJpegFile();
+
     }
 
     @Test
@@ -66,15 +72,15 @@ class UserControllerTest extends BaseSecurityTest {
 
         mockMvc.perform(MockMvcRequestBuilders.multipart(UserRegisterApiFixture.REGISTER_PATH)
                         .file(profileImage)
-                        .param("name", UserRegistrationFixture.VALID_NAME)
-                        .param("nickname", UserRegistrationFixture.VALID_NICKNAME)
-                        .param("username", UserRegistrationFixture.VALID_USERNAME)
-                        .param("password", UserRegistrationFixture.VALID_PASSWORD)
-                        .param("passwordConfirm", UserRegistrationFixture.VALID_PASSWORD)
-                        .param("birth", UserRegistrationFixture.VALID_BIRTH)
-                        .param("email", UserRegistrationFixture.VALID_EMAIL)
-                        .param("gender", UserRegistrationFixture.VALID_MALE)
-                        .param("job", UserRegistrationFixture.VALID_JOB)
+                        .param("name", UserFixture.VALID_NAME)
+                        .param("nickname", UserFixture.VALID_NICKNAME)
+                        .param("username", UserFixture.VALID_USERNAME)
+                        .param("password", UserFixture.VALID_PASSWORD)
+                        .param("passwordConfirm", UserFixture.VALID_PASSWORD)
+                        .param("birth", UserFixture.VALID_BIRTH)
+                        .param("email", UserFixture.VALID_EMAIL)
+                        .param("gender", UserFixture.VALID_MALE)
+                        .param("job", UserFixture.VALID_JOB)
                         .with(csrf())
                         .contentType(MediaType.MULTIPART_FORM_DATA_VALUE))
                 .andExpect(status().isCreated())
@@ -92,14 +98,14 @@ class UserControllerTest extends BaseSecurityTest {
 
         mockMvc.perform(MockMvcRequestBuilders.multipart(UserRegisterApiFixture.REGISTER_PATH)
                         .file(profileImage)
-                        .param("name", UserRegistrationFixture.VALID_NAME)
-                        .param("nickname", UserRegistrationFixture.VALID_NICKNAME)
-                        .param("username", UserRegistrationFixture.VALID_USERNAME)
-                        .param("password", UserRegistrationFixture.VALID_PASSWORD)
-                        .param("passwordConfirm", UserRegistrationFixture.VALID_PASSWORD)
-                        .param("birth", UserRegistrationFixture.VALID_BIRTH)
-                        .param("email", UserRegistrationFixture.VALID_EMAIL)
-                        .param("gender", UserRegistrationFixture.VALID_MALE)
+                        .param("name", UserFixture.VALID_NAME)
+                        .param("nickname", UserFixture.VALID_NICKNAME)
+                        .param("username", UserFixture.VALID_USERNAME)
+                        .param("password", UserFixture.VALID_PASSWORD)
+                        .param("passwordConfirm", UserFixture.VALID_PASSWORD)
+                        .param("birth", UserFixture.VALID_BIRTH)
+                        .param("email", UserFixture.VALID_EMAIL)
+                        .param("gender", UserFixture.VALID_MALE)
                         .with(csrf())
                         .contentType(MediaType.MULTIPART_FORM_DATA_VALUE))
                 .andExpect(status().isCreated())
@@ -140,6 +146,38 @@ class UserControllerTest extends BaseSecurityTest {
                 .andExpect(jsonPath("$.resultMessage").value(UserResponseMessages.NICKNAME_AVAILABLE));
 
         verify(userFacade, times(1)).checkNicknameAndReservation(any(NicknameCheckRequest.class));
+    }
+
+    @Test
+    @DisplayName("유효한 액세스 토큰으로 회원 상세 조회 api를 호출")
+    @WithMockUser(username = UserFixture.VALID_USERNAME)
+    public void getUserDetails_whenValidAccessToken_thenNoException() throws Exception {
+        User mockUser = UserFixture.createDefaultUser();
+        UserDetailResponse response = UserDetailResponse.builder()
+                .profileImage(mockUser.getProfileImage())
+                .name(mockUser.getName())
+                .nickname(mockUser.getNickname())
+                .birth(mockUser.getBirth().toString())
+                .gender(mockUser.getGender().toString())
+                .job(mockUser.getJob())
+                .build();
+
+        when(userFacade.getUserDetails(UserFixture.VALID_USERNAME)).thenReturn(response);
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/user/detail")
+                        .with(SecurityMockMvcRequestPostProcessors.user(mockUser))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.resultCode").value(HttpStatus.OK.value()))
+                .andExpect(jsonPath("$.resultMessage").value(UserResponse.USER_DETAIL_FIND_SUCCESS.getMessage()))
+                .andExpect(jsonPath("$.data.profileImage").value(response.getProfileImage()))
+                .andExpect(jsonPath("$.data.name").value(response.getName()))
+                .andExpect(jsonPath("$.data.nickname").value(response.getNickname()))
+                .andExpect(jsonPath("$.data.birth").value(response.getBirth()))
+                .andExpect(jsonPath("$.data.gender").value(response.getGender()))
+                .andExpect(jsonPath("$.data.job").value(response.getJob()));
+
+        verify(userFacade).getUserDetails(UserFixture.VALID_USERNAME);
     }
 
     private String getUserRegistrationRequestJson() throws JsonProcessingException {
