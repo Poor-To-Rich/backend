@@ -12,5 +12,5 @@ public class UserDetailResponse {
     private String nickname;
     private String birth;
     private String gender;
-    private String jobs;
+    private String job;
 }
