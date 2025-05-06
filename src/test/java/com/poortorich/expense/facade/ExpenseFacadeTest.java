@@ -8,6 +8,7 @@ import com.poortorich.expense.request.ExpenseRequest;
 import com.poortorich.expense.service.ExpenseService;
 import com.poortorich.expense.util.ExpenseRequestTestBuilder;
 import com.poortorich.iteration.service.IterationService;
+import com.poortorich.user.entity.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -36,6 +37,7 @@ class ExpenseFacadeTest {
 
     private ExpenseRequest expenseRequest;
     private Category category;
+    private User user;
     private Expense expense;
 
     @BeforeEach
@@ -44,18 +46,19 @@ class ExpenseFacadeTest {
         category = Category.builder()
                 .name(ExpenseFixture.VALID_CATEGORY_NAME)
                 .build();
+        user = User.builder().build();
         expense = Expense.builder().build();
     }
 
     @Test
     @DisplayName("Category, Expense 서비스가 적절히 호출된다.")
     void createExpense_shouldCallServiceMethods() {
-        when(categoryService.findCategoryByName(expenseRequest.getCategoryName())).thenReturn(category);
-        when(expenseService.createExpense(expenseRequest, category)).thenReturn(expense);
+        when(categoryService.findCategoryByName(expenseRequest.getCategoryName(), user)).thenReturn(category);
+        when(expenseService.createExpense(expenseRequest, category, user)).thenReturn(expense);
 
-        expenseFacade.createExpense(expenseRequest);
-        verify(expenseService).createExpense(expenseRequest, category);
-        verify(categoryService).findCategoryByName(expenseRequest.getCategoryName());
-        verify(iterationService).createIterationExpenses(expenseRequest.getCustomIteration(), expense);
+        expenseFacade.createExpense(expenseRequest, user);
+        verify(expenseService).createExpense(expenseRequest, category, user);
+        verify(categoryService).findCategoryByName(expenseRequest.getCategoryName(), user);
+        verify(iterationService).createIterationExpenses(expenseRequest.getCustomIteration(), expense, user);
     }
 }

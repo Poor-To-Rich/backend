@@ -6,6 +6,7 @@ import com.poortorich.expense.fixture.ExpenseFixture;
 import com.poortorich.expense.repository.ExpenseRepository;
 import com.poortorich.expense.request.ExpenseRequest;
 import com.poortorich.expense.util.ExpenseRequestTestBuilder;
+import com.poortorich.user.entity.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -34,6 +35,7 @@ public class ExpenseServiceTest {
 
     private ExpenseRequest expenseRequest;
     private Category category;
+    private User user;
 
     @BeforeEach
     void setUp() {
@@ -41,12 +43,13 @@ public class ExpenseServiceTest {
         category = Category.builder()
                 .name(ExpenseFixture.VALID_CATEGORY_NAME)
                 .build();
+        user = User.builder().build();
     }
 
     @Test
     @DisplayName("유효한 지출 정보가 성공적으로 저장된다.")
     void createValidExpense() {
-        expenseService.createExpense(expenseRequest, category);
+        expenseService.createExpense(expenseRequest, category, user);
 
         verify(expenseRepository).save(expenseCaptor.capture());
         Expense savedExpense = expenseCaptor.getValue();
