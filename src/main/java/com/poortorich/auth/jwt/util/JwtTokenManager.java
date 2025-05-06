@@ -13,17 +13,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @AllArgsConstructor
-public class JwtCookieManager {
-
-    public ResponseCookie createAccessTokenCookie(String token) {
-        return ResponseCookie.from(JwtConstants.ACCESS_TOKEN_COOKIE_NAME, token)
-                .httpOnly(true)
-                .secure(true)
-                .sameSite(JwtConstants.COOKIE_SAME_SITE)
-                .path(JwtConstants.ACCESS_TOKEN_COOKIE_PATH)
-                .maxAge(JwtConstants.ACCESS_TOKEN_COOKIE_EXPIRY)
-                .build();
-    }
+public class JwtTokenManager {
 
     public ResponseCookie createRefreshTokenCookie(String token) {
         return ResponseCookie.from(JwtConstants.REFRESH_TOKEN_COOKIE_NAME, token)
@@ -35,14 +25,8 @@ public class JwtCookieManager {
                 .build();
     }
 
-    private ResponseCookie deleteAccessTokenCookie() {
-        return ResponseCookie.from(JwtConstants.ACCESS_TOKEN_COOKIE_NAME, "")
-                .httpOnly(true)
-                .secure(true)
-                .sameSite(JwtConstants.COOKIE_SAME_SITE)
-                .path(JwtConstants.ACCESS_TOKEN_COOKIE_PATH)
-                .maxAge(0)
-                .build();
+    public void setAccessTokenHeader(HttpServletResponse response, String accessToken) {
+        response.setHeader(JwtConstants.AUTHORIZATION_HEADER, JwtConstants.TOKEN_PREFIX + accessToken);
     }
 
     private ResponseCookie deleteRefreshTokenCookie() {
@@ -55,10 +39,10 @@ public class JwtCookieManager {
                 .build();
     }
 
-    public Optional<String> extractAccessTokenFromCookies(HttpServletRequest request) {
-        Cookie[] cookies = request.getCookies();
-        if (cookies != null) {
-            return extractTokenFromCookies(cookies, JwtConstants.ACCESS_TOKEN_COOKIE_NAME);
+    public Optional<String> extractAccessTokenFromHeader(HttpServletRequest request) {
+        String header = request.getHeader(JwtConstants.AUTHORIZATION_HEADER);
+        if (header != null && header.startsWith(JwtConstants.TOKEN_PREFIX)) {
+            return Optional.of(header.substring(JwtConstants.TOKEN_PREFIX.length()));
         }
         return Optional.empty();
     }
@@ -80,19 +64,17 @@ public class JwtCookieManager {
         return Optional.empty();
     }
 
-    public void setAuthCookie(HttpServletResponse response, String accessToken, String refreshToken) {
-        ResponseCookie accessTokenCookie = createAccessTokenCookie(accessToken);
-        ResponseCookie refreshTokenCookie = createRefreshTokenCookie(refreshToken);
+    public void setAuthTokens(HttpServletResponse response, String accessToken, String refreshToken) {
+        setAccessTokenHeader(response, accessToken);
 
-        response.addHeader(HttpHeaders.SET_COOKIE, accessTokenCookie.toString());
+        ResponseCookie refreshTokenCookie = createRefreshTokenCookie(refreshToken);
         response.addHeader(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString());
     }
 
-    public void clearAuthCookie(HttpServletResponse response) {
-        ResponseCookie deleteAccessToken = deleteAccessTokenCookie();
-        ResponseCookie deleteRefreshToken = deleteRefreshTokenCookie();
+    public void clearAuthTokens(HttpServletResponse response) {
+        response.setHeader(JwtConstants.AUTHORIZATION_HEADER, "");
 
-        response.addHeader(HttpHeaders.SET_COOKIE, deleteAccessToken.toString());
+        ResponseCookie deleteRefreshToken = deleteRefreshTokenCookie();
         response.addHeader(HttpHeaders.SET_COOKIE, deleteRefreshToken.toString());
     }
 }

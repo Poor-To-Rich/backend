@@ -1,8 +1,8 @@
 package com.poortorich.security.filter.auth;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.poortorich.auth.jwt.util.JwtCookieManager;
 import com.poortorich.auth.jwt.util.JwtTokenExtractor;
+import com.poortorich.auth.jwt.util.JwtTokenManager;
 import com.poortorich.auth.jwt.validator.JwtTokenValidator;
 import com.poortorich.auth.response.enums.AuthResponse;
 import com.poortorich.global.exceptions.UnauthorizedException;
@@ -38,7 +38,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtTokenValidator tokenValidator;
     private final JwtTokenExtractor tokenExtractor;
-    private final JwtCookieManager cookieManager;
+    private final JwtTokenManager jwtManager;
     private final UserDetailsService userDetailsService;
 
     @Override
@@ -58,7 +58,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 processRefreshToken(request, response);
             }
         } catch (UnauthorizedException exception) {
-            cookieManager.clearAuthCookie(response);
+            jwtManager.clearAuthTokens(response);
             setResponseMessage(response, exception.getResponse());
             return;
         }
@@ -74,7 +74,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     private void processRefreshToken(HttpServletRequest request, HttpServletResponse response) {
-        Optional<String> refreshToken = cookieManager.extractRefreshTokenFromCookies(request);
+        Optional<String> refreshToken = jwtManager.extractRefreshTokenFromCookies(request);
 
         if (refreshToken.isEmpty()) {
             throw new UnauthorizedException(AuthResponse.TOKEN_INVALID);
@@ -86,7 +86,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     private boolean processAccessToken(HttpServletRequest request, HttpServletResponse response) {
-        Optional<String> accessToken = cookieManager.extractAccessTokenFromCookies(request);
+        Optional<String> accessToken = jwtManager.extractAccessTokenFromHeader(request);
 
         if (accessToken.isEmpty()) {
             throw new UnauthorizedException(AuthResponse.TOKEN_INVALID);
