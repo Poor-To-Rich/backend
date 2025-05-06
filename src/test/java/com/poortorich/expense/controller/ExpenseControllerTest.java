@@ -13,7 +13,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.poortorich.auth.service.CustomUserDetailsService;
 import com.poortorich.expense.facade.ExpenseFacade;
 import com.poortorich.expense.fixture.ExpenseApiFixture;
 import com.poortorich.expense.request.ExpenseRequest;
@@ -23,7 +22,6 @@ import com.poortorich.global.config.BaseSecurityTest;
 import com.poortorich.security.config.SecurityConfig;
 import com.poortorich.user.entity.User;
 import com.poortorich.user.repository.UserRepository;
-import com.poortorich.user.util.UserRegistrationRequestTestBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -35,9 +33,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 

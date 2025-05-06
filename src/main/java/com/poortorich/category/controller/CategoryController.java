@@ -15,7 +15,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -37,28 +36,32 @@ public class CategoryController {
 
     @GetMapping("/expense/default")
     public ResponseEntity<BaseResponse> getExpenseDefaultCategories(@AuthenticationPrincipal User user) {
-        List<DefaultCategoryResponse> expenseCategories = categoryService.getDefaultCategories(CategoryType.DEFAULT_EXPENSE, user);
+        List<DefaultCategoryResponse> expenseCategories
+                = categoryService.getDefaultCategories(CategoryType.DEFAULT_EXPENSE, user);
         DefaultCategoriesResponse response = new DefaultCategoriesResponse(expenseCategories);
         return DataResponse.toResponseEntity(CategoryResponse.GET_DEFAULT_EXPENSE_CATEGORIES_SUCCESS, response);
     }
 
     @GetMapping("/income/default")
     public ResponseEntity<BaseResponse> getIncomeDefaultCategories(@AuthenticationPrincipal User user) {
-        List<DefaultCategoryResponse> incomeCategories = categoryService.getDefaultCategories(CategoryType.DEFAULT_INCOME, user);
+        List<DefaultCategoryResponse> incomeCategories
+                = categoryService.getDefaultCategories(CategoryType.DEFAULT_INCOME, user);
         DefaultCategoriesResponse response = new DefaultCategoriesResponse(incomeCategories);
         return DataResponse.toResponseEntity(CategoryResponse.GET_DEFAULT_INCOME_CATEGORIES_SUCCESS, response);
     }
 
     @GetMapping("/expense/custom")
     public ResponseEntity<BaseResponse> getExpenseCustomCategories(@AuthenticationPrincipal User user) {
-        List<CustomCategoryResponse> expenseCategories = categoryService.getCustomCategories(CategoryType.CUSTOM_EXPENSE, user);
+        List<CustomCategoryResponse> expenseCategories
+                = categoryService.getCustomCategories(CategoryType.CUSTOM_EXPENSE, user);
         CustomCategoriesResponse response = new CustomCategoriesResponse(expenseCategories);
         return DataResponse.toResponseEntity(CategoryResponse.GET_CUSTOM_EXPENSE_CATEGORIES_SUCCESS, response);
     }
 
     @GetMapping("/income/custom")
     public ResponseEntity<BaseResponse> getIncomeCustomCategories(@AuthenticationPrincipal User user) {
-        List<CustomCategoryResponse> incomeCategories = categoryService.getCustomCategories(CategoryType.CUSTOM_INCOME, user);
+        List<CustomCategoryResponse> incomeCategories
+                = categoryService.getCustomCategories(CategoryType.CUSTOM_INCOME, user);
         CustomCategoriesResponse response = new CustomCategoriesResponse(incomeCategories);
         return DataResponse.toResponseEntity(CategoryResponse.GET_CUSTOM_INCOME_CATEGORIES_SUCCESS, response);
     }
@@ -72,13 +75,21 @@ public class CategoryController {
     }
 
     @PostMapping("/expense")
-    public ResponseEntity<BaseResponse> createExpenseCategory(@RequestBody @Valid CategoryInfoRequest categoryRequest, @AuthenticationPrincipal User user) {
-        return BaseResponse.toResponseEntity(categoryService.createCategory(categoryRequest, CategoryType.CUSTOM_EXPENSE, user));
+    public ResponseEntity<BaseResponse> createExpenseCategory(
+            @RequestBody @Valid CategoryInfoRequest categoryRequest,
+            @AuthenticationPrincipal User user) {
+        return BaseResponse.toResponseEntity(
+                categoryService.createCategory(categoryRequest, CategoryType.CUSTOM_EXPENSE, user)
+        );
     }
 
     @PostMapping("/income")
-    public ResponseEntity<BaseResponse> createIncomeCategory(@RequestBody @Valid CategoryInfoRequest categoryRequest, @AuthenticationPrincipal User user) {
-        return BaseResponse.toResponseEntity(categoryService.createCategory(categoryRequest, CategoryType.CUSTOM_INCOME, user));
+    public ResponseEntity<BaseResponse> createIncomeCategory(
+            @RequestBody @Valid CategoryInfoRequest categoryRequest,
+            @AuthenticationPrincipal User user) {
+        return BaseResponse.toResponseEntity(
+                categoryService.createCategory(categoryRequest, CategoryType.CUSTOM_INCOME, user)
+        );
     }
 
     @GetMapping("/{categoryId}")
