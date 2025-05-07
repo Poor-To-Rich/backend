@@ -9,7 +9,6 @@ import com.poortorich.expense.response.ExpenseResponse;
 import com.poortorich.expense.service.ExpenseService;
 import com.poortorich.global.response.Response;
 import com.poortorich.iteration.service.IterationService;
-import com.poortorich.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,21 +24,22 @@ public class ExpenseFacade {
     private final IterationService iterationService;
 
     @Transactional
-    public Response createExpense(ExpenseRequest expenseRequest, User user) {
-        Category category = categoryService.findCategoryByName(expenseRequest.getCategoryName(), user);
-        Expense expense = expenseService.createExpense(expenseRequest, category, user);
+    public Response createExpense(ExpenseRequest expenseRequest, String username) {
+        Category category = categoryService.findCategoryByName(expenseRequest.getCategoryName(), username);
+        Expense expense = expenseService.createExpense(expenseRequest, category, username);
         if (expense.getIterationType() != IterationType.DEFAULT) {
-            createIterationExpense(expenseRequest, expense, user);
+            createIterationExpense(expenseRequest, expense, username);
         }
 
         return ExpenseResponse.CREATE_EXPENSE_SUCCESS;
     }
 
-    public void createIterationExpense(ExpenseRequest expenseRequest, Expense expense, User user) {
-        List<Expense> iterationExpenses = iterationService.createIterationExpenses(expenseRequest.getCustomIteration(), expense, user);
+    public void createIterationExpense(ExpenseRequest expenseRequest, Expense expense, String username) {
+        List<Expense> iterationExpenses
+                = iterationService.createIterationExpenses(expenseRequest.getCustomIteration(), expense, username);
         List<Expense> savedExpenses = expenseService.createExpenseAll(iterationExpenses);
         if (expense.getIterationType() == IterationType.CUSTOM) {
-            iterationService.createIterationInfo(expenseRequest.getCustomIteration(), expense, savedExpenses, user);
+            iterationService.createIterationInfo(expenseRequest.getCustomIteration(), expense, savedExpenses, username);
         }
     }
 }
