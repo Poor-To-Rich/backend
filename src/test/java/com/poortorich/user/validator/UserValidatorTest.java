@@ -3,7 +3,7 @@ package com.poortorich.user.validator;
 import com.poortorich.global.exceptions.BadRequestException;
 import com.poortorich.global.exceptions.ConflictException;
 import com.poortorich.user.constants.UserResponseMessages;
-import com.poortorich.user.fixture.UserRegistrationFixture;
+import com.poortorich.user.fixture.UserFixture;
 import com.poortorich.user.repository.UserRepository;
 import java.time.LocalDate;
 import org.assertj.core.api.Assertions;
@@ -32,7 +32,7 @@ class UserValidatorTest {
         @Test
         @DisplayName("사용자 이름이 이미 존재하는 경우 ConflictException을 던진다.")
         void validateUsername_whenUsernameExists_thenThrowConflictException() {
-            String existingUsername = UserRegistrationFixture.VALID_USERNAME;
+            String existingUsername = UserFixture.VALID_USERNAME;
             Mockito.when(userRepository.existsByUsername(existingUsername)).thenReturn(true);
 
             Assertions.assertThatThrownBy(() -> userValidator.validateUsernameDuplicate(existingUsername))
@@ -43,7 +43,7 @@ class UserValidatorTest {
         @Test
         @DisplayName("사용자 이름이 존재하지않는 경우 예외를 발생시키지 않는다.")
         void validateUsername_whenUsernameDoesNotExists_thenNoException() {
-            String newUsername = UserRegistrationFixture.VALID_USERNAME;
+            String newUsername = UserFixture.VALID_USERNAME;
             Mockito.when(userRepository.existsByUsername(newUsername)).thenReturn(false);
 
             userValidator.validateUsernameDuplicate(newUsername);
@@ -57,7 +57,7 @@ class UserValidatorTest {
         @Test
         @DisplayName("이메일이 이미 존재하는 경우 ConflictException을 던진다.")
         void validateEmail_whenEmailExists_thenThrowConflictException() {
-            String existingEmail = UserRegistrationFixture.VALID_EMAIL;
+            String existingEmail = UserFixture.VALID_EMAIL;
             Mockito.when(userRepository.existsByEmail(existingEmail)).thenReturn(true);
 
             Assertions.assertThatThrownBy(() -> userValidator.validateEmailDuplicate(existingEmail))
@@ -68,7 +68,7 @@ class UserValidatorTest {
         @Test
         @DisplayName("이메일이 존재하지 않는 경우 예외를 던지지 않는다.")
         void validateEmail_whenEmailDoesNotExists_thenNoException() {
-            String newEmail = UserRegistrationFixture.VALID_EMAIL;
+            String newEmail = UserFixture.VALID_EMAIL;
             Mockito.when(userRepository.existsByEmail(newEmail)).thenReturn(false);
 
             userValidator.validateEmailDuplicate(newEmail);
@@ -82,7 +82,7 @@ class UserValidatorTest {
         @Test
         @DisplayName("닉네임이 이미 존재하는 경우 ConflictException을 던진다.")
         void validateNickname_whenNicknameExists_thenThrowConflictException() {
-            String existingNickname = UserRegistrationFixture.VALID_NICKNAME;
+            String existingNickname = UserFixture.VALID_NICKNAME;
             Mockito.when(userRepository.existsByNickname(existingNickname)).thenReturn(true);
 
             Assertions.assertThatThrownBy(() -> userValidator.validateNicknameDuplicate(existingNickname))
@@ -93,7 +93,7 @@ class UserValidatorTest {
         @Test
         @DisplayName("닉네임이 존재하지 않는 경우 예외를 던지지 않는다.")
         void validateNickname_whenNicknameDoesNotExists_thenNoException() {
-            String newNickname = UserRegistrationFixture.VALID_NICKNAME;
+            String newNickname = UserFixture.VALID_NICKNAME;
             Mockito.when(userRepository.existsByNickname(newNickname)).thenReturn(false);
 
             userValidator.validateNicknameDuplicate(newNickname);
@@ -107,8 +107,8 @@ class UserValidatorTest {
         @Test
         @DisplayName("비밀번호가 일치하지 않는 경우 BadRequestException을 던진다.")
         void validatePasswordMatch_whenPasswordsDoNotMatch_thenThrowBadRequestException() {
-            String password = UserRegistrationFixture.VALID_PASSWORD;
-            String differentPasswordConfirm = UserRegistrationFixture.MISMATCH_PASSWORD_CONFIRM;
+            String password = UserFixture.VALID_PASSWORD;
+            String differentPasswordConfirm = UserFixture.MISMATCH_PASSWORD_CONFIRM;
 
             Assertions.assertThatThrownBy(() -> userValidator.validatePasswordMatch(password, differentPasswordConfirm))
                     .isInstanceOf(BadRequestException.class)
@@ -118,8 +118,8 @@ class UserValidatorTest {
         @Test
         @DisplayName("비밀번호가 일치하는 경우 예외를 던지지 않는다.")
         void validatePasswordMatch_whenPasswordsMatch_thenNoException() {
-            String password = UserRegistrationFixture.VALID_PASSWORD;
-            String passwordConfirm = UserRegistrationFixture.VALID_PASSWORD;
+            String password = UserFixture.VALID_PASSWORD;
+            String passwordConfirm = UserFixture.VALID_PASSWORD;
 
             userValidator.validatePasswordMatch(password, passwordConfirm);
         }
