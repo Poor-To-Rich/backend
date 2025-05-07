@@ -46,19 +46,21 @@ class ExpenseFacadeTest {
         category = Category.builder()
                 .name(ExpenseFixture.VALID_CATEGORY_NAME)
                 .build();
-        user = User.builder().build();
+        user = User.builder()
+                .username("test")
+                .build();
         expense = Expense.builder().build();
     }
 
     @Test
     @DisplayName("Category, Expense 서비스가 적절히 호출된다.")
     void createExpense_shouldCallServiceMethods() {
-        when(categoryService.findCategoryByName(expenseRequest.getCategoryName(), user)).thenReturn(category);
-        when(expenseService.createExpense(expenseRequest, category, user)).thenReturn(expense);
+        when(categoryService.findCategoryByName(expenseRequest.getCategoryName(), user.getUsername())).thenReturn(category);
+        when(expenseService.createExpense(expenseRequest, category, user.getUsername())).thenReturn(expense);
 
-        expenseFacade.createExpense(expenseRequest, user);
-        verify(expenseService).createExpense(expenseRequest, category, user);
-        verify(categoryService).findCategoryByName(expenseRequest.getCategoryName(), user);
-        verify(iterationService).createIterationExpenses(expenseRequest.getCustomIteration(), expense, user);
+        expenseFacade.createExpense(expenseRequest, user.getUsername());
+        verify(expenseService).createExpense(expenseRequest, category, user.getUsername());
+        verify(categoryService).findCategoryByName(expenseRequest.getCategoryName(), user.getUsername());
+        verify(iterationService).createIterationExpenses(expenseRequest.getCustomIteration(), expense, user.getUsername());
     }
 }
