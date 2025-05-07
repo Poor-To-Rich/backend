@@ -4,10 +4,12 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.poortorich.s3.service.FileUploadService;
-import com.poortorich.user.fixture.UserRegistrationFixture;
+import com.poortorich.user.entity.User;
+import com.poortorich.user.fixture.UserFixture;
 import com.poortorich.user.request.NicknameCheckRequest;
 import com.poortorich.user.request.UserRegistrationRequest;
 import com.poortorich.user.request.UsernameCheckRequest;
+import com.poortorich.user.response.UserDetailResponse;
 import com.poortorich.user.service.RedisUserReservationService;
 import com.poortorich.user.service.UserService;
 import com.poortorich.user.service.UserValidationService;
@@ -49,7 +51,7 @@ public class UserFacadeTest {
     @DisplayName("Facade에서 회원가입 시 서비스들이 적절히 호출되는지 검증")
     void registerNewUser_shouldCallServiceMethods() {
         UserRegistrationRequest request = userRegistrationBuilder.build();
-        String profileImageUrl = UserRegistrationFixture.TEST_PROFILE_IMAGE_URL;
+        String profileImageUrl = UserFixture.TEST_PROFILE_IMAGE_URL;
 
         when(fileUploadService.uploadImage(request.getProfileImage())).thenReturn(profileImageUrl);
 
@@ -82,5 +84,25 @@ public class UserFacadeTest {
 
         verify(userValidationService).validateCheckNickname(nicknameCheckRequest.getNickname());
         verify(userReservationService).reservedNickname(nicknameCheckRequest.getNickname());
+    }
+
+    @Test
+    @DisplayName("Facade에서 회원 상세 조회 시 서비스들이 적절히 호출되는지 검증")
+    void getUserDetails_shouldCallServiceMethods() {
+        User mockUser = UserFixture.createDefaultUser();
+        UserDetailResponse userDetails = UserDetailResponse.builder()
+                .profileImage(mockUser.getProfileImage())
+                .name(mockUser.getName())
+                .nickname(mockUser.getNickname())
+                .gender(mockUser.getGender().toString())
+                .birth(mockUser.getBirth().toString())
+                .job(mockUser.getJob())
+                .build();
+
+        when(userService.findUserDetailByUsername(UserFixture.VALID_USERNAME)).thenReturn(userDetails);
+
+        userFacade.getUserDetails(UserFixture.VALID_USERNAME);
+
+        verify(userService).findUserDetailByUsername(UserFixture.VALID_USERNAME);
     }
 }

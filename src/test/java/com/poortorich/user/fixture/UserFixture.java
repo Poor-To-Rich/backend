@@ -1,6 +1,10 @@
 package com.poortorich.user.fixture;
 
-public class UserRegistrationFixture {
+import com.poortorich.user.entity.User;
+import com.poortorich.user.entity.enums.Gender;
+import java.time.LocalDate;
+
+public class UserFixture {
     public static final String VALID_NAME = "홍길동";
     public static final String VALID_NICKNAME = "happy123";
     public static final String VALID_USERNAME = "username1";
@@ -21,6 +25,19 @@ public class UserRegistrationFixture {
     public static final String TEST_PROFILE_IMAGE_URL = "http://example.com/profile.jpg";
     public static final String TEST_ENCODED_PASSWORD = "ENCODEDPASSWORD32$#$##!";
 
-    private UserRegistrationFixture() {
+    private UserFixture() {
+    }
+
+    public static User createDefaultUser() {
+        return User.builder()
+                .name(VALID_NAME)
+                .nickname(VALID_NICKNAME)
+                .username(VALID_USERNAME)
+                .password(VALID_PASSWORD)
+                .birth(LocalDate.parse(VALID_BIRTH))
+                .email(VALID_EMAIL)
+                .gender(Gender.from(VALID_MALE))
+                .profileImage(TEST_PROFILE_IMAGE_URL)
+                .build();
     }
 }
