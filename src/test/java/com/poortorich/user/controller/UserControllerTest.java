@@ -62,7 +62,6 @@ class UserControllerTest extends BaseSecurityTest {
         objectMapper = new ObjectMapper();
         userRegistrationRequest = UserRegisterApiFixture.createValidUserRegistrationRequest();
         profileImage = S3TestFileGenerator.createJpegFile();
-
     }
 
     @Test
