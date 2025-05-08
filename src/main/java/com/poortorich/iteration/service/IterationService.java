@@ -3,6 +3,7 @@ package com.poortorich.iteration.service;
 import com.poortorich.expense.entity.Expense;
 import com.poortorich.expense.entity.enums.IterationType;
 import com.poortorich.global.exceptions.BadRequestException;
+import com.poortorich.global.exceptions.NotFoundException;
 import com.poortorich.iteration.entity.IterationExpenses;
 import com.poortorich.iteration.entity.enums.Weekday;
 import com.poortorich.iteration.entity.enums.EndType;
@@ -21,6 +22,9 @@ import com.poortorich.iteration.request.IterationRule;
 import com.poortorich.iteration.request.MonthlyOption;
 import com.poortorich.iteration.response.IterationResponse;
 import com.poortorich.iteration.util.IterationDateCalculator;
+import com.poortorich.user.entity.User;
+import com.poortorich.user.repository.UserRepository;
+import com.poortorich.user.response.enums.UserResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -36,18 +40,22 @@ public class IterationService {
     private final IterationDateCalculator dateCalculator;
     private final IterationExpensesRepository iterationExpensesRepository;
     private final IterationInfoRepository iterationInfoRepository;
+    private final UserRepository userRepository;
 
     public List<Expense> createIterationExpenses(CustomIteration customIteration,
-                                                 Expense expense) {
+                                                 Expense expense,
+                                                 String username) {
+        User user = findUserByUsername(username);
         LocalDate startDate = expense.getExpenseDate();
         return getIterationExpenses(
                 customIteration,
                 startDate,
-                expense
+                expense,
+                user
         );
     }
 
-    private List<Expense> getIterationExpenses(CustomIteration customIteration, LocalDate startDate, Expense expense) {
+    private List<Expense> getIterationExpenses(CustomIteration customIteration, LocalDate startDate, Expense expense, User user) {
         List<Expense> iterationExpenses = new ArrayList<>();
         LocalDate date = getDateByIterationType(customIteration, startDate, expense.getIterationType());
         LocalDate endDate = calculateEndDate(customIteration, expense, startDate);
@@ -58,7 +66,7 @@ public class IterationService {
             if (maxIterations > allowedIterations) {
                 throw new BadRequestException(IterationResponse.ITERATIONS_TOO_LONG);
             }
-            Expense generatedExpense = buildIterationExpense(expense, date);
+            Expense generatedExpense = buildIterationExpense(expense, date, user);
             iterationExpenses.add(generatedExpense);
             date = getDateByIterationType(customIteration, date, expense.getIterationType());
             maxIterations++;
@@ -196,7 +204,7 @@ public class IterationService {
         return targetDate;
     }
 
-    private Expense buildIterationExpense(Expense originalExpense, LocalDate date) {
+    private Expense buildIterationExpense(Expense originalExpense, LocalDate date, User user) {
         return Expense.builder()
                 .expenseDate(date)
                 .title(originalExpense.getTitle())
@@ -205,17 +213,20 @@ public class IterationService {
                 .memo(originalExpense.getMemo())
                 .iterationType(originalExpense.getIterationType())
                 .category(originalExpense.getCategory())
+                .user(user)
                 .build();
     }
 
     public void createIterationInfo(CustomIteration customIteration,
                                     Expense originalExpense,
-                                    List<Expense> savedIterationExpenses) {
+                                    List<Expense> savedIterationExpenses,
+                                    String username) {
+        User user = findUserByUsername(username);
         IterationInfo iterationInfo = getIterationInfo(customIteration);
         iterationInfoRepository.save(iterationInfo);
 
         for (Expense savedExpense : savedIterationExpenses) {
-            IterationExpenses iterationExpenses = buildIterationExpenses(originalExpense, savedExpense, iterationInfo);
+            IterationExpenses iterationExpenses = buildIterationExpenses(originalExpense, savedExpense, iterationInfo, user);
             iterationExpensesRepository.save(iterationExpenses);
         }
     }
@@ -283,11 +294,18 @@ public class IterationService {
 
     private IterationExpenses buildIterationExpenses(Expense originalExpense,
                                                      Expense generatedExpense,
-                                                     IterationInfo iterationInfo) {
+                                                     IterationInfo iterationInfo,
+                                                     User user) {
         return IterationExpenses.builder()
                 .originalExpense(originalExpense)
                 .generatedExpense(generatedExpense)
                 .iterationInfo(iterationInfo)
+                .user(user)
                 .build();
+    }
+
+    private User findUserByUsername(String username) {
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new NotFoundException(UserResponse.USER_NOT_FOUND));
     }
 }
