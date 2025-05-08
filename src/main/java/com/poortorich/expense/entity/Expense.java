@@ -3,6 +3,7 @@ package com.poortorich.expense.entity;
 import com.poortorich.category.entity.Category;
 import com.poortorich.expense.entity.enums.IterationType;
 import com.poortorich.expense.entity.enums.PaymentMethod;
+import com.poortorich.iteration.entity.IterationExpenses;
 import com.poortorich.user.entity.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -14,6 +15,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -64,14 +66,6 @@ public class Expense {
     @Column(name = "iterationType", nullable = false)
     private IterationType iterationType;
 
-    @CreationTimestamp
-    @Column(name = "createdDate")
-    private LocalDateTime createdDate;
-
-    @UpdateTimestamp
-    @Column(name = "updatedDate")
-    private LocalDateTime updatedDate;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "categoryId")
     private Category category;
@@ -79,4 +73,15 @@ public class Expense {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userId")
     private User user;
+
+    @OneToOne(mappedBy = "generatedExpense")
+    private IterationExpenses generatedIterationExpenses;
+
+    @CreationTimestamp
+    @Column(name = "createdDate")
+    private LocalDateTime createdDate;
+
+    @UpdateTimestamp
+    @Column(name = "updatedDate")
+    private LocalDateTime updatedDate;
 }
