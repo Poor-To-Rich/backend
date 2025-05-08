@@ -9,9 +9,12 @@ import com.poortorich.category.response.CategoryInfoResponse;
 import com.poortorich.category.response.CategoryResponse;
 import com.poortorich.category.response.CustomCategoryResponse;
 import com.poortorich.category.response.DefaultCategoryResponse;
-import com.poortorich.category.validator.CategoryValidator;
+import com.poortorich.global.exceptions.BadRequestException;
 import com.poortorich.global.exceptions.NotFoundException;
 import com.poortorich.global.response.Response;
+import com.poortorich.user.entity.User;
+import com.poortorich.user.repository.UserRepository;
+import com.poortorich.user.response.enums.UserResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -23,10 +26,10 @@ import java.util.List;
 public class CategoryService {
 
     private final CategoryRepository categoryRepository;
-    private final CategoryValidator categoryValidator;
+    private final UserRepository userRepository;
 
-    public List<DefaultCategoryResponse> getDefaultCategories(CategoryType type) {
-        return categoryRepository.findByType(type).stream()
+    public List<DefaultCategoryResponse> getDefaultCategories(CategoryType type, String username) {
+        return categoryRepository.findByTypeAndUser(type, findUserByUsername(username)).stream()
                 .map(category -> DefaultCategoryResponse.builder()
                         .name(category.getName())
                         .color(category.getColor())
@@ -35,8 +38,8 @@ public class CategoryService {
                 .toList();
     }
 
-    public List<CustomCategoryResponse> getCustomCategories(CategoryType type) {
-        return categoryRepository.findByType(type).stream()
+    public List<CustomCategoryResponse> getCustomCategories(CategoryType type, String username) {
+        return categoryRepository.findByTypeAndUser(type, findUserByUsername(username)).stream()
                 .map(category -> CustomCategoryResponse.builder()
                         .id(category.getId())
                         .color(category.getColor())
@@ -45,8 +48,9 @@ public class CategoryService {
                 .toList();
     }
 
-    public ActiveCategoriesResponse getActiveCategories(String type) {
-        List<String> categories = categoryRepository.findByType(CategoryType.from(type)).stream()
+    public ActiveCategoriesResponse getActiveCategories(String type, String username) {
+        List<String> categories
+                = categoryRepository.findByTypeAndUser(CategoryType.from(type), findUserByUsername(username)).stream()
                 .filter(Category::getVisibility)
                 .map(Category::getName)
                 .toList();
@@ -56,26 +60,29 @@ public class CategoryService {
                 .build();
     }
 
-    public Response createCategory(CategoryInfoRequest customCategory, CategoryType type) {
-        if (categoryValidator.isNameUsed(customCategory.getName())) {
+    public Response createCategory(CategoryInfoRequest customCategory, CategoryType type, String username) {
+        User user = findUserByUsername(username);
+
+        if (categoryRepository.findByNameAndUser(customCategory.getName(), user).isPresent()) {
             return CategoryResponse.CATEGORY_NAME_DUPLICATE;
         }
 
-        categoryRepository.save(buildCategory(customCategory, type));
+        categoryRepository.save(buildCategory(customCategory, type, user));
         return CategoryResponse.CREATE_CATEGORY_SUCCESS;
     }
 
-    private Category buildCategory(CategoryInfoRequest customCategory, CategoryType type) {
+    private Category buildCategory(CategoryInfoRequest customCategory, CategoryType type, User user) {
         return Category.builder()
                 .type(type)
                 .name(customCategory.getName())
                 .color(customCategory.getColor())
                 .visibility(true)
+                .user(user)
                 .build();
     }
 
-    public CategoryInfoResponse getCategory(Long id) {
-        Category category = getCategoryOrThrow(id);
+    public CategoryInfoResponse getCategory(Long id, String username) {
+        Category category = getCategoryOrThrow(id, findUserByUsername(username));
 
         return CategoryInfoResponse.builder()
                 .name(category.getName())
@@ -84,31 +91,37 @@ public class CategoryService {
     }
 
     @Transactional
-    public Response modifyCategory(Long id, CategoryInfoRequest categoryRequest) {
-        if (categoryValidator.isNameUsed(categoryRequest.getName(), id)) {
-            return CategoryResponse.CATEGORY_NAME_DUPLICATE;
-        }
+    public Response modifyCategory(Long id, CategoryInfoRequest categoryRequest, String username) {
+        User user = findUserByUsername(username);
 
-        Category category = getCategoryOrThrow(id);
+        categoryRepository.findByNameAndUser(categoryRequest.getName(), user)
+                .orElseThrow(() -> new BadRequestException(CategoryResponse.CATEGORY_NAME_DUPLICATE));
+
+        Category category = getCategoryOrThrow(id, user);
         category.updateCategory(categoryRequest.getName(), categoryRequest.getColor());
 
         return CategoryResponse.MODIFY_CATEGORY_SUCCESS;
     }
 
-    public Response deleteCategory(Long id) {
-        Category category = getCategoryOrThrow(id);
+    public Response deleteCategory(Long id, String username) {
+        Category category = getCategoryOrThrow(id, findUserByUsername(username));
         categoryRepository.delete(category);
 
         return CategoryResponse.DELETE_CATEGORY_SUCCESS;
     }
 
-    private Category getCategoryOrThrow(Long id) {
-        return categoryRepository.findById(id)
+    private Category getCategoryOrThrow(Long id, User user) {
+        return categoryRepository.findByIdAndUser(id, user)
                 .orElseThrow(() -> new NotFoundException(CategoryResponse.CATEGORY_NON_EXISTENT));
     }
 
-    public Category findCategoryByName(String name) {
-        return categoryRepository.findByName(name)
+    public Category findCategoryByName(String name, String username) {
+        return categoryRepository.findByNameAndUser(name, findUserByUsername(username))
                 .orElseThrow(() -> new NotFoundException(CategoryResponse.CATEGORY_NON_EXISTENT));
+    }
+
+    private User findUserByUsername(String username) {
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new NotFoundException(UserResponse.USER_NOT_FOUND));
     }
 }

@@ -24,21 +24,22 @@ public class ExpenseFacade {
     private final IterationService iterationService;
 
     @Transactional
-    public Response createExpense(ExpenseRequest expenseRequest) {
-        Category category = categoryService.findCategoryByName(expenseRequest.getCategoryName());
-        Expense expense = expenseService.createExpense(expenseRequest, category);
+    public Response createExpense(ExpenseRequest expenseRequest, String username) {
+        Category category = categoryService.findCategoryByName(expenseRequest.getCategoryName(), username);
+        Expense expense = expenseService.createExpense(expenseRequest, category, username);
         if (expense.getIterationType() != IterationType.DEFAULT) {
-            createIterationExpense(expenseRequest, expense);
+            createIterationExpense(expenseRequest, expense, username);
         }
 
         return ExpenseResponse.CREATE_EXPENSE_SUCCESS;
     }
 
-    public void createIterationExpense(ExpenseRequest expenseRequest, Expense expense) {
-        List<Expense> iterationExpenses = iterationService.createIterationExpenses(expenseRequest.getCustomIteration(), expense);
+    public void createIterationExpense(ExpenseRequest expenseRequest, Expense expense, String username) {
+        List<Expense> iterationExpenses
+                = iterationService.createIterationExpenses(expenseRequest.getCustomIteration(), expense, username);
         List<Expense> savedExpenses = expenseService.createExpenseAll(iterationExpenses);
         if (expense.getIterationType() == IterationType.CUSTOM) {
-            iterationService.createIterationInfo(expenseRequest.getCustomIteration(), expense, savedExpenses);
+            iterationService.createIterationInfo(expenseRequest.getCustomIteration(), expense, savedExpenses, username);
         }
     }
 }

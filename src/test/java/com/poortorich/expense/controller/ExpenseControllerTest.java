@@ -1,6 +1,7 @@
 package com.poortorich.expense.controller;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -32,6 +33,8 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.List;
+
 @WebMvcTest(ExpenseController.class)
 @Import(SecurityConfig.class)
 @ExtendWith(MockitoExtension.class)
@@ -55,12 +58,12 @@ class ExpenseControllerTest extends BaseSecurityTest {
     }
 
     @Test
-    @WithMockUser(username = "testUser")
+    @WithMockUser(username = "test")
     @DisplayName("유효한 지출 가계부 데이터로 createExpense 호출 시 기대했던 응답이 반환된다.")
     void createExpense_whenValidInput_thenNoException() throws Exception {
         String requestJson = objectMapper.writeValueAsString(expenseRequest);
 
-        when(expenseFacade.createExpense(any(ExpenseRequest.class)))
+        when(expenseFacade.createExpense(any(ExpenseRequest.class), anyString()))
                 .thenReturn(ExpenseResponse.CREATE_EXPENSE_SUCCESS);
 
         mockMvc.perform(post(ExpenseApiFixture.CREATE_PATH)
@@ -70,6 +73,6 @@ class ExpenseControllerTest extends BaseSecurityTest {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.resultMessage").value(ExpenseResponse.CREATE_EXPENSE_SUCCESS.getMessage()));
 
-        verify(expenseFacade, times(1)).createExpense(any(ExpenseRequest.class));
+        verify(expenseFacade, times(1)).createExpense(any(ExpenseRequest.class), anyString());
     }
 }
