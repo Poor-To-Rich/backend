@@ -317,14 +317,10 @@ public class IterationService {
 
     public CustomIterationInfoResponse getCustomIteration(IterationExpenses iterationExpenses) {
         IterationInfo iterationInfo = iterationExpenses.getIterationInfo();
-        return buildCustomIterationInfo(iterationInfo);
-    }
-
-    private CustomIterationInfoResponse buildCustomIterationInfo(IterationInfo info) {
         return CustomIterationInfoResponse.builder()
-                .iterationRule(buildIterationRuleByRuleType(info))
-                .cycle(info.getCycle())
-                .end(buildEndInfoResponseByEndType(info))
+                .iterationRule(buildIterationRuleByRuleType(iterationInfo))
+                .cycle(iterationInfo.getCycle())
+                .end(buildEndInfoResponseByEndType(iterationInfo))
                 .build();
     }
 
