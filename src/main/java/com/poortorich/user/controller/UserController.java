@@ -5,6 +5,7 @@ import com.poortorich.global.response.DataResponse;
 import com.poortorich.user.constants.UserResponseMessages;
 import com.poortorich.user.facade.UserFacade;
 import com.poortorich.user.request.NicknameCheckRequest;
+import com.poortorich.user.request.ProfileUpdateRequest;
 import com.poortorich.user.request.UserRegistrationRequest;
 import com.poortorich.user.request.UsernameCheckRequest;
 import com.poortorich.user.response.enums.UserResponse;
@@ -17,6 +18,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -27,7 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserController {
 
     private final UserFacade userFacade;
-    
+
     @PostMapping(value = "/register", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<BaseResponse> registerUser(
             @Valid
@@ -54,5 +56,13 @@ public class UserController {
                 UserResponse.USER_DETAIL_FIND_SUCCESS,
                 userFacade.getUserDetails(userDetails.getUsername())
         );
+    }
+
+    @PutMapping(value = "/update", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<BaseResponse> updateUserProfile(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @Valid ProfileUpdateRequest userProfile
+    ) {
+        return BaseResponse.toResponseEntity(userFacade.updateUserProfile(userDetails.getUsername(), userProfile));
     }
 }
