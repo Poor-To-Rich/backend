@@ -53,8 +53,11 @@ public class UserFacade {
     @Transactional
     public Response updateUserProfile(String username, ProfileUpdateRequest userProfile) {
         userValidationService.validateUpdateUserProfile(username, userProfile);
-        String currentProfileImage = userService.findProfileImageByUsername(username);
-        String newProfileImage = fileUploadService.updateImage(currentProfileImage, userProfile.getProfileImage());
+        String newProfileImage = fileUploadService.updateImage(
+                userService.findProfileImageByUsername(username),
+                userProfile.getProfileImage(),
+                userProfile.getIsDefaultProfile());
+
         userService.update(username, userProfile, newProfileImage);
         return UserResponse.USER_PROFILE_UPDATE_SUCCESS;
     }

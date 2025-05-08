@@ -29,6 +29,10 @@ public class FileUploadService {
     private String bucketName;
 
     public String uploadImage(MultipartFile imageFile) {
+        if (imageFile.isEmpty()) {
+            return DEFAULT_PROFILE_IMAGE;
+        }
+        
         fileValidator.validateFileType(imageFile);
         fileValidator.validateFileSize(imageFile);
 
@@ -39,21 +43,25 @@ public class FileUploadService {
         return amazonS3Client.getUrl(bucketName, fileName).toString();
     }
 
-    public String updateImage(String currentProfileImage, MultipartFile newProfileImage) {
+    public String updateImage(String currentProfileImage, MultipartFile newProfileImage, Boolean isDefaultProfile) {
+        if (isDefaultProfile) {
+            deleteImage(currentProfileImage);
+            return DEFAULT_PROFILE_IMAGE;
+        }
+
         if (newProfileImage.isEmpty()) {
             return currentProfileImage;
         }
 
-        if (!Objects.equals(DEFAULT_PROFILE_IMAGE, currentProfileImage)) {
-            deleteImage(currentProfileImage);
-        }
-
+        deleteImage(currentProfileImage);
         return uploadImage(newProfileImage);
     }
 
     public void deleteImage(String imageUrl) {
-        String fileName = S3FileUtils.extractFileNameFromUrl(imageUrl);
-        amazonS3Client.deleteObject(bucketName, fileName);
+        if (!Objects.equals(DEFAULT_PROFILE_IMAGE, imageUrl)) {
+            String fileName = S3FileUtils.extractFileNameFromUrl(imageUrl);
+            amazonS3Client.deleteObject(bucketName, fileName);
+        }
     }
 
     private void uploadToS3(MultipartFile file, String fileName) {
