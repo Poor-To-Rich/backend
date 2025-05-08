@@ -17,6 +17,8 @@ public class ProfileUpdateRequest {
 
     private MultipartFile profileImage;
 
+    private Boolean isDefaultProfile;
+
     @NotBlank(message = UserResponseMessages.NAME_REQUIRED)
     @Size(max = UserValidationRules.NAME_MAX_LENGTH, message = UserResponseMessages.NAME_TOO_LONG)
     @Pattern(regexp = UserValidationRules.NO_BLANK_PATTERN, message = UserResponseMessages.NAME_CONTAINS_BLANK)
@@ -38,6 +40,6 @@ public class ProfileUpdateRequest {
 
     @NotBlank(message = UserResponseMessages.GENDER_REQUIRED)
     private String gender;
-    
+
     private String job;
 }
