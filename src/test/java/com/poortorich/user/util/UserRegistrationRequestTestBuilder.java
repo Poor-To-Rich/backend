@@ -7,15 +7,15 @@ import org.springframework.web.multipart.MultipartFile;
 
 public class UserRegistrationRequestTestBuilder {
 
-    private String name = UserFixture.VALID_NAME;
-    private String nickname = UserFixture.VALID_NICKNAME;
-    private String username = UserFixture.VALID_USERNAME;
-    private String password = UserFixture.VALID_PASSWORD;
-    private String passwordConfirm = UserFixture.VALID_PASSWORD;
-    private String birth = UserFixture.VALID_BIRTH;
+    private String name = UserFixture.VALID_NAME_SAMPLE_1;
+    private String nickname = UserFixture.VALID_NICKNAME_SAMPLE_1;
+    private String username = UserFixture.VALID_USERNAME_SAMPLE_1;
+    private String password = UserFixture.VALID_PASSWORD_SAMPLE_1;
+    private String passwordConfirm = UserFixture.VALID_PASSWORD_SAMPLE_1;
+    private String birth = UserFixture.VALID_BIRTH_SAMPLE_1;
     private String email = UserFixture.VALID_EMAIL;
     private String gender = UserFixture.VALID_MALE;
-    private String job = UserFixture.VALID_JOB;
+    private String job = UserFixture.VALID_JOB_SAMPLE_1;
     private MultipartFile profileImage = S3TestFileGenerator.createJpegFile();
 
     public UserRegistrationRequestTestBuilder name(String name) {
