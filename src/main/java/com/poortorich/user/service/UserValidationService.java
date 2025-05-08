@@ -5,6 +5,7 @@ import com.poortorich.email.util.EmailVerificationPolicyManager;
 import com.poortorich.global.exceptions.BadRequestException;
 import com.poortorich.global.exceptions.ConflictException;
 import com.poortorich.global.exceptions.ForbiddenException;
+import com.poortorich.user.request.ProfileUpdateRequest;
 import com.poortorich.user.request.UserRegistrationRequest;
 import com.poortorich.user.response.enums.UserResponse;
 import com.poortorich.user.validator.UserValidator;
@@ -53,6 +54,16 @@ public class UserValidationService {
         userValidator.validateNicknameDuplicate(nickname);
         if (userReservationService.existsByNickname(nickname)) {
             throw new ConflictException(UserResponse.NICKNAME_DUPLICATE);
+        }
+    }
+
+    public void validateUpdateUserProfile(String username, ProfileUpdateRequest userProfile) {
+        if (userValidator.isNicknameChanged(username, userProfile.getNickname())) {
+            userValidator.validateNicknameDuplicate(userProfile.getNickname());
+            
+            if (!userReservationService.existsByNickname(userProfile.getNickname())) {
+                throw new BadRequestException(UserResponse.NICKNAME_RESERVE_CHECK_REQUIRED);
+            }
         }
     }
 }
