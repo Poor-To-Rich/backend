@@ -22,4 +22,9 @@ public enum MonthlyMode {
                 .findFirst()
                 .orElseThrow(() -> new BadRequestException(IterationResponse.MONTHLY_MODE_INVALID));
     }
+
+    @Override
+    public String toString() {
+        return mode;
+    }
 }
