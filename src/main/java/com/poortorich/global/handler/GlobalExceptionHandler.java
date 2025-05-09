@@ -38,12 +38,12 @@ public class GlobalExceptionHandler {
     ) {
         FieldError fieldError = exception.getBindingResult().getFieldError();
 
-        String errorMessage = Optional.ofNullable(exception.getBindingResult().getFieldError())
+        String errorMessage = Optional.ofNullable(fieldError)
                 .map(DefaultMessageSourceResolvable::getDefaultMessage)
                 .orElse(DEFAULT_ERROR_MESSAGE);
 
         if (fieldError == null) {
-            return DataResponse.toResponseEntity(HttpStatus.BAD_REQUEST, errorMessage, null);
+            return BaseResponse.toResponseEntity(HttpStatus.BAD_REQUEST, errorMessage);
         }
 
         return DataResponse.toResponseEntity(

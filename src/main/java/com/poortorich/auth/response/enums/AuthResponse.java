@@ -4,7 +4,6 @@ import com.poortorich.auth.constants.AuthResponseMessage;
 import com.poortorich.global.response.Response;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.parameters.P;
 
 @AllArgsConstructor
 public enum AuthResponse implements Response {
