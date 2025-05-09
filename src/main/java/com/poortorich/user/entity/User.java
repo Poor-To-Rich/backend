@@ -1,6 +1,8 @@
 package com.poortorich.user.entity;
 
+import com.poortorich.user.constants.UserValidationRules;
 import com.poortorich.user.entity.enums.Gender;
+import com.poortorich.user.request.ProfileUpdateRequest;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -11,6 +13,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Collection;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -96,5 +99,16 @@ public class User implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
+    }
+
+    public void updateProfile(ProfileUpdateRequest userProfile, String newProfileImage) {
+        this.profileImage = newProfileImage;
+        this.name = userProfile.getName();
+        this.nickname = userProfile.getNickname();
+        this.gender = Gender.from(userProfile.getGender());
+        this.birth = LocalDate.parse(
+                userProfile.getBirth(),
+                DateTimeFormatter.ofPattern(UserValidationRules.BIRTHDAY_DATE_FORMAT));
+        this.job = userProfile.getJob();
     }
 }

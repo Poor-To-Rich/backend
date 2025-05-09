@@ -1,11 +1,19 @@
 package com.poortorich.user.validator;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
+
 import com.poortorich.global.exceptions.BadRequestException;
 import com.poortorich.global.exceptions.ConflictException;
+import com.poortorich.global.exceptions.NotFoundException;
 import com.poortorich.user.constants.UserResponseMessages;
+import com.poortorich.user.entity.User;
 import com.poortorich.user.fixture.UserFixture;
 import com.poortorich.user.repository.UserRepository;
 import java.time.LocalDate;
+import java.util.Optional;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -13,7 +21,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
@@ -32,8 +39,8 @@ class UserValidatorTest {
         @Test
         @DisplayName("사용자 이름이 이미 존재하는 경우 ConflictException을 던진다.")
         void validateUsername_whenUsernameExists_thenThrowConflictException() {
-            String existingUsername = UserFixture.VALID_USERNAME;
-            Mockito.when(userRepository.existsByUsername(existingUsername)).thenReturn(true);
+            String existingUsername = UserFixture.VALID_USERNAME_SAMPLE_1;
+            when(userRepository.existsByUsername(existingUsername)).thenReturn(true);
 
             Assertions.assertThatThrownBy(() -> userValidator.validateUsernameDuplicate(existingUsername))
                     .isInstanceOf(ConflictException.class)
@@ -43,8 +50,8 @@ class UserValidatorTest {
         @Test
         @DisplayName("사용자 이름이 존재하지않는 경우 예외를 발생시키지 않는다.")
         void validateUsername_whenUsernameDoesNotExists_thenNoException() {
-            String newUsername = UserFixture.VALID_USERNAME;
-            Mockito.when(userRepository.existsByUsername(newUsername)).thenReturn(false);
+            String newUsername = UserFixture.VALID_USERNAME_SAMPLE_1;
+            when(userRepository.existsByUsername(newUsername)).thenReturn(false);
 
             userValidator.validateUsernameDuplicate(newUsername);
         }
@@ -58,7 +65,7 @@ class UserValidatorTest {
         @DisplayName("이메일이 이미 존재하는 경우 ConflictException을 던진다.")
         void validateEmail_whenEmailExists_thenThrowConflictException() {
             String existingEmail = UserFixture.VALID_EMAIL;
-            Mockito.when(userRepository.existsByEmail(existingEmail)).thenReturn(true);
+            when(userRepository.existsByEmail(existingEmail)).thenReturn(true);
 
             Assertions.assertThatThrownBy(() -> userValidator.validateEmailDuplicate(existingEmail))
                     .isInstanceOf(ConflictException.class)
@@ -69,7 +76,7 @@ class UserValidatorTest {
         @DisplayName("이메일이 존재하지 않는 경우 예외를 던지지 않는다.")
         void validateEmail_whenEmailDoesNotExists_thenNoException() {
             String newEmail = UserFixture.VALID_EMAIL;
-            Mockito.when(userRepository.existsByEmail(newEmail)).thenReturn(false);
+            when(userRepository.existsByEmail(newEmail)).thenReturn(false);
 
             userValidator.validateEmailDuplicate(newEmail);
         }
@@ -82,8 +89,8 @@ class UserValidatorTest {
         @Test
         @DisplayName("닉네임이 이미 존재하는 경우 ConflictException을 던진다.")
         void validateNickname_whenNicknameExists_thenThrowConflictException() {
-            String existingNickname = UserFixture.VALID_NICKNAME;
-            Mockito.when(userRepository.existsByNickname(existingNickname)).thenReturn(true);
+            String existingNickname = UserFixture.VALID_NICKNAME_SAMPLE_1;
+            when(userRepository.existsByNickname(existingNickname)).thenReturn(true);
 
             Assertions.assertThatThrownBy(() -> userValidator.validateNicknameDuplicate(existingNickname))
                     .isInstanceOf(ConflictException.class)
@@ -93,10 +100,46 @@ class UserValidatorTest {
         @Test
         @DisplayName("닉네임이 존재하지 않는 경우 예외를 던지지 않는다.")
         void validateNickname_whenNicknameDoesNotExists_thenNoException() {
-            String newNickname = UserFixture.VALID_NICKNAME;
-            Mockito.when(userRepository.existsByNickname(newNickname)).thenReturn(false);
+            String newNickname = UserFixture.VALID_NICKNAME_SAMPLE_1;
+            when(userRepository.existsByNickname(newNickname)).thenReturn(false);
 
             userValidator.validateNicknameDuplicate(newNickname);
+        }
+
+        @Test
+        @DisplayName("닉네임 변경 확인 - 닉네임이 변경 되지 않아 false를 반환")
+        void isNicknameChanged_whenNicknameIsNotChanged_thenReturnFalse() {
+            User user = UserFixture.createDefaultUser();
+
+            when(userRepository.findByUsername(anyString())).thenReturn(Optional.of(user));
+
+            assertThat(userValidator.isNicknameChanged(user.getUsername(), user.getNickname())).isFalse();
+        }
+
+        @Test
+        @DisplayName("닉네임 변경 확인 - 닉네임이 변경되어 true를 반환")
+        void isNicknameChanged_whenNicknameIsChanged_thenReturnTrue() {
+            User user = UserFixture.createDefaultUser();
+
+            when(userRepository.findByUsername(anyString())).thenReturn(Optional.of(user));
+
+            assertThat(userValidator.isNicknameChanged(
+                    user.getUsername(),
+                    UserFixture.VALID_NICKNAME_SAMPLE_3)
+            ).isTrue();
+        }
+
+        @Test
+        @DisplayName("닉네임 변경 확인 - 회원을 찾을 수 없어 예외 발생")
+        void isNicknameChanged_thenUserIsNotExists_thenThrowException() {
+
+            when(userRepository.findByUsername(anyString())).thenReturn(Optional.empty());
+
+            assertThatThrownBy(() -> userValidator.isNicknameChanged(
+                    UserFixture.VALID_USERNAME_SAMPLE_1,
+                    UserFixture.VALID_NICKNAME_SAMPLE_1))
+                    .isInstanceOf(NotFoundException.class)
+                    .hasMessage(UserResponseMessages.USER_NOT_FOUND);
         }
     }
 
@@ -107,7 +150,7 @@ class UserValidatorTest {
         @Test
         @DisplayName("비밀번호가 일치하지 않는 경우 BadRequestException을 던진다.")
         void validatePasswordMatch_whenPasswordsDoNotMatch_thenThrowBadRequestException() {
-            String password = UserFixture.VALID_PASSWORD;
+            String password = UserFixture.VALID_PASSWORD_SAMPLE_1;
             String differentPasswordConfirm = UserFixture.MISMATCH_PASSWORD_CONFIRM;
 
             Assertions.assertThatThrownBy(() -> userValidator.validatePasswordMatch(password, differentPasswordConfirm))
@@ -118,8 +161,8 @@ class UserValidatorTest {
         @Test
         @DisplayName("비밀번호가 일치하는 경우 예외를 던지지 않는다.")
         void validatePasswordMatch_whenPasswordsMatch_thenNoException() {
-            String password = UserFixture.VALID_PASSWORD;
-            String passwordConfirm = UserFixture.VALID_PASSWORD;
+            String password = UserFixture.VALID_PASSWORD_SAMPLE_1;
+            String passwordConfirm = UserFixture.VALID_PASSWORD_SAMPLE_1;
 
             userValidator.validatePasswordMatch(password, passwordConfirm);
         }

@@ -1,13 +1,13 @@
 package com.poortorich.user.request;
 
 import com.poortorich.global.testcases.TestCase;
-import com.poortorich.user.fixture.enums.BirthValidationCase;
-import com.poortorich.user.fixture.enums.EmailValidationCase;
-import com.poortorich.user.fixture.enums.NameValidationCase;
-import com.poortorich.user.fixture.enums.NicknameValidationCase;
-import com.poortorich.user.fixture.enums.PasswordValidationCase;
-import com.poortorich.user.fixture.enums.UsernameValidationCase;
 import com.poortorich.user.util.UserRegistrationRequestTestBuilder;
+import com.poortorich.user.validator.enums.BirthValidationCase;
+import com.poortorich.user.validator.enums.EmailValidationCase;
+import com.poortorich.user.validator.enums.NameValidationCase;
+import com.poortorich.user.validator.enums.NicknameValidationCase;
+import com.poortorich.user.validator.enums.PasswordValidationCase;
+import com.poortorich.user.validator.enums.UsernameValidationCase;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
 import java.util.Set;

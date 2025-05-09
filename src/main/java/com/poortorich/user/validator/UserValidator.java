@@ -2,9 +2,11 @@ package com.poortorich.user.validator;
 
 import com.poortorich.global.exceptions.BadRequestException;
 import com.poortorich.global.exceptions.ConflictException;
+import com.poortorich.global.exceptions.NotFoundException;
 import com.poortorich.user.repository.UserRepository;
 import com.poortorich.user.response.enums.UserResponse;
 import java.time.LocalDate;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -42,5 +44,13 @@ public class UserValidator {
         if (birthday.isAfter(LocalDate.now())) {
             throw new BadRequestException(UserResponse.BIRTHDAY_IN_FUTURE);
         }
+    }
+
+    public boolean isNicknameChanged(String username, String nickname) {
+        String currentNickname = userRepository.findByUsername(username)
+                .orElseThrow(() -> new NotFoundException(UserResponse.USER_NOT_FOUND))
+                .getNickname();
+        
+        return !Objects.equals(currentNickname, nickname);
     }
 }
