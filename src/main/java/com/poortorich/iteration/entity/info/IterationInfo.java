@@ -61,7 +61,7 @@ public class IterationInfo {
     private LocalDateTime createdDate;
 
     @UpdateTimestamp
-    @Column(name = "updateDate")
+    @Column(name = "updatedDate")
     private LocalDateTime updatedDate;
 
     public String getIterationTypeLowerCase() {

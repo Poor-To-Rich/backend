@@ -237,6 +237,11 @@ public class IterationService {
         }
     }
 
+    private User findUserByUsername(String username) {
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new NotFoundException(UserResponse.USER_NOT_FOUND));
+    }
+
     private IterationInfo getIterationInfo(CustomIteration customIteration) {
         IterationRuleType ruleType = customIteration.getIterationRule().parseIterationType();
 
@@ -308,11 +313,6 @@ public class IterationService {
                 .iterationInfo(iterationInfo)
                 .user(user)
                 .build();
-    }
-
-    private User findUserByUsername(String username) {
-        return userRepository.findByUsername(username)
-                .orElseThrow(() -> new NotFoundException(UserResponse.USER_NOT_FOUND));
     }
 
     public CustomIterationInfoResponse getCustomIteration(IterationExpenses iterationExpenses) {
