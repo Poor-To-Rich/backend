@@ -1,4 +1,4 @@
-package com.poortorich.user.fixture.enums;
+package com.poortorich.user.validator.enums;
 
 import com.poortorich.global.testcases.TestCase;
 import com.poortorich.user.constants.UserResponseMessages;

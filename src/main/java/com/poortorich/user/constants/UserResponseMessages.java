@@ -49,6 +49,8 @@ public class UserResponseMessages {
     public static final String USER_DETAIL_FIND_SUCCESS = "회원 상세 조회 성공";
     public static final String USER_NOT_FOUND = "회원 정보를 찾을 수 없습니다.";
 
+    public static final String USER_PROFILE_UPDATE_SUCCESS = "회원 프로필 편집 성공";
+
     private UserResponseMessages() {
     }
 }
