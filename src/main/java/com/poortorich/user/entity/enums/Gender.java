@@ -20,7 +20,7 @@ public enum Gender {
         return Arrays.stream(Gender.values())
                 .filter(gender -> Objects.equals(gender.value, value) || Objects.equals(gender.koreanValue, value))
                 .findFirst()
-                .orElseThrow(() -> new BadRequestException(UserResponse.GENDER_INVALID, "gender"));
+                .orElseThrow(() -> new BadRequestException(UserResponse.GENDER_INVALID));
     }
 
     @Override

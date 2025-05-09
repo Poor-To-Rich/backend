@@ -57,7 +57,7 @@ public class ExpenseRequest {
         try {
             return LocalDate.parse(date, DateTimeFormatter.ofPattern(DatePattern.BASIC_PATTERN));
         } catch (DateTimeException e) {
-            throw new BadRequestException(ExpenseResponse.DATE_INVALID, "date");
+            throw new BadRequestException(ExpenseResponse.DATE_INVALID);
         }
     }
 
@@ -75,7 +75,7 @@ public class ExpenseRequest {
             return trimTitle;
         }
 
-        throw new BadRequestException(ExpenseResponse.TITLE_TOO_SHORT, "title");
+        throw new BadRequestException(ExpenseResponse.TITLE_TOO_SHORT);
     }
 
     public IterationType parseIterationType() {

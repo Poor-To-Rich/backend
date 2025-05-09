@@ -20,6 +20,6 @@ public enum EndType {
         return Arrays.stream(EndType.values())
                 .filter(end -> Objects.equals(end.type, type))
                 .findFirst()
-                .orElseThrow(() -> new BadRequestException(IterationResponse.END_TYPE_INVALID, "end.type"));
+                .orElseThrow(() -> new BadRequestException(IterationResponse.END_TYPE_INVALID));
     }
 }

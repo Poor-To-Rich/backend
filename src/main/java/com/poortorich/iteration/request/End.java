@@ -43,7 +43,7 @@ public class End {
         try {
             return LocalDate.parse(date, DateTimeFormatter.ofPattern(DatePattern.BASIC_PATTERN));
         } catch (DateTimeException e) {
-            throw new BadRequestException(IterationResponse.END_DATE_INVALID, "end.date");
+            throw new BadRequestException(IterationResponse.END_DATE_INVALID);
         }
     }
 }

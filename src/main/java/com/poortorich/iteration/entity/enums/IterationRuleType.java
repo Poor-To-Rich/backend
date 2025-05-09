@@ -22,6 +22,6 @@ public enum IterationRuleType {
         return Arrays.stream(IterationRuleType.values())
                 .filter(iterationRule -> Objects.equals(iterationRule.type, type))
                 .findFirst()
-                .orElseThrow(() -> new BadRequestException(IterationResponse.ITERATION_RULE_TYPE_INVALID, "iterationRule.type"));
+                .orElseThrow(() -> new BadRequestException(IterationResponse.ITERATION_RULE_TYPE_INVALID));
     }
 }

@@ -10,10 +10,11 @@ import org.springframework.http.HttpStatus;
 @RequiredArgsConstructor
 public enum S3Response implements Response {
 
-    INVALID_FILE_TYPES(HttpStatus.BAD_REQUEST, S3ResponseMessages.INVALID_FILE_TYPE),
-    INVALID_FILE_SIZE(HttpStatus.BAD_REQUEST, S3ResponseMessages.INVALID_FILE_SIZE),
-    FILE_UPLOAD_FAILURE(HttpStatus.INTERNAL_SERVER_ERROR, S3ResponseMessages.FILE_UPLOAD_FAILURE);
+    INVALID_FILE_TYPES(HttpStatus.BAD_REQUEST, S3ResponseMessages.INVALID_FILE_TYPE, "profileImage"),
+    INVALID_FILE_SIZE(HttpStatus.BAD_REQUEST, S3ResponseMessages.INVALID_FILE_SIZE, "profileImage"),
+    FILE_UPLOAD_FAILURE(HttpStatus.INTERNAL_SERVER_ERROR, S3ResponseMessages.FILE_UPLOAD_FAILURE, "profileImage");
 
     private final HttpStatus httpStatus;
     private final String message;
+    private final String field;
 }

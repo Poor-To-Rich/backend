@@ -29,6 +29,6 @@ public enum IterationType {
         return Arrays.stream(IterationType.values())
                 .filter(iteration -> Objects.equals(iteration.type, type))
                 .findFirst()
-                .orElseThrow(() -> new BadRequestException(ExpenseResponse.ITERATION_TYPE_INVALID, "iterationType"));
+                .orElseThrow(() -> new BadRequestException(ExpenseResponse.ITERATION_TYPE_INVALID));
     }
 }

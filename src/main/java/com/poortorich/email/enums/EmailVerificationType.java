@@ -31,7 +31,7 @@ public enum EmailVerificationType {
                 return type;
             }
         }
-        throw new BadRequestException(EmailResponse.PURPOSE_INVALID, "purpose");
+        throw new BadRequestException(EmailResponse.PURPOSE_INVALID);
     }
 
     public String getRedisKey(String mail) {

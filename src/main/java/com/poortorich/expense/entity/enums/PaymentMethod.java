@@ -21,6 +21,6 @@ public enum PaymentMethod {
         return Arrays.stream(PaymentMethod.values())
                 .filter(paymentMethod -> Objects.equals(paymentMethod.type, type))
                 .findFirst()
-                .orElseThrow(() -> new BadRequestException(ExpenseResponse.PAYMENT_METHOD_INVALID, "paymentMethod"));
+                .orElseThrow(() -> new BadRequestException(ExpenseResponse.PAYMENT_METHOD_INVALID));
     }
 }

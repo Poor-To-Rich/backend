@@ -30,11 +30,11 @@ public class UserValidationService {
         userValidator.validateBirthIsInFuture(userRegistrationRequest.parseBirthday());
 
         if (!userReservationService.existsByUsername(userRegistrationRequest.getUsername())) {
-            throw new BadRequestException(UserResponse.USERNAME_RESERVE_CHECK_REQUIRED, "username");
+            throw new BadRequestException(UserResponse.USERNAME_RESERVE_CHECK_REQUIRED);
         }
 
         if (!userReservationService.existsByNickname(userRegistrationRequest.getNickname())) {
-            throw new BadRequestException(UserResponse.NICKNAME_RESERVE_CHECK_REQUIRED, "nickname");
+            throw new BadRequestException(UserResponse.NICKNAME_RESERVE_CHECK_REQUIRED);
         }
 
         if (!emailVerificationPolicyManager.isEmailVerified(userRegistrationRequest.getEmail())) {
@@ -45,14 +45,14 @@ public class UserValidationService {
     public void validateCheckUsername(String username) {
         userValidator.validateUsernameDuplicate(username);
         if (userReservationService.existsByUsername(username)) {
-            throw new ConflictException(UserResponse.USERNAME_DUPLICATE, "username");
+            throw new ConflictException(UserResponse.USERNAME_DUPLICATE);
         }
     }
 
     public void validateCheckNickname(String nickname) {
         userValidator.validateNicknameDuplicate(nickname);
         if (userReservationService.existsByNickname(nickname)) {
-            throw new ConflictException(UserResponse.NICKNAME_DUPLICATE, "nickname");
+            throw new ConflictException(UserResponse.NICKNAME_DUPLICATE);
         }
     }
 }

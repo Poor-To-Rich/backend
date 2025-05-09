@@ -7,4 +7,6 @@ public interface Response {
     HttpStatus getHttpStatus();
 
     String getMessage();
+
+    String getField();
 }

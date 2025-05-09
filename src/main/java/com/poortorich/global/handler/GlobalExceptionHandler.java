@@ -57,12 +57,24 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(HandlerMethodValidationException.class)
     public ResponseEntity<BaseResponse> handleValidation(HandlerMethodValidationException exception) {
+        String field = exception.getAllErrors().stream()
+                .filter(error -> error instanceof FieldError)
+                .map(error -> ((FieldError) error).getField())
+                .findFirst()
+                .orElse(null);
+
         String errorMessage = exception.getAllErrors().stream()
                 .findFirst()
                 .map(MessageSourceResolvable::getDefaultMessage)
                 .orElse(DEFAULT_ERROR_MESSAGE);
 
-        return BaseResponse.toResponseEntity(HttpStatus.BAD_REQUEST, errorMessage);
+        return DataResponse.toResponseEntity(
+                HttpStatus.BAD_REQUEST,
+                errorMessage,
+                ExceptionResponse.builder()
+                        .field(field)
+                        .build()
+        );
     }
 
     @ExceptionHandler(MissingServletRequestParameterException.class)
@@ -83,18 +95,12 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(BadRequestException.class)
     public ResponseEntity<BaseResponse> handleBadRequestException(BadRequestException exception) {
-        ExceptionResponse data = ExceptionResponse.builder()
-                .field(exception.getField())
-                .build();
-        return DataResponse.toResponseEntity(exception.getResponse(), data);
+        return BaseResponse.toResponseEntity(exception.getResponse());
     }
 
     @ExceptionHandler(ConflictException.class)
     public ResponseEntity<BaseResponse> handleConflictException(ConflictException exception) {
-        ExceptionResponse data = ExceptionResponse.builder()
-                .field(exception.getField())
-                .build();
-        return DataResponse.toResponseEntity(exception.getResponse(), data);
+        return BaseResponse.toResponseEntity(exception.getResponse());
     }
 
     @ExceptionHandler(InternalServerErrorException.class)
@@ -104,10 +110,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(NotFoundException.class)
     public ResponseEntity<BaseResponse> handleNotFoundException(NotFoundException exception) {
-        ExceptionResponse data = ExceptionResponse.builder()
-                .field(exception.getField())
-                .build();
-        return DataResponse.toResponseEntity(exception.getResponse(), data);
+        return BaseResponse.toResponseEntity(exception.getResponse());
     }
 
     @ExceptionHandler(UnauthorizedException.class)
