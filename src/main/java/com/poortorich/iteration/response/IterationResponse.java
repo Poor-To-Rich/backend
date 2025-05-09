@@ -8,20 +8,21 @@ import org.springframework.http.HttpStatus;
 @AllArgsConstructor
 public enum IterationResponse implements Response {
 
-    ITERATION_RULE_TYPE_INVALID(HttpStatus.BAD_REQUEST, IterationResponseMessages.ITERATION_RULE_TYPE_INVALID),
+    ITERATION_RULE_TYPE_INVALID(HttpStatus.BAD_REQUEST, IterationResponseMessages.ITERATION_RULE_TYPE_INVALID, "customIteration.iterationRule.type"),
 
-    DAY_OF_WEEK_INVALID(HttpStatus.BAD_REQUEST, IterationResponseMessages.DAY_OF_WEEK_INVALID),
+    DAY_OF_WEEK_INVALID(HttpStatus.BAD_REQUEST, IterationResponseMessages.DAY_OF_WEEK_INVALID, "dayOfWeek"),
 
-    MONTHLY_MODE_INVALID(HttpStatus.BAD_REQUEST, IterationResponseMessages.MONTHLY_MODE_INVALID),
+    MONTHLY_MODE_INVALID(HttpStatus.BAD_REQUEST, IterationResponseMessages.MONTHLY_MODE_INVALID, "customIteration.monthlyOption.mode"),
 
-    END_TYPE_INVALID(HttpStatus.BAD_REQUEST, IterationResponseMessages.END_TYPE_INVALID),
-    END_DATE_INVALID(HttpStatus.BAD_REQUEST, IterationResponseMessages.END_DATE_INVALID),
-    END_DATE_NOT_BEFORE(HttpStatus.BAD_REQUEST, IterationResponseMessages.END_DATE_NOT_BEFORE),
+    END_TYPE_INVALID(HttpStatus.BAD_REQUEST, IterationResponseMessages.END_TYPE_INVALID, "customIteration.end.type"),
+    END_DATE_INVALID(HttpStatus.BAD_REQUEST, IterationResponseMessages.END_DATE_INVALID, "customIteration.end.date"),
+    END_DATE_NOT_BEFORE(HttpStatus.BAD_REQUEST, IterationResponseMessages.END_DATE_NOT_BEFORE, "customIteration.end.date"),
 
-    ITERATIONS_TOO_LONG(HttpStatus.BAD_REQUEST, IterationResponseMessages.ITERATIONS_TOO_LONG);
+    ITERATIONS_TOO_LONG(HttpStatus.BAD_REQUEST, IterationResponseMessages.ITERATIONS_TOO_LONG, null);
 
     private final HttpStatus httpStatus;
     private final String message;
+    private final String field;
 
     @Override
     public HttpStatus getHttpStatus() {
@@ -31,5 +32,10 @@ public enum IterationResponse implements Response {
     @Override
     public String getMessage() {
         return message;
+    }
+
+    @Override
+    public String getField() {
+        return field;
     }
 }
