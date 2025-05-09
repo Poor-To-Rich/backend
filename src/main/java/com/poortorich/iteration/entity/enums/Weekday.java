@@ -29,7 +29,7 @@ public enum Weekday {
         return Arrays.stream(Weekday.values())
                 .filter(weekday -> Objects.equals(weekday.type, type))
                 .findFirst()
-                .orElseThrow(() -> new BadRequestException(IterationResponse.DAY_OF_WEEK_INVALID));
+                .orElseThrow(() -> new BadRequestException(IterationResponse.DAY_OF_WEEK_INVALID, "dayOfWeek"));
     }
 
     public DayOfWeek toDayOfWeek() {

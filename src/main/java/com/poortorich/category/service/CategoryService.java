@@ -95,7 +95,7 @@ public class CategoryService {
         User user = findUserByUsername(username);
 
         categoryRepository.findByNameAndUser(categoryRequest.getName(), user)
-                .orElseThrow(() -> new BadRequestException(CategoryResponse.CATEGORY_NAME_DUPLICATE));
+                .orElseThrow(() -> new BadRequestException(CategoryResponse.CATEGORY_NAME_DUPLICATE, "name"));
 
         Category category = getCategoryOrThrow(id, user);
         category.updateCategory(categoryRequest.getName(), categoryRequest.getColor());
@@ -112,12 +112,12 @@ public class CategoryService {
 
     private Category getCategoryOrThrow(Long id, User user) {
         return categoryRepository.findByIdAndUser(id, user)
-                .orElseThrow(() -> new NotFoundException(CategoryResponse.CATEGORY_NON_EXISTENT));
+                .orElseThrow(() -> new NotFoundException(CategoryResponse.CATEGORY_NON_EXISTENT, "categoryId"));
     }
 
     public Category findCategoryByName(String name, String username) {
         return categoryRepository.findByNameAndUser(name, findUserByUsername(username))
-                .orElseThrow(() -> new NotFoundException(CategoryResponse.CATEGORY_NON_EXISTENT));
+                .orElseThrow(() -> new NotFoundException(CategoryResponse.CATEGORY_NON_EXISTENT, "categoryName"));
     }
 
     private User findUserByUsername(String username) {

@@ -247,7 +247,7 @@ public class IterationService {
             return buildYearlyIterationInfo(customIteration);
         }
 
-        throw new BadRequestException(IterationResponse.ITERATION_RULE_TYPE_INVALID);
+        throw new BadRequestException(IterationResponse.ITERATION_RULE_TYPE_INVALID, "iterationRule.type");
     }
 
     private DailyIterationRule buildDailyIterationInfo(CustomIteration customIteration) {

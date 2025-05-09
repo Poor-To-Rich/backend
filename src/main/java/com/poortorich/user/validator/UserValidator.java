@@ -16,31 +16,31 @@ public class UserValidator {
 
     public void validateUsernameDuplicate(String username) {
         if (userRepository.existsByUsername(username)) {
-            throw new ConflictException(UserResponse.USERNAME_DUPLICATE);
+            throw new ConflictException(UserResponse.USERNAME_DUPLICATE, "username");
         }
     }
 
     public void validateEmailDuplicate(String email) {
         if (userRepository.existsByEmail(email)) {
-            throw new ConflictException((UserResponse.EMAIL_DUPLICATE));
+            throw new ConflictException(UserResponse.EMAIL_DUPLICATE, "email");
         }
     }
 
     public void validateNicknameDuplicate(String nickname) {
         if (userRepository.existsByNickname(nickname)) {
-            throw new ConflictException(UserResponse.NICKNAME_DUPLICATE);
+            throw new ConflictException(UserResponse.NICKNAME_DUPLICATE, "nickname");
         }
     }
 
     public void validatePasswordMatch(String password, String passwordConfirm) {
         if (!password.equals(passwordConfirm)) {
-            throw new BadRequestException(UserResponse.PASSWORD_DO_NOT_MATCH);
+            throw new BadRequestException(UserResponse.PASSWORD_DO_NOT_MATCH, "password");
         }
     }
 
     public void validateBirthIsInFuture(LocalDate birthday) {
         if (birthday.isAfter(LocalDate.now())) {
-            throw new BadRequestException(UserResponse.BIRTHDAY_IN_FUTURE);
+            throw new BadRequestException(UserResponse.BIRTHDAY_IN_FUTURE, "birth");
         }
     }
 }

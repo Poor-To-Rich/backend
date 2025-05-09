@@ -36,6 +36,6 @@ public enum EmailTemplateType {
                 return templateType;
             }
         }
-        throw new BadRequestException(EmailResponse.PURPOSE_INVALID);
+        throw new BadRequestException(EmailResponse.PURPOSE_INVALID, "purpose");
     }
 }

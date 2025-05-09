@@ -11,13 +11,13 @@ public class FileValidator {
 
     public void validateFileType(MultipartFile imageFile) {
         if (!S3ValidationConstraints.ALLOWED_FILE_TYPES.contains(imageFile.getContentType())) {
-            throw new BadRequestException(S3Response.INVALID_FILE_TYPES);
+            throw new BadRequestException(S3Response.INVALID_FILE_TYPES, "profileImage");
         }
     }
 
     public void validateFileSize(MultipartFile imageFile) {
         if (S3ValidationConstraints.FILE_MAX_SIZE < imageFile.getSize()) {
-            throw new BadRequestException(S3Response.INVALID_FILE_SIZE);
+            throw new BadRequestException(S3Response.INVALID_FILE_SIZE, "profileImage");
         }
     }
 }

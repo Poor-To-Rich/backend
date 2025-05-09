@@ -21,7 +21,7 @@ public enum CategoryType {
         return Arrays.stream(CategoryType.values())
                 .filter(category -> Objects.equals(category.type, type))
                 .findFirst()
-                .orElseThrow(() -> new BadRequestException(CategoryResponse.CATEGORY_TYPE_INVALID));
+                .orElseThrow(() -> new BadRequestException(CategoryResponse.CATEGORY_TYPE_INVALID, "categoryType"));
     }
 }
 

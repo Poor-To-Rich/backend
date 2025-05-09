@@ -7,10 +7,17 @@ import lombok.Getter;
 public class BadRequestException extends RuntimeException {
 
     private final Response response;
+    private final String field;
+
+    public BadRequestException(Response response, String field) {
+        super(response.getMessage());
+        this.response = response;
+        this.field = field;
+    }
 
     public BadRequestException(Response response) {
         super(response.getMessage());
         this.response = response;
+        this.field = null;
     }
-
 }

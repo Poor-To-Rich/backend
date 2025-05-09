@@ -10,11 +10,16 @@ import com.poortorich.global.exceptions.NotFoundException;
 import com.poortorich.global.exceptions.TooManyRequestException;
 import com.poortorich.global.exceptions.UnauthorizedException;
 import com.poortorich.global.response.BaseResponse;
+
 import java.util.Optional;
+
+import com.poortorich.global.response.DataResponse;
+import com.poortorich.global.response.ExceptionFieldResponse;
 import org.springframework.context.MessageSourceResolvable;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -31,11 +36,23 @@ public class GlobalExceptionHandler {
     public ResponseEntity<BaseResponse> handleMethodArgumentNotValidException(
             MethodArgumentNotValidException exception
     ) {
+        FieldError fieldError = exception.getBindingResult().getFieldError();
+
         String errorMessage = Optional.ofNullable(exception.getBindingResult().getFieldError())
                 .map(DefaultMessageSourceResolvable::getDefaultMessage)
                 .orElse(DEFAULT_ERROR_MESSAGE);
 
-        return BaseResponse.toResponseEntity(HttpStatus.BAD_REQUEST, errorMessage);
+        if (fieldError == null) {
+            return DataResponse.toResponseEntity(HttpStatus.BAD_REQUEST, errorMessage, null);
+        }
+
+        return DataResponse.toResponseEntity(
+                HttpStatus.BAD_REQUEST,
+                errorMessage,
+                ExceptionFieldResponse.builder()
+                        .field(fieldError.getField())
+                        .build()
+        );
     }
 
     @ExceptionHandler(HandlerMethodValidationException.class)
@@ -66,12 +83,18 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(BadRequestException.class)
     public ResponseEntity<BaseResponse> handleBadRequestException(BadRequestException exception) {
-        return BaseResponse.toResponseEntity(exception.getResponse());
+        ExceptionFieldResponse data = ExceptionFieldResponse.builder()
+                .field(exception.getField())
+                .build();
+        return DataResponse.toResponseEntity(exception.getResponse(), data);
     }
 
     @ExceptionHandler(ConflictException.class)
     public ResponseEntity<BaseResponse> handleConflictException(ConflictException exception) {
-        return BaseResponse.toResponseEntity(exception.getResponse());
+        ExceptionFieldResponse data = ExceptionFieldResponse.builder()
+                .field(exception.getField())
+                .build();
+        return DataResponse.toResponseEntity(exception.getResponse(), data);
     }
 
     @ExceptionHandler(InternalServerErrorException.class)
@@ -81,7 +104,10 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(NotFoundException.class)
     public ResponseEntity<BaseResponse> handleNotFoundException(NotFoundException exception) {
-        return BaseResponse.toResponseEntity(exception.getResponse());
+        ExceptionFieldResponse data = ExceptionFieldResponse.builder()
+                .field(exception.getField())
+                .build();
+        return DataResponse.toResponseEntity(exception.getResponse(), data);
     }
 
     @ExceptionHandler(UnauthorizedException.class)

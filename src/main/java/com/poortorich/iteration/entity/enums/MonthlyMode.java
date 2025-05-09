@@ -20,6 +20,6 @@ public enum MonthlyMode {
         return Arrays.stream(MonthlyMode.values())
                 .filter(monthly -> Objects.equals(monthly.mode, mode))
                 .findFirst()
-                .orElseThrow(() -> new BadRequestException(IterationResponse.MONTHLY_MODE_INVALID));
+                .orElseThrow(() -> new BadRequestException(IterationResponse.MONTHLY_MODE_INVALID, "monthlyOption.mode"));
     }
 }
