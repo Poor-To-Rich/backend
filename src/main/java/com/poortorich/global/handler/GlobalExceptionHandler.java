@@ -14,7 +14,7 @@ import com.poortorich.global.response.BaseResponse;
 import java.util.Optional;
 
 import com.poortorich.global.response.DataResponse;
-import com.poortorich.global.response.ExceptionFieldResponse;
+import com.poortorich.global.response.ExceptionResponse;
 import org.springframework.context.MessageSourceResolvable;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
@@ -49,7 +49,7 @@ public class GlobalExceptionHandler {
         return DataResponse.toResponseEntity(
                 HttpStatus.BAD_REQUEST,
                 errorMessage,
-                ExceptionFieldResponse.builder()
+                ExceptionResponse.builder()
                         .field(fieldError.getField())
                         .build()
         );
@@ -83,7 +83,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(BadRequestException.class)
     public ResponseEntity<BaseResponse> handleBadRequestException(BadRequestException exception) {
-        ExceptionFieldResponse data = ExceptionFieldResponse.builder()
+        ExceptionResponse data = ExceptionResponse.builder()
                 .field(exception.getField())
                 .build();
         return DataResponse.toResponseEntity(exception.getResponse(), data);
@@ -91,7 +91,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ConflictException.class)
     public ResponseEntity<BaseResponse> handleConflictException(ConflictException exception) {
-        ExceptionFieldResponse data = ExceptionFieldResponse.builder()
+        ExceptionResponse data = ExceptionResponse.builder()
                 .field(exception.getField())
                 .build();
         return DataResponse.toResponseEntity(exception.getResponse(), data);
@@ -104,7 +104,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(NotFoundException.class)
     public ResponseEntity<BaseResponse> handleNotFoundException(NotFoundException exception) {
-        ExceptionFieldResponse data = ExceptionFieldResponse.builder()
+        ExceptionResponse data = ExceptionResponse.builder()
                 .field(exception.getField())
                 .build();
         return DataResponse.toResponseEntity(exception.getResponse(), data);

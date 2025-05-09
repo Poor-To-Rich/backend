@@ -5,6 +5,6 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class ExceptionFieldResponse {
+public class ExceptionResponse {
     private String field;
 }
