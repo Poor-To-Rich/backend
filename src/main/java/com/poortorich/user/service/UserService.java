@@ -54,7 +54,6 @@ public class UserService {
                 .build();
     }
 
-
     public String findProfileImageByUsername(String username) {
         return userRepository.findByUsername(username)
                 .orElseThrow(() -> new NotFoundException(UserResponse.USER_NOT_FOUND))
