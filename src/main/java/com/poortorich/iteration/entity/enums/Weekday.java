@@ -43,4 +43,9 @@ public enum Weekday {
     public static Weekday fromDayOfWeek(DayOfWeek dayOfWeek) {
         return Weekday.values()[dayOfWeek.getValue() % 7];
     }
+
+    @Override
+    public String toString() {
+        return type;
+    }
 }

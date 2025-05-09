@@ -40,6 +40,9 @@ public class IterationInfo {
     @Column(name = "id")
     private Long id;
 
+    @Column(name = "iterationType", insertable = false, updatable = false)
+    private String iterationType;
+
     @Column(name = "cycle")
     private Integer cycle;
 
@@ -58,6 +61,10 @@ public class IterationInfo {
     private LocalDateTime createdDate;
 
     @UpdateTimestamp
-    @Column(name = "updateDate")
+    @Column(name = "updatedDate")
     private LocalDateTime updatedDate;
+
+    public String getIterationTypeLowerCase() {
+        return iterationType.toLowerCase();
+    }
 }

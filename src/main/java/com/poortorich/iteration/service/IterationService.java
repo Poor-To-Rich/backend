@@ -20,12 +20,17 @@ import com.poortorich.iteration.request.CustomIteration;
 import com.poortorich.iteration.request.End;
 import com.poortorich.iteration.request.IterationRule;
 import com.poortorich.iteration.request.MonthlyOption;
+import com.poortorich.iteration.response.CustomIterationInfoResponse;
+import com.poortorich.iteration.response.EndInfoResponse;
 import com.poortorich.iteration.response.IterationResponse;
+import com.poortorich.iteration.response.IterationRuleInfoResponse;
+import com.poortorich.iteration.response.MonthlyOptionInfoResponse;
 import com.poortorich.iteration.util.IterationDateCalculator;
 import com.poortorich.user.entity.User;
 import com.poortorich.user.repository.UserRepository;
 import com.poortorich.user.response.enums.UserResponse;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -62,6 +67,7 @@ public class IterationService {
         int maxIterations = 0;
         int allowedIterations = getAllowedIterations(expense.getIterationType(), customIteration);
 
+        iterationExpenses.add(expense);
         while (!date.isAfter(endDate)) {
             if (maxIterations > allowedIterations) {
                 throw new BadRequestException(IterationResponse.ITERATIONS_TOO_LONG);
@@ -231,6 +237,11 @@ public class IterationService {
         }
     }
 
+    private User findUserByUsername(String username) {
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new NotFoundException(UserResponse.USER_NOT_FOUND));
+    }
+
     private IterationInfo getIterationInfo(CustomIteration customIteration) {
         IterationRuleType ruleType = customIteration.getIterationRule().parseIterationType();
 
@@ -304,8 +315,75 @@ public class IterationService {
                 .build();
     }
 
-    private User findUserByUsername(String username) {
-        return userRepository.findByUsername(username)
-                .orElseThrow(() -> new NotFoundException(UserResponse.USER_NOT_FOUND));
+    public CustomIterationInfoResponse getCustomIteration(IterationExpenses iterationExpenses) {
+        IterationInfo iterationInfo = iterationExpenses.getIterationInfo();
+        return CustomIterationInfoResponse.builder()
+                .iterationRule(buildIterationRuleByRuleType(iterationInfo))
+                .cycle(iterationInfo.getCycle())
+                .end(buildEndInfoResponseByEndType(iterationInfo))
+                .build();
+    }
+
+    private IterationRuleInfoResponse buildIterationRuleByRuleType(IterationInfo info) {
+        IterationInfo unproxiedInfo = (IterationInfo) Hibernate.unproxy(info);
+
+        if (unproxiedInfo instanceof WeeklyIterationRule weekly) {
+            return IterationRuleInfoResponse.builder()
+                    .type(weekly.getIterationTypeLowerCase())
+                    .daysOfWeek(weekly.getDaysOfWeekList())
+                    .build();
+        }
+
+        if (unproxiedInfo instanceof MonthlyIterationRule monthly) {
+            return IterationRuleInfoResponse.builder()
+                    .type(monthly.getIterationTypeLowerCase())
+                    .monthlyOption(buildMonthlyOptionInfoResponseByMonthlyMode(monthly))
+                    .build();
+        }
+
+        return IterationRuleInfoResponse.builder()
+                .type(info.getIterationTypeLowerCase())
+                .build();
+    }
+
+    private MonthlyOptionInfoResponse buildMonthlyOptionInfoResponseByMonthlyMode(MonthlyIterationRule monthly) {
+        if (monthly.getMonthlyMode() == MonthlyMode.DAY) {
+            return MonthlyOptionInfoResponse.builder()
+                    .mode(monthly.getMonthlyMode().toString())
+                    .day(monthly.getMonthlyDay())
+                    .week(monthly.getMonthlyWeek())
+                    .build();
+        }
+
+        if (monthly.getMonthlyMode() == MonthlyMode.WEEKDAY) {
+            return MonthlyOptionInfoResponse.builder()
+                    .mode(monthly.getMonthlyMode().toString())
+                    .dayOfWeek(monthly.getMonthlyDayOfWeek().toString())
+                    .build();
+        }
+
+        return MonthlyOptionInfoResponse.builder()
+                .mode(monthly.getMonthlyMode().toString())
+                .build();
+    }
+
+    private EndInfoResponse buildEndInfoResponseByEndType(IterationInfo info) {
+        if (info.getEndType() == EndType.AFTER) {
+            return EndInfoResponse.builder()
+                    .type(info.getEndType().toString())
+                    .count(info.getEndCount())
+                    .build();
+        }
+
+        if (info.getEndType() == EndType.UNTIL) {
+            return EndInfoResponse.builder()
+                    .type(info.getEndType().toString())
+                    .date(info.getEndDate())
+                    .build();
+        }
+
+        return EndInfoResponse.builder()
+                .type(info.getEndType().toString())
+                .build();
     }
 }

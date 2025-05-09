@@ -24,4 +24,9 @@ public enum IterationRuleType {
                 .findFirst()
                 .orElseThrow(() -> new BadRequestException(IterationResponse.ITERATION_RULE_TYPE_INVALID));
     }
+
+    @Override
+    public String toString() {
+        return type;
+    }
 }

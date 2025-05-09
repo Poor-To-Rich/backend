@@ -22,4 +22,9 @@ public enum EndType {
                 .findFirst()
                 .orElseThrow(() -> new BadRequestException(IterationResponse.END_TYPE_INVALID));
     }
+
+    @Override
+    public String toString() {
+        return type;
+    }
 }
