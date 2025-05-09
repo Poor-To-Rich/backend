@@ -3,6 +3,7 @@ package com.poortorich.user.service;
 import com.poortorich.global.exceptions.NotFoundException;
 import com.poortorich.user.entity.User;
 import com.poortorich.user.repository.UserRepository;
+import com.poortorich.user.request.ProfileUpdateRequest;
 import com.poortorich.user.request.UserRegistrationRequest;
 import com.poortorich.user.response.UserDetailResponse;
 import com.poortorich.user.response.enums.UserResponse;
@@ -33,6 +34,12 @@ public class UserService {
         userRepository.save(user);
     }
 
+    public void update(String username, ProfileUpdateRequest userProfile, String newProfileImage) {
+        userRepository.findByUsername(username)
+                .orElseThrow(() -> new NotFoundException(UserResponse.USER_NOT_FOUND))
+                .updateProfile(userProfile, newProfileImage);
+    }
+
     public UserDetailResponse findUserDetailByUsername(String username) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new NotFoundException(UserResponse.USER_NOT_FOUND));
@@ -45,5 +52,11 @@ public class UserService {
                 .gender(user.getGender().toString())
                 .job(user.getJob())
                 .build();
+    }
+
+    public String findProfileImageByUsername(String username) {
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new NotFoundException(UserResponse.USER_NOT_FOUND))
+                .getProfileImage();
     }
 }

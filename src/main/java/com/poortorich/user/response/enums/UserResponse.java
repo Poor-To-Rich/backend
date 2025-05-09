@@ -23,7 +23,8 @@ public enum UserResponse implements Response {
     BIRTHDAY_IN_FUTURE(HttpStatus.BAD_REQUEST, UserResponseMessages.BIRTHDAY_IN_FUTURE),
     GENDER_INVALID(HttpStatus.BAD_REQUEST, UserResponseMessages.GENDER_INVALID),
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, UserResponseMessages.USER_NOT_FOUND),
-    USER_DETAIL_FIND_SUCCESS(HttpStatus.OK, UserResponseMessages.USER_DETAIL_FIND_SUCCESS);
+    USER_DETAIL_FIND_SUCCESS(HttpStatus.OK, UserResponseMessages.USER_DETAIL_FIND_SUCCESS),
+    USER_PROFILE_UPDATE_SUCCESS(HttpStatus.OK, UserResponseMessages.USER_PROFILE_UPDATE_SUCCESS);
 
     private final HttpStatus httpStatus;
     private final String message;

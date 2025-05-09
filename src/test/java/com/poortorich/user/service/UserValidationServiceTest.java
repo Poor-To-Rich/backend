@@ -2,6 +2,8 @@ package com.poortorich.user.service;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -13,9 +15,12 @@ import com.poortorich.global.exceptions.BadRequestException;
 import com.poortorich.global.exceptions.ConflictException;
 import com.poortorich.global.exceptions.ForbiddenException;
 import com.poortorich.user.constants.UserResponseMessages;
+import com.poortorich.user.entity.User;
 import com.poortorich.user.fixture.UserFixture;
+import com.poortorich.user.request.ProfileUpdateRequest;
 import com.poortorich.user.request.UserRegistrationRequest;
 import com.poortorich.user.response.enums.UserResponse;
+import com.poortorich.user.util.ProfileUpdateRequestTestBuilder;
 import com.poortorich.user.util.UserRegistrationRequestTestBuilder;
 import com.poortorich.user.validator.UserValidator;
 import org.junit.jupiter.api.BeforeEach;
@@ -343,5 +348,73 @@ public class UserValidationServiceTest {
 
         verify(userValidator).validateNicknameDuplicate(nickname);
         verify(userReservationService).existsByNickname(nickname);
+    }
+
+    @Test
+    @DisplayName("프로필 편집 검증 - 닉네임이 변경되지 않은 경우 아무 작업도 하지 않는다.")
+    void validateUpdateUserProfile_whenNicknameIsNotChanged_thenDoNothing() {
+        ProfileUpdateRequest profile = ProfileUpdateRequestTestBuilder.builder().build();
+        User user = UserFixture.createDefaultUser();
+
+        when(userValidator.isNicknameChanged(anyString(), anyString())).thenReturn(false);
+
+        userValidationService.validateUpdateUserProfile(user.getUsername(), profile);
+
+        verify(userValidator, never()).validateNicknameDuplicate(anyString());
+        verify(userReservationService, never()).existsByNickname(anyString());
+    }
+
+    @Test
+    @DisplayName("프로필 편집 검증 - 변경된 닉네임이 이미 존재하는 경우")
+    void validateUpdateUserProfile_whenNicknameIsExists_thenThrowException() {
+        ProfileUpdateRequest profile = ProfileUpdateRequestTestBuilder.builder().build();
+
+        when(userValidator.isNicknameChanged(anyString(), anyString())).thenReturn(true);
+        doThrow(new ConflictException(UserResponse.NICKNAME_DUPLICATE))
+                .when(userValidator).validateNicknameDuplicate(anyString());
+
+        assertThatThrownBy(
+                () -> userValidationService.validateUpdateUserProfile(UserFixture.VALID_USERNAME_SAMPLE_1, profile))
+                .isInstanceOf(ConflictException.class)
+                .hasMessage(UserResponseMessages.NICKNAME_DUPLICATE);
+
+        verify(userValidator).isNicknameChanged(UserFixture.VALID_USERNAME_SAMPLE_1, profile.getNickname());
+        verify(userValidator).validateNicknameDuplicate(profile.getNickname());
+        verify(userReservationService, never()).existsByNickname(profile.getNickname());
+    }
+
+    @Test
+    @DisplayName("프로필 편집 검증 - 변경할 닉네임이 중복 검사를 하지 않은 경우")
+    void validateUpdateUserProfile_whenNicknameIsNotReserved_thenThrowException() {
+        ProfileUpdateRequest profile = ProfileUpdateRequestTestBuilder.builder().build();
+
+        when(userValidator.isNicknameChanged(anyString(), anyString())).thenReturn(true);
+        doNothing().when(userValidator).validateNicknameDuplicate(anyString());
+        when(userReservationService.existsByNickname(anyString())).thenReturn(false);
+
+        assertThatThrownBy(
+                () -> userValidationService.validateUpdateUserProfile(UserFixture.VALID_USERNAME_SAMPLE_1, profile))
+                .isInstanceOf(BadRequestException.class)
+                .hasMessage(UserResponseMessages.NICKNAME_RESERVE_CHECK_REQUIRED);
+
+        verify(userValidator).isNicknameChanged(UserFixture.VALID_USERNAME_SAMPLE_1, profile.getNickname());
+        verify(userValidator).validateNicknameDuplicate(profile.getNickname());
+        verify(userReservationService).existsByNickname(profile.getNickname());
+    }
+
+    @Test
+    @DisplayName("프로필 편집 검증 - 유효한 데이터인 경우 예외가 발생하지 않는다.")
+    void validateUpdateUserProfile_whenAllPassValidation_thenDoNotThrowException() {
+        ProfileUpdateRequest profile = ProfileUpdateRequestTestBuilder.builder().build();
+
+        when(userValidator.isNicknameChanged(anyString(), anyString())).thenReturn(true);
+        doNothing().when(userValidator).validateNicknameDuplicate(anyString());
+        when(userReservationService.existsByNickname(anyString())).thenReturn(true);
+
+        userValidationService.validateUpdateUserProfile(UserFixture.VALID_USERNAME_SAMPLE_1, profile);
+
+        verify(userValidator).isNicknameChanged(UserFixture.VALID_USERNAME_SAMPLE_1, profile.getNickname());
+        verify(userValidator).validateNicknameDuplicate(profile.getNickname());
+        verify(userReservationService).existsByNickname(profile.getNickname());
     }
 }

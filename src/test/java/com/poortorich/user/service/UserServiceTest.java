@@ -1,17 +1,25 @@
 package com.poortorich.user.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.poortorich.global.exceptions.NotFoundException;
+import com.poortorich.s3.constants.S3TestFile;
+import com.poortorich.user.constants.UserResponseMessages;
 import com.poortorich.user.entity.User;
+import com.poortorich.user.entity.enums.Gender;
 import com.poortorich.user.fixture.UserFixture;
 import com.poortorich.user.repository.UserRepository;
+import com.poortorich.user.request.ProfileUpdateRequest;
 import com.poortorich.user.request.UserRegistrationRequest;
 import com.poortorich.user.response.UserDetailResponse;
+import com.poortorich.user.response.enums.UserResponse;
+import com.poortorich.user.util.ProfileUpdateRequestTestBuilder;
 import com.poortorich.user.util.UserRegistrationRequestTestBuilder;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
@@ -68,6 +76,44 @@ public class UserServiceTest {
         assertThat(savedUser.getGender()).isEqualTo(userRegistrationRequest.parseGender());
         assertThat(savedUser.getBirth()).isEqualTo(userRegistrationRequest.parseBirthday());
         assertThat(savedUser.getJob()).isEqualTo(userRegistrationRequest.getJob());
+    }
+
+    @Test
+    @DisplayName("사용자 정보를 갱신한다.")
+    void update_shouldUpdateUser() {
+        User user = UserFixture.createDefaultUser();
+        ProfileUpdateRequest profileUpdateRequest = ProfileUpdateRequestTestBuilder.builder()
+                .name(UserFixture.VALID_NAME_SAMPLE_2)
+                .nickname(UserFixture.VALID_NICKNAME_SAMPLE_2)
+                .birth(UserFixture.VALID_BIRTH_SAMPLE_2)
+                .gender(UserFixture.VALID_FEMALE)
+                .build();
+
+        String newProfileImage = S3TestFile.FILE_NAME;
+
+        when(userRepository.findByUsername(anyString())).thenReturn(Optional.of(user));
+
+        userService.update(user.getUsername(), profileUpdateRequest, newProfileImage);
+
+        assertThat(user.getProfileImage()).isEqualTo(newProfileImage);
+        assertThat(user.getName()).isEqualTo(UserFixture.VALID_NAME_SAMPLE_2);
+        assertThat(user.getNickname()).isEqualTo(UserFixture.VALID_NICKNAME_SAMPLE_2);
+        assertThat(user.getGender()).isEqualTo(Gender.from(UserFixture.VALID_FEMALE));
+        assertThat(user.getBirth().toString()).isEqualTo(UserFixture.VALID_BIRTH_SAMPLE_2);
+    }
+
+    @Test
+    @DisplayName("회원 프로필 편집 호출했을 때, 회원을 찾을 수 없다면 예외를 발생시킨다.")
+    void update_userIsNotExists_shouldThrowException() {
+        when(userRepository.findByUsername(anyString())).thenThrow(new NotFoundException(UserResponse.USER_NOT_FOUND));
+        
+        assertThatThrownBy(
+                () -> userService.update(
+                        UserFixture.VALID_USERNAME_SAMPLE_1,
+                        ProfileUpdateRequestTestBuilder.builder().build(),
+                        S3TestFile.FILE_NAME))
+                .isInstanceOf(NotFoundException.class)
+                .hasMessage(UserResponseMessages.USER_NOT_FOUND);
     }
 
     @Test

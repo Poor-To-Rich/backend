@@ -1,6 +1,7 @@
 package com.poortorich.user.controller;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -20,6 +21,7 @@ import com.poortorich.user.facade.UserFacade;
 import com.poortorich.user.fixture.UserFixture;
 import com.poortorich.user.fixture.UserRegisterApiFixture;
 import com.poortorich.user.request.NicknameCheckRequest;
+import com.poortorich.user.request.ProfileUpdateRequest;
 import com.poortorich.user.request.UserRegistrationRequest;
 import com.poortorich.user.request.UsernameCheckRequest;
 import com.poortorich.user.response.UserDetailResponse;
@@ -71,15 +73,15 @@ class UserControllerTest extends BaseSecurityTest {
 
         mockMvc.perform(MockMvcRequestBuilders.multipart(UserRegisterApiFixture.REGISTER_PATH)
                         .file(profileImage)
-                        .param("name", UserFixture.VALID_NAME)
-                        .param("nickname", UserFixture.VALID_NICKNAME)
-                        .param("username", UserFixture.VALID_USERNAME)
-                        .param("password", UserFixture.VALID_PASSWORD)
-                        .param("passwordConfirm", UserFixture.VALID_PASSWORD)
-                        .param("birth", UserFixture.VALID_BIRTH)
+                        .param("name", UserFixture.VALID_NAME_SAMPLE_1)
+                        .param("nickname", UserFixture.VALID_NICKNAME_SAMPLE_1)
+                        .param("username", UserFixture.VALID_USERNAME_SAMPLE_1)
+                        .param("password", UserFixture.VALID_PASSWORD_SAMPLE_1)
+                        .param("passwordConfirm", UserFixture.VALID_PASSWORD_SAMPLE_1)
+                        .param("birth", UserFixture.VALID_BIRTH_SAMPLE_1)
                         .param("email", UserFixture.VALID_EMAIL)
                         .param("gender", UserFixture.VALID_MALE)
-                        .param("job", UserFixture.VALID_JOB)
+                        .param("job", UserFixture.VALID_JOB_SAMPLE_1)
                         .with(csrf())
                         .contentType(MediaType.MULTIPART_FORM_DATA_VALUE))
                 .andExpect(status().isCreated())
@@ -97,12 +99,12 @@ class UserControllerTest extends BaseSecurityTest {
 
         mockMvc.perform(MockMvcRequestBuilders.multipart(UserRegisterApiFixture.REGISTER_PATH)
                         .file(profileImage)
-                        .param("name", UserFixture.VALID_NAME)
-                        .param("nickname", UserFixture.VALID_NICKNAME)
-                        .param("username", UserFixture.VALID_USERNAME)
-                        .param("password", UserFixture.VALID_PASSWORD)
-                        .param("passwordConfirm", UserFixture.VALID_PASSWORD)
-                        .param("birth", UserFixture.VALID_BIRTH)
+                        .param("name", UserFixture.VALID_NAME_SAMPLE_1)
+                        .param("nickname", UserFixture.VALID_NICKNAME_SAMPLE_1)
+                        .param("username", UserFixture.VALID_USERNAME_SAMPLE_1)
+                        .param("password", UserFixture.VALID_PASSWORD_SAMPLE_1)
+                        .param("passwordConfirm", UserFixture.VALID_PASSWORD_SAMPLE_1)
+                        .param("birth", UserFixture.VALID_BIRTH_SAMPLE_1)
                         .param("email", UserFixture.VALID_EMAIL)
                         .param("gender", UserFixture.VALID_MALE)
                         .with(csrf())
@@ -149,7 +151,7 @@ class UserControllerTest extends BaseSecurityTest {
 
     @Test
     @DisplayName("유효한 액세스 토큰으로 회원 상세 조회 api를 호출")
-    @WithMockUser(username = UserFixture.VALID_USERNAME)
+    @WithMockUser(username = UserFixture.VALID_USERNAME_SAMPLE_1)
     public void getUserDetails_whenValidAccessToken_thenNoException() throws Exception {
         User mockUser = UserFixture.createDefaultUser();
         UserDetailResponse response = UserDetailResponse.builder()
@@ -161,7 +163,7 @@ class UserControllerTest extends BaseSecurityTest {
                 .job(mockUser.getJob())
                 .build();
 
-        when(userFacade.getUserDetails(UserFixture.VALID_USERNAME)).thenReturn(response);
+        when(userFacade.getUserDetails(UserFixture.VALID_USERNAME_SAMPLE_1)).thenReturn(response);
 
         mockMvc.perform(MockMvcRequestBuilders.get("/user/detail")
                         .with(SecurityMockMvcRequestPostProcessors.user(mockUser))
@@ -176,7 +178,79 @@ class UserControllerTest extends BaseSecurityTest {
                 .andExpect(jsonPath("$.data.gender").value(response.getGender()))
                 .andExpect(jsonPath("$.data.job").value(response.getJob()));
 
-        verify(userFacade).getUserDetails(UserFixture.VALID_USERNAME);
+        verify(userFacade).getUserDetails(UserFixture.VALID_USERNAME_SAMPLE_1);
+    }
+
+    @Test
+    @DisplayName("유효한 데이터로 프로필 변경 api 호출 - 프로필 변경 X")
+    @WithMockUser(username = UserFixture.VALID_USERNAME_SAMPLE_1)
+    void updateUserProfile_whenValidInputWithoutProfileImage_thenNoException() throws Exception {
+        when(userFacade.updateUserProfile(anyString(), any(ProfileUpdateRequest.class)))
+                .thenReturn(UserResponse.USER_PROFILE_UPDATE_SUCCESS);
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/user/update")
+                        .param("name", UserFixture.VALID_NAME_SAMPLE_1)
+                        .param("nickname", UserFixture.VALID_NICKNAME_SAMPLE_1)
+                        .param("birth", UserFixture.VALID_BIRTH_SAMPLE_1)
+                        .param("gender", UserFixture.VALID_MALE)
+                        .param("job", UserFixture.VALID_JOB_SAMPLE_1)
+                        .with(SecurityMockMvcRequestPostProcessors.user(UserFixture.createDefaultUser()))
+                        .contentType(MediaType.MULTIPART_FORM_DATA_VALUE))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.resultCode").value(HttpStatus.OK.value()))
+                .andExpect(jsonPath("$.resultMessage").value(UserResponseMessages.USER_PROFILE_UPDATE_SUCCESS));
+
+        verify(userFacade).updateUserProfile(anyString(), any(ProfileUpdateRequest.class));
+    }
+
+    @Test
+    @DisplayName("유효한 데이터로 프로필 변경 api 호출 - 기본 프로필로 변경")
+    @WithMockUser(username = UserFixture.VALID_USERNAME_SAMPLE_1)
+    void updateUserProfile_whenValidInputWithIsDefaultImage_thenNoException() throws Exception {
+        when(userFacade.updateUserProfile(anyString(), any(ProfileUpdateRequest.class)))
+                .thenReturn(UserResponse.USER_PROFILE_UPDATE_SUCCESS);
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/user/update")
+                        .param("isDefaultImage", "true")
+                        .param("name", UserFixture.VALID_NAME_SAMPLE_1)
+                        .param("nickname", UserFixture.VALID_NICKNAME_SAMPLE_1)
+                        .param("birth", UserFixture.VALID_BIRTH_SAMPLE_1)
+                        .param("gender", UserFixture.VALID_MALE)
+                        .param("job", UserFixture.VALID_JOB_SAMPLE_1)
+                        .with(SecurityMockMvcRequestPostProcessors.user(UserFixture.createDefaultUser()))
+                        .contentType(MediaType.MULTIPART_FORM_DATA_VALUE))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.resultCode").value(HttpStatus.OK.value()))
+                .andExpect(jsonPath("$.resultMessage").value(UserResponseMessages.USER_PROFILE_UPDATE_SUCCESS));
+
+        verify(userFacade).updateUserProfile(anyString(), any(ProfileUpdateRequest.class));
+    }
+
+    @Test
+    @DisplayName("유효한 데이터로 프로필 변경 api 호출 - 다른 프로필로 변경")
+    @WithMockUser(username = UserFixture.VALID_USERNAME_SAMPLE_1)
+    void updateUserProfile_whenValidInputWithProfileImage_thenNoException() throws Exception {
+        when(userFacade.updateUserProfile(anyString(), any(ProfileUpdateRequest.class)))
+                .thenReturn(UserResponse.USER_PROFILE_UPDATE_SUCCESS);
+
+        mockMvc.perform(MockMvcRequestBuilders.multipart("/user/update")
+                        .file(profileImage)
+                        .param("name", UserFixture.VALID_NAME_SAMPLE_1)
+                        .param("nickname", UserFixture.VALID_NICKNAME_SAMPLE_1)
+                        .param("birth", UserFixture.VALID_BIRTH_SAMPLE_1)
+                        .param("gender", UserFixture.VALID_MALE)
+                        .param("job", UserFixture.VALID_JOB_SAMPLE_1)
+                        .with(SecurityMockMvcRequestPostProcessors.user(UserFixture.createDefaultUser()))
+                        .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
+                        .with(request -> {
+                            request.setMethod("PUT");
+                            return request;
+                        }))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.resultCode").value(HttpStatus.OK.value()))
+                .andExpect(jsonPath("$.resultMessage").value(UserResponseMessages.USER_PROFILE_UPDATE_SUCCESS));
+
+        verify(userFacade).updateUserProfile(anyString(), any(ProfileUpdateRequest.class));
     }
 
     private String getUserRegistrationRequestJson() throws JsonProcessingException {
