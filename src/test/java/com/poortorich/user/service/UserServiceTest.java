@@ -18,6 +18,7 @@ import com.poortorich.user.repository.UserRepository;
 import com.poortorich.user.request.ProfileUpdateRequest;
 import com.poortorich.user.request.UserRegistrationRequest;
 import com.poortorich.user.response.UserDetailResponse;
+import com.poortorich.user.response.UserEmailResponse;
 import com.poortorich.user.response.enums.UserResponse;
 import com.poortorich.user.util.ProfileUpdateRequestTestBuilder;
 import com.poortorich.user.util.UserRegistrationRequestTestBuilder;
@@ -106,7 +107,7 @@ public class UserServiceTest {
     @DisplayName("회원 프로필 편집 호출했을 때, 회원을 찾을 수 없다면 예외를 발생시킨다.")
     void update_userIsNotExists_shouldThrowException() {
         when(userRepository.findByUsername(anyString())).thenThrow(new NotFoundException(UserResponse.USER_NOT_FOUND));
-        
+
         assertThatThrownBy(
                 () -> userService.update(
                         UserFixture.VALID_USERNAME_SAMPLE_1,
@@ -142,5 +143,21 @@ public class UserServiceTest {
         assertThat(userDetails.getJob()).isEqualTo(mockUser.getJob());
 
         verify(userRepository, times(1)).findByUsername(anyString());
+    }
+
+    @Test
+    @DisplayName("회원이 존재할 때 이메일을 반환한다.")
+    void getUserEmail_whenUserExists_thenReturnEmail() {
+        User mockUser = UserFixture.createDefaultUser();
+
+        when(userRepository.findByUsername(anyString())).thenReturn(Optional.of(mockUser));
+
+        UserEmailResponse userEmail = userService.getUserEmail(UserFixture.VALID_USERNAME_SAMPLE_1);
+
+        assertThat(userEmail).isNotNull();
+        assertThat(userEmail.getEmail()).isEqualTo(mockUser.getEmail());
+
+        verify(userRepository, times(1)).findByUsername(anyString());
+
     }
 }

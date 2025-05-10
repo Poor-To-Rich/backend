@@ -25,6 +25,7 @@ import com.poortorich.user.request.ProfileUpdateRequest;
 import com.poortorich.user.request.UserRegistrationRequest;
 import com.poortorich.user.request.UsernameCheckRequest;
 import com.poortorich.user.response.UserDetailResponse;
+import com.poortorich.user.response.UserEmailResponse;
 import com.poortorich.user.response.enums.UserResponse;
 import com.poortorich.user.util.UserRegistrationRequestTestBuilder;
 import org.junit.jupiter.api.BeforeEach;
@@ -251,6 +252,27 @@ class UserControllerTest extends BaseSecurityTest {
                 .andExpect(jsonPath("$.resultMessage").value(UserResponseMessages.USER_PROFILE_UPDATE_SUCCESS));
 
         verify(userFacade).updateUserProfile(anyString(), any(ProfileUpdateRequest.class));
+    }
+
+    @Test
+    @DisplayName("유효한 데이터로 이메일 조회 api 호출 - 성공")
+    @WithMockUser(username = UserFixture.VALID_USERNAME_SAMPLE_1)
+    void getUserEmail_whenValidInput_thenNoException() throws Exception {
+        User mockUser = UserFixture.createDefaultUser();
+        UserEmailResponse userEmailResponse = UserEmailResponse.builder()
+                .email(mockUser.getEmail())
+                .build();
+
+        when(userFacade.getUserEmail(anyString())).thenReturn(userEmailResponse);
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/user/email")
+                        .with(SecurityMockMvcRequestPostProcessors.user(mockUser))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.resultCode").value(HttpStatus.OK.value()))
+                .andExpect(jsonPath("$.resultMessage").value(UserResponseMessages.USER_EMAIL_FIND_SUCCESS))
+                .andExpect(jsonPath("$.data.email").value(mockUser.getEmail()));
+
+        verify(userFacade, times(1)).getUserEmail(anyString());
     }
 
     private String getUserRegistrationRequestJson() throws JsonProcessingException {
