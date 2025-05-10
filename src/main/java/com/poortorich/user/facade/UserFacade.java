@@ -64,8 +64,6 @@ public class UserFacade {
     }
 
     public UserEmailResponse getUserEmail(String username) {
-        return UserEmailResponse.builder()
-                .email(userService.getUserEmail(username))
-                .build();
+        return userService.getUserEmail(username);
     }
 }
