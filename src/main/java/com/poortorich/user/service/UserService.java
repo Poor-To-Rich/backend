@@ -6,6 +6,7 @@ import com.poortorich.user.repository.UserRepository;
 import com.poortorich.user.request.ProfileUpdateRequest;
 import com.poortorich.user.request.UserRegistrationRequest;
 import com.poortorich.user.response.UserDetailResponse;
+import com.poortorich.user.response.UserEmailResponse;
 import com.poortorich.user.response.enums.UserResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -58,5 +59,15 @@ public class UserService {
         return userRepository.findByUsername(username)
                 .orElseThrow(() -> new NotFoundException(UserResponse.USER_NOT_FOUND))
                 .getProfileImage();
+    }
+
+    public UserEmailResponse getUserEmail(String username) {
+        String userEmail = userRepository.findByUsername(username)
+                .orElseThrow(() -> new NotFoundException(UserResponse.USER_NOT_FOUND))
+                .getEmail();
+
+        return UserEmailResponse.builder()
+                .email(userEmail)
+                .build();
     }
 }

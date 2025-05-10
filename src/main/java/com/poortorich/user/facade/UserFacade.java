@@ -7,6 +7,7 @@ import com.poortorich.user.request.ProfileUpdateRequest;
 import com.poortorich.user.request.UserRegistrationRequest;
 import com.poortorich.user.request.UsernameCheckRequest;
 import com.poortorich.user.response.UserDetailResponse;
+import com.poortorich.user.response.UserEmailResponse;
 import com.poortorich.user.response.enums.UserResponse;
 import com.poortorich.user.service.RedisUserReservationService;
 import com.poortorich.user.service.UserService;
@@ -60,5 +61,9 @@ public class UserFacade {
 
         userService.update(username, userProfile, newProfileImage);
         return UserResponse.USER_PROFILE_UPDATE_SUCCESS;
+    }
+
+    public UserEmailResponse getUserEmail(String username) {
+        return userService.getUserEmail(username);
     }
 }

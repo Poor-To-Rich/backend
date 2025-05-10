@@ -20,6 +20,7 @@ import com.poortorich.user.request.ProfileUpdateRequest;
 import com.poortorich.user.request.UserRegistrationRequest;
 import com.poortorich.user.request.UsernameCheckRequest;
 import com.poortorich.user.response.UserDetailResponse;
+import com.poortorich.user.response.UserEmailResponse;
 import com.poortorich.user.response.enums.UserResponse;
 import com.poortorich.user.service.RedisUserReservationService;
 import com.poortorich.user.service.UserService;
@@ -162,5 +163,21 @@ public class UserFacadeTest {
                         eq(newProfile),
                         eq(S3TestConfig.FILE_URL_SAMPLE_2)
                 );
+    }
+
+    @Test
+    @DisplayName("이메일 조회 요청시 서비스들이 적절히 호출되는지 확인")
+    void getUserEmail_shouldCallServiceMethods() {
+        User mockUser = UserFixture.createDefaultUser();
+
+        UserEmailResponse userEmailResponse = UserEmailResponse.builder()
+                .email(mockUser.getEmail())
+                .build();
+
+        when(userService.getUserEmail(anyString())).thenReturn(userEmailResponse);
+
+        userFacade.getUserEmail(mockUser.getUsername());
+
+        verify(userService, times(1)).getUserEmail(anyString());
     }
 }
