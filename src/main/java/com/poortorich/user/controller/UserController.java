@@ -65,4 +65,12 @@ public class UserController {
     ) {
         return BaseResponse.toResponseEntity(userFacade.updateUserProfile(userDetails.getUsername(), userProfile));
     }
+
+    @GetMapping("/email")
+    public ResponseEntity<BaseResponse> getUserEmail(@AuthenticationPrincipal UserDetails userDetails) {
+        return DataResponse.toResponseEntity(
+                UserResponse.USER_EMAIL_FIND_SUCCESS,
+                userFacade.getUserEmail(userDetails.getUsername())
+        );
+    }
 }

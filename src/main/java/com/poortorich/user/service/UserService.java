@@ -59,4 +59,10 @@ public class UserService {
                 .orElseThrow(() -> new NotFoundException(UserResponse.USER_NOT_FOUND))
                 .getProfileImage();
     }
+
+    public String getUserEmail(String username) {
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new NotFoundException(UserResponse.USER_NOT_FOUND))
+                .getEmail();
+    }
 }
