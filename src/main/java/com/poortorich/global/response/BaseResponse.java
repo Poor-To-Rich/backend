@@ -14,6 +14,15 @@ public class BaseResponse {
     private final String resultMessage;
 
     public static ResponseEntity<BaseResponse> toResponseEntity(Response response) {
+        if (response.getField() != null) {
+            return DataResponse.toResponseEntity(
+                    response,
+                    ExceptionResponse.builder()
+                            .field(response.getField())
+                            .build()
+            );
+        }
+
         BaseResponse baseResponse = BaseResponse.builder()
                 .resultCode(response.getHttpStatus().value())
                 .resultMessage(response.getMessage())

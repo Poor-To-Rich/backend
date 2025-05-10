@@ -23,4 +23,9 @@ public enum PaymentMethod {
                 .findFirst()
                 .orElseThrow(() -> new BadRequestException(ExpenseResponse.PAYMENT_METHOD_INVALID));
     }
+
+    @Override
+    public String toString() {
+        return type;
+    }
 }

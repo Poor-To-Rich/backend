@@ -5,9 +5,12 @@ import com.poortorich.category.service.CategoryService;
 import com.poortorich.expense.entity.Expense;
 import com.poortorich.expense.entity.enums.IterationType;
 import com.poortorich.expense.request.ExpenseRequest;
+import com.poortorich.expense.response.ExpenseInfoResponse;
 import com.poortorich.expense.response.ExpenseResponse;
 import com.poortorich.expense.service.ExpenseService;
 import com.poortorich.global.response.Response;
+import com.poortorich.iteration.entity.IterationExpenses;
+import com.poortorich.iteration.response.CustomIterationInfoResponse;
 import com.poortorich.iteration.service.IterationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -41,5 +44,17 @@ public class ExpenseFacade {
         if (expense.getIterationType() == IterationType.CUSTOM) {
             iterationService.createIterationInfo(expenseRequest.getCustomIteration(), expense, savedExpenses, username);
         }
+    }
+
+    @Transactional
+    public ExpenseInfoResponse getExpense(Long id, String username) {
+        IterationExpenses iterationExpenses = expenseService.getIterationExpenses(id, username);
+
+        CustomIterationInfoResponse customIteration = null;
+        if (iterationExpenses != null) {
+            customIteration = iterationService.getCustomIteration(iterationExpenses);
+        }
+
+        return expenseService.getExpenseInfoResponse(id, username, customIteration);
     }
 }

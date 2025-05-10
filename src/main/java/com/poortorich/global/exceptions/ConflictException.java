@@ -12,5 +12,4 @@ public class ConflictException extends RuntimeException {
         super(response.getMessage());
         this.response = response;
     }
-
 }

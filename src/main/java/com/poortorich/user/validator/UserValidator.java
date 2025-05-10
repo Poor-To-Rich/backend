@@ -24,7 +24,7 @@ public class UserValidator {
 
     public void validateEmailDuplicate(String email) {
         if (userRepository.existsByEmail(email)) {
-            throw new ConflictException((UserResponse.EMAIL_DUPLICATE));
+            throw new ConflictException(UserResponse.EMAIL_DUPLICATE);
         }
     }
 

@@ -31,4 +31,9 @@ public enum IterationType {
                 .findFirst()
                 .orElseThrow(() -> new BadRequestException(ExpenseResponse.ITERATION_TYPE_INVALID));
     }
+
+    @Override
+    public String toString() {
+        return type;
+    }
 }
