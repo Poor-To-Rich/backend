@@ -51,6 +51,8 @@ public class UserResponseMessages {
 
     public static final String USER_PROFILE_UPDATE_SUCCESS = "회원 프로필 편집 성공";
 
+    public static final String USER_EMAIL_FIND_SUCCESS = "회원 이메일 조회 성공";
+
     private UserResponseMessages() {
     }
 }
