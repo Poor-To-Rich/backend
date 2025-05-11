@@ -84,4 +84,13 @@ public class Expense {
     @UpdateTimestamp
     @Column(name = "updatedDate")
     private LocalDateTime updatedDate;
+
+    public void updateExpense(LocalDate expenseDate, String title, Long cost, PaymentMethod paymentMethod, String memo, Category category) {
+        this.expenseDate = expenseDate;
+        this.title = title;
+        this.cost = cost;
+        this.paymentMethod = paymentMethod;
+        this.memo = memo;
+        this.category = category;
+    }
 }

@@ -5,6 +5,7 @@ import com.poortorich.category.service.CategoryService;
 import com.poortorich.expense.entity.Expense;
 import com.poortorich.expense.entity.enums.IterationType;
 import com.poortorich.expense.request.ExpenseRequest;
+import com.poortorich.expense.request.enums.IterationAction;
 import com.poortorich.expense.response.ExpenseInfoResponse;
 import com.poortorich.expense.response.ExpenseResponse;
 import com.poortorich.expense.service.ExpenseService;
@@ -56,5 +57,12 @@ public class ExpenseFacade {
         }
 
         return expenseService.getExpenseInfoResponse(id, username, customIteration);
+    }
+
+    @Transactional
+    public ExpenseResponse modifyExpense(String username, Long expenseId, ExpenseRequest expenseRequest) {
+        Category category = categoryService.findCategoryByName(expenseRequest.getCategoryName(), username);
+        expenseService.modifyExpense(expenseId, username, expenseRequest, category);
+        return ExpenseResponse.MODIFY_EXPENSE_SUCCESS;
     }
 }

@@ -15,6 +15,7 @@ import com.poortorich.iteration.entity.IterationExpenses;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.beans.Transient;
 import java.util.List;
 
 @Service
@@ -69,6 +70,18 @@ public class ExpenseService {
                 .iterationType(expense.getIterationType().toString())
                 .customIteration(customIteration)
                 .build();
+    }
+
+    @Transient
+    public void modifyExpense(Long id, String username, ExpenseRequest expenseRequest, Category category) {
+        Expense expense = getExpense(id, username);
+        expense.updateExpense(
+                expenseRequest.parseDate(),
+                expenseRequest.trimTitle(),
+                expenseRequest.getCost(),
+                expenseRequest.parsePaymentMethod(),
+                expenseRequest.getMemo(),
+                category);
     }
 
     private Expense getExpense(Long id, String username) {

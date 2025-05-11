@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.PutMapping;
 
 @RestController
 @RequestMapping("/expense")
@@ -39,5 +40,13 @@ public class ExpenseController {
                 ExpenseResponse.GET_EXPENSE_SUCCESS,
                 expenseFacade.getExpense(expenseId, userDetails.getUsername())
         );
+    }
+
+    @PutMapping("/{expenseId}")
+    public ResponseEntity<BaseResponse> modifyExpense(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @PathVariable Long expenseId,
+            @RequestBody @Valid ExpenseRequest expenseRequest) {
+        return BaseResponse.toResponseEntity(expenseFacade.modifyExpense(userDetails.getUsername(), expenseId, expenseRequest));
     }
 }

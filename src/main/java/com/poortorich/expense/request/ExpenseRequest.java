@@ -4,6 +4,7 @@ import com.poortorich.expense.constants.ExpenseResponseMessages;
 import com.poortorich.expense.constants.ExpenseValidationConstraints;
 import com.poortorich.expense.entity.enums.IterationType;
 import com.poortorich.expense.entity.enums.PaymentMethod;
+import com.poortorich.expense.request.enums.IterationAction;
 import com.poortorich.expense.response.ExpenseResponse;
 import com.poortorich.global.constants.DatePattern;
 import com.poortorich.global.exceptions.BadRequestException;
@@ -50,6 +51,8 @@ public class ExpenseRequest {
 
     private String iterationType;
 
+    private String iterationAction;
+
     @Valid
     private CustomIteration customIteration;
 
@@ -80,5 +83,9 @@ public class ExpenseRequest {
 
     public IterationType parseIterationType() {
         return IterationType.from(iterationType);
+    }
+
+    public IterationAction parseIterationAction() {
+        return IterationAction.from(iterationAction);
     }
 }
