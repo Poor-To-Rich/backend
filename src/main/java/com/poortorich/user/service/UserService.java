@@ -70,4 +70,10 @@ public class UserService {
                 .email(userEmail)
                 .build();
     }
+
+    public void updatePassword(String username, String newPassword) {
+        userRepository.findByUsername(username)
+                .orElseThrow(() -> new NotFoundException(UserResponse.USER_NOT_FOUND))
+                .updatePasswrod(passwordEncoder.encode(newPassword));
+    }
 }
