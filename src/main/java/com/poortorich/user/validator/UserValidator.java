@@ -1,5 +1,6 @@
 package com.poortorich.user.validator;
 
+import com.poortorich.auth.response.enums.AuthResponse;
 import com.poortorich.global.exceptions.BadRequestException;
 import com.poortorich.global.exceptions.ConflictException;
 import com.poortorich.global.exceptions.NotFoundException;
@@ -8,6 +9,7 @@ import com.poortorich.user.response.enums.UserResponse;
 import java.time.LocalDate;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -15,6 +17,7 @@ import org.springframework.stereotype.Component;
 public class UserValidator {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     public void validateUsernameDuplicate(String username) {
         if (userRepository.existsByUsername(username)) {
@@ -50,7 +53,17 @@ public class UserValidator {
         String currentNickname = userRepository.findByUsername(username)
                 .orElseThrow(() -> new NotFoundException(UserResponse.USER_NOT_FOUND))
                 .getNickname();
-        
+
         return !Objects.equals(currentNickname, nickname);
+    }
+
+    public void validatePasswordCorrect(String username, String currentPassword) {
+        String password = userRepository.findByUsername(username)
+                .orElseThrow(() -> new NotFoundException(UserResponse.USER_NOT_FOUND))
+                .getPassword();
+
+        if (!passwordEncoder.matches(currentPassword, password)) {
+            throw new BadRequestException(AuthResponse.CREDENTIALS_INVALID);
+        }
     }
 }
