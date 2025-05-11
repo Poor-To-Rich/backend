@@ -16,6 +16,7 @@ import com.poortorich.s3.service.FileUploadService;
 import com.poortorich.user.entity.User;
 import com.poortorich.user.fixture.UserFixture;
 import com.poortorich.user.request.NicknameCheckRequest;
+import com.poortorich.user.request.PasswordUpdateRequest;
 import com.poortorich.user.request.ProfileUpdateRequest;
 import com.poortorich.user.request.UserRegistrationRequest;
 import com.poortorich.user.request.UsernameCheckRequest;
@@ -25,6 +26,7 @@ import com.poortorich.user.response.enums.UserResponse;
 import com.poortorich.user.service.RedisUserReservationService;
 import com.poortorich.user.service.UserService;
 import com.poortorich.user.service.UserValidationService;
+import com.poortorich.user.util.PasswordUpdateRequestTestBuilder;
 import com.poortorich.user.util.ProfileUpdateRequestTestBuilder;
 import com.poortorich.user.util.UserRegistrationRequestTestBuilder;
 import org.junit.jupiter.api.BeforeEach;
@@ -179,5 +181,23 @@ public class UserFacadeTest {
         userFacade.getUserEmail(mockUser.getUsername());
 
         verify(userService, times(1)).getUserEmail(anyString());
+    }
+
+    @Test
+    @DisplayName("비밀번호 변경 요청 시 서비스들이 적절히 호출되는지 확인한다.")
+    void updateUserPassword_shouldCallServiceMethods() {
+        String username = UserFixture.VALID_USERNAME_SAMPLE_1;
+        PasswordUpdateRequest passwordUpdateRequest = PasswordUpdateRequestTestBuilder.builder().build();
+
+        doNothing().when(userValidationService)
+                .validateUpdateUserPassword(anyString(), any(PasswordUpdateRequest.class));
+
+        doNothing().when(userService)
+                .updatePassword(username, passwordUpdateRequest.getNewPassword());
+
+        userFacade.updateUserPassword(username, passwordUpdateRequest);
+
+        verify(userValidationService, times(1)).validateUpdateUserPassword(username, passwordUpdateRequest);
+        verify(userService, times(1)).updatePassword(username, passwordUpdateRequest.getNewPassword());
     }
 }
