@@ -57,12 +57,12 @@ public class UserValidator {
         return !Objects.equals(currentNickname, nickname);
     }
 
-    public void validatePasswordCorrect(String username, String currentPassword) {
-        String password = userRepository.findByUsername(username)
+    public void validatePassword(String username, String password) {
+        String userPassword = userRepository.findByUsername(username)
                 .orElseThrow(() -> new NotFoundException(UserResponse.USER_NOT_FOUND))
                 .getPassword();
 
-        if (!passwordEncoder.matches(currentPassword, password)) {
+        if (!passwordEncoder.matches(password, userPassword)) {
             throw new BadRequestException(AuthResponse.CREDENTIALS_INVALID);
         }
     }

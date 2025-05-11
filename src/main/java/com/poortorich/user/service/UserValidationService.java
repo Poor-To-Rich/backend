@@ -69,7 +69,7 @@ public class UserValidationService {
     }
 
     public void validateUpdateUserPassword(String username, PasswordUpdateRequest passwordUpdateRequest) {
-        userValidator.validatePasswordCorrect(username, passwordUpdateRequest.getCurrentPassword());
+        userValidator.validatePassword(username, passwordUpdateRequest.getCurrentPassword());
         userValidator.validatePasswordMatch(
                 passwordUpdateRequest.getNewPassword(),
                 passwordUpdateRequest.getConfirmNewPassword()
