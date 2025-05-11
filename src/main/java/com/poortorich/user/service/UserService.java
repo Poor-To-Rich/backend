@@ -74,6 +74,6 @@ public class UserService {
     public void updatePassword(String username, String newPassword) {
         userRepository.findByUsername(username)
                 .orElseThrow(() -> new NotFoundException(UserResponse.USER_NOT_FOUND))
-                .updatePasswrod(passwordEncoder.encode(newPassword));
+                .updatePassword(passwordEncoder.encode(newPassword));
     }
 }
