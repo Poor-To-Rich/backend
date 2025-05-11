@@ -6,6 +6,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -17,9 +18,11 @@ import com.poortorich.global.exceptions.ForbiddenException;
 import com.poortorich.user.constants.UserResponseMessages;
 import com.poortorich.user.entity.User;
 import com.poortorich.user.fixture.UserFixture;
+import com.poortorich.user.request.PasswordUpdateRequest;
 import com.poortorich.user.request.ProfileUpdateRequest;
 import com.poortorich.user.request.UserRegistrationRequest;
 import com.poortorich.user.response.enums.UserResponse;
+import com.poortorich.user.util.PasswordUpdateRequestTestBuilder;
 import com.poortorich.user.util.ProfileUpdateRequestTestBuilder;
 import com.poortorich.user.util.UserRegistrationRequestTestBuilder;
 import com.poortorich.user.validator.UserValidator;
@@ -416,5 +419,23 @@ public class UserValidationServiceTest {
         verify(userValidator).isNicknameChanged(UserFixture.VALID_USERNAME_SAMPLE_1, profile.getNickname());
         verify(userValidator).validateNicknameDuplicate(profile.getNickname());
         verify(userReservationService).existsByNickname(profile.getNickname());
+    }
+
+    @Test
+    @DisplayName("비밀번호 변경 검증 - 유효한 데이터인 경우 예외가 발생하지 않는다.")
+    public void validateUpdateUserPassword_whenValidRequest_thenDoNothing() {
+        String username = UserFixture.VALID_USERNAME_SAMPLE_1;
+        PasswordUpdateRequest passwordUpdateRequest = PasswordUpdateRequestTestBuilder.builder().build();
+
+        doNothing().when(userValidator).validatePassword(anyString(), anyString());
+
+        userValidationService.validateUpdateUserPassword(username, passwordUpdateRequest);
+
+        verify(userValidator, times(1)).validatePassword(username, passwordUpdateRequest.getCurrentPassword());
+        verify(userValidator, times(1))
+                .validatePasswordMatch(
+                        passwordUpdateRequest.getNewPassword(),
+                        passwordUpdateRequest.getConfirmNewPassword()
+                );
     }
 }
