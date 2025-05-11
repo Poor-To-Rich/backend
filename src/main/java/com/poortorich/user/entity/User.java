@@ -112,7 +112,7 @@ public class User implements UserDetails {
         this.job = userProfile.getJob();
     }
 
-    public void updatePasswrod(String password) {
+    public void updatePassword(String password) {
         this.password = password;
     }
 }
