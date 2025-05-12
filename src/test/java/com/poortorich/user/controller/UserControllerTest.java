@@ -21,13 +21,14 @@ import com.poortorich.user.facade.UserFacade;
 import com.poortorich.user.fixture.UserFixture;
 import com.poortorich.user.fixture.UserRegisterApiFixture;
 import com.poortorich.user.request.NicknameCheckRequest;
+import com.poortorich.user.request.PasswordUpdateRequest;
 import com.poortorich.user.request.ProfileUpdateRequest;
 import com.poortorich.user.request.UserRegistrationRequest;
 import com.poortorich.user.request.UsernameCheckRequest;
 import com.poortorich.user.response.UserDetailResponse;
 import com.poortorich.user.response.UserEmailResponse;
 import com.poortorich.user.response.enums.UserResponse;
-import com.poortorich.user.util.UserRegistrationRequestTestBuilder;
+import com.poortorich.user.util.PasswordUpdateRequestTestBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -275,7 +276,27 @@ class UserControllerTest extends BaseSecurityTest {
         verify(userFacade, times(1)).getUserEmail(anyString());
     }
 
-    private String getUserRegistrationRequestJson() throws JsonProcessingException {
-        return objectMapper.writeValueAsString(new UserRegistrationRequestTestBuilder().build());
+    @Test
+    @DisplayName("유효한 데이터로 비밀번호 변경 api 호출 - 성공")
+    @WithMockUser(username = UserFixture.VALID_USERNAME_SAMPLE_1)
+    void updateUserPassword_whenValidInput_thenNoException() throws Exception {
+        User mockUser = UserFixture.createDefaultUser();
+        PasswordUpdateRequest request = PasswordUpdateRequestTestBuilder.builder().build();
+
+        when(userFacade.updateUserPassword(anyString(), any(PasswordUpdateRequest.class)))
+                .thenReturn(UserResponse.PASSWORD_UPDATE_SUCCESS);
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/user/password")
+                        .with(SecurityMockMvcRequestPostProcessors.user(mockUser))
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(getRequestJson(request)))
+                .andExpect(jsonPath("$.resultCode").value(HttpStatus.OK.value()))
+                .andExpect(jsonPath("$.resultMessage").value(UserResponseMessages.PASSWORD_UPDATE_SUCCESS));
+
+        verify(userFacade).updateUserPassword(anyString(), any(PasswordUpdateRequest.class));
+    }
+
+    private String getRequestJson(Object request) throws JsonProcessingException {
+        return objectMapper.writeValueAsString(request);
     }
 }

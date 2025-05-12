@@ -2,9 +2,11 @@ package com.poortorich.user.controller;
 
 import com.poortorich.global.response.BaseResponse;
 import com.poortorich.global.response.DataResponse;
+import com.poortorich.global.response.Response;
 import com.poortorich.user.constants.UserResponseMessages;
 import com.poortorich.user.facade.UserFacade;
 import com.poortorich.user.request.NicknameCheckRequest;
+import com.poortorich.user.request.PasswordUpdateRequest;
 import com.poortorich.user.request.ProfileUpdateRequest;
 import com.poortorich.user.request.UserRegistrationRequest;
 import com.poortorich.user.request.UsernameCheckRequest;
@@ -72,5 +74,14 @@ public class UserController {
                 UserResponse.USER_EMAIL_FIND_SUCCESS,
                 userFacade.getUserEmail(userDetails.getUsername())
         );
+    }
+
+    @PutMapping("/password")
+    public ResponseEntity<BaseResponse> updateUserPassword(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @RequestBody @Valid PasswordUpdateRequest passwordUpdateRequest
+    ) {
+        Response response = userFacade.updateUserPassword(userDetails.getUsername(), passwordUpdateRequest);
+        return BaseResponse.toResponseEntity(response);
     }
 }

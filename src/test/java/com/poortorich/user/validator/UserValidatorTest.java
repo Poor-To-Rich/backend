@@ -3,8 +3,12 @@ package com.poortorich.user.validator;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.poortorich.auth.constants.AuthResponseMessage;
 import com.poortorich.global.exceptions.BadRequestException;
 import com.poortorich.global.exceptions.ConflictException;
 import com.poortorich.global.exceptions.NotFoundException;
@@ -12,6 +16,7 @@ import com.poortorich.user.constants.UserResponseMessages;
 import com.poortorich.user.entity.User;
 import com.poortorich.user.fixture.UserFixture;
 import com.poortorich.user.repository.UserRepository;
+import com.poortorich.user.response.enums.UserResponse;
 import java.time.LocalDate;
 import java.util.Optional;
 import org.assertj.core.api.Assertions;
@@ -22,12 +27,16 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @ExtendWith(MockitoExtension.class)
 class UserValidatorTest {
 
     @Mock
     private UserRepository userRepository;
+
+    @Mock
+    private PasswordEncoder passwordEncoder;
 
     @InjectMocks
     private UserValidator userValidator;
@@ -153,7 +162,7 @@ class UserValidatorTest {
             String password = UserFixture.VALID_PASSWORD_SAMPLE_1;
             String differentPasswordConfirm = UserFixture.MISMATCH_PASSWORD_CONFIRM;
 
-            Assertions.assertThatThrownBy(() -> userValidator.validatePasswordMatch(password, differentPasswordConfirm))
+            Assertions.assertThatThrownBy(() -> userValidator.isPasswordMatch(password, differentPasswordConfirm))
                     .isInstanceOf(BadRequestException.class)
                     .hasMessage(UserResponseMessages.PASSWORD_DO_NOT_MATCH);
         }
@@ -164,7 +173,57 @@ class UserValidatorTest {
             String password = UserFixture.VALID_PASSWORD_SAMPLE_1;
             String passwordConfirm = UserFixture.VALID_PASSWORD_SAMPLE_1;
 
-            userValidator.validatePasswordMatch(password, passwordConfirm);
+            userValidator.isPasswordMatch(password, passwordConfirm);
+        }
+
+        @Test
+        @DisplayName("평문 비밀번호가 DB 내 인코딩된 비밀번호와 일치할 때 예외를 던지지 않는다.")
+        void validatePassword_whenCurrentPasswordIsCorrect_thenNoException() {
+            User mockUser = UserFixture.createDefaultUser();
+            String username = UserFixture.VALID_USERNAME_SAMPLE_1;
+            String currentPassword = UserFixture.VALID_PASSWORD_SAMPLE_1;
+
+            when(userRepository.findByUsername(username)).thenReturn(Optional.of(mockUser));
+            when(passwordEncoder.matches(currentPassword, mockUser.getPassword())).thenReturn(true);
+
+            userValidator.validatePassword(username, currentPassword);
+
+            verify(userRepository, times(1)).findByUsername(username);
+            verify(passwordEncoder, times(1)).matches(anyString(), anyString());
+        }
+
+        @Test
+        @DisplayName("평문 비밀번호가 DB 내 인코딩된 비밀번호와 일치하지 않아 예외를 던진다.")
+        void validatePassword_whenCurrentPasswordIsIncorrect_thenThrowException() {
+            User mockUser = UserFixture.createDefaultUser();
+            String username = UserFixture.VALID_USERNAME_SAMPLE_1;
+            String currentPassword = UserFixture.VALID_PASSWORD_SAMPLE_1;
+
+            when(userRepository.findByUsername(username)).thenReturn(Optional.of(mockUser));
+            when(passwordEncoder.matches(currentPassword, mockUser.getPassword())).thenReturn(false);
+
+            assertThatThrownBy(() -> userValidator.validatePassword(username, currentPassword))
+                    .isInstanceOf(BadRequestException.class)
+                    .hasMessage(AuthResponseMessage.CREDENTIALS_INVALID);
+
+            verify(userRepository, times(1)).findByUsername(username);
+            verify(passwordEncoder, times(1)).matches(anyString(), anyString());
+        }
+
+        @Test
+        @DisplayName("DB 내 유저를 찾을 수 없어 예외를 던진다.")
+        void validatePassword_whenUserNotFound_thenThrowException() {
+            String username = UserFixture.VALID_USERNAME_SAMPLE_1;
+            String currentPassword = UserFixture.VALID_PASSWORD_SAMPLE_1;
+
+            when(userRepository.findByUsername(username)).thenThrow(new NotFoundException(UserResponse.USER_NOT_FOUND));
+
+            assertThatThrownBy(() -> userValidator.validatePassword(username, currentPassword))
+                    .isInstanceOf(NotFoundException.class)
+                    .hasMessage(UserResponseMessages.USER_NOT_FOUND);
+
+            verify(userRepository, times(1)).findByUsername(username);
+            verify(passwordEncoder, never()).matches(anyString(), anyString());
         }
     }
 
