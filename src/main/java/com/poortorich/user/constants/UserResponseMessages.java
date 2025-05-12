@@ -31,12 +31,15 @@ public class UserResponseMessages {
     public static final String PASSWORD_LENGTH_INVALID = "비밀번호는 8 ~ 15자리로 작성해야 합니다.";
     public static final String PASSWORD_DO_NOT_MATCH = "비밀번호와 비밀번호 재입력이 일치하지 않습니다.";
     public static final String PASSWORD_CONFIRM_REQUIRED = "비밀번호 재입력칸을 입력해주세요.";
+
     public static final String PASSWORD_UPDATE_SUCCESS = "비밀번호 변경 성공";
     public static final String CURRENT_PASSWORD_REQUIRED = "현재 비밀번호를 입력해주세요.";
     public static final String NEW_PASSWORD_REQUIRED = "새 비밀번호를 입력해주세요.";
+    public static final String CURRENT_PASSWORD_IS_WRONG = "비밀번호가 틀렸습니다. 다시 입력해주세요.";
+    public static final String NEW_PASSWORD_IS_DO_NOT_MATCH = "새 비밀번호가 일치하지 않습니다.";
     
     public static final String BIRTHDAY_REQUIRED = "생년월일을 입력해주세요.";
-    public static final String BIRTHDAY_FORMAT_INVALID = "yyyy.mm.dd 형식이어야 합니다.";
+    public static final String BIRTHDAY_FORMAT_INVALID = "yyyy-mm-dd 형식이어야 합니다.";
     public static final String BIRTHDAY_IN_FUTURE = "생년월일은 오늘 이전 날짜여야 합니다.";
 
     public static final String EMAIL_REQUIRED = "이메일을 입력해주세요.";

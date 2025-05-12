@@ -1,6 +1,5 @@
 package com.poortorich.user.validator;
 
-import com.poortorich.auth.response.enums.AuthResponse;
 import com.poortorich.global.exceptions.BadRequestException;
 import com.poortorich.global.exceptions.ConflictException;
 import com.poortorich.global.exceptions.NotFoundException;
@@ -37,10 +36,8 @@ public class UserValidator {
         }
     }
 
-    public void validatePasswordMatch(String password, String passwordConfirm) {
-        if (!password.equals(passwordConfirm)) {
-            throw new BadRequestException(UserResponse.PASSWORD_DO_NOT_MATCH);
-        }
+    public boolean isPasswordMatch(String password, String passwordConfirm) {
+        return password.equals(passwordConfirm);
     }
 
     public void validateBirthIsInFuture(LocalDate birthday) {
@@ -63,7 +60,7 @@ public class UserValidator {
                 .getPassword();
 
         if (!passwordEncoder.matches(password, userPassword)) {
-            throw new BadRequestException(AuthResponse.CREDENTIALS_INVALID);
+            throw new BadRequestException(UserResponse.CURRENT_PASSWORD_IS_WRONG);
         }
     }
 }

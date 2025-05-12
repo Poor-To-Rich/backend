@@ -24,10 +24,12 @@ public class UserValidationService {
     public void validateRegistration(UserRegistrationRequest userRegistrationRequest) {
         userValidator.validateUsernameDuplicate(userRegistrationRequest.getUsername());
         userValidator.validateNicknameDuplicate(userRegistrationRequest.getNickname());
-        userValidator.validatePasswordMatch(
+        if (!userValidator.isPasswordMatch(
                 userRegistrationRequest.getPassword(),
-                userRegistrationRequest.getPasswordConfirm()
-        );
+                userRegistrationRequest.getPasswordConfirm())
+        ) {
+            throw new BadRequestException(UserResponse.PASSWORD_DO_NOT_MATCH);
+        }
         userValidator.validateEmailDuplicate(userRegistrationRequest.getEmail());
         userValidator.validateBirthIsInFuture(userRegistrationRequest.parseBirthday());
 
@@ -70,9 +72,11 @@ public class UserValidationService {
 
     public void validateUpdateUserPassword(String username, PasswordUpdateRequest passwordUpdateRequest) {
         userValidator.validatePassword(username, passwordUpdateRequest.getCurrentPassword());
-        userValidator.validatePasswordMatch(
+        if (!userValidator.isPasswordMatch(
                 passwordUpdateRequest.getNewPassword(),
-                passwordUpdateRequest.getConfirmNewPassword()
-        );
+                passwordUpdateRequest.getConfirmNewPassword())
+        ) {
+            throw new BadRequestException(UserResponse.NEW_PASSWORD_DO_NOT_MATCH);
+        }
     }
 }
