@@ -162,7 +162,7 @@ class UserValidatorTest {
             String password = UserFixture.VALID_PASSWORD_SAMPLE_1;
             String differentPasswordConfirm = UserFixture.MISMATCH_PASSWORD_CONFIRM;
 
-            Assertions.assertThatThrownBy(() -> userValidator.validatePasswordMatch(password, differentPasswordConfirm))
+            Assertions.assertThatThrownBy(() -> userValidator.isPasswordMatch(password, differentPasswordConfirm))
                     .isInstanceOf(BadRequestException.class)
                     .hasMessage(UserResponseMessages.PASSWORD_DO_NOT_MATCH);
         }
@@ -173,7 +173,7 @@ class UserValidatorTest {
             String password = UserFixture.VALID_PASSWORD_SAMPLE_1;
             String passwordConfirm = UserFixture.VALID_PASSWORD_SAMPLE_1;
 
-            userValidator.validatePasswordMatch(password, passwordConfirm);
+            userValidator.isPasswordMatch(password, passwordConfirm);
         }
 
         @Test

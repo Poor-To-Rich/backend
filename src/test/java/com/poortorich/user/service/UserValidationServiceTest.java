@@ -65,12 +65,12 @@ public class UserValidationServiceTest {
         when(emailVerificationPolicyManager.isEmailVerified(Mockito.anyString())).thenReturn(true);
         when(userReservationService.existsByUsername(request.getUsername())).thenReturn(true);
         when(userReservationService.existsByNickname(request.getNickname())).thenReturn(true);
-
+        when(userValidator.isPasswordMatch(anyString(), anyString())).thenReturn(true);
         userValidationService.validateRegistration(request);
 
         verify(userValidator).validateUsernameDuplicate(request.getUsername());
         verify(userValidator).validateNicknameDuplicate(request.getNickname());
-        verify(userValidator).validatePasswordMatch(request.getPassword(), request.getPasswordConfirm());
+        verify(userValidator).isPasswordMatch(request.getPassword(), request.getPasswordConfirm());
         verify(userValidator).validateEmailDuplicate(request.getEmail());
         verify(userValidator).validateBirthIsInFuture(request.parseBirthday());
         verify(userReservationService).existsByUsername(request.getUsername());
@@ -86,6 +86,7 @@ public class UserValidationServiceTest {
         when(emailVerificationPolicyManager.isEmailVerified(any())).thenReturn(false);
         when(userReservationService.existsByUsername(request.getUsername())).thenReturn(true);
         when(userReservationService.existsByNickname(request.getNickname())).thenReturn(true);
+        when(userValidator.isPasswordMatch(anyString(), anyString())).thenReturn(true);
 
         assertThatThrownBy(() -> userValidationService.validateRegistration(request))
                 .isInstanceOf(ForbiddenException.class)
@@ -93,7 +94,7 @@ public class UserValidationServiceTest {
 
         verify(userValidator).validateUsernameDuplicate(request.getUsername());
         verify(userValidator).validateNicknameDuplicate(request.getNickname());
-        verify(userValidator).validatePasswordMatch(request.getPassword(), request.getPasswordConfirm());
+        verify(userValidator).isPasswordMatch(request.getPassword(), request.getPasswordConfirm());
         verify(userValidator).validateEmailDuplicate(request.getEmail());
         verify(userValidator).validateBirthIsInFuture(request.parseBirthday());
         verify(userReservationService).existsByUsername(request.getUsername());
@@ -116,7 +117,7 @@ public class UserValidationServiceTest {
 
         verify(userValidator).validateUsernameDuplicate(request.getUsername());
         verify(userValidator, never()).validateNicknameDuplicate(any());
-        verify(userValidator, never()).validatePasswordMatch(any(), any());
+        verify(userValidator, never()).isPasswordMatch(any(), any());
         verify(userValidator, never()).validateEmailDuplicate(any());
         verify(userValidator, never()).validateBirthIsInFuture(any());
         verify(userReservationService, never()).existsByUsername(any());
@@ -139,7 +140,7 @@ public class UserValidationServiceTest {
 
         verify(userValidator).validateUsernameDuplicate(request.getUsername());
         verify(userValidator).validateNicknameDuplicate(request.getNickname());
-        verify(userValidator, never()).validatePasswordMatch(any(), any());
+        verify(userValidator, never()).isPasswordMatch(any(), any());
         verify(userValidator, never()).validateEmailDuplicate(any());
         verify(userValidator, never()).validateBirthIsInFuture(any());
         verify(userReservationService, never()).existsByUsername(any());
@@ -154,9 +155,7 @@ public class UserValidationServiceTest {
                 .passwordConfirm(UserFixture.MISMATCH_PASSWORD_CONFIRM)
                 .build();
 
-        doThrow(new BadRequestException(UserResponse.PASSWORD_DO_NOT_MATCH))
-                .when(userValidator)
-                .validatePasswordMatch(request.getPassword(), request.getPasswordConfirm());
+        when(userValidator.isPasswordMatch(anyString(), anyString())).thenReturn(false);
 
         assertThatThrownBy(() -> userValidationService.validateRegistration(request))
                 .isInstanceOf(BadRequestException.class)
@@ -164,7 +163,7 @@ public class UserValidationServiceTest {
 
         verify(userValidator).validateUsernameDuplicate(request.getUsername());
         verify(userValidator).validateNicknameDuplicate(request.getNickname());
-        verify(userValidator).validatePasswordMatch(request.getPassword(), request.getPasswordConfirm());
+        verify(userValidator).isPasswordMatch(request.getPassword(), request.getPasswordConfirm());
         verify(userValidator, never()).validateEmailDuplicate(any());
         verify(userValidator, never()).validateBirthIsInFuture(any());
         verify(userReservationService, never()).existsByUsername(any());
@@ -177,6 +176,7 @@ public class UserValidationServiceTest {
     void validateRegistration_whenEmailDuplicate_thenThrowConflictException() {
         UserRegistrationRequest request = userRegistrationBuilder.build();
 
+        when(userValidator.isPasswordMatch(anyString(), anyString())).thenReturn(true);
         doThrow(new ConflictException(UserResponse.EMAIL_DUPLICATE))
                 .when(userValidator)
                 .validateEmailDuplicate(request.getEmail());
@@ -187,7 +187,7 @@ public class UserValidationServiceTest {
 
         verify(userValidator).validateUsernameDuplicate(request.getUsername());
         verify(userValidator).validateNicknameDuplicate(request.getNickname());
-        verify(userValidator).validatePasswordMatch(request.getPassword(), request.getPasswordConfirm());
+        verify(userValidator).isPasswordMatch(request.getPassword(), request.getPasswordConfirm());
         verify(userValidator).validateEmailDuplicate(request.getEmail());
         verify(userValidator, never()).validateBirthIsInFuture(any());
         verify(userReservationService, never()).existsByUsername(any());
@@ -202,6 +202,7 @@ public class UserValidationServiceTest {
                 .email(UserFixture.FUTURE_BIRTH)
                 .build();
 
+        when(userValidator.isPasswordMatch(anyString(), anyString())).thenReturn(true);
         doThrow(new BadRequestException(UserResponse.BIRTHDAY_IN_FUTURE))
                 .when(userValidator)
                 .validateBirthIsInFuture(request.parseBirthday());
@@ -212,7 +213,7 @@ public class UserValidationServiceTest {
 
         verify(userValidator).validateUsernameDuplicate(request.getUsername());
         verify(userValidator).validateNicknameDuplicate(request.getNickname());
-        verify(userValidator).validatePasswordMatch(request.getPassword(), request.getPasswordConfirm());
+        verify(userValidator).isPasswordMatch(request.getPassword(), request.getPasswordConfirm());
         verify(userValidator).validateEmailDuplicate(request.getEmail());
         verify(userValidator).validateBirthIsInFuture(request.parseBirthday());
         verify(userReservationService, never()).existsByUsername(any());
@@ -225,6 +226,7 @@ public class UserValidationServiceTest {
     void validateRegistration_whenUsernameIsNotReserved_thenThrowBadRequestException() {
         UserRegistrationRequest request = userRegistrationBuilder.build();
 
+        when(userValidator.isPasswordMatch(anyString(), anyString())).thenReturn(true);
         when(userReservationService.existsByUsername(any())).thenReturn(false);
 
         assertThatThrownBy(() -> userValidationService.validateRegistration(request))
@@ -233,7 +235,7 @@ public class UserValidationServiceTest {
 
         verify(userValidator).validateUsernameDuplicate(request.getUsername());
         verify(userValidator).validateNicknameDuplicate(request.getNickname());
-        verify(userValidator).validatePasswordMatch(request.getPassword(), request.getPasswordConfirm());
+        verify(userValidator).isPasswordMatch(request.getPassword(), request.getPasswordConfirm());
         verify(userValidator).validateEmailDuplicate(request.getEmail());
         verify(userValidator).validateBirthIsInFuture(request.parseBirthday());
         verify(userReservationService).existsByUsername(request.getUsername());
@@ -248,6 +250,7 @@ public class UserValidationServiceTest {
 
         when(userReservationService.existsByUsername(any())).thenReturn(true);
         when(userReservationService.existsByNickname(any())).thenReturn(false);
+        when(userValidator.isPasswordMatch(anyString(), anyString())).thenReturn(true);
 
         assertThatThrownBy(() -> userValidationService.validateRegistration(request))
                 .isInstanceOf(BadRequestException.class)
@@ -255,7 +258,7 @@ public class UserValidationServiceTest {
 
         verify(userValidator).validateUsernameDuplicate(request.getUsername());
         verify(userValidator).validateNicknameDuplicate(request.getNickname());
-        verify(userValidator).validatePasswordMatch(request.getPassword(), request.getPasswordConfirm());
+        verify(userValidator).isPasswordMatch(request.getPassword(), request.getPasswordConfirm());
         verify(userValidator).validateEmailDuplicate(request.getEmail());
         verify(userValidator).validateBirthIsInFuture(request.parseBirthday());
         verify(userReservationService).existsByUsername(request.getUsername());
@@ -427,13 +430,14 @@ public class UserValidationServiceTest {
         String username = UserFixture.VALID_USERNAME_SAMPLE_1;
         PasswordUpdateRequest passwordUpdateRequest = PasswordUpdateRequestTestBuilder.builder().build();
 
+        when(userValidator.isPasswordMatch(anyString(), anyString())).thenReturn(true);
         doNothing().when(userValidator).validatePassword(anyString(), anyString());
 
         userValidationService.validateUpdateUserPassword(username, passwordUpdateRequest);
 
         verify(userValidator, times(1)).validatePassword(username, passwordUpdateRequest.getCurrentPassword());
         verify(userValidator, times(1))
-                .validatePasswordMatch(
+                .isPasswordMatch(
                         passwordUpdateRequest.getNewPassword(),
                         passwordUpdateRequest.getConfirmNewPassword()
                 );
