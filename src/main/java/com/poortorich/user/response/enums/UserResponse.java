@@ -39,7 +39,6 @@ public enum UserResponse implements Response {
     USER_EMAIL_FIND_SUCCESS(HttpStatus.OK, UserResponseMessages.USER_EMAIL_FIND_SUCCESS, null),
     USER_PROFILE_UPDATE_SUCCESS(HttpStatus.OK, UserResponseMessages.USER_PROFILE_UPDATE_SUCCESS, null);
 
-
     private final HttpStatus httpStatus;
     private final String message;
     private final String field;
