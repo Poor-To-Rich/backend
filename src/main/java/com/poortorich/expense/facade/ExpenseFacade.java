@@ -4,7 +4,9 @@ import com.poortorich.category.entity.Category;
 import com.poortorich.category.service.CategoryService;
 import com.poortorich.expense.entity.Expense;
 import com.poortorich.expense.entity.enums.IterationType;
+import com.poortorich.expense.request.ExpenseDeleteRequest;
 import com.poortorich.expense.request.ExpenseRequest;
+import com.poortorich.expense.request.enums.IterationAction;
 import com.poortorich.expense.response.ExpenseInfoResponse;
 import com.poortorich.expense.response.ExpenseResponse;
 import com.poortorich.expense.service.ExpenseService;
@@ -41,9 +43,7 @@ public class ExpenseFacade {
         List<Expense> iterationExpenses
                 = iterationService.createIterationExpenses(expenseRequest.getCustomIteration(), expense, username);
         List<Expense> savedExpenses = expenseService.createExpenseAll(iterationExpenses);
-        if (expense.getIterationType() == IterationType.CUSTOM) {
-            iterationService.createIterationInfo(expenseRequest.getCustomIteration(), expense, savedExpenses, username);
-        }
+        iterationService.createIterationInfo(expenseRequest, expense, savedExpenses, username);
     }
 
     @Transactional

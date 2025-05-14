@@ -2,6 +2,8 @@ package com.poortorich.iteration.service;
 
 import com.poortorich.expense.entity.Expense;
 import com.poortorich.expense.entity.enums.IterationType;
+import com.poortorich.expense.request.ExpenseRequest;
+import com.poortorich.expense.request.enums.IterationAction;
 import com.poortorich.global.exceptions.BadRequestException;
 import com.poortorich.global.exceptions.NotFoundException;
 import com.poortorich.iteration.entity.IterationExpenses;
@@ -223,23 +225,21 @@ public class IterationService {
                 .build();
     }
 
-    public void createIterationInfo(CustomIteration customIteration,
+    public void createIterationInfo(ExpenseRequest expenseRequest,
                                     Expense originalExpense,
                                     List<Expense> savedIterationExpenses,
                                     String username) {
         User user = findUserByUsername(username);
-        IterationInfo iterationInfo = getIterationInfo(customIteration);
-        iterationInfoRepository.save(iterationInfo);
+        IterationInfo iterationInfo = null;
+        if (expenseRequest.parseIterationType() == IterationType.CUSTOM) {
+            iterationInfo = getIterationInfo(expenseRequest.getCustomIteration());
+            iterationInfoRepository.save(iterationInfo);
+        }
 
         for (Expense savedExpense : savedIterationExpenses) {
             IterationExpenses iterationExpenses = buildIterationExpenses(originalExpense, savedExpense, iterationInfo, user);
             iterationExpensesRepository.save(iterationExpenses);
         }
-    }
-
-    private User findUserByUsername(String username) {
-        return userRepository.findByUsername(username)
-                .orElseThrow(() -> new NotFoundException(UserResponse.USER_NOT_FOUND));
     }
 
     private IterationInfo getIterationInfo(CustomIteration customIteration) {
@@ -385,5 +385,10 @@ public class IterationService {
         return EndInfoResponse.builder()
                 .type(info.getEndType().toString())
                 .build();
+    }
+
+    private User findUserByUsername(String username) {
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new NotFoundException(UserResponse.USER_NOT_FOUND));
     }
 }
