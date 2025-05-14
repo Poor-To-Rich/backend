@@ -57,4 +57,23 @@ public class ExpenseFacade {
 
         return expenseService.getExpenseInfoResponse(id, username, customIteration);
     }
+
+    @Transactional
+    public ExpenseResponse deleteExpense(Long expenseId, ExpenseDeleteRequest expenseDeleteRequest, String username) {
+        if (expenseDeleteRequest.parseIterationAction() == IterationAction.NONE) {
+            expenseService.deleteExpense(expenseId, username);
+        }
+
+        if (expenseDeleteRequest.parseIterationAction() != IterationAction.NONE) {
+            Expense targetExpense = expenseService.getExpenseOrThrow(expenseId, username);
+            expenseService.deleteExpenseAll(
+                    iterationService.deleteIterationExpenses(
+                            targetExpense,
+                            username,
+                            expenseDeleteRequest.parseIterationAction())
+            );
+        }
+
+        return ExpenseResponse.DELETE_EXPENSE_SUCCESS;
+    }
 }

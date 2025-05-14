@@ -11,4 +11,6 @@ import java.util.Optional;
 public interface ExpenseRepository extends JpaRepository<Expense, Long> {
 
     Optional<Expense> findByIdAndUser(Long id, User user);
+
+    void deleteByIdAndUser(Long id, User user);
 }

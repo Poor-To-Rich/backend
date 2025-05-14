@@ -387,6 +387,38 @@ public class IterationService {
                 .build();
     }
 
+    public List<Expense> deleteIterationExpenses(Expense targetExpense, String username, IterationAction iterationAction) {
+        User user = findUserByUsername(username);
+        IterationExpenses iterationExpenses = iterationExpensesRepository.findByGeneratedExpenseAndUser(targetExpense, user);
+
+        Expense originalExpense = iterationExpenses.getOriginalExpense();
+        List<IterationExpenses> deleteIterationExpenses = List.of();
+
+        if (iterationAction == IterationAction.THIS_ONLY) {
+            deleteIterationExpenses = List.of(iterationExpenses);
+        }
+
+        if (iterationAction == IterationAction.ALL) {
+            deleteIterationExpenses = iterationExpensesRepository.findAllByOriginalExpenseAndUser(originalExpense, user);
+            IterationInfo iterationInfo = iterationExpenses.getIterationInfo();
+            if (iterationInfo != null) {
+                iterationInfoRepository.delete(deleteIterationExpenses.getFirst().getIterationInfo());
+            }
+        }
+
+        if (iterationAction == IterationAction.THIS_AND_FUTURE) {
+            deleteIterationExpenses = iterationExpensesRepository
+                    .findAllByOriginalExpenseAndUserAndGeneratedExpenseDateAfterOrEqual(
+                            originalExpense, user, targetExpense.getExpenseDate()
+                    );
+        }
+
+        iterationExpensesRepository.deleteAll(deleteIterationExpenses);
+        return deleteIterationExpenses.stream()
+                .map(IterationExpenses::getGeneratedExpense)
+                .toList();
+    }
+
     private User findUserByUsername(String username) {
         return userRepository.findByUsername(username)
                 .orElseThrow(() -> new NotFoundException(UserResponse.USER_NOT_FOUND));

@@ -48,17 +48,12 @@ public class ExpenseService {
     }
 
     public IterationExpenses getIterationExpenses(Long id, String username) {
-        Expense expense = getExpense(id, username);
+        Expense expense = getExpenseOrThrow(id, username);
         return expense.getGeneratedIterationExpenses();
     }
 
-    private User findUserByUsername(String username) {
-        return userRepository.findByUsername(username)
-                .orElseThrow(() -> new NotFoundException(UserResponse.USER_NOT_FOUND));
-    }
-
     public ExpenseInfoResponse getExpenseInfoResponse(Long id, String username, CustomIterationInfoResponse customIteration) {
-        Expense expense = getExpense(id, username);
+        Expense expense = getExpenseOrThrow(id, username);
         return ExpenseInfoResponse.builder()
                 .date(expense.getExpenseDate())
                 .categoryName(expense.getCategory().getName())
@@ -71,8 +66,22 @@ public class ExpenseService {
                 .build();
     }
 
-    private Expense getExpense(Long id, String username) {
+    public void deleteExpense(Long expenseId, String username) {
+        Expense expense = getExpenseOrThrow(expenseId, username);
+        expenseRepository.delete(expense);
+    }
+
+    public Expense getExpenseOrThrow(Long id, String username) {
         return expenseRepository.findByIdAndUser(id, findUserByUsername(username))
                 .orElseThrow(() -> new NotFoundException(ExpenseResponse.EXPENSE_NON_EXISTENT));
+    }
+
+    public void deleteExpenseAll(List<Expense> deleteExpenses) {
+        expenseRepository.deleteAll(deleteExpenses);
+    }
+
+    private User findUserByUsername(String username) {
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new NotFoundException(UserResponse.USER_NOT_FOUND));
     }
 }
