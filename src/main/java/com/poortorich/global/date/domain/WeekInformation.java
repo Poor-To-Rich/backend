@@ -1,4 +1,4 @@
-package com.poortorich.global.domain;
+package com.poortorich.global.date.domain;
 
 import java.time.LocalDate;
 import lombok.AllArgsConstructor;
