@@ -17,9 +17,15 @@ public interface IterationExpensesRepository extends JpaRepository<IterationExpe
 
     List<IterationExpenses> findAllByOriginalExpenseAndUser(Expense origianlExpense, User user);
 
-    @Query("SELECT ie FROM IterationExpenses ie JOIN FETCH ie.generatedExpense ge " +
-            "WHERE ie.originalExpense = :originalExpense AND ie.user = :user AND ge.expenseDate >= :startDate " +
-            "ORDER BY ge.expenseDate ASC")
+    @Query("""
+        SELECT DISTINCT ie
+        FROM IterationExpenses ie
+        JOIN FETCH ie.generatedExpense ge
+        WHERE ie.originalExpense = :originalExpense
+          AND ie.user = :user
+          AND ge.expenseDate >= :startDate
+        ORDER BY ge.expenseDate ASC
+        """)
     List<IterationExpenses> findAllByOriginalExpenseAndUserAndGeneratedExpenseDateAfterOrEqual(
             Expense originalExpense,
             User user,
