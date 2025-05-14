@@ -13,6 +13,10 @@ import java.util.List;
 @Repository
 public interface IterationExpensesRepository extends JpaRepository<IterationExpenses, Long> {
 
+    IterationExpenses findByGeneratedExpenseAndUser(Expense targetExpense, User userByUsername);
+
+    List<IterationExpenses> findAllByOriginalExpenseAndUser(Expense origianlExpense, User user);
+
     @Query("SELECT ie FROM IterationExpenses ie JOIN FETCH ie.generatedExpense ge " +
             "WHERE ie.originalExpense = :originalExpense AND ie.user = :user AND ge.expenseDate >= :startDate " +
             "ORDER BY ge.expenseDate ASC")
@@ -21,10 +25,4 @@ public interface IterationExpensesRepository extends JpaRepository<IterationExpe
             User user,
             LocalDate startDate
     );
-
-    void deleteByGeneratedExpenseAndUser(Expense targetExpense, User userByUsername);
-
-    IterationExpenses findByGeneratedExpenseAndUser(Expense targetExpense, User userByUsername);
-
-    List<IterationExpenses> findAllByOriginalExpenseAndUser(Expense origianlExpense, User user);
 }
