@@ -77,8 +77,8 @@ public class AuthControllerTest extends BaseSecurityTest {
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.resultCode").value(successResponse.getHttpStatus().value()))
-                .andExpect(jsonPath("$.resultMessage").value(successResponse.getMessage()));
+                .andExpect(jsonPath("$.status").value(successResponse.getHttpStatus().value()))
+                .andExpect(jsonPath("$.message").value(successResponse.getMessage()));
 
         verify(authService, Mockito.times(1)).login(any(LoginRequest.class), any(HttpServletResponse.class));
     }
@@ -97,8 +97,8 @@ public class AuthControllerTest extends BaseSecurityTest {
         actions
                 .andDo(print())
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.resultCode").value(AuthResponse.CREDENTIALS_INVALID.getHttpStatus().value()))
-                .andExpect(jsonPath("$.resultMessage").value(AuthResponse.CREDENTIALS_INVALID.getMessage()));
+                .andExpect(jsonPath("$.status").value(AuthResponse.CREDENTIALS_INVALID.getHttpStatus().value()))
+                .andExpect(jsonPath("$.message").value(AuthResponse.CREDENTIALS_INVALID.getMessage()));
 
         verify(authService, Mockito.times(1)).login(any(LoginRequest.class), any(HttpServletResponse.class));
     }
@@ -116,8 +116,8 @@ public class AuthControllerTest extends BaseSecurityTest {
         actions
                 .andDo(print())
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.resultCode").value(HttpStatus.BAD_REQUEST.value()))
-                .andExpect(jsonPath("$.resultMessage").value(AuthResponseMessage.USERNAME_REQUIRED));
+                .andExpect(jsonPath("$.status").value(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(jsonPath("$.message").value(AuthResponseMessage.USERNAME_REQUIRED));
 
         verifyNoInteractions(authService);
     }
@@ -135,8 +135,8 @@ public class AuthControllerTest extends BaseSecurityTest {
         actions
                 .andDo(print())
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.resultCode").value(HttpStatus.BAD_REQUEST.value()))
-                .andExpect(jsonPath("$.resultMessage").value(AuthResponseMessage.PASSWORD_REQUIRED));
+                .andExpect(jsonPath("$.status").value(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(jsonPath("$.message").value(AuthResponseMessage.PASSWORD_REQUIRED));
 
         verifyNoInteractions(authService);
     }
@@ -152,8 +152,8 @@ public class AuthControllerTest extends BaseSecurityTest {
         actions
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.resultCode").value(AuthResponse.TOKEN_REFRESH_SUCCESS.getHttpStatus().value()))
-                .andExpect(jsonPath("$.resultMessage").value(AuthResponse.TOKEN_REFRESH_SUCCESS.getMessage()));
+                .andExpect(jsonPath("$.status").value(AuthResponse.TOKEN_REFRESH_SUCCESS.getHttpStatus().value()))
+                .andExpect(jsonPath("$.message").value(AuthResponse.TOKEN_REFRESH_SUCCESS.getMessage()));
 
         verify(authService, times(1)).refreshToken(any(HttpServletRequest.class), any(HttpServletResponse.class));
     }
@@ -169,8 +169,8 @@ public class AuthControllerTest extends BaseSecurityTest {
         actions
                 .andDo(print())
                 .andExpect(status().isUnauthorized())
-                .andExpect(jsonPath("$.resultCode").value(AuthResponse.TOKEN_INVALID.getHttpStatus().value()))
-                .andExpect(jsonPath("$.resultMessage").value(AuthResponse.TOKEN_INVALID.getMessage()));
+                .andExpect(jsonPath("$.status").value(AuthResponse.TOKEN_INVALID.getHttpStatus().value()))
+                .andExpect(jsonPath("$.message").value(AuthResponse.TOKEN_INVALID.getMessage()));
 
         verify(authService, times(1)).refreshToken(any(HttpServletRequest.class), any(HttpServletResponse.class));
     }
@@ -210,8 +210,8 @@ public class AuthControllerTest extends BaseSecurityTest {
 
         actions
                 .andDo(print())
-                .andExpect(jsonPath("$.resultCode").value(AuthResponse.LOGOUT_SUCCESS.getHttpStatus().value()))
-                .andExpect(jsonPath("$.resultMessage").value(AuthResponse.LOGOUT_SUCCESS.getMessage()));
+                .andExpect(jsonPath("$.status").value(AuthResponse.LOGOUT_SUCCESS.getHttpStatus().value()))
+                .andExpect(jsonPath("$.message").value(AuthResponse.LOGOUT_SUCCESS.getMessage()));
 
         verify(authService, times(1)).logout(any(HttpServletResponse.class));
     }

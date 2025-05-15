@@ -134,8 +134,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         BaseResponse responseMessage = BaseResponse
                 .builder()
-                .resultCode(responseInformation.getHttpStatus().value())
-                .resultMessage(responseInformation.getMessage())
+                .status(responseInformation.getHttpStatus().value())
+                .message(responseInformation.getMessage())
                 .build();
 
         objectMapper.writeValue(response.getWriter(), responseMessage);

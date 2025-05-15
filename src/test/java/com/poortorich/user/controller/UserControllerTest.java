@@ -87,7 +87,7 @@ class UserControllerTest extends BaseSecurityTest {
                         .with(csrf())
                         .contentType(MediaType.MULTIPART_FORM_DATA_VALUE))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.resultMessage").value(UserResponse.REGISTRATION_SUCCESS.getMessage()));
+                .andExpect(jsonPath("$.message").value(UserResponse.REGISTRATION_SUCCESS.getMessage()));
 
         verify(userFacade, times(1)).registerNewUser(any(UserRegistrationRequest.class));
     }
@@ -112,7 +112,7 @@ class UserControllerTest extends BaseSecurityTest {
                         .with(csrf())
                         .contentType(MediaType.MULTIPART_FORM_DATA_VALUE))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.resultMessage").value(UserResponse.REGISTRATION_SUCCESS.getMessage()));
+                .andExpect(jsonPath("$.message").value(UserResponse.REGISTRATION_SUCCESS.getMessage()));
 
         verify(userFacade, times(1)).registerNewUser(any(UserRegistrationRequest.class));
     }
@@ -129,7 +129,7 @@ class UserControllerTest extends BaseSecurityTest {
                         .content(objectMapper.writeValueAsString(request))
                         .with(csrf()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.resultMessage").value(UserResponse.USERNAME_AVAILABLE.getMessage()));
+                .andExpect(jsonPath("$.message").value(UserResponse.USERNAME_AVAILABLE.getMessage()));
 
         verify(userFacade, times(1)).checkUsernameAndReservation(any(UsernameCheckRequest.class));
     }
@@ -146,7 +146,7 @@ class UserControllerTest extends BaseSecurityTest {
                         .content(objectMapper.writeValueAsString(request))
                         .with(csrf()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.resultMessage").value(UserResponseMessages.NICKNAME_AVAILABLE));
+                .andExpect(jsonPath("$.message").value(UserResponseMessages.NICKNAME_AVAILABLE));
 
         verify(userFacade, times(1)).checkNicknameAndReservation(any(NicknameCheckRequest.class));
     }
@@ -171,8 +171,8 @@ class UserControllerTest extends BaseSecurityTest {
                         .with(SecurityMockMvcRequestPostProcessors.user(mockUser))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.resultCode").value(HttpStatus.OK.value()))
-                .andExpect(jsonPath("$.resultMessage").value(UserResponse.USER_DETAIL_FIND_SUCCESS.getMessage()))
+                .andExpect(jsonPath("$.status").value(HttpStatus.OK.value()))
+                .andExpect(jsonPath("$.message").value(UserResponse.USER_DETAIL_FIND_SUCCESS.getMessage()))
                 .andExpect(jsonPath("$.data.profileImage").value(response.getProfileImage()))
                 .andExpect(jsonPath("$.data.name").value(response.getName()))
                 .andExpect(jsonPath("$.data.nickname").value(response.getNickname()))
@@ -199,8 +199,8 @@ class UserControllerTest extends BaseSecurityTest {
                         .with(SecurityMockMvcRequestPostProcessors.user(UserFixture.createDefaultUser()))
                         .contentType(MediaType.MULTIPART_FORM_DATA_VALUE))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.resultCode").value(HttpStatus.OK.value()))
-                .andExpect(jsonPath("$.resultMessage").value(UserResponseMessages.USER_PROFILE_UPDATE_SUCCESS));
+                .andExpect(jsonPath("$.status").value(HttpStatus.OK.value()))
+                .andExpect(jsonPath("$.message").value(UserResponseMessages.USER_PROFILE_UPDATE_SUCCESS));
 
         verify(userFacade).updateUserProfile(anyString(), any(ProfileUpdateRequest.class));
     }
@@ -222,8 +222,8 @@ class UserControllerTest extends BaseSecurityTest {
                         .with(SecurityMockMvcRequestPostProcessors.user(UserFixture.createDefaultUser()))
                         .contentType(MediaType.MULTIPART_FORM_DATA_VALUE))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.resultCode").value(HttpStatus.OK.value()))
-                .andExpect(jsonPath("$.resultMessage").value(UserResponseMessages.USER_PROFILE_UPDATE_SUCCESS));
+                .andExpect(jsonPath("$.status").value(HttpStatus.OK.value()))
+                .andExpect(jsonPath("$.message").value(UserResponseMessages.USER_PROFILE_UPDATE_SUCCESS));
 
         verify(userFacade).updateUserProfile(anyString(), any(ProfileUpdateRequest.class));
     }
@@ -249,8 +249,8 @@ class UserControllerTest extends BaseSecurityTest {
                             return request;
                         }))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.resultCode").value(HttpStatus.OK.value()))
-                .andExpect(jsonPath("$.resultMessage").value(UserResponseMessages.USER_PROFILE_UPDATE_SUCCESS));
+                .andExpect(jsonPath("$.status").value(HttpStatus.OK.value()))
+                .andExpect(jsonPath("$.message").value(UserResponseMessages.USER_PROFILE_UPDATE_SUCCESS));
 
         verify(userFacade).updateUserProfile(anyString(), any(ProfileUpdateRequest.class));
     }
@@ -269,8 +269,8 @@ class UserControllerTest extends BaseSecurityTest {
         mockMvc.perform(MockMvcRequestBuilders.get("/user/email")
                         .with(SecurityMockMvcRequestPostProcessors.user(mockUser))
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.resultCode").value(HttpStatus.OK.value()))
-                .andExpect(jsonPath("$.resultMessage").value(UserResponseMessages.USER_EMAIL_FIND_SUCCESS))
+                .andExpect(jsonPath("$.status").value(HttpStatus.OK.value()))
+                .andExpect(jsonPath("$.message").value(UserResponseMessages.USER_EMAIL_FIND_SUCCESS))
                 .andExpect(jsonPath("$.data.email").value(mockUser.getEmail()));
 
         verify(userFacade, times(1)).getUserEmail(anyString());
@@ -290,8 +290,8 @@ class UserControllerTest extends BaseSecurityTest {
                         .with(SecurityMockMvcRequestPostProcessors.user(mockUser))
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .content(getRequestJson(request)))
-                .andExpect(jsonPath("$.resultCode").value(HttpStatus.OK.value()))
-                .andExpect(jsonPath("$.resultMessage").value(UserResponseMessages.PASSWORD_UPDATE_SUCCESS));
+                .andExpect(jsonPath("$.status").value(HttpStatus.OK.value()))
+                .andExpect(jsonPath("$.message").value(UserResponseMessages.PASSWORD_UPDATE_SUCCESS));
 
         verify(userFacade).updateUserPassword(anyString(), any(PasswordUpdateRequest.class));
     }
