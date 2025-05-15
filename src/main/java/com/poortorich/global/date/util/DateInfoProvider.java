@@ -25,7 +25,7 @@ public class DateInfoProvider {
 
         return YearInformation.builder()
                 .year(year)
-                .startDate(year.atDay(DateConstants.ONE_DAY))
+                .startDate(year.atDay(DateConstants.FIRST_DAY_OF_YEAR))
                 .endDate(year.atMonth(Month.DECEMBER).atEndOfMonth())
                 .months(months)
                 .build();
@@ -34,15 +34,15 @@ public class DateInfoProvider {
     public static MonthInformation getMonthInformation(YearMonth yearMonth) {
         return MonthInformation.builder()
                 .yearMonth(yearMonth)
-                .startDate(yearMonth.atDay(DateConstants.ONE_DAY))
+                .startDate(yearMonth.atDay(DateConstants.FIRST_DAY_OF_MONTH))
                 .endDate(yearMonth.atEndOfMonth())
-                .weeks(DateInfoProvider.getWeekInformation(yearMonth))
+                .weeks(DateInfoProvider.getWeeksInformation(yearMonth))
                 .build();
     }
 
-    public static List<WeekInformation> getWeekInformation(YearMonth yearMonth) {
+    public static List<WeekInformation> getWeeksInformation(YearMonth yearMonth) {
         List<WeekInformation> weeks = new ArrayList<>();
-        LocalDate weekStart = yearMonth.atDay(DateConstants.ONE_DAY)
+        LocalDate weekStart = yearMonth.atDay(DateConstants.FIRST_DAY_OF_MONTH)
                 .with(TemporalAdjusters.previousOrSame(DayOfWeek.SUNDAY));
 
         while (!weekStart.isAfter(yearMonth.atEndOfMonth())) {
