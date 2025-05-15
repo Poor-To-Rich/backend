@@ -189,8 +189,8 @@ public class JwtAuthenticationFilterTest {
     private String getExpectedJsonResponse(Response expectedResponse) throws JsonProcessingException {
         return testObjectMapper.writeValueAsString(
                 BaseResponse.builder()
-                        .resultCode(expectedResponse.getHttpStatus().value())
-                        .resultMessage(expectedResponse.getMessage())
+                        .status(expectedResponse.getHttpStatus().value())
+                        .message(expectedResponse.getMessage())
                         .build()
         );
     }

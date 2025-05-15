@@ -157,14 +157,12 @@ class UserValidatorTest {
     class ValidatePasswordTest {
 
         @Test
-        @DisplayName("비밀번호가 일치하지 않는 경우 BadRequestException을 던진다.")
+        @DisplayName("비밀번호가 일치하지 않는 경우 false를 던진다.")
         void validatePasswordMatch_whenPasswordsDoNotMatch_thenThrowBadRequestException() {
             String password = UserFixture.VALID_PASSWORD_SAMPLE_1;
             String differentPasswordConfirm = UserFixture.MISMATCH_PASSWORD_CONFIRM;
 
-            Assertions.assertThatThrownBy(() -> userValidator.isPasswordMatch(password, differentPasswordConfirm))
-                    .isInstanceOf(BadRequestException.class)
-                    .hasMessage(UserResponseMessages.PASSWORD_DO_NOT_MATCH);
+            Assertions.assertThat(userValidator.isPasswordMatch(password, differentPasswordConfirm)).isFalse();
         }
 
         @Test
@@ -204,7 +202,7 @@ class UserValidatorTest {
 
             assertThatThrownBy(() -> userValidator.validatePassword(username, currentPassword))
                     .isInstanceOf(BadRequestException.class)
-                    .hasMessage(AuthResponseMessage.CREDENTIALS_INVALID);
+                    .hasMessage(UserResponseMessages.CURRENT_PASSWORD_IS_WRONG);
 
             verify(userRepository, times(1)).findByUsername(username);
             verify(passwordEncoder, times(1)).matches(anyString(), anyString());
