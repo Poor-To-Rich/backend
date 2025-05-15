@@ -9,9 +9,8 @@ import org.springframework.http.ResponseEntity;
 @Getter
 public class BaseResponse {
 
-    private final Integer resultCode;
-
-    private final String resultMessage;
+    private final Integer status;
+    private final String message;
 
     public static ResponseEntity<BaseResponse> toResponseEntity(Response response) {
         if (response.getField() != null) {
@@ -24,8 +23,8 @@ public class BaseResponse {
         }
 
         BaseResponse baseResponse = BaseResponse.builder()
-                .resultCode(response.getHttpStatus().value())
-                .resultMessage(response.getMessage())
+                .status(response.getHttpStatus().value())
+                .message(response.getMessage())
                 .build();
 
         return ResponseEntity.status(response.getHttpStatus()).body(baseResponse);
@@ -33,8 +32,8 @@ public class BaseResponse {
 
     public static ResponseEntity<BaseResponse> toResponseEntity(HttpStatus httpStatus, String message) {
         BaseResponse baseResponse = BaseResponse.builder()
-                .resultCode(httpStatus.value())
-                .resultMessage(message)
+                .status(httpStatus.value())
+                .message(message)
                 .build();
 
         return ResponseEntity.status(httpStatus.value()).body(baseResponse);

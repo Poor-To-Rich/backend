@@ -18,8 +18,8 @@ public class DataResponse extends BaseResponse {
 
         return ResponseEntity.status(response.getHttpStatus())
                 .body(DataResponse.builder()
-                        .resultCode(response.getHttpStatus().value())
-                        .resultMessage(response.getMessage())
+                        .status(response.getHttpStatus().value())
+                        .message(response.getMessage())
                         .data(data)
                         .build());
     }
@@ -31,8 +31,8 @@ public class DataResponse extends BaseResponse {
         
         return ResponseEntity.status(httpStatus)
                 .body(DataResponse.builder()
-                        .resultCode(httpStatus.value())
-                        .resultMessage(message)
+                        .status(httpStatus.value())
+                        .message(message)
                         .data(data)
                         .build());
     }
