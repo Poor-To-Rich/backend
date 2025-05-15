@@ -185,7 +185,7 @@ public class AuthControllerTest extends BaseSecurityTest {
         String username = "testUser";
 
         // JWT 관련 Mock 설정
-        given(cookieManager.extractAccessTokenFromCookies(any(HttpServletRequest.class)))
+        given(cookieManager.extractAccessTokenFromHeader(any(HttpServletRequest.class)))
                 .willReturn(Optional.of(fakeJwt));
 
         given(tokenValidator.isTokenExpired(fakeJwt))

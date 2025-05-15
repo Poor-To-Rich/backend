@@ -1,19 +1,22 @@
 package com.poortorich.user.util;
 
-import com.poortorich.user.fixture.UserRegistrationFixture;
+import com.poortorich.s3.util.S3TestFileGenerator;
+import com.poortorich.user.fixture.UserFixture;
 import com.poortorich.user.request.UserRegistrationRequest;
+import org.springframework.web.multipart.MultipartFile;
 
 public class UserRegistrationRequestTestBuilder {
 
-    private String name = UserRegistrationFixture.VALID_NAME;
-    private String nickname = UserRegistrationFixture.VALID_NICKNAME;
-    private String username = UserRegistrationFixture.VALID_USERNAME;
-    private String password = UserRegistrationFixture.VALID_PASSWORD;
-    private String passwordConfirm = UserRegistrationFixture.VALID_PASSWORD;
-    private String birth = UserRegistrationFixture.VALID_BIRTH;
-    private String email = UserRegistrationFixture.VALID_EMAIL;
-    private String gender = UserRegistrationFixture.VALID_MALE;
-    private String job = UserRegistrationFixture.VALID_JOB;
+    private String name = UserFixture.VALID_NAME_SAMPLE_1;
+    private String nickname = UserFixture.VALID_NICKNAME_SAMPLE_1;
+    private String username = UserFixture.VALID_USERNAME_SAMPLE_1;
+    private String password = UserFixture.VALID_PASSWORD_SAMPLE_1;
+    private String passwordConfirm = UserFixture.VALID_PASSWORD_SAMPLE_1;
+    private String birth = UserFixture.VALID_BIRTH_SAMPLE_1;
+    private String email = UserFixture.VALID_EMAIL;
+    private String gender = UserFixture.VALID_MALE;
+    private String job = UserFixture.VALID_JOB_SAMPLE_1;
+    private MultipartFile profileImage = S3TestFileGenerator.createJpegFile();
 
     public UserRegistrationRequestTestBuilder name(String name) {
         this.name = name;
@@ -60,6 +63,11 @@ public class UserRegistrationRequestTestBuilder {
         return this;
     }
 
+    public UserRegistrationRequestTestBuilder profileImage(MultipartFile profileImage) {
+        this.profileImage = profileImage;
+        return this;
+    }
+
     public UserRegistrationRequest build() {
         return new UserRegistrationRequest(
                 name,
@@ -70,7 +78,8 @@ public class UserRegistrationRequestTestBuilder {
                 birth,
                 email,
                 gender,
-                job
+                job,
+                profileImage
         );
     }
 }

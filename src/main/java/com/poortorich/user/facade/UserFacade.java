@@ -3,8 +3,12 @@ package com.poortorich.user.facade;
 import com.poortorich.global.response.Response;
 import com.poortorich.s3.service.FileUploadService;
 import com.poortorich.user.request.NicknameCheckRequest;
+import com.poortorich.user.request.PasswordUpdateRequest;
+import com.poortorich.user.request.ProfileUpdateRequest;
 import com.poortorich.user.request.UserRegistrationRequest;
 import com.poortorich.user.request.UsernameCheckRequest;
+import com.poortorich.user.response.UserDetailResponse;
+import com.poortorich.user.response.UserEmailResponse;
 import com.poortorich.user.response.enums.UserResponse;
 import com.poortorich.user.service.RedisUserReservationService;
 import com.poortorich.user.service.UserService;
@@ -12,7 +16,6 @@ import com.poortorich.user.service.UserValidationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
@@ -24,15 +27,12 @@ public class UserFacade {
     private final RedisUserReservationService userReservationService;
 
     @Transactional
-    public void registerNewUser(
-            UserRegistrationRequest userRegistrationRequest,
-            MultipartFile profileImage
-    ) {
+    public void registerNewUser(UserRegistrationRequest userRegistrationRequest) {
         userValidationService.validateRegistration(userRegistrationRequest);
         userReservationService.removeUsernameReservation(userRegistrationRequest.getUsername());
         userReservationService.removeNicknameReservation(userRegistrationRequest.getNickname());
-        
-        String profileImageUrl = fileUploadService.uploadImage(profileImage);
+
+        String profileImageUrl = fileUploadService.uploadImage(userRegistrationRequest.getProfileImage());
         userService.save(userRegistrationRequest, profileImageUrl);
     }
 
@@ -46,5 +46,32 @@ public class UserFacade {
         userValidationService.validateCheckNickname(nicknameCheckRequest.getNickname());
         userReservationService.reservedNickname(nicknameCheckRequest.getNickname());
         return UserResponse.NICKNAME_AVAILABLE;
+    }
+
+    public UserDetailResponse getUserDetails(String username) {
+        return userService.findUserDetailByUsername(username);
+    }
+
+    @Transactional
+    public Response updateUserProfile(String username, ProfileUpdateRequest userProfile) {
+        userValidationService.validateUpdateUserProfile(username, userProfile);
+        String newProfileImage = fileUploadService.updateImage(
+                userService.findProfileImageByUsername(username),
+                userProfile.getProfileImage(),
+                userProfile.getIsDefaultProfile());
+
+        userService.update(username, userProfile, newProfileImage);
+        return UserResponse.USER_PROFILE_UPDATE_SUCCESS;
+    }
+
+    public UserEmailResponse getUserEmail(String username) {
+        return userService.getUserEmail(username);
+    }
+
+    @Transactional
+    public Response updateUserPassword(String username, PasswordUpdateRequest passwordUpdateRequest) {
+        userValidationService.validateUpdateUserPassword(username, passwordUpdateRequest);
+        userService.updatePassword(username, passwordUpdateRequest.getNewPassword());
+        return UserResponse.PASSWORD_UPDATE_SUCCESS;
     }
 }

@@ -1,10 +1,12 @@
 package com.poortorich.user.service;
 
-import com.poortorich.email.enums.EmailResponse;
+import com.poortorich.email.response.enums.EmailResponse;
 import com.poortorich.email.util.EmailVerificationPolicyManager;
 import com.poortorich.global.exceptions.BadRequestException;
 import com.poortorich.global.exceptions.ConflictException;
 import com.poortorich.global.exceptions.ForbiddenException;
+import com.poortorich.user.request.PasswordUpdateRequest;
+import com.poortorich.user.request.ProfileUpdateRequest;
 import com.poortorich.user.request.UserRegistrationRequest;
 import com.poortorich.user.response.enums.UserResponse;
 import com.poortorich.user.validator.UserValidator;
@@ -22,10 +24,12 @@ public class UserValidationService {
     public void validateRegistration(UserRegistrationRequest userRegistrationRequest) {
         userValidator.validateUsernameDuplicate(userRegistrationRequest.getUsername());
         userValidator.validateNicknameDuplicate(userRegistrationRequest.getNickname());
-        userValidator.validatePasswordMatch(
+        if (!userValidator.isPasswordMatch(
                 userRegistrationRequest.getPassword(),
-                userRegistrationRequest.getPasswordConfirm()
-        );
+                userRegistrationRequest.getPasswordConfirm())
+        ) {
+            throw new BadRequestException(UserResponse.PASSWORD_DO_NOT_MATCH);
+        }
         userValidator.validateEmailDuplicate(userRegistrationRequest.getEmail());
         userValidator.validateBirthIsInFuture(userRegistrationRequest.parseBirthday());
 
@@ -37,7 +41,7 @@ public class UserValidationService {
             throw new BadRequestException(UserResponse.NICKNAME_RESERVE_CHECK_REQUIRED);
         }
 
-        if (!emailVerificationPolicyManager.isVerifiedMail(userRegistrationRequest.getEmail())) {
+        if (!emailVerificationPolicyManager.isEmailVerified(userRegistrationRequest.getEmail())) {
             throw new ForbiddenException(EmailResponse.EMAIL_NOT_VERIFIED);
         }
     }
@@ -53,6 +57,26 @@ public class UserValidationService {
         userValidator.validateNicknameDuplicate(nickname);
         if (userReservationService.existsByNickname(nickname)) {
             throw new ConflictException(UserResponse.NICKNAME_DUPLICATE);
+        }
+    }
+
+    public void validateUpdateUserProfile(String username, ProfileUpdateRequest userProfile) {
+        if (userValidator.isNicknameChanged(username, userProfile.getNickname())) {
+            userValidator.validateNicknameDuplicate(userProfile.getNickname());
+
+            if (!userReservationService.existsByNickname(userProfile.getNickname())) {
+                throw new BadRequestException(UserResponse.NICKNAME_RESERVE_CHECK_REQUIRED);
+            }
+        }
+    }
+
+    public void validateUpdateUserPassword(String username, PasswordUpdateRequest passwordUpdateRequest) {
+        userValidator.validatePassword(username, passwordUpdateRequest.getCurrentPassword());
+        if (!userValidator.isPasswordMatch(
+                passwordUpdateRequest.getNewPassword(),
+                passwordUpdateRequest.getConfirmNewPassword())
+        ) {
+            throw new BadRequestException(UserResponse.NEW_PASSWORD_DO_NOT_MATCH);
         }
     }
 }

@@ -2,7 +2,7 @@ package com.poortorich.user.request;
 
 import com.poortorich.global.testcases.TestCase;
 import com.poortorich.global.util.RequestValidTestHelper;
-import com.poortorich.user.fixture.enums.UsernameValidationCase;
+import com.poortorich.user.validator.enums.UsernameValidationCase;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;

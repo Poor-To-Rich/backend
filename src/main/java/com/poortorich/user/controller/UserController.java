@@ -1,9 +1,13 @@
 package com.poortorich.user.controller;
 
 import com.poortorich.global.response.BaseResponse;
+import com.poortorich.global.response.DataResponse;
+import com.poortorich.global.response.Response;
 import com.poortorich.user.constants.UserResponseMessages;
 import com.poortorich.user.facade.UserFacade;
 import com.poortorich.user.request.NicknameCheckRequest;
+import com.poortorich.user.request.PasswordUpdateRequest;
+import com.poortorich.user.request.ProfileUpdateRequest;
 import com.poortorich.user.request.UserRegistrationRequest;
 import com.poortorich.user.request.UsernameCheckRequest;
 import com.poortorich.user.response.enums.UserResponse;
@@ -12,12 +16,14 @@ import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequiredArgsConstructor
@@ -28,16 +34,11 @@ public class UserController {
 
     @PostMapping(value = "/register", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<BaseResponse> registerUser(
-            @RequestPart("userRegistrationRequest")
             @Valid
             @NotNull(message = UserResponseMessages.REGISTRATION_REQUEST_REQUIRED)
-            UserRegistrationRequest userRegistrationRequest,
-
-            @RequestPart("profileImage")
-            @NotNull(message = UserResponseMessages.PROFILE_IMAGE_REQUIRED)
-            MultipartFile profileImage
+            UserRegistrationRequest userRegistrationRequest
     ) {
-        userFacade.registerNewUser(userRegistrationRequest, profileImage);
+        userFacade.registerNewUser(userRegistrationRequest);
         return BaseResponse.toResponseEntity(UserResponse.REGISTRATION_SUCCESS);
     }
 
@@ -49,5 +50,38 @@ public class UserController {
     @PostMapping("/exists/nickname")
     public ResponseEntity<BaseResponse> checkNickname(@RequestBody @Valid NicknameCheckRequest nicknameCheckRequest) {
         return BaseResponse.toResponseEntity(userFacade.checkNicknameAndReservation(nicknameCheckRequest));
+    }
+
+    @GetMapping("/detail")
+    public ResponseEntity<BaseResponse> getUserDetails(@AuthenticationPrincipal UserDetails userDetails) {
+        return DataResponse.toResponseEntity(
+                UserResponse.USER_DETAIL_FIND_SUCCESS,
+                userFacade.getUserDetails(userDetails.getUsername())
+        );
+    }
+
+    @PutMapping(value = "/update", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<BaseResponse> updateUserProfile(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @Valid ProfileUpdateRequest userProfile
+    ) {
+        return BaseResponse.toResponseEntity(userFacade.updateUserProfile(userDetails.getUsername(), userProfile));
+    }
+
+    @GetMapping("/email")
+    public ResponseEntity<BaseResponse> getUserEmail(@AuthenticationPrincipal UserDetails userDetails) {
+        return DataResponse.toResponseEntity(
+                UserResponse.USER_EMAIL_FIND_SUCCESS,
+                userFacade.getUserEmail(userDetails.getUsername())
+        );
+    }
+
+    @PutMapping("/password")
+    public ResponseEntity<BaseResponse> updateUserPassword(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @RequestBody @Valid PasswordUpdateRequest passwordUpdateRequest
+    ) {
+        Response response = userFacade.updateUserPassword(userDetails.getUsername(), passwordUpdateRequest);
+        return BaseResponse.toResponseEntity(response);
     }
 }

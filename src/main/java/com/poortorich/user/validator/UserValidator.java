@@ -2,10 +2,13 @@ package com.poortorich.user.validator;
 
 import com.poortorich.global.exceptions.BadRequestException;
 import com.poortorich.global.exceptions.ConflictException;
+import com.poortorich.global.exceptions.NotFoundException;
 import com.poortorich.user.repository.UserRepository;
 import com.poortorich.user.response.enums.UserResponse;
 import java.time.LocalDate;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -13,6 +16,7 @@ import org.springframework.stereotype.Component;
 public class UserValidator {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     public void validateUsernameDuplicate(String username) {
         if (userRepository.existsByUsername(username)) {
@@ -22,7 +26,7 @@ public class UserValidator {
 
     public void validateEmailDuplicate(String email) {
         if (userRepository.existsByEmail(email)) {
-            throw new ConflictException((UserResponse.EMAIL_DUPLICATE));
+            throw new ConflictException(UserResponse.EMAIL_DUPLICATE);
         }
     }
 
@@ -32,15 +36,31 @@ public class UserValidator {
         }
     }
 
-    public void validatePasswordMatch(String password, String passwordConfirm) {
-        if (!password.equals(passwordConfirm)) {
-            throw new BadRequestException(UserResponse.PASSWORD_DO_NOT_MATCH);
-        }
+    public boolean isPasswordMatch(String password, String passwordConfirm) {
+        return password.equals(passwordConfirm);
     }
 
     public void validateBirthIsInFuture(LocalDate birthday) {
         if (birthday.isAfter(LocalDate.now())) {
             throw new BadRequestException(UserResponse.BIRTHDAY_IN_FUTURE);
+        }
+    }
+
+    public boolean isNicknameChanged(String username, String nickname) {
+        String currentNickname = userRepository.findByUsername(username)
+                .orElseThrow(() -> new NotFoundException(UserResponse.USER_NOT_FOUND))
+                .getNickname();
+
+        return !Objects.equals(currentNickname, nickname);
+    }
+
+    public void validatePassword(String username, String password) {
+        String userPassword = userRepository.findByUsername(username)
+                .orElseThrow(() -> new NotFoundException(UserResponse.USER_NOT_FOUND))
+                .getPassword();
+
+        if (!passwordEncoder.matches(password, userPassword)) {
+            throw new BadRequestException(UserResponse.CURRENT_PASSWORD_IS_WRONG);
         }
     }
 }

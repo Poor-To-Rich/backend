@@ -1,7 +1,9 @@
 package com.poortorich.global.exceptions;
 
 import com.poortorich.global.response.Response;
+import lombok.Getter;
 
+@Getter
 public class ForbiddenException extends RuntimeException {
 
     private final Response response;

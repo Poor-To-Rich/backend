@@ -4,6 +4,7 @@ import com.poortorich.expense.response.ExpenseResponse;
 import com.poortorich.global.exceptions.BadRequestException;
 import lombok.RequiredArgsConstructor;
 
+import java.util.Arrays;
 import java.util.Objects;
 
 @RequiredArgsConstructor
@@ -15,6 +16,7 @@ public enum IterationType {
     MONTHLY("monthly"),
     YEARLY("yearly"),
     WEEKDAY("weekday"),
+    END_OF_MONTH("endOfMonth"),
     CUSTOM("custom");
 
     public final String type;
@@ -24,12 +26,14 @@ public enum IterationType {
             return DEFAULT;
         }
 
-        for (IterationType iteration : IterationType.values()) {
-            if (Objects.equals(iteration.type, type)) {
-                return iteration;
-            }
-        }
+        return Arrays.stream(IterationType.values())
+                .filter(iteration -> Objects.equals(iteration.type, type))
+                .findFirst()
+                .orElseThrow(() -> new BadRequestException(ExpenseResponse.ITERATION_TYPE_INVALID));
+    }
 
-        throw new BadRequestException(ExpenseResponse.ITERATION_TYPE_INVALID);
+    @Override
+    public String toString() {
+        return type;
     }
 }

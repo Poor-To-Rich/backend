@@ -1,17 +1,33 @@
 package com.poortorich.user.facade;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.poortorich.global.response.Response;
+import com.poortorich.s3.constants.S3TestConfig;
 import com.poortorich.s3.service.FileUploadService;
-import com.poortorich.s3.util.S3TestFileGenerator;
-import com.poortorich.user.fixture.UserRegistrationFixture;
+import com.poortorich.user.entity.User;
+import com.poortorich.user.fixture.UserFixture;
 import com.poortorich.user.request.NicknameCheckRequest;
+import com.poortorich.user.request.PasswordUpdateRequest;
+import com.poortorich.user.request.ProfileUpdateRequest;
 import com.poortorich.user.request.UserRegistrationRequest;
 import com.poortorich.user.request.UsernameCheckRequest;
+import com.poortorich.user.response.UserDetailResponse;
+import com.poortorich.user.response.UserEmailResponse;
+import com.poortorich.user.response.enums.UserResponse;
 import com.poortorich.user.service.RedisUserReservationService;
 import com.poortorich.user.service.UserService;
 import com.poortorich.user.service.UserValidationService;
+import com.poortorich.user.util.PasswordUpdateRequestTestBuilder;
+import com.poortorich.user.util.ProfileUpdateRequestTestBuilder;
 import com.poortorich.user.util.UserRegistrationRequestTestBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -51,17 +67,16 @@ public class UserFacadeTest {
     @DisplayName("Facade에서 회원가입 시 서비스들이 적절히 호출되는지 검증")
     void registerNewUser_shouldCallServiceMethods() {
         UserRegistrationRequest request = userRegistrationBuilder.build();
-        MultipartFile profileImage = S3TestFileGenerator.createJpegFile();
-        String profileImageUrl = UserRegistrationFixture.TEST_PROFILE_IMAGE_URL;
+        String profileImageUrl = UserFixture.TEST_PROFILE_IMAGE_URL;
 
-        when(fileUploadService.uploadImage(profileImage)).thenReturn(profileImageUrl);
+        when(fileUploadService.uploadImage(request.getProfileImage())).thenReturn(profileImageUrl);
 
-        userFacade.registerNewUser(request, profileImage);
+        userFacade.registerNewUser(request);
 
         verify(userValidationService).validateRegistration(request);
         verify(userReservationService).removeUsernameReservation(request.getUsername());
         verify(userReservationService).removeNicknameReservation(request.getNickname());
-        verify(fileUploadService).uploadImage(profileImage);
+        verify(fileUploadService).uploadImage(request.getProfileImage());
         verify(userService).save(request, profileImageUrl);
     }
 
@@ -85,5 +100,104 @@ public class UserFacadeTest {
 
         verify(userValidationService).validateCheckNickname(nicknameCheckRequest.getNickname());
         verify(userReservationService).reservedNickname(nicknameCheckRequest.getNickname());
+    }
+
+    @Test
+    @DisplayName("Facade에서 회원 상세 조회 시 서비스들이 적절히 호출되는지 검증")
+    void getUserDetails_shouldCallServiceMethods() {
+        User mockUser = UserFixture.createDefaultUser();
+        UserDetailResponse userDetails = UserDetailResponse.builder()
+                .profileImage(mockUser.getProfileImage())
+                .name(mockUser.getName())
+                .nickname(mockUser.getNickname())
+                .gender(mockUser.getGender().toString())
+                .birth(mockUser.getBirth().toString())
+                .job(mockUser.getJob())
+                .build();
+
+        when(userService.findUserDetailByUsername(UserFixture.VALID_USERNAME_SAMPLE_1)).thenReturn(userDetails);
+
+        userFacade.getUserDetails(UserFixture.VALID_USERNAME_SAMPLE_1);
+
+        verify(userService).findUserDetailByUsername(UserFixture.VALID_USERNAME_SAMPLE_1);
+    }
+
+    @Test
+    @DisplayName("Facade에서 회원 프로필 편집 시 서비스들이 적절히 호출되는지 검증")
+    void updateUserProfile_shouldCallServiceMethods() {
+        ProfileUpdateRequest newProfile = ProfileUpdateRequestTestBuilder.builder().build();
+
+        doNothing()
+                .when(userValidationService)
+                .validateUpdateUserProfile(eq(UserFixture.VALID_USERNAME_SAMPLE_1), eq(newProfile));
+
+        when(userService.findProfileImageByUsername(eq(UserFixture.VALID_USERNAME_SAMPLE_1)))
+                .thenReturn(S3TestConfig.FILE_URL_SAMPLE_1);
+
+        when(fileUploadService.updateImage(
+                anyString(),
+                any(MultipartFile.class),
+                anyBoolean()))
+                .thenReturn(S3TestConfig.FILE_URL_SAMPLE_2);
+
+        doNothing().when(userService).update(anyString(), any(ProfileUpdateRequest.class), anyString());
+
+        Response result = userFacade.updateUserProfile(UserFixture.VALID_USERNAME_SAMPLE_1, newProfile);
+
+        assertThat(result).isEqualTo(UserResponse.USER_PROFILE_UPDATE_SUCCESS);
+
+        verify(userValidationService, times(1))
+                .validateUpdateUserProfile(eq(UserFixture.VALID_USERNAME_SAMPLE_1), eq(newProfile));
+
+        verify(userService, times(1))
+                .findProfileImageByUsername(eq(UserFixture.VALID_USERNAME_SAMPLE_1));
+
+        verify(fileUploadService, times(1))
+                .updateImage(
+                        eq(S3TestConfig.FILE_URL_SAMPLE_1),
+                        eq(newProfile.getProfileImage()),
+                        eq(newProfile.getIsDefaultProfile())
+                );
+
+        verify(userService, times(1))
+                .update(
+                        eq(UserFixture.VALID_USERNAME_SAMPLE_1),
+                        eq(newProfile),
+                        eq(S3TestConfig.FILE_URL_SAMPLE_2)
+                );
+    }
+
+    @Test
+    @DisplayName("이메일 조회 요청시 서비스들이 적절히 호출되는지 확인")
+    void getUserEmail_shouldCallServiceMethods() {
+        User mockUser = UserFixture.createDefaultUser();
+
+        UserEmailResponse userEmailResponse = UserEmailResponse.builder()
+                .email(mockUser.getEmail())
+                .build();
+
+        when(userService.getUserEmail(anyString())).thenReturn(userEmailResponse);
+
+        userFacade.getUserEmail(mockUser.getUsername());
+
+        verify(userService, times(1)).getUserEmail(anyString());
+    }
+
+    @Test
+    @DisplayName("비밀번호 변경 요청 시 서비스들이 적절히 호출되는지 확인한다.")
+    void updateUserPassword_shouldCallServiceMethods() {
+        String username = UserFixture.VALID_USERNAME_SAMPLE_1;
+        PasswordUpdateRequest passwordUpdateRequest = PasswordUpdateRequestTestBuilder.builder().build();
+
+        doNothing().when(userValidationService)
+                .validateUpdateUserPassword(anyString(), any(PasswordUpdateRequest.class));
+
+        doNothing().when(userService)
+                .updatePassword(username, passwordUpdateRequest.getNewPassword());
+
+        userFacade.updateUserPassword(username, passwordUpdateRequest);
+
+        verify(userValidationService, times(1)).validateUpdateUserPassword(username, passwordUpdateRequest);
+        verify(userService, times(1)).updatePassword(username, passwordUpdateRequest.getNewPassword());
     }
 }

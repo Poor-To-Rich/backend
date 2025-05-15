@@ -43,4 +43,13 @@ public final class S3TestFileGenerator {
                 new byte[S3TestFile.SIX_MB]
         );
     }
+
+    public static MockMultipartFile createEmpty() {
+        return new MockMultipartFile(
+                S3TestFile.FILE_NAME,
+                S3TestFile.EMPTY_FILE_NAME,
+                S3TestFile.JPEG_CONTENT_TYPE,
+                new byte[S3TestFile.ZERO_MB]
+        );
+    }
 }

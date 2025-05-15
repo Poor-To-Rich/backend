@@ -3,6 +3,7 @@ package com.poortorich.expense.constants;
 public class ExpenseResponseMessages {
 
     public static final String DATE_REQUIRED = "날짜는 필수로 입력해야 합니다.";
+    public static final String DATE_INVALID = "날짜 형식이 적절하지 않습니다.";
 
     public static final String CATEGORY_NAME_REQUIRED = "카테고리는 필수로 선택해야 합니다.";
 
@@ -19,7 +20,10 @@ public class ExpenseResponseMessages {
 
     public static final String ITERATION_TYPE_INVALID = "반복 데이터 유형이 적절하지 않습니다.";
 
-    public static final String CREATE_EXPENSE_SUCCESS = "가계부를 성공적으로 등록하였습니다.";
+    public static final String CREATE_EXPENSE_SUCCESS = "지출 가계부를 성공적으로 등록하였습니다.";
+    public static final String GET_EXPENSE_SUCCESS = "지출 가계부를 성공적으로 조회하였습니다.";
+
+    public static final String EXPENSE_NON_EXISTENT = "존재하지 않는 지출입니다.";
 
     private ExpenseResponseMessages() {}
 }
