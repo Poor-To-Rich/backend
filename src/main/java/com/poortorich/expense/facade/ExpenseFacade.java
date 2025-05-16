@@ -65,10 +65,10 @@ public class ExpenseFacade {
         }
 
         if (expenseDeleteRequest.parseIterationAction() != IterationAction.NONE) {
-            Expense targetExpense = expenseService.getExpenseOrThrow(expenseId, username);
+            Expense expenseToDelete = expenseService.getExpenseOrThrow(expenseId, username);
             expenseService.deleteExpenseAll(
                     iterationService.deleteIterationExpenses(
-                            targetExpense,
+                            expenseToDelete,
                             username,
                             expenseDeleteRequest.parseIterationAction())
             );
