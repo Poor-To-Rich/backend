@@ -4,6 +4,7 @@ import com.poortorich.expense.entity.Expense;
 import com.poortorich.expense.entity.enums.IterationType;
 import com.poortorich.expense.request.ExpenseRequest;
 import com.poortorich.expense.request.enums.IterationAction;
+import com.poortorich.expense.response.ExpenseResponse;
 import com.poortorich.global.exceptions.BadRequestException;
 import com.poortorich.global.exceptions.NotFoundException;
 import com.poortorich.iteration.entity.IterationExpenses;
@@ -390,28 +391,41 @@ public class IterationService {
     public List<Expense> deleteIterationExpenses(Expense expenseToDelete, String username, IterationAction iterationAction) {
         User user = findUserByUsername(username);
         IterationExpenses iterationExpense = iterationExpensesRepository.findByGeneratedExpenseAndUser(expenseToDelete, user);
-
         Expense originalExpense = iterationExpense.getOriginalExpense();
         List<IterationExpenses> allIterationExpenses = iterationExpensesRepository.findAllByOriginalExpenseAndUser(originalExpense, user);
-        List<IterationExpenses> deleteIterationExpenses = List.of();
 
-        if (iterationAction == IterationAction.THIS_ONLY) {
-            deleteIterationExpenses = handleThisOnly(originalExpense, expenseToDelete, iterationExpense, allIterationExpenses);
-        }
-
-        if (iterationAction == IterationAction.ALL
-                || (iterationAction == IterationAction.THIS_AND_FUTURE && expenseToDelete.equals(originalExpense))) {
-            deleteIterationExpenses = handleAll(iterationExpense, allIterationExpenses);
-        }
-
-        if (iterationAction == IterationAction.THIS_AND_FUTURE && !expenseToDelete.equals(originalExpense)) {
-            deleteIterationExpenses = handleThisAndFuture(originalExpense, expenseToDelete, user);
-        }
+        List<IterationExpenses> deleteIterationExpenses = resolveIterationExpensesToDelete(
+                iterationAction, originalExpense, expenseToDelete, iterationExpense, allIterationExpenses, user
+        );
 
         iterationExpensesRepository.deleteAll(deleteIterationExpenses);
         return deleteIterationExpenses.stream()
                 .map(IterationExpenses::getGeneratedExpense)
                 .toList();
+    }
+
+    private List<IterationExpenses> resolveIterationExpensesToDelete(
+            IterationAction iterationAction,
+            Expense originalExpense,
+            Expense expenseToDelete,
+            IterationExpenses iterationExpense,
+            List<IterationExpenses> allIterationExpenses,
+            User user
+    ) {
+        if (iterationAction == IterationAction.THIS_ONLY) {
+            return handleThisOnly(originalExpense, expenseToDelete, iterationExpense, allIterationExpenses);
+        }
+
+        if (iterationAction == IterationAction.ALL
+                || (iterationAction == IterationAction.THIS_AND_FUTURE && expenseToDelete.equals(originalExpense))) {
+            return handleAll(iterationExpense, allIterationExpenses);
+        }
+
+        if (iterationAction == IterationAction.THIS_AND_FUTURE && !expenseToDelete.equals(originalExpense)) {
+            return handleThisAndFuture(originalExpense, expenseToDelete, user);
+        }
+
+        throw new BadRequestException(ExpenseResponse.ITERATION_ACTION_INVALID);
     }
 
     private List<IterationExpenses> handleThisOnly(
