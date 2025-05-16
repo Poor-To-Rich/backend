@@ -389,18 +389,19 @@ public class IterationService {
 
     public List<Expense> deleteIterationExpenses(Expense targetExpense, String username, IterationAction iterationAction) {
         User user = findUserByUsername(username);
-        IterationExpenses iterationExpenses = iterationExpensesRepository.findByGeneratedExpenseAndUser(targetExpense, user);
+        IterationExpenses iterationExpense = iterationExpensesRepository.findByGeneratedExpenseAndUser(targetExpense, user);
 
-        Expense originalExpense = iterationExpenses.getOriginalExpense();
+        Expense originalExpense = iterationExpense.getOriginalExpense();
+        List<IterationExpenses> allIterationExpenses = iterationExpensesRepository.findAllByOriginalExpenseAndUser(originalExpense, user);
         List<IterationExpenses> deleteIterationExpenses = List.of();
 
         if (iterationAction == IterationAction.THIS_ONLY) {
-            deleteIterationExpenses = handleThisOnly(originalExpense, targetExpense, iterationExpenses, user);
+            deleteIterationExpenses = handleThisOnly(originalExpense, targetExpense, iterationExpense, allIterationExpenses);
         }
 
         if (iterationAction == IterationAction.ALL
                 || (iterationAction == IterationAction.THIS_AND_FUTURE && targetExpense.equals(originalExpense))) {
-            deleteIterationExpenses = handleAll(originalExpense, iterationExpenses, user);
+            deleteIterationExpenses = handleAll(iterationExpense, allIterationExpenses);
         }
 
         if (iterationAction == IterationAction.THIS_AND_FUTURE && !targetExpense.equals(originalExpense)) {
@@ -413,12 +414,34 @@ public class IterationService {
                 .toList();
     }
 
-    private List<IterationExpenses> handleThisOnly(Expense originalExpense, Expense targetExpense, IterationExpenses iterationExpenses,  User user) {
-        return List.of(iterationExpenses);
+    private List<IterationExpenses> handleThisOnly(
+            Expense originalExpense,
+            Expense targetExpense,
+            IterationExpenses iterationExpense,
+            List<IterationExpenses> allIterationExpenses
+    ) {
+        if (targetExpense.equals(originalExpense) && allIterationExpenses.size() < 2) {
+            return handleAll(iterationExpense, allIterationExpenses);
+        }
+
+        if (targetExpense.equals(originalExpense)) {
+            updateOriginalExpense(allIterationExpenses);
+        }
+
+        return List.of(iterationExpense);
     }
 
-    private List<IterationExpenses> handleAll(Expense originalExpense, IterationExpenses iterationExpenses, User user) {
-        List<IterationExpenses> deleteIterationExpenses = iterationExpensesRepository.findAllByOriginalExpenseAndUser(originalExpense, user);
+    private void updateOriginalExpense(List<IterationExpenses> allIterationExpenses) {
+        Expense newOriginalExpense = allIterationExpenses.get(1).getGeneratedExpense();
+        for (IterationExpenses iterationExpense : allIterationExpenses) {
+            iterationExpense.updateOriginalExpense(newOriginalExpense);
+        }
+    }
+
+    private List<IterationExpenses> handleAll(
+            IterationExpenses iterationExpenses,
+            List<IterationExpenses> deleteIterationExpenses
+    ) {
         IterationInfo iterationInfo = iterationExpenses.getIterationInfo();
         if (iterationInfo != null) {
             iterationInfoRepository.delete(deleteIterationExpenses.getFirst().getIterationInfo());
