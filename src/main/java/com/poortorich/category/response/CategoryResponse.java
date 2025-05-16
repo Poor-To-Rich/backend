@@ -15,6 +15,9 @@ public enum CategoryResponse implements Response {
     GET_CUSTOM_CATEGORY_SUCCESS(HttpStatus.OK, CategoryResponseMessage.GET_CUSTOM_CATEGORY_SUCCESS, null),
     GET_ACTIVE_CATEGORIES_SUCCESS(HttpStatus.OK, CategoryResponseMessage.GET_ACTIVE_CATEGORIES_SUCCESS, null),
 
+    CATEGORY_VISIBILITY_TRUE_SUCCESS(HttpStatus.OK, CategoryResponseMessage.CATEGORY_VISIBILITY_TRUE_SUCCESS, null),
+    CATEGORY_VISIBILITY_FALSE_SUCCESS(HttpStatus.OK, CategoryResponseMessage.CATEGORY_VISIBILITY_FALSE_SUCCESS, null),
+
     CREATE_CATEGORY_SUCCESS(HttpStatus.CREATED, CategoryResponseMessage.CREATE_CATEGORY_SUCCESS, null),
     MODIFY_CATEGORY_SUCCESS(HttpStatus.CREATED, CategoryResponseMessage.MODIFY_CATEGORY_SUCCESS, null),
     DELETE_CATEGORY_SUCCESS(HttpStatus.OK, CategoryResponseMessage.DELETE_CATEGORY_SUCCESS, null),
