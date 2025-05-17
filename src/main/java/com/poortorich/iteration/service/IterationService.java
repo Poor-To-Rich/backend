@@ -6,7 +6,6 @@ import com.poortorich.expense.request.ExpenseRequest;
 import com.poortorich.expense.request.enums.IterationAction;
 import com.poortorich.expense.response.ExpenseResponse;
 import com.poortorich.global.exceptions.BadRequestException;
-import com.poortorich.global.exceptions.NotFoundException;
 import com.poortorich.iteration.entity.IterationExpenses;
 import com.poortorich.iteration.entity.enums.Weekday;
 import com.poortorich.iteration.entity.enums.EndType;
@@ -31,7 +30,6 @@ import com.poortorich.iteration.response.MonthlyOptionInfoResponse;
 import com.poortorich.iteration.util.IterationDateCalculator;
 import com.poortorich.user.entity.User;
 import com.poortorich.user.repository.UserRepository;
-import com.poortorich.user.response.enums.UserResponse;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
@@ -52,8 +50,7 @@ public class IterationService {
 
     public List<Expense> createIterationExpenses(CustomIteration customIteration,
                                                  Expense expense,
-                                                 String username) {
-        User user = findUserByUsername(username);
+                                                 User user) {
         LocalDate startDate = expense.getExpenseDate();
         return getIterationExpenses(
                 customIteration,
@@ -229,8 +226,7 @@ public class IterationService {
     public void createIterationInfo(ExpenseRequest expenseRequest,
                                     Expense originalExpense,
                                     List<Expense> savedIterationExpenses,
-                                    String username) {
-        User user = findUserByUsername(username);
+                                    User user) {
         IterationInfo iterationInfo = null;
         if (expenseRequest.parseIterationType() == IterationType.CUSTOM) {
             iterationInfo = getIterationInfo(expenseRequest.getCustomIteration());
@@ -388,8 +384,7 @@ public class IterationService {
                 .build();
     }
 
-    public List<Expense> deleteIterationExpenses(Expense expenseToDelete, String username, IterationAction iterationAction) {
-        User user = findUserByUsername(username);
+    public List<Expense> deleteIterationExpenses(Expense expenseToDelete, User user, IterationAction iterationAction) {
         IterationExpenses iterationExpense = iterationExpensesRepository.findByGeneratedExpenseAndUser(expenseToDelete, user);
         Expense originalExpense = iterationExpense.getOriginalExpense();
         List<IterationExpenses> allIterationExpenses = iterationExpensesRepository.findAllByOriginalExpenseAndUser(originalExpense, user);
@@ -468,10 +463,5 @@ public class IterationService {
         return iterationExpensesRepository.findAllByOriginalExpenseAndUserAndGeneratedExpenseDateAfterOrEqual(
                 originalExpense, user, targetExpense.getExpenseDate()
         );
-    }
-
-    private User findUserByUsername(String username) {
-        return userRepository.findByUsername(username)
-                .orElseThrow(() -> new NotFoundException(UserResponse.USER_NOT_FOUND));
     }
 }

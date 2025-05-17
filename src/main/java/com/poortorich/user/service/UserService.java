@@ -76,4 +76,9 @@ public class UserService {
                 .orElseThrow(() -> new NotFoundException(UserResponse.USER_NOT_FOUND))
                 .updatePassword(passwordEncoder.encode(newPassword));
     }
+
+    public User findUserByUsername(String username) {
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new NotFoundException(UserResponse.USER_NOT_FOUND));
+    }
 }
