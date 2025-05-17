@@ -16,11 +16,10 @@ import com.poortorich.iteration.response.CustomIterationInfoResponse;
 import com.poortorich.iteration.service.IterationService;
 import com.poortorich.user.entity.User;
 import com.poortorich.user.service.UserService;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor

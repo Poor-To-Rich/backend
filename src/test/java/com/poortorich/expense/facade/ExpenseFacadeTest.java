@@ -1,5 +1,8 @@
 package com.poortorich.expense.facade;
 
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import com.poortorich.category.entity.Category;
 import com.poortorich.category.service.CategoryService;
 import com.poortorich.expense.entity.Expense;
@@ -17,9 +20,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class ExpenseFacadeTest {
