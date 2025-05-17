@@ -2,8 +2,10 @@ package com.poortorich.iteration.service;
 
 import com.poortorich.expense.entity.Expense;
 import com.poortorich.expense.entity.enums.IterationType;
+import com.poortorich.expense.request.ExpenseRequest;
+import com.poortorich.expense.request.enums.IterationAction;
+import com.poortorich.expense.response.ExpenseResponse;
 import com.poortorich.global.exceptions.BadRequestException;
-import com.poortorich.global.exceptions.NotFoundException;
 import com.poortorich.iteration.entity.IterationExpenses;
 import com.poortorich.iteration.entity.enums.Weekday;
 import com.poortorich.iteration.entity.enums.EndType;
@@ -28,7 +30,6 @@ import com.poortorich.iteration.response.MonthlyOptionInfoResponse;
 import com.poortorich.iteration.util.IterationDateCalculator;
 import com.poortorich.user.entity.User;
 import com.poortorich.user.repository.UserRepository;
-import com.poortorich.user.response.enums.UserResponse;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
@@ -49,8 +50,7 @@ public class IterationService {
 
     public List<Expense> createIterationExpenses(CustomIteration customIteration,
                                                  Expense expense,
-                                                 String username) {
-        User user = findUserByUsername(username);
+                                                 User user) {
         LocalDate startDate = expense.getExpenseDate();
         return getIterationExpenses(
                 customIteration,
@@ -223,23 +223,20 @@ public class IterationService {
                 .build();
     }
 
-    public void createIterationInfo(CustomIteration customIteration,
+    public void createIterationInfo(ExpenseRequest expenseRequest,
                                     Expense originalExpense,
                                     List<Expense> savedIterationExpenses,
-                                    String username) {
-        User user = findUserByUsername(username);
-        IterationInfo iterationInfo = getIterationInfo(customIteration);
-        iterationInfoRepository.save(iterationInfo);
+                                    User user) {
+        IterationInfo iterationInfo = null;
+        if (expenseRequest.parseIterationType() == IterationType.CUSTOM) {
+            iterationInfo = getIterationInfo(expenseRequest.getCustomIteration());
+            iterationInfoRepository.save(iterationInfo);
+        }
 
         for (Expense savedExpense : savedIterationExpenses) {
             IterationExpenses iterationExpenses = buildIterationExpenses(originalExpense, savedExpense, iterationInfo, user);
             iterationExpensesRepository.save(iterationExpenses);
         }
-    }
-
-    private User findUserByUsername(String username) {
-        return userRepository.findByUsername(username)
-                .orElseThrow(() -> new NotFoundException(UserResponse.USER_NOT_FOUND));
     }
 
     private IterationInfo getIterationInfo(CustomIteration customIteration) {
@@ -385,5 +382,86 @@ public class IterationService {
         return EndInfoResponse.builder()
                 .type(info.getEndType().toString())
                 .build();
+    }
+
+    public List<Expense> deleteIterationExpenses(Expense expenseToDelete, User user, IterationAction iterationAction) {
+        IterationExpenses iterationExpense = iterationExpensesRepository.findByGeneratedExpenseAndUser(expenseToDelete, user);
+        Expense originalExpense = iterationExpense.getOriginalExpense();
+        List<IterationExpenses> allIterationExpenses = iterationExpensesRepository.findAllByOriginalExpenseAndUser(originalExpense, user);
+
+        List<IterationExpenses> deleteIterationExpenses = resolveIterationExpensesToDelete(
+                iterationAction, originalExpense, expenseToDelete, iterationExpense, allIterationExpenses, user
+        );
+
+        iterationExpensesRepository.deleteAll(deleteIterationExpenses);
+        return deleteIterationExpenses.stream()
+                .map(IterationExpenses::getGeneratedExpense)
+                .toList();
+    }
+
+    private List<IterationExpenses> resolveIterationExpensesToDelete(
+            IterationAction iterationAction,
+            Expense originalExpense,
+            Expense expenseToDelete,
+            IterationExpenses iterationExpense,
+            List<IterationExpenses> allIterationExpenses,
+            User user
+    ) {
+        if (iterationAction == IterationAction.THIS_ONLY) {
+            return handleThisOnly(originalExpense, expenseToDelete, iterationExpense, allIterationExpenses);
+        }
+
+        if (iterationAction == IterationAction.ALL
+                || (iterationAction == IterationAction.THIS_AND_FUTURE && expenseToDelete.equals(originalExpense))) {
+            return handleAll(iterationExpense, allIterationExpenses);
+        }
+
+        if (iterationAction == IterationAction.THIS_AND_FUTURE && !expenseToDelete.equals(originalExpense)) {
+            return handleThisAndFuture(originalExpense, expenseToDelete, user);
+        }
+
+        throw new BadRequestException(ExpenseResponse.ITERATION_ACTION_INVALID);
+    }
+
+    private List<IterationExpenses> handleThisOnly(
+            Expense originalExpense,
+            Expense expenseToDelete,
+            IterationExpenses iterationExpense,
+            List<IterationExpenses> allIterationExpenses
+    ) {
+        if (expenseToDelete.equals(originalExpense) && allIterationExpenses.size() < 2) {
+            return handleAll(iterationExpense, allIterationExpenses);
+        }
+
+        if (expenseToDelete.equals(originalExpense)) {
+            updateOriginalExpense(allIterationExpenses);
+        }
+
+        return List.of(iterationExpense);
+    }
+
+    private void updateOriginalExpense(List<IterationExpenses> allIterationExpenses) {
+        Expense newOriginalExpense = allIterationExpenses.get(1).getGeneratedExpense();
+        for (IterationExpenses iterationExpense : allIterationExpenses) {
+            iterationExpense.updateOriginalExpense(newOriginalExpense);
+        }
+    }
+
+    private List<IterationExpenses> handleAll(
+            IterationExpenses iterationExpenses,
+            List<IterationExpenses> deleteIterationExpenses
+    ) {
+        IterationInfo iterationInfo = iterationExpenses.getIterationInfo();
+        if (iterationInfo != null) {
+            iterationInfoRepository.delete(deleteIterationExpenses.getFirst().getIterationInfo());
+        }
+
+        return deleteIterationExpenses;
+    }
+
+    private List<IterationExpenses> handleThisAndFuture(Expense originalExpense, Expense targetExpense, User user) {
+        return iterationExpensesRepository.findAllByOriginalExpenseAndUserAndGeneratedExpenseDateAfterOrEqual(
+                originalExpense, user, targetExpense.getExpenseDate()
+        );
     }
 }

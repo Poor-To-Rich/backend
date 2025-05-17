@@ -20,8 +20,11 @@ public class ExpenseResponseMessages {
 
     public static final String ITERATION_TYPE_INVALID = "반복 데이터 유형이 적절하지 않습니다.";
 
+    public static final String ITERATION_ACTION_INVALID = "반복 데이터 편집/삭제 유형이 적절하지 않습니다.";
+
     public static final String CREATE_EXPENSE_SUCCESS = "지출 가계부를 성공적으로 등록하였습니다.";
     public static final String GET_EXPENSE_SUCCESS = "지출 가계부를 성공적으로 조회하였습니다.";
+    public static final String DELETE_EXPENSE_SUCCESS = "지출 가계부를 성공적으로 삭제하였습니다.";
 
     public static final String EXPENSE_NON_EXISTENT = "존재하지 않는 지출입니다.";
 

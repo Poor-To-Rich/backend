@@ -1,6 +1,7 @@
 package com.poortorich.expense.controller;
 
 import com.poortorich.expense.facade.ExpenseFacade;
+import com.poortorich.expense.request.ExpenseDeleteRequest;
 import com.poortorich.expense.request.ExpenseRequest;
 import com.poortorich.expense.response.ExpenseResponse;
 import com.poortorich.global.response.BaseResponse;
@@ -10,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -39,5 +41,13 @@ public class ExpenseController {
                 ExpenseResponse.GET_EXPENSE_SUCCESS,
                 expenseFacade.getExpense(expenseId, userDetails.getUsername())
         );
+    }
+
+    @DeleteMapping("/{expenseId}")
+    public ResponseEntity<BaseResponse> deleteExpense(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @PathVariable Long expenseId,
+            @RequestBody @Valid ExpenseDeleteRequest expenseDeleteRequest) {
+        return BaseResponse.toResponseEntity(expenseFacade.deleteExpense(expenseId, expenseDeleteRequest, userDetails.getUsername()));
     }
 }
