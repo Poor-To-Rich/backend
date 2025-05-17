@@ -1,7 +1,5 @@
 package com.poortorich.expense.request.enums;
 
-import com.poortorich.expense.response.ExpenseResponse;
-import com.poortorich.global.exceptions.BadRequestException;
 import lombok.RequiredArgsConstructor;
 
 import java.util.Arrays;
@@ -18,13 +16,9 @@ public enum IterationAction {
     private final String action;
 
     public static IterationAction from(String action) {
-        if (Objects.isNull(action)) {
-            return NONE;
-        }
-
         return Arrays.stream(IterationAction.values())
                 .filter(iterationAction -> Objects.equals(iterationAction.action, action))
                 .findFirst()
-                .orElseThrow(() -> new BadRequestException(ExpenseResponse.ITERATION_ACTION_INVALID));
+                .orElse(NONE);
     }
 }
