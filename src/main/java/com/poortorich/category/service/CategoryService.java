@@ -1,5 +1,7 @@
 package com.poortorich.category.service;
 
+import com.poortorich.category.domain.model.enums.DefaultExpenseCategory;
+import com.poortorich.category.domain.model.enums.DefaultIncomeCategory;
 import com.poortorich.category.entity.Category;
 import com.poortorich.category.entity.enums.CategoryType;
 import com.poortorich.category.repository.CategoryRepository;
@@ -16,10 +18,10 @@ import com.poortorich.global.response.Response;
 import com.poortorich.user.entity.User;
 import com.poortorich.user.service.UserService;
 import jakarta.transaction.Transactional;
+import java.util.Arrays;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -50,7 +52,8 @@ public class CategoryService {
 
     public ActiveCategoriesResponse getActiveCategories(String type, String username) {
         List<String> categories
-                = categoryRepository.findByTypeAndUser(CategoryType.from(type), userService.findUserByUsername(username)).stream()
+                = categoryRepository.findByTypeAndUser(CategoryType.from(type),
+                        userService.findUserByUsername(username)).stream()
                 .filter(Category::getVisibility)
                 .map(Category::getName)
                 .toList();
@@ -61,9 +64,13 @@ public class CategoryService {
     }
 
     @Transactional
-    public Response updateActiveCategory(Long categoryId, CategoryVisibilityRequest visibilityRequest, String username) {
+    public Response updateActiveCategory(
+            Long categoryId,
+            CategoryVisibilityRequest visibilityRequest,
+            String username
+    ) {
         Boolean visibility = visibilityRequest.getVisibility();
-        getCategoryOrThrow(categoryId, findUserByUsername(username)).updateVisibility(visibility);
+        getCategoryOrThrow(categoryId, userService.findUserByUsername(username)).updateVisibility(visibility);
 
         if (visibility) {
             return CategoryResponse.CATEGORY_VISIBILITY_TRUE_SUCCESS;
@@ -80,6 +87,20 @@ public class CategoryService {
 
         categoryRepository.save(buildCategory(customCategory, type, user));
         return CategoryResponse.CREATE_CATEGORY_SUCCESS;
+    }
+
+    public void saveAllDefaultCategories(User user) {
+        categoryRepository.saveAll(
+                Arrays.stream(DefaultExpenseCategory.values())
+                        .map(category -> category.toCategoryEntity(user))
+                        .toList()
+        );
+
+        categoryRepository.saveAll(
+                Arrays.stream(DefaultIncomeCategory.values())
+                        .map(category -> category.toCategoryEntity(user))
+                        .toList()
+        );
     }
 
     private Category buildCategory(CategoryInfoRequest customCategory, CategoryType type, User user) {
@@ -130,4 +151,5 @@ public class CategoryService {
         return categoryRepository.findByNameAndUser(name, user)
                 .orElseThrow(() -> new NotFoundException(CategoryResponse.CATEGORY_NON_EXISTENT));
     }
+
 }
