@@ -1,7 +1,9 @@
 package com.poortorich.user.facade;
 
+import com.poortorich.category.service.CategoryService;
 import com.poortorich.global.response.Response;
 import com.poortorich.s3.service.FileUploadService;
+import com.poortorich.user.entity.User;
 import com.poortorich.user.request.NicknameCheckRequest;
 import com.poortorich.user.request.PasswordUpdateRequest;
 import com.poortorich.user.request.ProfileUpdateRequest;
@@ -26,6 +28,8 @@ public class UserFacade {
     private final FileUploadService fileUploadService;
     private final RedisUserReservationService userReservationService;
 
+    private final CategoryService categoryService;
+
     @Transactional
     public void registerNewUser(UserRegistrationRequest userRegistrationRequest) {
         userValidationService.validateRegistration(userRegistrationRequest);
@@ -33,7 +37,9 @@ public class UserFacade {
         userReservationService.removeNicknameReservation(userRegistrationRequest.getNickname());
 
         String profileImageUrl = fileUploadService.uploadImage(userRegistrationRequest.getProfileImage());
-        userService.save(userRegistrationRequest, profileImageUrl);
+        User user = userService.save(userRegistrationRequest, profileImageUrl);
+
+        categoryService.saveAllDefaultCategories(user);
     }
 
     public Response checkUsernameAndReservation(UsernameCheckRequest usernameCheckRequest) {

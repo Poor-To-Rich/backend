@@ -19,7 +19,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public void save(UserRegistrationRequest userRegistrationRequest, String profileImageUrl) {
+    public User save(UserRegistrationRequest userRegistrationRequest, String profileImageUrl) {
         User user = User.builder()
                 .profileImage(profileImageUrl)
                 .username(userRegistrationRequest.getUsername())
@@ -33,6 +33,8 @@ public class UserService {
                 .build();
 
         userRepository.save(user);
+        
+        return user;
     }
 
     public void update(String username, ProfileUpdateRequest userProfile, String newProfileImage) {
