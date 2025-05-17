@@ -9,6 +9,11 @@ public class CategoryResponseMessage {
     public static final String GET_CUSTOM_CATEGORY_SUCCESS = "사용자화 카테고리를 성공적으로 조회했습니다.";
     public static final String GET_ACTIVE_CATEGORIES_SUCCESS = "활성화된 카테고리 목록을 성공적으로 조회했습니다.";
 
+    public static final String CATEGORY_VISIBILITY_TRUE_SUCCESS = "카테고리를 성공적으로 활성화하였습니다.";
+    public static final String CATEGORY_VISIBILITY_FALSE_SUCCESS = "카테고리를 성공적으로 비활성화하였습니다.";
+
+    public static final String CATEGORY_VISIBILITY_REQUIRED = "카테고리 활성화/비활성화 여부는 필수값입니다.";
+
     public static final String CREATE_CATEGORY_SUCCESS = "카테고리를 성공적으로 등록하였습니다.";
     public static final String MODIFY_CATEGORY_SUCCESS = "카테고리를 성공적으로 편집하였습니다.";
     public static final String DELETE_CATEGORY_SUCCESS = "카테고리를 성공적으로 삭제하였습니다.";

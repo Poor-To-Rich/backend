@@ -4,6 +4,7 @@ import com.poortorich.category.entity.Category;
 import com.poortorich.category.entity.enums.CategoryType;
 import com.poortorich.category.repository.CategoryRepository;
 import com.poortorich.category.request.CategoryInfoRequest;
+import com.poortorich.category.request.CategoryVisibilityRequest;
 import com.poortorich.category.response.ActiveCategoriesResponse;
 import com.poortorich.category.response.CategoryInfoResponse;
 import com.poortorich.category.response.CategoryResponse;
@@ -58,6 +59,17 @@ public class CategoryService {
         return ActiveCategoriesResponse.builder()
                 .activeCategories(categories)
                 .build();
+    }
+
+    @Transactional
+    public Response updateActiveCategory(Long categoryId, CategoryVisibilityRequest visibilityRequest, String username) {
+        Boolean visibility = visibilityRequest.getVisibility();
+        getCategoryOrThrow(categoryId, findUserByUsername(username)).updateVisibility(visibility);
+
+        if (visibility) {
+            return CategoryResponse.CATEGORY_VISIBILITY_TRUE_SUCCESS;
+        }
+        return CategoryResponse.CATEGORY_VISIBILITY_FALSE_SUCCESS;
     }
 
     public Response createCategory(CategoryInfoRequest customCategory, CategoryType type, String username) {
