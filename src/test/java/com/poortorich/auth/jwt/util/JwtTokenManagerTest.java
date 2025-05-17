@@ -38,14 +38,6 @@ public class JwtTokenManagerTest {
     private JwtTokenManager tokenManager;
 
     @Test
-    @DisplayName("헤더에 액세스 토큰 설정 - Authorization 헤더를 올바르게 설정해야 함")
-    void createAccessTokenCookie_ShouldCreateCookieWithCorrectAttributes() {
-        tokenManager.setAccessTokenHeader(response, TEST_ACCESS_TOKEN);
-
-        verify(response).setHeader(JwtConstants.AUTHORIZATION_HEADER, JwtConstants.TOKEN_PREFIX + TEST_ACCESS_TOKEN);
-    }
-
-    @Test
     @DisplayName("리프레시 토큰 쿠키 생성 - 올바른 속성을 가진 쿠키를 생성해야 함")
     void createRefreshCookie_ShouldCreateTokenCookieWithCorrectAttributes() {
         ResponseCookie cookie = tokenManager.createRefreshTokenCookie(TEST_REFRESH_TOKEN);
@@ -124,10 +116,8 @@ public class JwtTokenManagerTest {
 
     @Test
     @DisplayName("인증 쿠키 설정 - 헤더에 액세스 토큰과 쿠키에 리프레시 토큰을 추가해야 함")
-    void setAuthCookie_ShouldAddTwoTokensHeadersToResponse() {
-        tokenManager.setAuthTokens(response, TEST_ACCESS_TOKEN, TEST_REFRESH_TOKEN);
-
-        verify(response).setHeader(JwtConstants.AUTHORIZATION_HEADER, JwtConstants.TOKEN_PREFIX + TEST_ACCESS_TOKEN);
+    void setRefreshToken_ShouldAddTwoTokensHeadersToResponse() {
+        tokenManager.setRefreshTokens(response, TEST_REFRESH_TOKEN);
         verify(response).addHeader(eq(HttpHeaders.SET_COOKIE), anyString());
     }
 

@@ -1,12 +1,15 @@
 package com.poortorich.auth.service;
 
+import com.poortorich.auth.jwt.constants.JwtConstants;
 import com.poortorich.auth.jwt.util.JwtTokenExtractor;
 import com.poortorich.auth.jwt.util.JwtTokenGenerator;
 import com.poortorich.auth.jwt.util.JwtTokenManager;
 import com.poortorich.auth.jwt.validator.JwtTokenValidator;
 import com.poortorich.auth.repository.interfaces.RefreshTokenRepository;
 import com.poortorich.auth.request.LoginRequest;
+import com.poortorich.auth.response.AccessTokenResponse;
 import com.poortorich.auth.response.enums.AuthResponse;
+import com.poortorich.global.exceptions.BadRequestException;
 import com.poortorich.global.exceptions.InternalServerErrorException;
 import com.poortorich.global.exceptions.UnauthorizedException;
 import com.poortorich.global.response.Response;
@@ -39,11 +42,11 @@ public class AuthService {
     private final JwtTokenExtractor tokenExtractor;
     private final JwtTokenManager cookieManager;
 
-    public Response login(LoginRequest loginRequest, HttpServletResponse response) {
+    public AccessTokenResponse login(LoginRequest loginRequest, HttpServletResponse response) {
         UserDetails userDetails = userDetailsService.loadUserByUsername(loginRequest.getUsername());
 
         if (!passwordEncoder.matches(loginRequest.getPassword(), userDetails.getPassword())) {
-            return AuthResponse.CREDENTIALS_INVALID;
+            throw new BadRequestException(AuthResponse.CREDENTIALS_INVALID);
         }
 
         User user = (User) userDetails;
@@ -52,16 +55,19 @@ public class AuthService {
         String refreshToken = tokenGenerator.generateRefreshToken(user);
 
         refreshTokenRepository.save(user.getId(), refreshToken);
-        cookieManager.setAuthTokens(response, accessToken, refreshToken);
+        cookieManager.setRefreshTokens(response, refreshToken);
 
-        return AuthResponse.LOGIN_SUCCESS;
+        return AccessTokenResponse.builder()
+                .accessToken(JwtConstants.TOKEN_PREFIX + accessToken)
+                .build();
     }
 
-    public Response refreshToken(HttpServletRequest request, HttpServletResponse response) {
+    public AccessTokenResponse refreshToken(HttpServletRequest request, HttpServletResponse response) {
         Optional<String> refreshTokenOpt = cookieManager.extractRefreshTokenFromCookies(request);
 
         if (refreshTokenOpt.isEmpty()) {
-            return AuthResponse.TOKEN_INVALID;
+            System.out.println("토큰이 없습니다.");
+            throw new UnauthorizedException(AuthResponse.TOKEN_INVALID);
         }
 
         String refreshToken = refreshTokenOpt.get();
@@ -76,14 +82,16 @@ public class AuthService {
             refreshTokenRepository.deleteByUserIdAndToken(user.getId(), refreshToken);
             refreshTokenRepository.save(user.getId(), newRefreshToken);
 
-            cookieManager.setAuthTokens(response, accessToken, newRefreshToken);
+            cookieManager.setRefreshTokens(response, newRefreshToken);
+
+            return AccessTokenResponse.builder()
+                    .accessToken(JwtConstants.TOKEN_PREFIX + accessToken)
+                    .build();
 
         } catch (DataAccessException e) {
             log.error("Redis 데이터 접근 중 예외 발생 {}", e.getMessage());
             throw new InternalServerErrorException(AuthResponse.REDIS_SERVER_ERROR);
         }
-
-        return AuthResponse.TOKEN_REFRESH_SUCCESS;
     }
 
     public Response logout(HttpServletResponse response) {
