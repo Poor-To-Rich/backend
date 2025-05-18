@@ -151,5 +151,4 @@ public class CategoryService {
         return categoryRepository.findByNameAndUser(name, user)
                 .orElseThrow(() -> new NotFoundException(CategoryResponse.CATEGORY_NON_EXISTENT));
     }
-
 }
