@@ -1,6 +1,5 @@
 package com.poortorich.auth.jwt.util;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.poortorich.auth.jwt.constants.JwtConstants;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -15,8 +14,6 @@ import org.springframework.stereotype.Component;
 @Component
 @AllArgsConstructor
 public class JwtTokenManager {
-
-    private static final ObjectMapper objectMapper = new ObjectMapper();
 
     public ResponseCookie createRefreshTokenCookie(String token) {
         return ResponseCookie.from(JwtConstants.REFRESH_TOKEN_COOKIE_NAME, token)
@@ -48,16 +45,6 @@ public class JwtTokenManager {
 
     public Optional<String> extractRefreshTokenFromCookies(HttpServletRequest request) {
         Cookie[] cookies = request.getCookies();
-        if (cookies == null) {
-            System.out.println("쿠키가 null입니다");
-        } else if (cookies.length == 0) {
-            System.out.println("쿠키가 비어있습니다");
-        } else {
-            System.out.println("쿠키 목록:");
-            for (Cookie cookie : cookies) {
-                System.out.println(cookie.getName() + ": " + cookie.getValue());
-            }
-        }
         if (cookies != null) {
             return extractTokenFromCookies(cookies, JwtConstants.REFRESH_TOKEN_COOKIE_NAME);
         }
