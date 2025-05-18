@@ -69,7 +69,7 @@ class ExpenseControllerTest extends BaseSecurityTest {
                         .content(requestJson)
                         .with(csrf()))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.resultMessage").value(ExpenseResponse.CREATE_EXPENSE_SUCCESS.getMessage()));
+                .andExpect(jsonPath("$.message").value(ExpenseResponse.CREATE_EXPENSE_SUCCESS.getMessage()));
 
         verify(expenseFacade, times(1)).createExpense(any(ExpenseRequest.class), anyString());
     }

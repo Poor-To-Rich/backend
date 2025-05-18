@@ -3,6 +3,7 @@ package com.poortorich.user.facade;
 import com.poortorich.global.response.Response;
 import com.poortorich.s3.service.FileUploadService;
 import com.poortorich.user.request.NicknameCheckRequest;
+import com.poortorich.user.request.PasswordUpdateRequest;
 import com.poortorich.user.request.ProfileUpdateRequest;
 import com.poortorich.user.request.UserRegistrationRequest;
 import com.poortorich.user.request.UsernameCheckRequest;
@@ -65,5 +66,12 @@ public class UserFacade {
 
     public UserEmailResponse getUserEmail(String username) {
         return userService.getUserEmail(username);
+    }
+
+    @Transactional
+    public Response updateUserPassword(String username, PasswordUpdateRequest passwordUpdateRequest) {
+        userValidationService.validateUpdateUserPassword(username, passwordUpdateRequest);
+        userService.updatePassword(username, passwordUpdateRequest.getNewPassword());
+        return UserResponse.PASSWORD_UPDATE_SUCCESS;
     }
 }

@@ -8,8 +8,6 @@ import com.poortorich.expense.response.ExpenseInfoResponse;
 import com.poortorich.global.exceptions.NotFoundException;
 import com.poortorich.iteration.response.CustomIterationInfoResponse;
 import com.poortorich.user.entity.User;
-import com.poortorich.user.repository.UserRepository;
-import com.poortorich.user.response.enums.UserResponse;
 import com.poortorich.expense.response.ExpenseResponse;
 import com.poortorich.iteration.entity.IterationExpenses;
 import lombok.RequiredArgsConstructor;
@@ -23,10 +21,9 @@ import java.util.List;
 public class ExpenseService {
 
     private final ExpenseRepository expenseRepository;
-    private final UserRepository userRepository;
 
-    public Expense createExpense(ExpenseRequest expenseRequest, Category category, String username) {
-        Expense expense = buildExpense(expenseRequest, category, findUserByUsername(username));
+    public Expense createExpense(ExpenseRequest expenseRequest, Category category, User user) {
+        Expense expense = buildExpense(expenseRequest, category, user);
         expenseRepository.save(expense);
         return expense;
     }
@@ -48,18 +45,13 @@ public class ExpenseService {
                 .build();
     }
 
-    public IterationExpenses getIterationExpenses(Long id, String username) {
-        Expense expense = getExpense(id, username);
+    public IterationExpenses getIterationExpenses(Long id, User user) {
+        Expense expense = getExpenseOrThrow(id, user);
         return expense.getGeneratedIterationExpenses();
     }
 
-    private User findUserByUsername(String username) {
-        return userRepository.findByUsername(username)
-                .orElseThrow(() -> new NotFoundException(UserResponse.USER_NOT_FOUND));
-    }
-
-    public ExpenseInfoResponse getExpenseInfoResponse(Long id, String username, CustomIterationInfoResponse customIteration) {
-        Expense expense = getExpense(id, username);
+    public ExpenseInfoResponse getExpenseInfoResponse(Long id, User user, CustomIterationInfoResponse customIteration) {
+        Expense expense = getExpenseOrThrow(id, user);
         return ExpenseInfoResponse.builder()
                 .date(expense.getExpenseDate())
                 .categoryName(expense.getCategory().getName())
@@ -73,8 +65,8 @@ public class ExpenseService {
     }
 
     @Transient
-    public void modifyExpense(Long id, String username, ExpenseRequest expenseRequest, Category category) {
-        Expense expense = getExpense(id, username);
+    public void modifyExpense(Long id, User user, ExpenseRequest expenseRequest, Category category) {
+        Expense expense = getExpenseOrThrow(id, user);
         expense.updateExpense(
                 expenseRequest.parseDate(),
                 expenseRequest.trimTitle(),
@@ -84,8 +76,17 @@ public class ExpenseService {
                 category);
     }
 
-    private Expense getExpense(Long id, String username) {
-        return expenseRepository.findByIdAndUser(id, findUserByUsername(username))
+    public void deleteExpense(Long expenseId, User user) {
+        Expense expense = getExpenseOrThrow(expenseId, user);
+        expenseRepository.delete(expense);
+    }
+
+    public Expense getExpenseOrThrow(Long id, User user) {
+        return expenseRepository.findByIdAndUser(id, user)
                 .orElseThrow(() -> new NotFoundException(ExpenseResponse.EXPENSE_NON_EXISTENT));
+    }
+
+    public void deleteExpenseAll(List<Expense> deleteExpenses) {
+        expenseRepository.deleteAll(deleteExpenses);
     }
 }

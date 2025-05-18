@@ -9,6 +9,7 @@ import com.poortorich.expense.service.ExpenseService;
 import com.poortorich.expense.util.ExpenseRequestTestBuilder;
 import com.poortorich.iteration.service.IterationService;
 import com.poortorich.user.entity.User;
+import com.poortorich.user.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -28,6 +29,9 @@ class ExpenseFacadeTest {
 
     @Mock
     private CategoryService categoryService;
+
+    @Mock
+    private UserService userService;
 
     @Mock
     private IterationService iterationService;
@@ -55,12 +59,13 @@ class ExpenseFacadeTest {
     @Test
     @DisplayName("Category, Expense 서비스가 적절히 호출된다.")
     void createExpense_shouldCallServiceMethods() {
-        when(categoryService.findCategoryByName(expenseRequest.getCategoryName(), user.getUsername())).thenReturn(category);
-        when(expenseService.createExpense(expenseRequest, category, user.getUsername())).thenReturn(expense);
+        when(userService.findUserByUsername(user.getUsername())).thenReturn(user);
+        when(categoryService.findCategoryByName(expenseRequest.getCategoryName(), user)).thenReturn(category);
+        when(expenseService.createExpense(expenseRequest, category, user)).thenReturn(expense);
 
         expenseFacade.createExpense(expenseRequest, user.getUsername());
-        verify(expenseService).createExpense(expenseRequest, category, user.getUsername());
-        verify(categoryService).findCategoryByName(expenseRequest.getCategoryName(), user.getUsername());
-        verify(iterationService).createIterationExpenses(expenseRequest.getCustomIteration(), expense, user.getUsername());
+        verify(expenseService).createExpense(expenseRequest, category, user);
+        verify(categoryService).findCategoryByName(expenseRequest.getCategoryName(), user);
+        verify(iterationService).createIterationExpenses(expenseRequest.getCustomIteration(), expense, user);
     }
 }

@@ -4,6 +4,7 @@ import com.poortorich.category.entity.Category;
 import com.poortorich.category.entity.enums.CategoryType;
 import com.poortorich.category.repository.CategoryRepository;
 import com.poortorich.category.request.CategoryInfoRequest;
+import com.poortorich.category.request.CategoryVisibilityRequest;
 import com.poortorich.category.response.ActiveCategoriesResponse;
 import com.poortorich.category.response.CategoryInfoResponse;
 import com.poortorich.category.response.CategoryResponse;
@@ -13,8 +14,7 @@ import com.poortorich.global.exceptions.BadRequestException;
 import com.poortorich.global.exceptions.NotFoundException;
 import com.poortorich.global.response.Response;
 import com.poortorich.user.entity.User;
-import com.poortorich.user.repository.UserRepository;
-import com.poortorich.user.response.enums.UserResponse;
+import com.poortorich.user.service.UserService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -26,10 +26,10 @@ import java.util.List;
 public class CategoryService {
 
     private final CategoryRepository categoryRepository;
-    private final UserRepository userRepository;
+    private final UserService userService;
 
     public List<DefaultCategoryResponse> getDefaultCategories(CategoryType type, String username) {
-        return categoryRepository.findByTypeAndUser(type, findUserByUsername(username)).stream()
+        return categoryRepository.findByTypeAndUser(type, userService.findUserByUsername(username)).stream()
                 .map(category -> DefaultCategoryResponse.builder()
                         .name(category.getName())
                         .color(category.getColor())
@@ -39,7 +39,7 @@ public class CategoryService {
     }
 
     public List<CustomCategoryResponse> getCustomCategories(CategoryType type, String username) {
-        return categoryRepository.findByTypeAndUser(type, findUserByUsername(username)).stream()
+        return categoryRepository.findByTypeAndUser(type, userService.findUserByUsername(username)).stream()
                 .map(category -> CustomCategoryResponse.builder()
                         .id(category.getId())
                         .color(category.getColor())
@@ -50,7 +50,7 @@ public class CategoryService {
 
     public ActiveCategoriesResponse getActiveCategories(String type, String username) {
         List<String> categories
-                = categoryRepository.findByTypeAndUser(CategoryType.from(type), findUserByUsername(username)).stream()
+                = categoryRepository.findByTypeAndUser(CategoryType.from(type), userService.findUserByUsername(username)).stream()
                 .filter(Category::getVisibility)
                 .map(Category::getName)
                 .toList();
@@ -60,8 +60,19 @@ public class CategoryService {
                 .build();
     }
 
+    @Transactional
+    public Response updateActiveCategory(Long categoryId, CategoryVisibilityRequest visibilityRequest, String username) {
+        Boolean visibility = visibilityRequest.getVisibility();
+        getCategoryOrThrow(categoryId, findUserByUsername(username)).updateVisibility(visibility);
+
+        if (visibility) {
+            return CategoryResponse.CATEGORY_VISIBILITY_TRUE_SUCCESS;
+        }
+        return CategoryResponse.CATEGORY_VISIBILITY_FALSE_SUCCESS;
+    }
+
     public Response createCategory(CategoryInfoRequest customCategory, CategoryType type, String username) {
-        User user = findUserByUsername(username);
+        User user = userService.findUserByUsername(username);
 
         if (categoryRepository.findByNameAndUser(customCategory.getName(), user).isPresent()) {
             return CategoryResponse.CATEGORY_NAME_DUPLICATE;
@@ -82,7 +93,7 @@ public class CategoryService {
     }
 
     public CategoryInfoResponse getCategory(Long id, String username) {
-        Category category = getCategoryOrThrow(id, findUserByUsername(username));
+        Category category = getCategoryOrThrow(id, userService.findUserByUsername(username));
 
         return CategoryInfoResponse.builder()
                 .name(category.getName())
@@ -92,7 +103,7 @@ public class CategoryService {
 
     @Transactional
     public Response modifyCategory(Long id, CategoryInfoRequest categoryRequest, String username) {
-        User user = findUserByUsername(username);
+        User user = userService.findUserByUsername(username);
 
         categoryRepository.findByNameAndUser(categoryRequest.getName(), user)
                 .orElseThrow(() -> new BadRequestException(CategoryResponse.CATEGORY_NAME_DUPLICATE));
@@ -104,7 +115,7 @@ public class CategoryService {
     }
 
     public Response deleteCategory(Long id, String username) {
-        Category category = getCategoryOrThrow(id, findUserByUsername(username));
+        Category category = getCategoryOrThrow(id, userService.findUserByUsername(username));
         categoryRepository.delete(category);
 
         return CategoryResponse.DELETE_CATEGORY_SUCCESS;
@@ -115,13 +126,8 @@ public class CategoryService {
                 .orElseThrow(() -> new NotFoundException(CategoryResponse.CATEGORY_NON_EXISTENT));
     }
 
-    public Category findCategoryByName(String name, String username) {
-        return categoryRepository.findByNameAndUser(name, findUserByUsername(username))
+    public Category findCategoryByName(String name, User user) {
+        return categoryRepository.findByNameAndUser(name, user)
                 .orElseThrow(() -> new NotFoundException(CategoryResponse.CATEGORY_NON_EXISTENT));
-    }
-
-    private User findUserByUsername(String username) {
-        return userRepository.findByUsername(username)
-                .orElseThrow(() -> new NotFoundException(UserResponse.USER_NOT_FOUND));
     }
 }

@@ -71,4 +71,8 @@ public class Category {
         this.name = name;
         this.color = color;
     }
+
+    public void updateVisibility(Boolean visibility) {
+        this.visibility = visibility;
+    }
 }

@@ -21,13 +21,14 @@ import com.poortorich.user.facade.UserFacade;
 import com.poortorich.user.fixture.UserFixture;
 import com.poortorich.user.fixture.UserRegisterApiFixture;
 import com.poortorich.user.request.NicknameCheckRequest;
+import com.poortorich.user.request.PasswordUpdateRequest;
 import com.poortorich.user.request.ProfileUpdateRequest;
 import com.poortorich.user.request.UserRegistrationRequest;
 import com.poortorich.user.request.UsernameCheckRequest;
 import com.poortorich.user.response.UserDetailResponse;
 import com.poortorich.user.response.UserEmailResponse;
 import com.poortorich.user.response.enums.UserResponse;
-import com.poortorich.user.util.UserRegistrationRequestTestBuilder;
+import com.poortorich.user.util.PasswordUpdateRequestTestBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -86,7 +87,7 @@ class UserControllerTest extends BaseSecurityTest {
                         .with(csrf())
                         .contentType(MediaType.MULTIPART_FORM_DATA_VALUE))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.resultMessage").value(UserResponse.REGISTRATION_SUCCESS.getMessage()));
+                .andExpect(jsonPath("$.message").value(UserResponse.REGISTRATION_SUCCESS.getMessage()));
 
         verify(userFacade, times(1)).registerNewUser(any(UserRegistrationRequest.class));
     }
@@ -111,7 +112,7 @@ class UserControllerTest extends BaseSecurityTest {
                         .with(csrf())
                         .contentType(MediaType.MULTIPART_FORM_DATA_VALUE))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.resultMessage").value(UserResponse.REGISTRATION_SUCCESS.getMessage()));
+                .andExpect(jsonPath("$.message").value(UserResponse.REGISTRATION_SUCCESS.getMessage()));
 
         verify(userFacade, times(1)).registerNewUser(any(UserRegistrationRequest.class));
     }
@@ -128,7 +129,7 @@ class UserControllerTest extends BaseSecurityTest {
                         .content(objectMapper.writeValueAsString(request))
                         .with(csrf()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.resultMessage").value(UserResponse.USERNAME_AVAILABLE.getMessage()));
+                .andExpect(jsonPath("$.message").value(UserResponse.USERNAME_AVAILABLE.getMessage()));
 
         verify(userFacade, times(1)).checkUsernameAndReservation(any(UsernameCheckRequest.class));
     }
@@ -145,7 +146,7 @@ class UserControllerTest extends BaseSecurityTest {
                         .content(objectMapper.writeValueAsString(request))
                         .with(csrf()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.resultMessage").value(UserResponseMessages.NICKNAME_AVAILABLE));
+                .andExpect(jsonPath("$.message").value(UserResponseMessages.NICKNAME_AVAILABLE));
 
         verify(userFacade, times(1)).checkNicknameAndReservation(any(NicknameCheckRequest.class));
     }
@@ -170,8 +171,8 @@ class UserControllerTest extends BaseSecurityTest {
                         .with(SecurityMockMvcRequestPostProcessors.user(mockUser))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.resultCode").value(HttpStatus.OK.value()))
-                .andExpect(jsonPath("$.resultMessage").value(UserResponse.USER_DETAIL_FIND_SUCCESS.getMessage()))
+                .andExpect(jsonPath("$.status").value(HttpStatus.OK.value()))
+                .andExpect(jsonPath("$.message").value(UserResponse.USER_DETAIL_FIND_SUCCESS.getMessage()))
                 .andExpect(jsonPath("$.data.profileImage").value(response.getProfileImage()))
                 .andExpect(jsonPath("$.data.name").value(response.getName()))
                 .andExpect(jsonPath("$.data.nickname").value(response.getNickname()))
@@ -198,8 +199,8 @@ class UserControllerTest extends BaseSecurityTest {
                         .with(SecurityMockMvcRequestPostProcessors.user(UserFixture.createDefaultUser()))
                         .contentType(MediaType.MULTIPART_FORM_DATA_VALUE))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.resultCode").value(HttpStatus.OK.value()))
-                .andExpect(jsonPath("$.resultMessage").value(UserResponseMessages.USER_PROFILE_UPDATE_SUCCESS));
+                .andExpect(jsonPath("$.status").value(HttpStatus.OK.value()))
+                .andExpect(jsonPath("$.message").value(UserResponseMessages.USER_PROFILE_UPDATE_SUCCESS));
 
         verify(userFacade).updateUserProfile(anyString(), any(ProfileUpdateRequest.class));
     }
@@ -221,8 +222,8 @@ class UserControllerTest extends BaseSecurityTest {
                         .with(SecurityMockMvcRequestPostProcessors.user(UserFixture.createDefaultUser()))
                         .contentType(MediaType.MULTIPART_FORM_DATA_VALUE))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.resultCode").value(HttpStatus.OK.value()))
-                .andExpect(jsonPath("$.resultMessage").value(UserResponseMessages.USER_PROFILE_UPDATE_SUCCESS));
+                .andExpect(jsonPath("$.status").value(HttpStatus.OK.value()))
+                .andExpect(jsonPath("$.message").value(UserResponseMessages.USER_PROFILE_UPDATE_SUCCESS));
 
         verify(userFacade).updateUserProfile(anyString(), any(ProfileUpdateRequest.class));
     }
@@ -248,8 +249,8 @@ class UserControllerTest extends BaseSecurityTest {
                             return request;
                         }))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.resultCode").value(HttpStatus.OK.value()))
-                .andExpect(jsonPath("$.resultMessage").value(UserResponseMessages.USER_PROFILE_UPDATE_SUCCESS));
+                .andExpect(jsonPath("$.status").value(HttpStatus.OK.value()))
+                .andExpect(jsonPath("$.message").value(UserResponseMessages.USER_PROFILE_UPDATE_SUCCESS));
 
         verify(userFacade).updateUserProfile(anyString(), any(ProfileUpdateRequest.class));
     }
@@ -268,14 +269,34 @@ class UserControllerTest extends BaseSecurityTest {
         mockMvc.perform(MockMvcRequestBuilders.get("/user/email")
                         .with(SecurityMockMvcRequestPostProcessors.user(mockUser))
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.resultCode").value(HttpStatus.OK.value()))
-                .andExpect(jsonPath("$.resultMessage").value(UserResponseMessages.USER_EMAIL_FIND_SUCCESS))
+                .andExpect(jsonPath("$.status").value(HttpStatus.OK.value()))
+                .andExpect(jsonPath("$.message").value(UserResponseMessages.USER_EMAIL_FIND_SUCCESS))
                 .andExpect(jsonPath("$.data.email").value(mockUser.getEmail()));
 
         verify(userFacade, times(1)).getUserEmail(anyString());
     }
 
-    private String getUserRegistrationRequestJson() throws JsonProcessingException {
-        return objectMapper.writeValueAsString(new UserRegistrationRequestTestBuilder().build());
+    @Test
+    @DisplayName("유효한 데이터로 비밀번호 변경 api 호출 - 성공")
+    @WithMockUser(username = UserFixture.VALID_USERNAME_SAMPLE_1)
+    void updateUserPassword_whenValidInput_thenNoException() throws Exception {
+        User mockUser = UserFixture.createDefaultUser();
+        PasswordUpdateRequest request = PasswordUpdateRequestTestBuilder.builder().build();
+
+        when(userFacade.updateUserPassword(anyString(), any(PasswordUpdateRequest.class)))
+                .thenReturn(UserResponse.PASSWORD_UPDATE_SUCCESS);
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/user/password")
+                        .with(SecurityMockMvcRequestPostProcessors.user(mockUser))
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(getRequestJson(request)))
+                .andExpect(jsonPath("$.status").value(HttpStatus.OK.value()))
+                .andExpect(jsonPath("$.message").value(UserResponseMessages.PASSWORD_UPDATE_SUCCESS));
+
+        verify(userFacade).updateUserPassword(anyString(), any(PasswordUpdateRequest.class));
+    }
+
+    private String getRequestJson(Object request) throws JsonProcessingException {
+        return objectMapper.writeValueAsString(request);
     }
 }

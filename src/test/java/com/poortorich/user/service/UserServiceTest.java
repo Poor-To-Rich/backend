@@ -158,6 +158,22 @@ public class UserServiceTest {
         assertThat(userEmail.getEmail()).isEqualTo(mockUser.getEmail());
 
         verify(userRepository, times(1)).findByUsername(anyString());
+    }
 
+    @Test
+    @DisplayName("회원이 존재할 때 비밀번호를 변경한다.")
+    void updateUserPassword_whenUserExists_thenUpdatePassword() {
+        User mockUser = UserFixture.createDefaultUser();
+        String newPassword = UserFixture.VALID_PASSWORD_SAMPLE_2;
+        String encodedNewPassword = UserFixture.TEST_ENCODED_PASSWORD;
+
+        when(userRepository.findByUsername(anyString())).thenReturn(Optional.of(mockUser));
+        when(passwordEncoder.encode(anyString())).thenReturn(encodedNewPassword);
+
+        userService.updatePassword(mockUser.getUsername(), newPassword);
+
+        assertThat(mockUser.getPassword()).isEqualTo(encodedNewPassword);
+
+        verify(userRepository, times(1)).findByUsername(anyString());
     }
 }

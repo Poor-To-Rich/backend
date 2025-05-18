@@ -111,4 +111,8 @@ public class User implements UserDetails {
                 DateTimeFormatter.ofPattern(UserValidationRules.BIRTHDAY_DATE_FORMAT));
         this.job = userProfile.getJob();
     }
+
+    public void updatePassword(String password) {
+        this.password = password;
+    }
 }

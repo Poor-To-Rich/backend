@@ -8,6 +8,7 @@ import com.poortorich.user.response.enums.UserResponse;
 import java.time.LocalDate;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Component;
 public class UserValidator {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     public void validateUsernameDuplicate(String username) {
         if (userRepository.existsByUsername(username)) {
@@ -34,10 +36,8 @@ public class UserValidator {
         }
     }
 
-    public void validatePasswordMatch(String password, String passwordConfirm) {
-        if (!password.equals(passwordConfirm)) {
-            throw new BadRequestException(UserResponse.PASSWORD_DO_NOT_MATCH);
-        }
+    public boolean isPasswordMatch(String password, String passwordConfirm) {
+        return password.equals(passwordConfirm);
     }
 
     public void validateBirthIsInFuture(LocalDate birthday) {
@@ -50,7 +50,17 @@ public class UserValidator {
         String currentNickname = userRepository.findByUsername(username)
                 .orElseThrow(() -> new NotFoundException(UserResponse.USER_NOT_FOUND))
                 .getNickname();
-        
+
         return !Objects.equals(currentNickname, nickname);
+    }
+
+    public void validatePassword(String username, String password) {
+        String userPassword = userRepository.findByUsername(username)
+                .orElseThrow(() -> new NotFoundException(UserResponse.USER_NOT_FOUND))
+                .getPassword();
+
+        if (!passwordEncoder.matches(password, userPassword)) {
+            throw new BadRequestException(UserResponse.CURRENT_PASSWORD_IS_WRONG);
+        }
     }
 }

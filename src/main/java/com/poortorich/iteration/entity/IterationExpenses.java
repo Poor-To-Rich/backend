@@ -60,4 +60,8 @@ public class IterationExpenses {
     @UpdateTimestamp
     @Column(name = "updatedDate")
     private LocalDateTime updatedDate;
+
+    public void updateOriginalExpense(Expense originalExpense) {
+        this.originalExpense = originalExpense;
+    }
 }
