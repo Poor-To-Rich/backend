@@ -6,7 +6,6 @@ import com.poortorich.user.constants.UserValidationRules;
 import com.poortorich.user.entity.enums.Gender;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import java.time.LocalDate;
@@ -88,7 +87,6 @@ public class UserRegistrationRequest {
     private String job;
 
     @JsonIgnore
-    @NotNull(message = UserResponseMessages.PROFILE_IMAGE_REQUIRED)
     private MultipartFile profileImage;
 
     @JsonIgnore
