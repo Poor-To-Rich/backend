@@ -24,14 +24,12 @@ public enum DefaultExpenseCategory {
     PET_CARE("펫케어", "#E8CEA0"),
     OTHER("기타", "#BDBDBD");
 
-    private static final CategoryType type = CategoryType.DEFAULT_EXPENSE;
-
     private final String name;
     private final String color;
 
     public Category toCategoryEntity(User user) {
         return Category.builder()
-                .type(type)
+                .type(CategoryType.DEFAULT_EXPENSE)
                 .name(name)
                 .color(color)
                 .visibility(Boolean.TRUE)

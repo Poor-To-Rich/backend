@@ -13,14 +13,12 @@ public enum DefaultIncomeCategory {
     BONUS("보너스", "#E5D038"),
     OTHER("기타", "#ADADAD");
 
-    private final static CategoryType type = CategoryType.DEFAULT_INCOME;
-
     private final String name;
     private final String color;
 
     public Category toCategoryEntity(User user) {
         return Category.builder()
-                .type(type)
+                .type(CategoryType.DEFAULT_INCOME)
                 .name(name)
                 .color(color)
                 .visibility(Boolean.TRUE)
