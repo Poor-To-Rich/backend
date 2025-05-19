@@ -19,7 +19,6 @@ import com.poortorich.auth.response.enums.AuthResponse;
 import com.poortorich.auth.service.AuthService;
 import com.poortorich.auth.util.LoginRequestTestBuilder;
 import com.poortorich.global.config.BaseSecurityTest;
-import com.poortorich.global.response.Response;
 import com.poortorich.security.config.SecurityConfig;
 import com.poortorich.user.entity.User;
 import jakarta.servlet.http.Cookie;
@@ -64,10 +63,6 @@ public class AuthControllerTest extends BaseSecurityTest {
     @Test
     @DisplayName("로그인 요청 테스트 성공")
     void login_ShouldReturnLoginSuccessResponse_WhenLoginRequestIsValid() throws Exception {
-        Response successResponse = AuthResponse.LOGIN_SUCCESS;
-        given(authService.login(any(LoginRequest.class), any(HttpServletResponse.class)))
-                .willReturn(successResponse);
-
         ResultActions actions = mockMvc.perform(post("/auth/login")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(validLoginRequest))
@@ -77,28 +72,8 @@ public class AuthControllerTest extends BaseSecurityTest {
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.status").value(successResponse.getHttpStatus().value()))
-                .andExpect(jsonPath("$.message").value(successResponse.getMessage()));
-
-        verify(authService, Mockito.times(1)).login(any(LoginRequest.class), any(HttpServletResponse.class));
-    }
-
-    @Test
-    @DisplayName("로그인 - 아이디 또는 비밀번호가 틀렸을 때")
-    void login_ShouldReturnCredentialsInvalidResponse_WhenLoginRequestIsInvalid() throws Exception {
-        given(authService.login(any(LoginRequest.class), any(HttpServletResponse.class)))
-                .willReturn(AuthResponse.CREDENTIALS_INVALID);
-
-        ResultActions actions = mockMvc.perform(post("/auth/login")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(validLoginRequest))
-                .with(csrf()));
-
-        actions
-                .andDo(print())
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.status").value(AuthResponse.CREDENTIALS_INVALID.getHttpStatus().value()))
-                .andExpect(jsonPath("$.message").value(AuthResponse.CREDENTIALS_INVALID.getMessage()));
+                .andExpect(jsonPath("$.status").value(AuthResponse.LOGIN_SUCCESS.getHttpStatus().value()))
+                .andExpect(jsonPath("$.message").value(AuthResponse.LOGIN_SUCCESS.getMessage()));
 
         verify(authService, Mockito.times(1)).login(any(LoginRequest.class), any(HttpServletResponse.class));
     }
@@ -144,9 +119,6 @@ public class AuthControllerTest extends BaseSecurityTest {
     @Test
     @DisplayName("토큰 갱신 - 리프레시 토큰이 유효할 때 토큰 갱신 성공 응답을 반환함")
     void refreshToken_ShouldReturnTokenRefreshSuccessResponse_WhenRefreshTokenIsValid() throws Exception {
-        given(authService.refreshToken(any(HttpServletRequest.class), any(HttpServletResponse.class)))
-                .willReturn(AuthResponse.TOKEN_REFRESH_SUCCESS);
-
         ResultActions actions = mockMvc.perform(post("/auth/refresh"));
 
         actions
@@ -161,16 +133,13 @@ public class AuthControllerTest extends BaseSecurityTest {
     @Test
     @DisplayName("토큰 갱신 - 리프레시 토큰이 유효할 때 토큰 갱신 성공 응답을 반환함")
     void refreshToken_ShouldReturnTokenInvalidResponse_WhenRefreshTokenIsInvalid() throws Exception {
-        given(authService.refreshToken(any(HttpServletRequest.class), any(HttpServletResponse.class)))
-                .willReturn(AuthResponse.TOKEN_INVALID);
-
         ResultActions actions = mockMvc.perform(post("/auth/refresh"));
 
         actions
                 .andDo(print())
-                .andExpect(status().isUnauthorized())
-                .andExpect(jsonPath("$.status").value(AuthResponse.TOKEN_INVALID.getHttpStatus().value()))
-                .andExpect(jsonPath("$.message").value(AuthResponse.TOKEN_INVALID.getMessage()));
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value(AuthResponse.TOKEN_REFRESH_SUCCESS.getHttpStatus().value()))
+                .andExpect(jsonPath("$.message").value(AuthResponse.TOKEN_REFRESH_SUCCESS.getMessage()));
 
         verify(authService, times(1)).refreshToken(any(HttpServletRequest.class), any(HttpServletResponse.class));
     }

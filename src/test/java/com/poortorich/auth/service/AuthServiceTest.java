@@ -18,6 +18,7 @@ import com.poortorich.auth.repository.interfaces.RefreshTokenRepository;
 import com.poortorich.auth.request.LoginRequest;
 import com.poortorich.auth.response.enums.AuthResponse;
 import com.poortorich.auth.util.LoginRequestTestBuilder;
+import com.poortorich.global.exceptions.BadRequestException;
 import com.poortorich.global.exceptions.InternalServerErrorException;
 import com.poortorich.global.exceptions.UnauthorizedException;
 import com.poortorich.global.response.Response;
@@ -25,6 +26,7 @@ import com.poortorich.user.entity.User;
 import com.poortorich.user.repository.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -101,11 +103,10 @@ public class AuthServiceTest {
         when(tokenGenerator.generateAccessToken(testUser)).thenReturn(accessToken);
         when(tokenGenerator.generateRefreshToken(testUser)).thenReturn(refreshToken);
 
-        Response result = authService.login(loginRequest, response);
+        authService.login(loginRequest, response);
 
-        assertThat(result).isEqualTo(AuthResponse.LOGIN_SUCCESS);
         verify(refreshTokenRepository).save(testUser.getId(), refreshToken);
-        verify(cookieManager).setAuthTokens(response, accessToken, refreshToken);
+        verify(cookieManager).setRefreshTokens(response, refreshToken);
     }
 
     @Test
@@ -114,16 +115,17 @@ public class AuthServiceTest {
         when(userDetailsService.loadUserByUsername(loginRequest.getUsername())).thenReturn(testUser);
         when(passwordEncoder.matches(loginRequest.getPassword(), testUser.getPassword())).thenReturn(false);
 
-        Response result = authService.login(loginRequest, response);
+        assertThatThrownBy(() -> authService.login(loginRequest, response))
+                .isInstanceOf(BadRequestException.class)
+                .hasMessage(AuthResponse.CREDENTIALS_INVALID.getMessage());
 
-        assertThat(result).isEqualTo(AuthResponse.CREDENTIALS_INVALID);
         verifyNoInteractions(tokenGenerator, cookieManager);
         verifyNoInteractions(refreshTokenRepository);
     }
 
     @Test
     @DisplayName("토큰 갱신 성공 - 유효한 리프레시 토큰으로 새로운 토큰을 생성하고 쿠키를 설정해야 함")
-    void refreshToken_ShouldGenerateNewTokensAndSetCookies_WhenRefreshTokenIsValid() {
+    void refreshToken_ShouldGenerateNewTokensAndSetCookies_WhenRefreshTokenIsValid() throws IOException {
         String newAccessToken = "new-access-token";
         String newRefreshToken = "new-refresh-token";
 
@@ -133,13 +135,12 @@ public class AuthServiceTest {
         when(tokenGenerator.generateAccessToken(testUser)).thenReturn(newAccessToken);
         when(tokenGenerator.generateRefreshToken(testUser)).thenReturn(newRefreshToken);
 
-        Response result = authService.refreshToken(request, response);
+        authService.refreshToken(request, response);
 
-        assertThat(result).isEqualTo(AuthResponse.TOKEN_REFRESH_SUCCESS);
         verify(tokenValidator).validateToken(refreshToken);
         verify(refreshTokenRepository).deleteByUserIdAndToken(testUser.getId(), refreshToken);
         verify(refreshTokenRepository).save(testUser.getId(), newRefreshToken);
-        verify(cookieManager).setAuthTokens(response, newAccessToken, newRefreshToken);
+        verify(cookieManager).setRefreshTokens(response, newRefreshToken);
     }
 
     @Test
@@ -147,9 +148,10 @@ public class AuthServiceTest {
     void refreshToken_ShouldReturnTokenInvalid_WhenRefreshTokenIsNotPresent() {
         when(cookieManager.extractRefreshTokenFromCookies(request)).thenReturn(Optional.empty());
 
-        Response result = authService.refreshToken(request, response);
+        assertThatThrownBy(() -> authService.refreshToken(request, response))
+                .isInstanceOf(UnauthorizedException.class)
+                .hasMessage(AuthResponse.TOKEN_INVALID.getMessage());
 
-        assertThat(result).isEqualTo(AuthResponse.TOKEN_INVALID);
         verifyNoInteractions(tokenValidator, tokenGenerator, userRepository);
     }
 
