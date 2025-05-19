@@ -25,10 +25,6 @@ public class JwtTokenManager {
                 .build();
     }
 
-    public void setAccessTokenHeader(HttpServletResponse response, String accessToken) {
-        response.setHeader(JwtConstants.AUTHORIZATION_HEADER, JwtConstants.TOKEN_PREFIX + accessToken);
-    }
-
     private ResponseCookie deleteRefreshTokenCookie() {
         return ResponseCookie.from(JwtConstants.REFRESH_TOKEN_COOKIE_NAME, "")
                 .httpOnly(true)
@@ -52,6 +48,7 @@ public class JwtTokenManager {
         if (cookies != null) {
             return extractTokenFromCookies(cookies, JwtConstants.REFRESH_TOKEN_COOKIE_NAME);
         }
+
         return Optional.empty();
     }
 
@@ -64,9 +61,7 @@ public class JwtTokenManager {
         return Optional.empty();
     }
 
-    public void setAuthTokens(HttpServletResponse response, String accessToken, String refreshToken) {
-        setAccessTokenHeader(response, accessToken);
-
+    public void setRefreshTokens(HttpServletResponse response, String refreshToken) {
         ResponseCookie refreshTokenCookie = createRefreshTokenCookie(refreshToken);
         response.addHeader(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString());
     }
