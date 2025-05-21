@@ -84,12 +84,16 @@ public class Expense {
     @Column(name = "updatedDate")
     private LocalDateTime updatedDate;
 
-    public void updateExpense(LocalDate expenseDate, String title, Long cost, PaymentMethod paymentMethod, String memo, Category category) {
-        this.expenseDate = expenseDate;
+    public void updateExpense(String title, Long cost, PaymentMethod paymentMethod, String memo, IterationType iterationType, Category category) {
         this.title = title;
         this.cost = cost;
         this.paymentMethod = paymentMethod;
         this.memo = memo;
+        this.iterationType = iterationType;
         this.category = category;
+    }
+
+    public void updateExpenseDate(LocalDate expenseDate) {
+        this.expenseDate = expenseDate;
     }
 }

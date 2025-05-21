@@ -52,6 +52,8 @@ public class ExpenseRequest {
 
     private String iterationAction;
 
+    private Boolean isIterationModified;
+
     @Valid
     private CustomIteration customIteration;
 

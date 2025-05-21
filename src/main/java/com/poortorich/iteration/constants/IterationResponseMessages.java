@@ -36,5 +36,7 @@ public class IterationResponseMessages {
 
     public static final String ITERATIONS_TOO_LONG = "반복 횟수가 허용 범위를 초과했습니다.";
 
+    public static final String ITERATION_EXPENSES_NOT_FOUND = "반복 데이터 정보를 찾을 수 없습니다.";
+
     private IterationResponseMessages() {}
 }

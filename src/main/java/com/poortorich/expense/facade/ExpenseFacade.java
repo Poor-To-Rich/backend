@@ -16,6 +16,8 @@ import com.poortorich.iteration.response.CustomIterationInfoResponse;
 import com.poortorich.iteration.service.IterationService;
 import com.poortorich.user.entity.User;
 import com.poortorich.user.service.UserService;
+
+import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -84,8 +86,88 @@ public class ExpenseFacade {
 
     @Transactional
     public ExpenseResponse modifyExpense(String username, Long expenseId, ExpenseRequest expenseRequest) {
-        Category category = categoryService.findCategoryByName(expenseRequest.getCategoryName(), username);
-        expenseService.modifyExpense(expenseId, username, expenseRequest, category);
+        User user = userService.findUserByUsername(username);
+        Category category = categoryService.findCategoryByName(expenseRequest.getCategoryName(), user);
+        Expense expense = expenseService.modifyExpense(expenseId, expenseRequest, category, user);
+
+        IterationAction iterationAction = expenseRequest.parseIterationAction();
+        if (iterationAction == IterationAction.NONE) {
+            modifySingleExpense(expense, expenseRequest, user);
+        }
+
+        if (iterationAction != IterationAction.NONE) {
+            modifyIterationExpenses(expense, expenseRequest, iterationAction, category, user);
+        }
+
         return ExpenseResponse.MODIFY_EXPENSE_SUCCESS;
+    }
+
+    private void modifySingleExpense(Expense expense, ExpenseRequest expenseRequest, User user) {
+        expenseService.modifyExpenseDate(expense, expenseRequest.parseDate());
+
+        if (expenseRequest.getIsIterationModified()) {
+            createIterationExpense(expenseRequest, expense, user);
+        }
+    }
+
+    private void modifyIterationExpenses(
+            Expense expense,
+            ExpenseRequest expenseRequest,
+            IterationAction iterationAction,
+            Category category,
+            User user
+    ) {
+        if (expenseRequest.getIsIterationModified()) {
+            handleModifiedIteration(expense, expenseRequest, iterationAction, category, user);
+            return;
+        }
+
+        handleUnmodifiedIteration(expense, expenseRequest, iterationAction, category, user);
+    }
+
+    private void handleModifiedIteration(
+            Expense expense,
+            ExpenseRequest expenseRequest,
+            IterationAction iterationAction,
+            Category category,
+            User user
+    ) {
+        expenseService.deleteExpenseAll(
+                iterationService.deleteIterationExpenses(expense, user, iterationAction)
+        );
+        Expense newExpense = expenseService.createExpense(expenseRequest, category, user);
+        createIterationExpense(expenseRequest, newExpense, user);
+    }
+
+    private void handleUnmodifiedIteration(
+            Expense expense,
+            ExpenseRequest expenseRequest,
+            IterationAction iterationAction,
+            Category category,
+            User user
+    ) {
+        LocalDate expenseDate = expense.getExpenseDate();
+        LocalDate requestDate = expenseRequest.parseDate();
+
+        if (iterationAction == IterationAction.THIS_ONLY && !expenseDate.equals(requestDate)) {
+            expenseService.modifyExpenseDate(expense, requestDate);
+            return;
+        }
+
+        modifyIterationGeneratedExpenses(expense, expenseRequest, iterationAction, category, user);
+    }
+
+    private void modifyIterationGeneratedExpenses(
+            Expense expense,
+            ExpenseRequest expenseRequest,
+            IterationAction iterationAction,
+            Category category,
+            User user
+    ) {
+        List<IterationExpenses> modifyIterationExpenses
+                = iterationService.getIterationExpensesByIterationAction(expense, user, iterationAction);
+        for (IterationExpenses iterationExpenses : modifyIterationExpenses) {
+            expenseService.modifyExpense(iterationExpenses.getGeneratedExpense(), expenseRequest, category);
+        }
     }
 }
