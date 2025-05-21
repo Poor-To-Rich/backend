@@ -413,26 +413,26 @@ public class IterationService {
     private List<IterationExpenses> resolveIterationExpenses(
             IterationAction iterationAction,
             Expense originalExpense,
-            Expense expenseToModify,
+            Expense expense,
             IterationExpenses iterationExpense,
             List<IterationExpenses> allIterationExpenses,
             User user,
             String type
     ) {
         if (iterationAction == IterationAction.THIS_ONLY) {
-            return handleThisOnly(originalExpense, expenseToModify, iterationExpense, allIterationExpenses);
+            return handleThisOnly(originalExpense, expense, iterationExpense, allIterationExpenses);
         }
 
         if (iterationAction == IterationAction.ALL
-                || (iterationAction == IterationAction.THIS_AND_FUTURE && expenseToModify.equals(originalExpense))) {
+                || (iterationAction == IterationAction.THIS_AND_FUTURE && expense.equals(originalExpense))) {
             if (type.equals(MODIFY_TYPE)) {
                 return allIterationExpenses;
             }
             return handleAll(iterationExpense, allIterationExpenses);
         }
 
-        if (iterationAction == IterationAction.THIS_AND_FUTURE && !expenseToModify.equals(originalExpense)) {
-            return handleThisAndFuture(originalExpense, expenseToModify, user);
+        if (iterationAction == IterationAction.THIS_AND_FUTURE && !expense.equals(originalExpense)) {
+            return handleThisAndFuture(originalExpense, expense, user);
         }
 
         throw new BadRequestException(ExpenseResponse.ITERATION_ACTION_INVALID);
