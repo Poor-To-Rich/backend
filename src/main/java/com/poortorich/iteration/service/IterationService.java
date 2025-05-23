@@ -29,7 +29,6 @@ import com.poortorich.iteration.response.IterationRuleInfoResponse;
 import com.poortorich.iteration.response.MonthlyOptionInfoResponse;
 import com.poortorich.iteration.util.IterationDateCalculator;
 import com.poortorich.user.entity.User;
-import com.poortorich.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
@@ -46,7 +45,9 @@ public class IterationService {
     private final IterationDateCalculator dateCalculator;
     private final IterationExpensesRepository iterationExpensesRepository;
     private final IterationInfoRepository iterationInfoRepository;
-    private final UserRepository userRepository;
+
+    private static final String MODIFY_TYPE = "modify";
+    private static final String DELETE_TYPE = "delete";
 
     public List<Expense> createIterationExpenses(CustomIteration customIteration,
                                                  Expense expense,
@@ -384,13 +385,23 @@ public class IterationService {
                 .build();
     }
 
+    public List<IterationExpenses> getIterationExpensesByIterationAction(Expense expense, User user, IterationAction iterationAction) {
+        IterationExpenses iterationExpense = iterationExpensesRepository.findByGeneratedExpenseAndUser(expense, user);
+        Expense originalExpense = iterationExpense.getOriginalExpense();
+        List<IterationExpenses> allIterationExpenses = iterationExpensesRepository.findAllByOriginalExpenseAndUser(originalExpense, user);
+
+        return resolveIterationExpenses(
+                iterationAction, originalExpense, expense, iterationExpense, allIterationExpenses, user, MODIFY_TYPE
+        );
+    }
+
     public List<Expense> deleteIterationExpenses(Expense expenseToDelete, User user, IterationAction iterationAction) {
         IterationExpenses iterationExpense = iterationExpensesRepository.findByGeneratedExpenseAndUser(expenseToDelete, user);
         Expense originalExpense = iterationExpense.getOriginalExpense();
         List<IterationExpenses> allIterationExpenses = iterationExpensesRepository.findAllByOriginalExpenseAndUser(originalExpense, user);
 
-        List<IterationExpenses> deleteIterationExpenses = resolveIterationExpensesToDelete(
-                iterationAction, originalExpense, expenseToDelete, iterationExpense, allIterationExpenses, user
+        List<IterationExpenses> deleteIterationExpenses = resolveIterationExpenses(
+                iterationAction, originalExpense, expenseToDelete, iterationExpense, allIterationExpenses, user, DELETE_TYPE
         );
 
         iterationExpensesRepository.deleteAll(deleteIterationExpenses);
@@ -399,25 +410,29 @@ public class IterationService {
                 .toList();
     }
 
-    private List<IterationExpenses> resolveIterationExpensesToDelete(
+    private List<IterationExpenses> resolveIterationExpenses(
             IterationAction iterationAction,
             Expense originalExpense,
-            Expense expenseToDelete,
+            Expense expense,
             IterationExpenses iterationExpense,
             List<IterationExpenses> allIterationExpenses,
-            User user
+            User user,
+            String type
     ) {
         if (iterationAction == IterationAction.THIS_ONLY) {
-            return handleThisOnly(originalExpense, expenseToDelete, iterationExpense, allIterationExpenses);
+            return handleThisOnly(originalExpense, expense, iterationExpense, allIterationExpenses);
         }
 
         if (iterationAction == IterationAction.ALL
-                || (iterationAction == IterationAction.THIS_AND_FUTURE && expenseToDelete.equals(originalExpense))) {
+                || (iterationAction == IterationAction.THIS_AND_FUTURE && expense.equals(originalExpense))) {
+            if (type.equals(MODIFY_TYPE)) {
+                return allIterationExpenses;
+            }
             return handleAll(iterationExpense, allIterationExpenses);
         }
 
-        if (iterationAction == IterationAction.THIS_AND_FUTURE && !expenseToDelete.equals(originalExpense)) {
-            return handleThisAndFuture(originalExpense, expenseToDelete, user);
+        if (iterationAction == IterationAction.THIS_AND_FUTURE && !expense.equals(originalExpense)) {
+            return handleThisAndFuture(originalExpense, expense, user);
         }
 
         throw new BadRequestException(ExpenseResponse.ITERATION_ACTION_INVALID);
