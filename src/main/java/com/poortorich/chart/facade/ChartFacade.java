@@ -33,7 +33,7 @@ public class ChartFacade {
         );
 
         Category savingCategory = categoryService.findCategoryByName(
-                DefaultExpenseCategory.SAVINGS_INVESTMENT.name(),
+                DefaultExpenseCategory.SAVINGS_INVESTMENT.getName(),
                 user
         );
 
