@@ -1,6 +1,7 @@
 package com.poortorich.expense.service;
 
 import com.poortorich.category.entity.Category;
+import com.poortorich.category.response.CategoryResponse;
 import com.poortorich.expense.entity.Expense;
 import com.poortorich.expense.repository.ExpenseRepository;
 import com.poortorich.expense.request.ExpenseRequest;
@@ -10,7 +11,9 @@ import com.poortorich.global.exceptions.NotFoundException;
 import com.poortorich.iteration.entity.IterationExpenses;
 import com.poortorich.iteration.response.CustomIterationInfoResponse;
 import com.poortorich.user.entity.User;
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -74,5 +77,10 @@ public class ExpenseService {
 
     public void deleteExpenseAll(List<Expense> deleteExpenses) {
         expenseRepository.deleteAll(deleteExpenses);
+    }
+
+    public List<Expense> getExpensesBetweenDates(User user, LocalDate startDate, LocalDate endDate) {
+        return Optional.of(expenseRepository.findByUserAndExpenseDateBetween(user, startDate, endDate))
+                .orElseThrow(() -> new NotFoundException(CategoryResponse.CATEGORY_NON_EXISTENT));
     }
 }
