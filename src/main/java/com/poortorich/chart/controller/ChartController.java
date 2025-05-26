@@ -4,6 +4,7 @@ import com.poortorich.chart.facade.ChartFacade;
 import com.poortorich.chart.response.ChartResponse;
 import com.poortorich.global.response.BaseResponse;
 import com.poortorich.global.response.DataResponse;
+import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -23,7 +24,7 @@ public class ChartController {
     @GetMapping("/expense/total")
     public ResponseEntity<BaseResponse> getTotalExpenseAmountAndSaving(
             @AuthenticationPrincipal UserDetails userDetails,
-            @RequestParam("date") String date
+            @RequestParam("date") @Nullable String date
     ) {
         return DataResponse.toResponseEntity(
                 ChartResponse.GET_TOTAL_EXPENSE_AND_SAVINGS_SUCCESS,
