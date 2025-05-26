@@ -66,6 +66,8 @@ public class ExpenseRequestTestBuilder {
                 paymentMethod,
                 memo,
                 iterationType,
+                null,
+                null,
                 customIteration
         );
     }
