@@ -5,9 +5,9 @@ import lombok.Data;
 
 @Data
 @Builder
-public class TotalExpenseAndSavingResponse {
+public class TotalAmountAndSavingResponse {
 
     private Long savingCategoryId;
-    private Long totalExpenseAmount;
-    private Long totalSavingAmount;
+    private Long totalAmount;
+    private Long totalSaving;
 }
