@@ -10,6 +10,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.poortorich.category.service.CategoryService;
 import com.poortorich.global.response.Response;
 import com.poortorich.s3.constants.S3TestConfig;
 import com.poortorich.s3.service.FileUploadService;
@@ -53,6 +54,9 @@ public class UserFacadeTest {
     @Mock
     private RedisUserReservationService userReservationService;
 
+    @Mock
+    private CategoryService categoryService;
+
     @InjectMocks
     private UserFacade userFacade;
 
@@ -67,10 +71,11 @@ public class UserFacadeTest {
     @DisplayName("Facade에서 회원가입 시 서비스들이 적절히 호출되는지 검증")
     void registerNewUser_shouldCallServiceMethods() {
         UserRegistrationRequest request = userRegistrationBuilder.build();
+        User mockUser = UserFixture.createDefaultUser();
         String profileImageUrl = UserFixture.TEST_PROFILE_IMAGE_URL;
 
         when(fileUploadService.uploadImage(request.getProfileImage())).thenReturn(profileImageUrl);
-
+        when(userService.save(request, profileImageUrl)).thenReturn(mockUser);
         userFacade.registerNewUser(request);
 
         verify(userValidationService).validateRegistration(request);
@@ -78,6 +83,7 @@ public class UserFacadeTest {
         verify(userReservationService).removeNicknameReservation(request.getNickname());
         verify(fileUploadService).uploadImage(request.getProfileImage());
         verify(userService).save(request, profileImageUrl);
+        verify(categoryService).saveAllDefaultCategories(any(User.class));
     }
 
     @Test
