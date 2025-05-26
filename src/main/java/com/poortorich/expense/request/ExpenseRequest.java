@@ -54,7 +54,7 @@ public class ExpenseRequest {
 
     public LocalDate parseDate() {
         try {
-            return LocalDate.parse(date, DateTimeFormatter.ofPattern(DatePattern.BASIC_PATTERN));
+            return LocalDate.parse(date, DateTimeFormatter.ofPattern(DatePattern.LOCAL_DATE_PATTERN));
         } catch (DateTimeException e) {
             throw new BadRequestException(ExpenseResponse.DATE_INVALID);
         }
