@@ -12,7 +12,7 @@ import lombok.Setter;
 @Setter
 @Builder
 @AllArgsConstructor
-public class MonthInformation {
+public class MonthInformation implements DateInfo {
 
     private final YearMonth yearMonth;
     private final LocalDate startDate;

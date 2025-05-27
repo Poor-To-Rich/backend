@@ -13,7 +13,7 @@ import lombok.Setter;
 @Getter
 @Builder
 @AllArgsConstructor
-public class YearInformation {
+public class YearInformation implements DateInfo {
 
     private final Year year;
     private final LocalDate startDate;
