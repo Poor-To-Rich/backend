@@ -2,10 +2,10 @@ package com.poortorich.income.facade;
 
 import com.poortorich.category.entity.Category;
 import com.poortorich.category.service.CategoryService;
-import com.poortorich.expense.response.ExpenseResponse;
 import com.poortorich.global.response.Response;
 import com.poortorich.income.entity.Income;
 import com.poortorich.income.request.IncomeRequest;
+import com.poortorich.income.response.enums.IncomeResponse;
 import com.poortorich.income.service.IncomeService;
 import com.poortorich.user.entity.User;
 import com.poortorich.user.service.UserService;
@@ -27,6 +27,6 @@ public class IncomeFacade {
         Category category = categoryService.findCategoryByName(incomeRequest.getCategoryName(), user);
         Income income = incomeService.create(incomeRequest, category, user);
 
-        return ExpenseResponse.CREATE_EXPENSE_SUCCESS;
+        return IncomeResponse.CREATE_INCOME_SUCCESS;
     }
 }
