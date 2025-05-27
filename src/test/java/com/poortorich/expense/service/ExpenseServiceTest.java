@@ -51,7 +51,7 @@ public class ExpenseServiceTest {
     @Test
     @DisplayName("유효한 지출 정보가 성공적으로 저장된다.")
     void createValidExpense() {
-        expenseService.createExpense(expenseRequest, category, user);
+        expenseService.create(expenseRequest, category, user);
 
         verify(expenseRepository).save(expenseCaptor.capture());
         Expense savedExpense = expenseCaptor.getValue();
