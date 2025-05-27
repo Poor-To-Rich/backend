@@ -1,6 +1,5 @@
 package com.poortorich.expense.response;
 
-import com.poortorich.accountbook.constants.AccountBookResponseMessages;
 import com.poortorich.expense.constants.ExpenseResponseMessages;
 import com.poortorich.global.response.Response;
 import lombok.AllArgsConstructor;
