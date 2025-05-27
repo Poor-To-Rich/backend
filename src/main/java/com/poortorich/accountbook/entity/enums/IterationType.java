@@ -1,4 +1,4 @@
-package com.poortorich.expense.entity.enums;
+package com.poortorich.accountbook.entity.enums;
 
 import com.poortorich.accountbook.response.AccountBookResponse;
 import com.poortorich.global.exceptions.BadRequestException;
