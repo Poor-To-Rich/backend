@@ -1,7 +1,6 @@
 package com.poortorich.expense.service;
 
 import com.poortorich.category.entity.Category;
-import com.poortorich.category.response.CategoryResponse;
 import com.poortorich.expense.entity.Expense;
 import com.poortorich.expense.repository.ExpenseRepository;
 import com.poortorich.expense.request.ExpenseRequest;
@@ -104,6 +103,6 @@ public class ExpenseService {
 
     public List<Expense> getExpensesBetweenDates(User user, LocalDate startDate, LocalDate endDate) {
         return Optional.of(expenseRepository.findByUserAndExpenseDateBetween(user, startDate, endDate))
-                .orElseThrow(() -> new NotFoundException(CategoryResponse.CATEGORY_NON_EXISTENT));
+                .orElseThrow(() -> new NotFoundException(ExpenseResponse.EXPENSE_NON_EXISTENT));
     }
 }
