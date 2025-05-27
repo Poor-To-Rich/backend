@@ -3,10 +3,10 @@ package com.poortorich.expense.facade;
 import com.poortorich.category.entity.Category;
 import com.poortorich.category.service.CategoryService;
 import com.poortorich.expense.entity.Expense;
-import com.poortorich.expense.entity.enums.IterationType;
+import com.poortorich.accountbook.entity.enums.IterationType;
 import com.poortorich.expense.request.ExpenseDeleteRequest;
 import com.poortorich.expense.request.ExpenseRequest;
-import com.poortorich.expense.request.enums.IterationAction;
+import com.poortorich.accountbook.request.enums.IterationAction;
 import com.poortorich.expense.response.ExpenseInfoResponse;
 import com.poortorich.expense.response.ExpenseResponse;
 import com.poortorich.expense.service.ExpenseService;
@@ -36,7 +36,7 @@ public class ExpenseFacade {
     public Response createExpense(ExpenseRequest expenseRequest, String username) {
         User user = userService.findUserByUsername(username);
         Category category = categoryService.findCategoryByName(expenseRequest.getCategoryName(), user);
-        Expense expense = expenseService.createExpense(expenseRequest, category, user);
+        Expense expense = expenseService.create(expenseRequest, category, user);
         if (expense.getIterationType() != IterationType.DEFAULT) {
             createIterationExpense(expenseRequest, expense, user);
         }
@@ -135,7 +135,7 @@ public class ExpenseFacade {
         expenseService.deleteExpenseAll(
                 iterationService.deleteIterationExpenses(expense, user, iterationAction)
         );
-        Expense newExpense = expenseService.createExpense(expenseRequest, category, user);
+        Expense newExpense = expenseService.create(expenseRequest, category, user);
         createIterationExpense(expenseRequest, newExpense, user);
     }
 
