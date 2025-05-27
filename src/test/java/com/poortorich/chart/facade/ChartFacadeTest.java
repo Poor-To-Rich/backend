@@ -11,7 +11,7 @@ import com.poortorich.category.entity.CategoryFixture;
 import com.poortorich.category.service.CategoryService;
 import com.poortorich.chart.service.ChartService;
 import com.poortorich.expense.entity.Expense;
-import com.poortorich.expense.entity.ExpenseFixture;
+import com.poortorich.expense.fixture.ExpenseFixture;
 import com.poortorich.expense.service.ExpenseService;
 import com.poortorich.user.entity.User;
 import com.poortorich.user.fixture.UserFixture;

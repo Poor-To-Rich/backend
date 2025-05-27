@@ -5,7 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.poortorich.category.entity.Category;
 import com.poortorich.category.entity.CategoryFixture;
 import com.poortorich.expense.entity.Expense;
-import com.poortorich.expense.entity.ExpenseFixture;
+import com.poortorich.expense.fixture.ExpenseFixture;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

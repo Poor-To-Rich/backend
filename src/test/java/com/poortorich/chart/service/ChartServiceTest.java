@@ -6,7 +6,7 @@ import com.poortorich.category.entity.Category;
 import com.poortorich.category.entity.CategoryFixture;
 import com.poortorich.chart.response.TotalAmountAndSavingResponse;
 import com.poortorich.expense.entity.Expense;
-import com.poortorich.expense.entity.ExpenseFixture;
+import com.poortorich.expense.fixture.ExpenseFixture;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
