@@ -2,7 +2,7 @@ package com.poortorich.expense.fixture;
 
 import com.poortorich.category.entity.Category;
 import com.poortorich.expense.entity.Expense;
-import com.poortorich.expense.entity.enums.IterationType;
+import com.poortorich.accountbook.entity.enums.IterationType;
 import com.poortorich.expense.entity.enums.PaymentMethod;
 import com.poortorich.iteration.request.CustomIteration;
 import java.time.LocalDate;
