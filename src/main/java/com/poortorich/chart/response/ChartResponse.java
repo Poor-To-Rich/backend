@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 
 @AllArgsConstructor
 public enum ChartResponse implements Response {
+
     GET_TOTAL_EXPENSE_AND_SAVINGS_SUCCESS(
             HttpStatus.OK,
             ChartResponseMessage.GET_TOTAL_EXPENSE_AND_SAVINGS_SUCCESS,
