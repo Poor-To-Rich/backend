@@ -14,8 +14,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.poortorich.chart.constants.ChartResponseMessage;
 import com.poortorich.chart.facade.ChartFacade;
-import com.poortorich.chart.response.ChartResponse;
 import com.poortorich.chart.response.TotalAmountAndSavingResponse;
+import com.poortorich.chart.response.enums.ChartResponse;
 import com.poortorich.global.config.BaseSecurityTest;
 import com.poortorich.global.date.fixture.DateTestFixture;
 import com.poortorich.security.config.SecurityConfig;

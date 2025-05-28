@@ -1,4 +1,4 @@
-package com.poortorich.chart.response;
+package com.poortorich.chart.response.enums;
 
 import com.poortorich.chart.constants.ChartResponseMessage;
 import com.poortorich.global.response.Response;
@@ -11,6 +11,11 @@ public enum ChartResponse implements Response {
     GET_TOTAL_EXPENSE_AND_SAVINGS_SUCCESS(
             HttpStatus.OK,
             ChartResponseMessage.GET_TOTAL_EXPENSE_AND_SAVINGS_SUCCESS,
+            null
+    ),
+    GET_CATEGORY_SECTION_SUCCESS(
+            HttpStatus.OK,
+            ChartResponseMessage.GET_CATEGORY_SECTION_SUCCESS,
             null
     );
 
