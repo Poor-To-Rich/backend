@@ -39,4 +39,8 @@ public class ChartFacade {
 
         return chartService.getTotalExpenseAndSavings(userExpenses, savingCategory);
     }
+
+    public Object getCategorySection(String username, Long categoryId, String date, String cursor) {
+        return null;
+    }
 }
