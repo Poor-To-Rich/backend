@@ -5,5 +5,4 @@ import lombok.experimental.SuperBuilder;
 
 @SuperBuilder
 public class IncomeRequest extends AccountBookRequest {
-
 }
