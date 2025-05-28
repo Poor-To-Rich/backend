@@ -22,7 +22,7 @@ public class IncomeFacade {
     private final IncomeService incomeService;
 
     @Transactional
-    public Response createIncome(IncomeRequest incomeRequest, String username) {
+    public Response createIncome(String username, IncomeRequest incomeRequest) {
         User user = userService.findUserByUsername(username);
         Category category = categoryService.findCategoryByName(incomeRequest.getCategoryName(), user);
         Income income = incomeService.create(incomeRequest, category, user);

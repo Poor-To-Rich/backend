@@ -24,6 +24,6 @@ public class IncomeController {
     public ResponseEntity<BaseResponse> createIncome(
             @AuthenticationPrincipal UserDetails userDetails,
             @RequestBody @Valid IncomeRequest incomeRequest) {
-        return BaseResponse.toResponseEntity(incomeFacade.createIncome(incomeRequest, userDetails.getUsername()));
+        return BaseResponse.toResponseEntity(incomeFacade.createIncome(userDetails.getUsername(), incomeRequest));
     }
 }
