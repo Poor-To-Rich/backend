@@ -1,6 +1,6 @@
 package com.poortorich.expense.request;
 
-import com.poortorich.expense.request.enums.IterationAction;
+import com.poortorich.accountbook.request.enums.IterationAction;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

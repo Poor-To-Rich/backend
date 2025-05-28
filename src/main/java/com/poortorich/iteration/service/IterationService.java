@@ -1,10 +1,10 @@
 package com.poortorich.iteration.service;
 
+import com.poortorich.accountbook.response.AccountBookResponse;
 import com.poortorich.expense.entity.Expense;
-import com.poortorich.expense.entity.enums.IterationType;
+import com.poortorich.accountbook.entity.enums.IterationType;
 import com.poortorich.expense.request.ExpenseRequest;
-import com.poortorich.expense.request.enums.IterationAction;
-import com.poortorich.expense.response.ExpenseResponse;
+import com.poortorich.accountbook.request.enums.IterationAction;
 import com.poortorich.global.exceptions.BadRequestException;
 import com.poortorich.iteration.entity.IterationExpenses;
 import com.poortorich.iteration.entity.enums.Weekday;
@@ -435,7 +435,7 @@ public class IterationService {
             return handleThisAndFuture(originalExpense, expense, user);
         }
 
-        throw new BadRequestException(ExpenseResponse.ITERATION_ACTION_INVALID);
+        throw new BadRequestException(AccountBookResponse.ITERATION_ACTION_INVALID);
     }
 
     private List<IterationExpenses> handleThisOnly(

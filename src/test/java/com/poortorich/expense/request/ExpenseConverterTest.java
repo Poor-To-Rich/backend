@@ -1,5 +1,6 @@
 package com.poortorich.expense.request;
 
+import com.poortorich.accountbook.constants.AccountBookResponseMessages;
 import com.poortorich.expense.constants.ExpenseResponseMessages;
 import com.poortorich.expense.fixture.ExpenseFixture;
 import com.poortorich.expense.util.ExpenseRequestTestBuilder;
@@ -54,7 +55,7 @@ public class ExpenseConverterTest {
 
             assertThatThrownBy(request::trimTitle)
                     .isInstanceOf(BadRequestException.class)
-                    .hasMessage(ExpenseResponseMessages.TITLE_TOO_SHORT);
+                    .hasMessage(AccountBookResponseMessages.TITLE_TOO_SHORT);
         }
     }
 
@@ -88,7 +89,7 @@ public class ExpenseConverterTest {
 
             assertThatThrownBy(request::parseIterationType)
                     .isInstanceOf(BadRequestException.class)
-                    .hasMessage(ExpenseResponseMessages.ITERATION_TYPE_INVALID);
+                    .hasMessage(AccountBookResponseMessages.ITERATION_TYPE_INVALID);
         }
     }
 }

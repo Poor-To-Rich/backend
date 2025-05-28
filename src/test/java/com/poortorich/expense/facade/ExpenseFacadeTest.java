@@ -61,10 +61,10 @@ class ExpenseFacadeTest {
     void createExpense_shouldCallServiceMethods() {
         when(userService.findUserByUsername(user.getUsername())).thenReturn(user);
         when(categoryService.findCategoryByName(expenseRequest.getCategoryName(), user)).thenReturn(category);
-        when(expenseService.createExpense(expenseRequest, category, user)).thenReturn(expense);
+        when(expenseService.create(expenseRequest, category, user)).thenReturn(expense);
 
         expenseFacade.createExpense(expenseRequest, user.getUsername());
-        verify(expenseService).createExpense(expenseRequest, category, user);
+        verify(expenseService).create(expenseRequest, category, user);
         verify(categoryService).findCategoryByName(expenseRequest.getCategoryName(), user);
         verify(iterationService).createIterationExpenses(expenseRequest.getCustomIteration(), expense, user);
     }

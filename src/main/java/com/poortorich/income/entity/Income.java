@@ -1,9 +1,7 @@
-package com.poortorich.expense.entity;
+package com.poortorich.income.entity;
 
-import com.poortorich.category.entity.Category;
 import com.poortorich.accountbook.entity.enums.IterationType;
-import com.poortorich.expense.entity.enums.PaymentMethod;
-import com.poortorich.iteration.entity.IterationExpenses;
+import com.poortorich.category.entity.Category;
 import com.poortorich.user.entity.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -15,11 +13,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -28,14 +23,17 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 @Entity
 @Getter
 @Builder
 @DynamicUpdate
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "expense")
-public class Expense {
+@Table(name = "income")
+public class Income {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -43,19 +41,14 @@ public class Expense {
     private Long id;
 
     @NotNull
-    @Column(name = "expenseDate", nullable = false)
-    private LocalDate expenseDate;
+    @Column(name = "incomeDate", nullable = false)
+    private LocalDate incomeDate;
 
     @Column(name = "title")
     private String title;
 
-    @Column(name = "cost", nullable = false)
+    @Column(name = "cost")
     private Long cost;
-
-    @NotNull
-    @Enumerated(EnumType.STRING)
-    @Column(name = "paymentMethod", nullable = false)
-    private PaymentMethod paymentMethod;
 
     @Column(name = "memo")
     private String memo;
@@ -73,8 +66,7 @@ public class Expense {
     @JoinColumn(name = "userId")
     private User user;
 
-    @OneToOne(mappedBy = "generatedExpense")
-    private IterationExpenses generatedIterationExpenses;
+    // 반복 데이터 테이블과의 연관관계
 
     @CreationTimestamp
     @Column(name = "createdDate")
@@ -83,17 +75,4 @@ public class Expense {
     @UpdateTimestamp
     @Column(name = "updatedDate")
     private LocalDateTime updatedDate;
-
-    public void updateExpense(String title, Long cost, PaymentMethod paymentMethod, String memo, IterationType iterationType, Category category) {
-        this.title = title;
-        this.cost = cost;
-        this.paymentMethod = paymentMethod;
-        this.memo = memo;
-        this.iterationType = iterationType;
-        this.category = category;
-    }
-
-    public void updateExpenseDate(LocalDate expenseDate) {
-        this.expenseDate = expenseDate;
-    }
 }
