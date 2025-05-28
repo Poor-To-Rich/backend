@@ -1,9 +1,13 @@
 package com.poortorich.global.date.util;
 
 import com.poortorich.global.date.constants.DateConstants;
+import com.poortorich.global.date.constants.DatePattern;
+import com.poortorich.global.date.domain.DateInfo;
 import com.poortorich.global.date.domain.MonthInformation;
 import com.poortorich.global.date.domain.WeekInformation;
 import com.poortorich.global.date.domain.YearInformation;
+import com.poortorich.global.date.response.enums.DateResponse;
+import com.poortorich.global.exceptions.BadRequestException;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.Month;
@@ -12,13 +16,44 @@ import java.time.YearMonth;
 import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.EnumMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 public class DateInfoProvider {
 
-    public static YearInformation getYearInformation(Year year) {
+    private static final Map<Predicate<String>, Function<String, DateInfo>> DATE_PARSER = new LinkedHashMap<>();
+
+    static {
+        DATE_PARSER.put(
+                Objects::isNull,
+                date -> getMonthInformation(YearMonth.now())
+        );
+
+        DATE_PARSER.put(
+                date -> date != null && date.matches(DatePattern.YEAR_REGEX),
+                date -> getYearInformation(Year.parse(date))
+        );
+
+        DATE_PARSER.put(
+                date -> date != null && date.matches(DatePattern.YEAR_MONTH_REGEX),
+                date -> getMonthInformation(YearMonth.parse(date))
+        );
+    }
+
+    public static DateInfo getDateInfo(String date) {
+        return DATE_PARSER.entrySet().stream()
+                .filter(entry -> entry.getKey().test(date))
+                .findFirst()
+                .map(entry -> entry.getValue().apply(date))
+                .orElseThrow(() -> new BadRequestException(DateResponse.UNSUPPORTED_DATE_FORMAT));
+    }
+
+    private static YearInformation getYearInformation(Year year) {
         Map<Month, MonthInformation> months = new EnumMap<>(Month.class);
         Stream.of(Month.values())
                 .forEach(month -> months.put(month, getMonthInformation(year.atMonth(month))));
@@ -31,7 +66,7 @@ public class DateInfoProvider {
                 .build();
     }
 
-    public static MonthInformation getMonthInformation(YearMonth yearMonth) {
+    private static MonthInformation getMonthInformation(YearMonth yearMonth) {
         return MonthInformation.builder()
                 .yearMonth(yearMonth)
                 .startDate(yearMonth.atDay(DateConstants.FIRST_DAY_OF_MONTH))
@@ -40,11 +75,10 @@ public class DateInfoProvider {
                 .build();
     }
 
-    public static List<WeekInformation> getWeeksInformation(YearMonth yearMonth) {
+    private static List<WeekInformation> getWeeksInformation(YearMonth yearMonth) {
         List<WeekInformation> weeks = new ArrayList<>();
         LocalDate weekStart = yearMonth.atDay(DateConstants.FIRST_DAY_OF_MONTH)
                 .with(TemporalAdjusters.previousOrSame(DayOfWeek.SUNDAY));
-
         while (!weekStart.isAfter(yearMonth.atEndOfMonth())) {
             LocalDate weekEnd = weekStart.with(TemporalAdjusters.next(DayOfWeek.SATURDAY));
             weeks.add(WeekInformation.builder()

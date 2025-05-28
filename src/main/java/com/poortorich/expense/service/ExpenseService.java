@@ -11,14 +11,13 @@ import com.poortorich.global.exceptions.NotFoundException;
 import com.poortorich.iteration.entity.IterationExpenses;
 import com.poortorich.iteration.response.CustomIterationInfoResponse;
 import com.poortorich.user.entity.User;
-
+import java.beans.Transient;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
-
-import java.beans.Transient;
 
 @Service
 @RequiredArgsConstructor
@@ -102,5 +101,10 @@ public class ExpenseService extends AccountBookService<ExpenseRequest, Expense> 
 
     public void deleteExpenseAll(List<Expense> deleteExpenses) {
         expenseRepository.deleteAll(deleteExpenses);
+    }
+
+    public List<Expense> getExpensesBetweenDates(User user, LocalDate startDate, LocalDate endDate) {
+        return Optional.of(expenseRepository.findByUserAndExpenseDateBetween(user, startDate, endDate))
+                .orElseThrow(() -> new NotFoundException(ExpenseResponse.EXPENSE_NON_EXISTENT));
     }
 }

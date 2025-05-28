@@ -15,7 +15,7 @@ public class ExpenseRequest extends AccountBookRequest {
 
     @NotBlank(message = ExpenseResponseMessages.PAYMENT_METHOD_REQUIRED)
     private String paymentMethod;
-
+  
     public PaymentMethod parsePaymentMethod() {
         return PaymentMethod.from(paymentMethod);
     }
