@@ -58,17 +58,15 @@ public class ExpenseRequestTestBuilder {
     }
 
     public ExpenseRequest build() {
-        return new ExpenseRequest(
-                date,
-                categoryName,
-                title,
-                cost,
-                paymentMethod,
-                memo,
-                iterationType,
-                null,
-                null,
-                customIteration
-        );
+        return ExpenseRequest.builder()
+                .date(date)
+                .categoryName(categoryName)
+                .title(title)
+                .cost(cost)
+                .paymentMethod(paymentMethod)
+                .memo(memo)
+                .iterationType(iterationType)
+                .customIteration(customIteration)
+                .build();
     }
 }

@@ -1,4 +1,4 @@
-package com.poortorich.expense.request.enums;
+package com.poortorich.accountbook.request.enums;
 
 import lombok.RequiredArgsConstructor;
 

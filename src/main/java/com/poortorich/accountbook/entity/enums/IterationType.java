@@ -1,6 +1,6 @@
-package com.poortorich.expense.entity.enums;
+package com.poortorich.accountbook.entity.enums;
 
-import com.poortorich.expense.response.ExpenseResponse;
+import com.poortorich.accountbook.response.AccountBookResponse;
 import com.poortorich.global.exceptions.BadRequestException;
 import lombok.RequiredArgsConstructor;
 
@@ -29,7 +29,7 @@ public enum IterationType {
         return Arrays.stream(IterationType.values())
                 .filter(iteration -> Objects.equals(iteration.type, type))
                 .findFirst()
-                .orElseThrow(() -> new BadRequestException(ExpenseResponse.ITERATION_TYPE_INVALID));
+                .orElseThrow(() -> new BadRequestException(AccountBookResponse.ITERATION_TYPE_INVALID));
     }
 
     @Override
