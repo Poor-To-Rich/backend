@@ -142,13 +142,13 @@ public class CategoryService {
         return CategoryResponse.DELETE_CATEGORY_SUCCESS;
     }
 
-    private Category getCategoryOrThrow(Long id, User user) {
-        return categoryRepository.findByIdAndUser(id, user)
+    public Category findCategoryByName(String name, User user) {
+        return categoryRepository.findByNameAndUser(name, user)
                 .orElseThrow(() -> new NotFoundException(CategoryResponse.CATEGORY_NON_EXISTENT));
     }
 
-    public Category findCategoryByName(String name, User user) {
-        return categoryRepository.findByNameAndUser(name, user)
+    public Category getCategoryOrThrow(Long id, User user) {
+        return categoryRepository.findByIdAndUser(id, user)
                 .orElseThrow(() -> new NotFoundException(CategoryResponse.CATEGORY_NON_EXISTENT));
     }
 }
