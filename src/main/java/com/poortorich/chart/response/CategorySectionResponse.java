@@ -7,6 +7,7 @@ import lombok.Data;
 @Data
 @Builder
 public class CategorySectionResponse {
+
     private Long countOfLogs;
     private Boolean hasNext;
     private String nextCursor;
