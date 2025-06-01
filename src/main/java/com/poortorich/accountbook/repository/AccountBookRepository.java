@@ -78,7 +78,7 @@ public class AccountBookRepository {
             AccountBookType type) {
         List<? extends AccountBook> accountBooks = switch (type) {
             case EXPENSE -> expenseRepository.findByUserAndExpenseDateBetween(user, startDate, endDate);
-            case INCOME -> incomeRepository.findByUserAndIncomeDatesBetween(user, startDate, endDate);
+            case INCOME -> incomeRepository.findByUserAndIncomeDateBetween(user, startDate, endDate);
         };
 
         return mapToAccountBooks(accountBooks);
@@ -118,7 +118,7 @@ public class AccountBookRepository {
             case DEFAULT_EXPENSE, CUSTOM_EXPENSE ->
                     expenseRepository.findByUserAndCategoryAndExpenseDate(user, category, accountBookDate);
             case DEFAULT_INCOME, CUSTOM_INCOME ->
-                    incomeRepository.findByUserAndCategoryAndIncomeDates(user, category, accountBookDate);
+                    incomeRepository.findByUserAndCategoryAndIncomeDate(user, category, accountBookDate);
         };
 
         return mapToAccountBooks(accountBooks);

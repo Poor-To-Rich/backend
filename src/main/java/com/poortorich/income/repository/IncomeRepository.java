@@ -19,9 +19,9 @@ public interface IncomeRepository extends JpaRepository<Income, Long> {
 
     Optional<AccountBook> findByIdAndUser(Long id, User user);
 
-    List<Income> findByUserAndIncomeDatesBetween(User user, LocalDate startDate, LocalDate endDate);
+    List<Income> findByUserAndIncomeDateBetween(User user, LocalDate startDate, LocalDate endDate);
 
-    List<Income> findByUserAndCategoryAndIncomeDates(User user, Category category, LocalDate incomeDate);
+    List<Income> findByUserAndCategoryAndIncomeDate(User user, Category category, LocalDate incomeDate);
 
     @Query("""
             SELECT i

@@ -29,13 +29,13 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class ExpenseFacade {
 
+    private static final AccountBookType accountBookType = AccountBookType.EXPENSE;
+
     private final ExpenseService expenseService;
     private final CategoryService categoryService;
     private final IterationService iterationService;
     private final UserService userService;
-
     // Change Service Layer
-    private final AccountBookType accountBookType = AccountBookType.EXPENSE;
     private final AccountBookService accountBookService;
 
     @Transactional
