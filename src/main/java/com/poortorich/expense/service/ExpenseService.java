@@ -15,6 +15,8 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -104,5 +106,38 @@ public class ExpenseService {
     public List<Expense> getExpensesBetweenDates(User user, LocalDate startDate, LocalDate endDate) {
         return Optional.of(expenseRepository.findByUserAndExpenseDateBetween(user, startDate, endDate))
                 .orElseThrow(() -> new NotFoundException(ExpenseResponse.EXPENSE_NON_EXISTENT));
+    }
+
+    public Slice<Expense> getExpenseByUserAndCategoryWithinDateRangeWithCursor(
+            User user,
+            Category category,
+            LocalDate startDate,
+            LocalDate cursor,
+            LocalDate endDate,
+            Pageable pageable
+    ) {
+        return expenseRepository.findExpenseByUserAndCategoryWithinDateRangeWithCursor(
+                user,
+                category,
+                startDate,
+                cursor,
+                endDate,
+                pageable
+        );
+    }
+
+    public List<Expense> getExpenseByUserAndCategoryAndExpenseDate(
+            User user,
+            Category category,
+            LocalDate expenseDate) {
+        return expenseRepository.findByUserAndCategoryAndExpenseDate(
+                user,
+                category,
+                expenseDate
+        );
+    }
+
+    public Boolean hasNextPage(User user, Category category, LocalDate startDate, LocalDate endDate) {
+        return expenseRepository.countExpensesByUserAndCategoryBetweenDates(user, category, startDate, endDate) > 0;
     }
 }
