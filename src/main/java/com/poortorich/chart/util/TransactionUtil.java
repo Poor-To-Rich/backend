@@ -1,7 +1,7 @@
 package com.poortorich.chart.util;
 
+import com.poortorich.accountbook.entity.AccountBook;
 import com.poortorich.chart.response.TransactionRecord;
-import com.poortorich.expense.entity.Expense;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -10,19 +10,20 @@ import java.util.stream.Stream;
 
 public class TransactionUtil {
 
-    public static List<Expense> mergeExpensesByDate(List<Expense> expenseSlice, List<Expense> expenses) {
+    public static List<AccountBook> mergeAccountBookByDate(List<? extends AccountBook> baseAccountBook,
+                                                           List<? extends AccountBook> additionalAccountBook) {
         return Stream.concat(
-                        expenseSlice.stream(),
-                        expenses.stream()
+                        baseAccountBook.stream(),
+                        additionalAccountBook.stream()
                 )
                 .distinct()
-                .sorted(Comparator.comparing(Expense::getExpenseDate))
+                .sorted(Comparator.comparing(AccountBook::getAccountBookDate))
                 .toList();
     }
 
-    public static List<List<Expense>> groupExpensesByDate(List<Expense> expenses) {
-        return expenses.stream()
-                .collect(Collectors.groupingBy(Expense::getExpenseDate))
+    public static List<List<AccountBook>> groupAccountBooksByDate(List<AccountBook> accountBooks) {
+        return accountBooks.stream()
+                .collect(Collectors.groupingBy(AccountBook::getAccountBookDate))
                 .entrySet()
                 .stream()
                 .sorted(Map.Entry.comparingByKey())
@@ -30,12 +31,12 @@ public class TransactionUtil {
                 .toList();
     }
 
-    public static List<TransactionRecord> mapToTransactionRecord(List<Expense> expenses) {
-        return expenses.stream()
-                .map(expense -> TransactionRecord.builder()
-                        .id(expense.getId())
-                        .title(expense.getTitle())
-                        .amount(expense.getCost())
+    public static List<TransactionRecord> mapToTransactionRecord(List<AccountBook> accountBooks) {
+        return accountBooks.stream()
+                .map(accountBook -> TransactionRecord.builder()
+                        .id(accountBook.getId())
+                        .title(accountBook.getTitle())
+                        .amount(accountBook.getCost())
                         .build())
                 .toList();
     }

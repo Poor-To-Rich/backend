@@ -1,32 +1,32 @@
 package com.poortorich.expense.util;
 
+import com.poortorich.accountbook.entity.AccountBook;
 import com.poortorich.category.entity.Category;
-import com.poortorich.expense.entity.Expense;
 import java.util.List;
 import java.util.Objects;
 
-public class ExpenseCostExtractor {
+public class AccountBookCostExtractor {
 
-    private ExpenseCostExtractor() {
+    private AccountBookCostExtractor() {
     }
 
-    public static List<Long> extract(List<Expense> expenses) {
-        return expenses.stream()
-                .map(Expense::getCost)
+    public static List<Long> extract(List<AccountBook> accountBooks) {
+        return accountBooks.stream()
+                .map(AccountBook::getCost)
                 .toList();
     }
-    
-    public static List<Long> extractByCategory(List<Expense> expenses, Category category) {
-        return expenses.stream()
+
+    public static List<Long> extractByCategory(List<AccountBook> accountBooks, Category category) {
+        return accountBooks.stream()
                 .filter(expense -> Objects.equals(expense.getCategory(), category))
-                .map(Expense::getCost)
+                .map(AccountBook::getCost)
                 .toList();
     }
 
-    public static List<Long> extractExcludingCategory(List<Expense> expenses, Category excludedCategory) {
-        return expenses.stream()
+    public static List<Long> extractExcludingCategory(List<AccountBook> accountBooks, Category excludedCategory) {
+        return accountBooks.stream()
                 .filter(expense -> !Objects.equals(expense.getCategory(), excludedCategory))
-                .map(Expense::getCost)
+                .map(AccountBook::getCost)
                 .toList();
     }
 }
