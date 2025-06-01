@@ -1,12 +1,15 @@
 package com.poortorich.expense.facade;
 
+import com.poortorich.accountbook.entity.AccountBook;
+import com.poortorich.accountbook.entity.enums.IterationType;
+import com.poortorich.accountbook.enums.AccountBookType;
+import com.poortorich.accountbook.request.enums.IterationAction;
+import com.poortorich.accountbook.service.AccountBookService;
 import com.poortorich.category.entity.Category;
 import com.poortorich.category.service.CategoryService;
 import com.poortorich.expense.entity.Expense;
-import com.poortorich.accountbook.entity.enums.IterationType;
 import com.poortorich.expense.request.ExpenseDeleteRequest;
 import com.poortorich.expense.request.ExpenseRequest;
-import com.poortorich.accountbook.request.enums.IterationAction;
 import com.poortorich.expense.response.ExpenseInfoResponse;
 import com.poortorich.expense.response.ExpenseResponse;
 import com.poortorich.expense.service.ExpenseService;
@@ -16,7 +19,6 @@ import com.poortorich.iteration.response.CustomIterationInfoResponse;
 import com.poortorich.iteration.service.IterationService;
 import com.poortorich.user.entity.User;
 import com.poortorich.user.service.UserService;
-
 import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -32,18 +34,23 @@ public class ExpenseFacade {
     private final IterationService iterationService;
     private final UserService userService;
 
+    // Change Service Layer
+    private final AccountBookType accountBookType = AccountBookType.EXPENSE;
+    private final AccountBookService accountBookService;
+
     @Transactional
     public Response createExpense(ExpenseRequest expenseRequest, String username) {
         User user = userService.findUserByUsername(username);
         Category category = categoryService.findCategoryByName(expenseRequest.getCategoryName(), user);
-        Expense expense = expenseService.create(expenseRequest, category, user);
+        AccountBook expense = accountBookService.create(user, category, expenseRequest, accountBookType);
         if (expense.getIterationType() != IterationType.DEFAULT) {
-            createIterationExpense(expenseRequest, expense, user);
+            createIterationExpense(expenseRequest, (Expense) expense, user); // Need To Resolve The Explicit Casting
         }
 
         return ExpenseResponse.CREATE_EXPENSE_SUCCESS;
     }
 
+    // IterationService Needed For AccountBook Entity
     public void createIterationExpense(ExpenseRequest expenseRequest, Expense expense, User user) {
         List<Expense> iterationExpenses
                 = iterationService.createIterationExpenses(expenseRequest.getCustomIteration(), expense, user);
@@ -68,14 +75,16 @@ public class ExpenseFacade {
     public ExpenseResponse deleteExpense(Long expenseId, ExpenseDeleteRequest expenseDeleteRequest, String username) {
         User user = userService.findUserByUsername(username);
         if (expenseDeleteRequest.parseIterationAction() == IterationAction.NONE) {
-            expenseService.deleteExpense(expenseId, user);
+            accountBookService.deleteAccountBook(expenseId, user, accountBookType);
+            // expenseService.deleteExpense(expenseId, user);
         }
 
         if (expenseDeleteRequest.parseIterationAction() != IterationAction.NONE) {
-            Expense expenseToDelete = expenseService.getExpenseOrThrow(expenseId, user);
+            AccountBook expenseToDelete = accountBookService.getAccountBookOrThrow(expenseId, user, accountBookType);
+//            Expense expenseToDelete = expenseService.getExpenseOrThrow(expenseId, user);
             expenseService.deleteExpenseAll(
                     iterationService.deleteIterationExpenses(
-                            expenseToDelete,
+                            (Expense) expenseToDelete, // Need To Resolve The Explicit Casting
                             user,
                             expenseDeleteRequest.parseIterationAction())
             );
