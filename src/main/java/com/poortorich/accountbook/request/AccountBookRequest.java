@@ -14,14 +14,13 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
+import java.time.DateTimeException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-
-import java.time.DateTimeException;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 
 @Getter
 @SuperBuilder
@@ -60,7 +59,7 @@ public abstract class AccountBookRequest {
 
     public LocalDate parseDate() {
         try {
-            return LocalDate.parse(date, DateTimeFormatter.ofPattern(DatePattern.BASIC_PATTERN));
+            return LocalDate.parse(date, DateTimeFormatter.ofPattern(DatePattern.LOCAL_DATE_PATTERN));
         } catch (DateTimeException e) {
             throw new BadRequestException(AccountBookResponse.DATE_INVALID);
         }
