@@ -50,7 +50,7 @@ public interface ExpenseRepository extends JpaRepository<Expense, Long> {
             AND e.expenseDate >= :startDate
             AND e.expenseDate <= :endDate
             """)
-    Long countExpensesByUserAndCategoryBetweenDates(
+    Long countByUserAndCategoryBetweenDates(
             @Param("user") User user,
             @Param("category") Category category,
             @Param("startDate") LocalDate startDate,
