@@ -1,12 +1,12 @@
 package com.poortorich.chart.service;
 
+import com.poortorich.accountbook.entity.AccountBook;
 import com.poortorich.category.entity.Category;
 import com.poortorich.chart.response.CategoryLog;
 import com.poortorich.chart.response.TotalAmountAndSavingResponse;
 import com.poortorich.chart.response.TransactionRecord;
 import com.poortorich.chart.util.TransactionUtil;
-import com.poortorich.expense.entity.Expense;
-import com.poortorich.expense.util.ExpenseCostExtractor;
+import com.poortorich.expense.util.AccountBookCostExtractor;
 import com.poortorich.global.statistics.util.StatCalculator;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -16,13 +16,16 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class ChartService {
 
-    public TotalAmountAndSavingResponse getTotalExpenseAndSavings(List<Expense> expenses, Category savingCategory) {
+    public TotalAmountAndSavingResponse getTotalAmountAndSavings(
+            List<AccountBook> accountBooks,
+            Category savingCategory
+    ) {
         long totalExpense = StatCalculator.calculateSum(
-                ExpenseCostExtractor.extractExcludingCategory(expenses, savingCategory)
+                AccountBookCostExtractor.extractExcludingCategory(accountBooks, savingCategory)
         ).longValue();
 
         long totalSavings = StatCalculator.calculateSum(
-                ExpenseCostExtractor.extractByCategory(expenses, savingCategory)
+                AccountBookCostExtractor.extractByCategory(accountBooks, savingCategory)
         ).longValue();
 
         return TotalAmountAndSavingResponse.builder()
@@ -32,14 +35,15 @@ public class ChartService {
                 .build();
     }
 
-    public List<CategoryLog> getCategoryLogs(List<Expense> expenses) {
-        return TransactionUtil.groupExpensesByDate(expenses)
+    public List<CategoryLog> getCategoryLogs(List<AccountBook> accountBooks) {
+        return TransactionUtil.groupAccountBooksByDate(accountBooks)
                 .stream()
-                .map(expensesOnDate -> {
-                    List<TransactionRecord> transactions = TransactionUtil.mapToTransactionRecord(expensesOnDate);
+                .map(accountBooksOnDate -> {
+                    List<TransactionRecord> transactions = TransactionUtil.mapToTransactionRecord(
+                            accountBooksOnDate);
 
                     return CategoryLog.builder()
-                            .date(expensesOnDate.getFirst().getExpenseDate().toString())
+                            .date(accountBooksOnDate.getFirst().getAccountBookDate().toString())
                             .countOfTransactions((long) transactions.size())
                             .transactions(transactions)
                             .build();
