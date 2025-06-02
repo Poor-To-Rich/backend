@@ -1,4 +1,4 @@
-package com.poortorich.expense.util;
+package com.poortorich.accountbook.util;
 
 import com.poortorich.accountbook.entity.AccountBook;
 import com.poortorich.category.entity.Category;
@@ -18,14 +18,14 @@ public class AccountBookCostExtractor {
 
     public static List<Long> extractByCategory(List<AccountBook> accountBooks, Category category) {
         return accountBooks.stream()
-                .filter(expense -> Objects.equals(expense.getCategory(), category))
+                .filter(accountBook -> Objects.equals(accountBook.getCategory(), category))
                 .map(AccountBook::getCost)
                 .toList();
     }
 
     public static List<Long> extractExcludingCategory(List<AccountBook> accountBooks, Category excludedCategory) {
         return accountBooks.stream()
-                .filter(expense -> !Objects.equals(expense.getCategory(), excludedCategory))
+                .filter(accountBook -> !Objects.equals(accountBook.getCategory(), excludedCategory))
                 .map(AccountBook::getCost)
                 .toList();
     }
