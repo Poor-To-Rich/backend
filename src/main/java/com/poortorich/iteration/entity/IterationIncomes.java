@@ -1,7 +1,7 @@
 package com.poortorich.iteration.entity;
 
 import com.poortorich.accountbook.entity.AccountBook;
-import com.poortorich.expense.entity.Expense;
+import com.poortorich.income.entity.Income;
 import com.poortorich.iteration.entity.info.IterationInfo;
 import com.poortorich.user.entity.User;
 import jakarta.persistence.Column;
@@ -30,8 +30,8 @@ import java.time.LocalDateTime;
 @DynamicUpdate
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "iterationExpenses")
-public class IterationExpenses implements Iteration {
+@Table(name = "iterationIncomes")
+public class IterationIncomes implements Iteration{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -43,12 +43,12 @@ public class IterationExpenses implements Iteration {
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "originalExpenseId")
-    private Expense originalExpense;
+    @JoinColumn(name = "originalIncomeId")
+    private Income originalIncome;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "generatedExpenseId")
-    private Expense generatedExpense;
+    @JoinColumn(name = "generatedIncomeId")
+    private Income generatedIncome;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "iteration_info_id")
@@ -64,15 +64,15 @@ public class IterationExpenses implements Iteration {
 
     @Override
     public AccountBook getOriginalAccountBook() {
-        return originalExpense;
+        return originalIncome;
     }
 
     @Override
     public AccountBook getGeneratedAccountBook() {
-        return generatedExpense;
+        return generatedIncome;
     }
 
-    public void updateOriginalExpense(Expense originalExpense) {
-        this.originalExpense = originalExpense;
+    public void updateOriginalIncome(Income originalIncome) {
+        this.originalIncome = originalIncome;
     }
 }
