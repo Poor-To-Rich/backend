@@ -3,6 +3,7 @@ package com.poortorich.expense.util;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.poortorich.accountbook.entity.AccountBook;
+import com.poortorich.accountbook.util.AccountBookCostExtractor;
 import com.poortorich.category.entity.Category;
 import com.poortorich.category.entity.CategoryFixture;
 import com.poortorich.expense.entity.Expense;

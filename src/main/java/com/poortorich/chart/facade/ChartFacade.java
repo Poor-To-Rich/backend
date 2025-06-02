@@ -79,11 +79,7 @@ public class ChartFacade {
 
         LocalDate nextCursor = accountBooksByLastDate.getFirst().getAccountBookDate().plusDays(DateConstants.ONE_DAY);
         return CategorySectionResponse.builder()
-                .hasNext(accountBookService.hasNextPage(
-                        user,
-                        category,
-                        nextCursor,
-                        dateInfo.getEndDate()))
+                .hasNext(accountBookService.hasNextPage(user, category, nextCursor, dateInfo.getEndDate()))
                 .nextCursor(nextCursor.toString())
                 .countOfLogs((long) categoryLogs.size())
                 .categoryLogs(categoryLogs)

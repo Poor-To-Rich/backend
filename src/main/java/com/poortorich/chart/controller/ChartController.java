@@ -42,12 +42,7 @@ public class ChartController {
     ) {
         return DataResponse.toResponseEntity(
                 ChartResponse.GET_CATEGORY_SECTION_SUCCESS,
-                chartFacade.getCategorySection(
-                        userDetails.getUsername(),
-                        categoryId,
-                        date,
-                        cursor
-                )
+                chartFacade.getCategorySection(userDetails.getUsername(), categoryId, date, cursor)
         );
     }
 }
