@@ -1,6 +1,5 @@
 package com.poortorich.expense.service;
 
-import com.poortorich.accountbook.service.AccountBookService;
 import com.poortorich.category.entity.Category;
 import com.poortorich.expense.entity.Expense;
 import com.poortorich.expense.repository.ExpenseRepository;
@@ -16,20 +15,26 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class ExpenseService extends AccountBookService<ExpenseRequest, Expense> {
+public class ExpenseService {
 
     private final ExpenseRepository expenseRepository;
+
+    public Expense create(ExpenseRequest expenseRequest, Category category, User user) {
+        Expense expense = buildEntity(expenseRequest, category, user);
+        expenseRepository.save(expense);
+        return expense;
+    }
 
     public List<Expense> createExpenseAll(List<Expense> expenses) {
         return expenseRepository.saveAll(expenses);
     }
 
-    @Override
     protected Expense buildEntity(ExpenseRequest expenseRequest, Category category, User user) {
         return Expense.builder()
                 .expenseDate(expenseRequest.parseDate())
@@ -41,11 +46,6 @@ public class ExpenseService extends AccountBookService<ExpenseRequest, Expense> 
                 .iterationType(expenseRequest.parseIterationType())
                 .user(user)
                 .build();
-    }
-
-    @Override
-    protected JpaRepository<Expense, Long> getRepository() {
-        return expenseRepository;
     }
 
     public IterationExpenses getIterationExpenses(Long id, User user) {
@@ -106,5 +106,38 @@ public class ExpenseService extends AccountBookService<ExpenseRequest, Expense> 
     public List<Expense> getExpensesBetweenDates(User user, LocalDate startDate, LocalDate endDate) {
         return Optional.of(expenseRepository.findByUserAndExpenseDateBetween(user, startDate, endDate))
                 .orElseThrow(() -> new NotFoundException(ExpenseResponse.EXPENSE_NON_EXISTENT));
+    }
+
+    public Slice<Expense> getExpenseByUserAndCategoryWithinDateRangeWithCursor(
+            User user,
+            Category category,
+            LocalDate startDate,
+            LocalDate cursor,
+            LocalDate endDate,
+            Pageable pageable
+    ) {
+        return expenseRepository.findExpenseByUserAndCategoryWithinDateRangeWithCursor(
+                user,
+                category,
+                startDate,
+                cursor,
+                endDate,
+                pageable
+        );
+    }
+
+    public List<Expense> getExpenseByUserAndCategoryAndExpenseDate(
+            User user,
+            Category category,
+            LocalDate expenseDate) {
+        return expenseRepository.findByUserAndCategoryAndExpenseDate(
+                user,
+                category,
+                expenseDate
+        );
+    }
+
+    public Boolean hasNextPage(User user, Category category, LocalDate startDate, LocalDate endDate) {
+        return expenseRepository.countByUserAndCategoryBetweenDates(user, category, startDate, endDate) > 0;
     }
 }

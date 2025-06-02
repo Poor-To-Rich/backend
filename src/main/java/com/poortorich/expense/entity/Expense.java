@@ -1,7 +1,8 @@
 package com.poortorich.expense.entity;
 
-import com.poortorich.category.entity.Category;
+import com.poortorich.accountbook.entity.AccountBook;
 import com.poortorich.accountbook.entity.enums.IterationType;
+import com.poortorich.category.entity.Category;
 import com.poortorich.expense.entity.enums.PaymentMethod;
 import com.poortorich.iteration.entity.IterationExpenses;
 import com.poortorich.user.entity.User;
@@ -35,7 +36,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "expense")
-public class Expense {
+public class Expense implements AccountBook {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -84,7 +85,13 @@ public class Expense {
     @Column(name = "updatedDate")
     private LocalDateTime updatedDate;
 
-    public void updateExpense(String title, Long cost, PaymentMethod paymentMethod, String memo, IterationType iterationType, Category category) {
+    @Override
+    public LocalDate getAccountBookDate() {
+        return expenseDate;
+    }
+
+    public void updateExpense(String title, Long cost, PaymentMethod paymentMethod, String memo,
+                              IterationType iterationType, Category category) {
         this.title = title;
         this.cost = cost;
         this.paymentMethod = paymentMethod;

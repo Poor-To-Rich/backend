@@ -2,10 +2,10 @@ package com.poortorich.chart.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.poortorich.accountbook.entity.AccountBook;
 import com.poortorich.category.entity.Category;
 import com.poortorich.category.entity.CategoryFixture;
 import com.poortorich.chart.response.TotalAmountAndSavingResponse;
-import com.poortorich.expense.entity.Expense;
 import com.poortorich.expense.fixture.ExpenseFixture;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
@@ -22,8 +22,8 @@ public class ChartServiceTest {
 
     @Test
     @DisplayName("총 지출액과 저축액을 계산한다.")
-    void getTotalExpenseAndSavings_whenVariousCategoryExpenseAreGiven_shouldCalculateTotalExpenseAndSavingCorrectly() {
-        List<Expense> expenses = List.of(
+    void getTotalExpenseAndSavings_whenVariousCategoryExpenseAreGiven_shouldCalculateTotalAmountAndSavingCorrectly() {
+        List<AccountBook> expenses = List.of(
                 ExpenseFixture.HOUSING_EXPENSE_1(),
                 ExpenseFixture.FOOD_EXPENSE_1(),
                 ExpenseFixture.BEAUTY_EXPENSE_1(),
@@ -40,7 +40,7 @@ public class ChartServiceTest {
                 + ExpenseFixture.ALCOHOL_ENTERTAINMENT_EXPENSE_1().getCost();
         long expectedTotalSavings = ExpenseFixture.SAVINGS_INVESTMENT_EXPENSE_1().getCost();
 
-        TotalAmountAndSavingResponse result = chartService.getTotalExpenseAndSavings(
+        TotalAmountAndSavingResponse result = chartService.getTotalAmountAndSavings(
                 expenses,
                 savingCategory);
 
@@ -50,8 +50,8 @@ public class ChartServiceTest {
 
     @Test
     @DisplayName("저축 카테고리만 있는 경우 총 지출액은 0이 된다.")
-    void getTotalExpenseAndSavings_whenOnlySavingCategoryExists_shouldReturnZeroTotalExpenseAndCalculateSavingsOnly() {
-        List<Expense> expenses = List.of(
+    void getTotalExpenseAndSavings_whenOnlySavingCategoryExists_shouldReturnZeroTotalAmountAndCalculateSavingsOnly() {
+        List<AccountBook> expenses = List.of(
                 ExpenseFixture.SAVINGS_INVESTMENT_EXPENSE_1()
         );
         Category savingCategory = CategoryFixture.SAVINGS_INVESTMENT;
@@ -59,7 +59,7 @@ public class ChartServiceTest {
         long expectedTotalExpense = 0L;
         long expectedTotalSavings = ExpenseFixture.SAVINGS_INVESTMENT_EXPENSE_1().getCost();
 
-        TotalAmountAndSavingResponse result = chartService.getTotalExpenseAndSavings(
+        TotalAmountAndSavingResponse result = chartService.getTotalAmountAndSavings(
                 expenses,
                 savingCategory
         );
@@ -70,14 +70,14 @@ public class ChartServiceTest {
 
     @Test
     @DisplayName("빈 지출 목록인 경우 모든 값이 0이 된다.")
-    void getTotalExpenseAndSavings_whenEmptyExpense_shouldReturnAllZeroValues() {
-        List<Expense> expenses = List.of();
+    void getTotalExpenseAndSavings_whenEmptyAmount_shouldReturnAllZeroValues() {
+        List<AccountBook> expenses = List.of();
         Category savingCategory = CategoryFixture.SAVINGS_INVESTMENT;
 
         long expectedTotalExpense = 0L;
         long expectedTotalSaving = 0L;
 
-        TotalAmountAndSavingResponse result = chartService.getTotalExpenseAndSavings(
+        TotalAmountAndSavingResponse result = chartService.getTotalAmountAndSavings(
                 expenses,
                 savingCategory
         );
@@ -88,8 +88,8 @@ public class ChartServiceTest {
 
     @Test
     @DisplayName("동일한 카테고리의 여러 지출이 있는 경우 합계를 정확히 계산한다.")
-    void getTotalExpenseAndSavings_whenMultipleExpensesInSameCategory_shouldCalculateSumCorrectly() {
-        List<Expense> expenses = List.of(
+    void getTotalAmountAndSavings_whenMultipleExpensesInSameCategory_shouldCalculateSumCorrectly() {
+        List<AccountBook> expenses = List.of(
                 ExpenseFixture.FOOD_EXPENSE_1(),
                 ExpenseFixture.FOOD_EXPENSE_2(),
                 ExpenseFixture.FOOD_EXPENSE_3(),
@@ -105,7 +105,7 @@ public class ChartServiceTest {
         long expectedSavings = ExpenseFixture.SAVINGS_INVESTMENT_EXPENSE_1().getCost()
                 + ExpenseFixture.SAVINGS_INVESTMENT_EXPENSE_1().getCost();
 
-        TotalAmountAndSavingResponse result = chartService.getTotalExpenseAndSavings(expenses, savingCategory);
+        TotalAmountAndSavingResponse result = chartService.getTotalAmountAndSavings(expenses, savingCategory);
 
         assertThat(result.getTotalAmount()).isEqualTo(expectedExpense);
         assertThat(result.getTotalSaving()).isEqualTo(expectedSavings);
