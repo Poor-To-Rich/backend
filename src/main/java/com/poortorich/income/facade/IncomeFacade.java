@@ -3,12 +3,15 @@ package com.poortorich.income.facade;
 import com.poortorich.accountbook.entity.AccountBook;
 import com.poortorich.accountbook.entity.enums.IterationType;
 import com.poortorich.accountbook.enums.AccountBookType;
+import com.poortorich.accountbook.response.InfoResponse;
 import com.poortorich.accountbook.service.AccountBookService;
 import com.poortorich.category.entity.Category;
 import com.poortorich.category.service.CategoryService;
 import com.poortorich.global.response.Response;
 import com.poortorich.income.request.IncomeRequest;
 import com.poortorich.income.response.enums.IncomeResponse;
+import com.poortorich.iteration.entity.Iteration;
+import com.poortorich.iteration.response.CustomIterationInfoResponse;
 import com.poortorich.iteration.service.IterationService;
 import com.poortorich.user.entity.User;
 import com.poortorich.user.service.UserService;
@@ -36,16 +39,29 @@ public class IncomeFacade {
         AccountBook income = accountBookService.create(user, category, incomeRequest, accountBookType);
 
         if (income.getIterationType() != IterationType.DEFAULT) {
-            createIteration(user, incomeRequest, income);
+            createIterationIncome(user, incomeRequest, income);
         }
 
         return IncomeResponse.CREATE_INCOME_SUCCESS;
     }
 
-    public void createIteration(User user, IncomeRequest incomeRequest, AccountBook income) {
+    public void createIterationIncome(User user, IncomeRequest incomeRequest, AccountBook income) {
         List<AccountBook> iterationIncomes
                 = iterationService.createIterations(user, incomeRequest.getCustomIteration(), income, accountBookType);
         List<AccountBook> savedIncomes = accountBookService.createAccountBookAll(iterationIncomes, accountBookType);
         iterationService.createIterationInfo(user, incomeRequest, income, savedIncomes, accountBookType);
+    }
+
+    @Transactional
+    public InfoResponse getIncome(String username, Long id) {
+        User user = userService.findUserByUsername(username);
+        Iteration iterationIncomes = accountBookService.getIteration(user, id, accountBookType);
+
+        CustomIterationInfoResponse customIteration = null;
+        if (iterationIncomes != null) {
+            customIteration = iterationService.getCustomIteration(iterationIncomes);
+        }
+
+        return accountBookService.getInfoResponse(user, id, customIteration, accountBookType);
     }
 }

@@ -311,8 +311,8 @@ public class IterationService {
                 .build();
     }
 
-    public CustomIterationInfoResponse getCustomIteration(IterationExpenses iterationExpenses) {
-        IterationInfo iterationInfo = iterationExpenses.getIterationInfo();
+    public CustomIterationInfoResponse getCustomIteration(Iteration iteration) {
+        IterationInfo iterationInfo = iteration.getIterationInfo();
         return CustomIterationInfoResponse.builder()
                 .iterationRule(buildIterationRuleByRuleType(iterationInfo))
                 .cycle(iterationInfo.getCycle())

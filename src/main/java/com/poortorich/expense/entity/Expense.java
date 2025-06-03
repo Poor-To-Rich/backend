@@ -4,6 +4,7 @@ import com.poortorich.accountbook.entity.AccountBook;
 import com.poortorich.accountbook.entity.enums.IterationType;
 import com.poortorich.category.entity.Category;
 import com.poortorich.expense.entity.enums.PaymentMethod;
+import com.poortorich.iteration.entity.Iteration;
 import com.poortorich.iteration.entity.IterationExpenses;
 import com.poortorich.user.entity.User;
 import jakarta.persistence.Column;
@@ -88,6 +89,11 @@ public class Expense implements AccountBook {
     @Override
     public LocalDate getAccountBookDate() {
         return expenseDate;
+    }
+
+    @Override
+    public Iteration getGeneratedIteration() {
+        return generatedIterationExpenses;
     }
 
     public void updateExpense(String title, Long cost, PaymentMethod paymentMethod, String memo,
