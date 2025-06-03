@@ -4,10 +4,13 @@ import com.poortorich.accountbook.entity.AccountBook;
 import com.poortorich.accountbook.enums.AccountBookType;
 import com.poortorich.accountbook.repository.AccountBookRepository;
 import com.poortorich.accountbook.request.AccountBookRequest;
+import com.poortorich.accountbook.response.InfoResponse;
 import com.poortorich.accountbook.util.AccountBookBuilder;
 import com.poortorich.category.entity.Category;
 import com.poortorich.expense.response.ExpenseResponse;
 import com.poortorich.global.exceptions.NotFoundException;
+import com.poortorich.iteration.entity.Iteration;
+import com.poortorich.iteration.response.CustomIterationInfoResponse;
 import com.poortorich.user.entity.User;
 import java.time.LocalDate;
 import java.util.List;
@@ -35,6 +38,16 @@ public class AccountBookService {
 
     public List<AccountBook> createAccountBookAll(List<AccountBook> accountBooks, AccountBookType type) {
         return accountBookRepository.saveAll(accountBooks, type);
+    }
+
+    public Iteration getIteration(User user, Long id, AccountBookType type) {
+        AccountBook accountBook = getAccountBookOrThrow(id, user, type);
+        return accountBook.getGeneratedIteration();
+    }
+
+    public InfoResponse getInfoResponse(User user, Long id, CustomIterationInfoResponse customIteration, AccountBookType type) {
+        AccountBook accountBook = getAccountBookOrThrow(id, user, type);
+        return AccountBookBuilder.buildInfoResponse(accountBook, customIteration, type);
     }
 
     public void deleteAccountBook(Long accountBookId, User user, AccountBookType type) {
