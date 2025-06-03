@@ -3,6 +3,8 @@ package com.poortorich.expense.facade;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.poortorich.accountbook.enums.AccountBookType;
+import com.poortorich.accountbook.service.AccountBookService;
 import com.poortorich.category.entity.Category;
 import com.poortorich.category.service.CategoryService;
 import com.poortorich.expense.entity.Expense;
@@ -23,6 +25,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 class ExpenseFacadeTest {
+
+    @Mock
+    private AccountBookService accountBookService;
 
     @Mock
     private ExpenseService expenseService;
@@ -61,10 +66,10 @@ class ExpenseFacadeTest {
     void createExpense_shouldCallServiceMethods() {
         when(userService.findUserByUsername(user.getUsername())).thenReturn(user);
         when(categoryService.findCategoryByName(expenseRequest.getCategoryName(), user)).thenReturn(category);
-        when(expenseService.create(expenseRequest, category, user)).thenReturn(expense);
+        when(accountBookService.create(user, category, expenseRequest, AccountBookType.EXPENSE)).thenReturn(expense);
 
         expenseFacade.createExpense(expenseRequest, user.getUsername());
-        verify(expenseService).create(expenseRequest, category, user);
+        verify(accountBookService).create(user, category, expenseRequest, AccountBookType.EXPENSE);
         verify(categoryService).findCategoryByName(expenseRequest.getCategoryName(), user);
         verify(iterationService).createIterationExpenses(expenseRequest.getCustomIteration(), expense, user);
     }
