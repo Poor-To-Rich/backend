@@ -1,11 +1,16 @@
 package com.poortorich.iteration.service;
 
+import com.poortorich.accountbook.entity.AccountBook;
+import com.poortorich.accountbook.enums.AccountBookType;
+import com.poortorich.accountbook.request.AccountBookRequest;
 import com.poortorich.accountbook.response.AccountBookResponse;
+import com.poortorich.accountbook.util.AccountBookBuilder;
 import com.poortorich.expense.entity.Expense;
 import com.poortorich.accountbook.entity.enums.IterationType;
 import com.poortorich.expense.request.ExpenseRequest;
 import com.poortorich.accountbook.request.enums.IterationAction;
 import com.poortorich.global.exceptions.BadRequestException;
+import com.poortorich.iteration.entity.Iteration;
 import com.poortorich.iteration.entity.IterationExpenses;
 import com.poortorich.iteration.entity.enums.Weekday;
 import com.poortorich.iteration.entity.enums.EndType;
@@ -18,6 +23,7 @@ import com.poortorich.iteration.entity.info.WeeklyIterationRule;
 import com.poortorich.iteration.entity.info.YearlyIterationRule;
 import com.poortorich.iteration.repository.IterationExpensesRepository;
 import com.poortorich.iteration.repository.IterationInfoRepository;
+import com.poortorich.iteration.repository.IterationRepository;
 import com.poortorich.iteration.request.CustomIteration;
 import com.poortorich.iteration.request.End;
 import com.poortorich.iteration.request.IterationRule;
@@ -27,6 +33,7 @@ import com.poortorich.iteration.response.EndInfoResponse;
 import com.poortorich.iteration.response.IterationResponse;
 import com.poortorich.iteration.response.IterationRuleInfoResponse;
 import com.poortorich.iteration.response.MonthlyOptionInfoResponse;
+import com.poortorich.iteration.util.IterationBuilder;
 import com.poortorich.iteration.util.IterationDateCalculator;
 import com.poortorich.user.entity.User;
 import lombok.RequiredArgsConstructor;
@@ -43,43 +50,55 @@ import java.util.List;
 public class IterationService {
 
     private final IterationDateCalculator dateCalculator;
-    private final IterationExpensesRepository iterationExpensesRepository;
+    private final IterationRepository iterationRepository;
     private final IterationInfoRepository iterationInfoRepository;
+    // TODO: Change Repository Layer
+    private final IterationExpensesRepository iterationExpensesRepository;
 
     private static final String MODIFY_TYPE = "modify";
     private static final String DELETE_TYPE = "delete";
 
-    public List<Expense> createIterationExpenses(CustomIteration customIteration,
-                                                 Expense expense,
-                                                 User user) {
-        LocalDate startDate = expense.getExpenseDate();
-        return getIterationExpenses(
+    public List<AccountBook> createIterations(
+            User user,
+            CustomIteration customIteration,
+            AccountBook accountBook,
+            AccountBookType type
+    ) {
+        LocalDate startDate = accountBook.getAccountBookDate();
+        return getIterations(
+                user,
                 customIteration,
                 startDate,
-                expense,
-                user
+                accountBook,
+                type
         );
     }
 
-    private List<Expense> getIterationExpenses(CustomIteration customIteration, LocalDate startDate, Expense expense, User user) {
-        List<Expense> iterationExpenses = new ArrayList<>();
-        LocalDate date = getDateByIterationType(customIteration, startDate, expense.getIterationType());
-        LocalDate endDate = calculateEndDate(customIteration, expense, startDate);
+    private List<AccountBook> getIterations(
+            User user,
+            CustomIteration customIteration,
+            LocalDate startDate,
+            AccountBook accountBook,
+            AccountBookType type
+    ) {
+        List<AccountBook> iterations = new ArrayList<>();
+        LocalDate date = getDateByIterationType(customIteration, startDate, accountBook.getIterationType());
+        LocalDate endDate = calculateEndDate(customIteration, accountBook, startDate);
         int maxIterations = 0;
-        int allowedIterations = getAllowedIterations(expense.getIterationType(), customIteration);
+        int allowedIterations = getAllowedIterations(accountBook.getIterationType(), customIteration);
 
-        iterationExpenses.add(expense);
+        iterations.add(accountBook);
         while (!date.isAfter(endDate)) {
             if (maxIterations > allowedIterations) {
                 throw new BadRequestException(IterationResponse.ITERATIONS_TOO_LONG);
             }
-            Expense generatedExpense = buildIterationExpense(expense, date, user);
-            iterationExpenses.add(generatedExpense);
-            date = getDateByIterationType(customIteration, date, expense.getIterationType());
+            AccountBook generatedAccountBook = AccountBookBuilder.buildEntity(user, date, accountBook, type);
+            iterations.add(generatedAccountBook);
+            date = getDateByIterationType(customIteration, date, accountBook.getIterationType());
             maxIterations++;
         }
 
-        return iterationExpenses;
+        return iterations;
     }
 
     private LocalDate getDateByIterationType(CustomIteration customIteration, LocalDate date, IterationType type) {
@@ -91,12 +110,12 @@ public class IterationService {
         return calculateDateByIterationType(type, date);
     }
 
-    private LocalDate calculateEndDate(CustomIteration customIteration, Expense expense, LocalDate startDate) {
-        if (expense.getIterationType() == IterationType.CUSTOM) {
+    private LocalDate calculateEndDate(CustomIteration customIteration, AccountBook accountBook, LocalDate startDate) {
+        if (accountBook.getIterationType() == IterationType.CUSTOM) {
             return calculateEndDate(customIteration.getEnd(), customIteration, startDate);
         }
 
-        if (expense.getIterationType() == IterationType.DAILY || expense.getIterationType() == IterationType.WEEKDAY) {
+        if (accountBook.getIterationType() == IterationType.DAILY || accountBook.getIterationType() == IterationType.WEEKDAY) {
             return dateCalculator.yearlyTypeDate(startDate, 3);
         }
 
@@ -211,32 +230,23 @@ public class IterationService {
         return targetDate;
     }
 
-    private Expense buildIterationExpense(Expense originalExpense, LocalDate date, User user) {
-        return Expense.builder()
-                .expenseDate(date)
-                .title(originalExpense.getTitle())
-                .cost(originalExpense.getCost())
-                .paymentMethod(originalExpense.getPaymentMethod())
-                .memo(originalExpense.getMemo())
-                .iterationType(originalExpense.getIterationType())
-                .category(originalExpense.getCategory())
-                .user(user)
-                .build();
-    }
-
-    public void createIterationInfo(ExpenseRequest expenseRequest,
-                                    Expense originalExpense,
-                                    List<Expense> savedIterationExpenses,
-                                    User user) {
+    public void createIterationInfo(
+            User user,
+            AccountBookRequest accountBookRequest,
+            AccountBook originalAccountBook,
+            List<AccountBook> savedIterationAccountBooks,
+            AccountBookType type
+    ) {
         IterationInfo iterationInfo = null;
-        if (expenseRequest.parseIterationType() == IterationType.CUSTOM) {
-            iterationInfo = getIterationInfo(expenseRequest.getCustomIteration());
+        if (accountBookRequest.parseIterationType() == IterationType.CUSTOM) {
+            iterationInfo = getIterationInfo(accountBookRequest.getCustomIteration());
             iterationInfoRepository.save(iterationInfo);
         }
 
-        for (Expense savedExpense : savedIterationExpenses) {
-            IterationExpenses iterationExpenses = buildIterationExpenses(originalExpense, savedExpense, iterationInfo, user);
-            iterationExpensesRepository.save(iterationExpenses);
+        for (AccountBook savedAccountBook : savedIterationAccountBooks) {
+            Iteration iterations
+                    = IterationBuilder.buildEntity(user, originalAccountBook, savedAccountBook, iterationInfo, type);
+            iterationRepository.save(iterations, type);
         }
     }
 
@@ -298,18 +308,6 @@ public class IterationService {
                 .endType(customIteration.getEnd().parseEndType())
                 .endCount(customIteration.getEnd().getCount())
                 .endDate(customIteration.getEnd().parseDate())
-                .build();
-    }
-
-    private IterationExpenses buildIterationExpenses(Expense originalExpense,
-                                                     Expense generatedExpense,
-                                                     IterationInfo iterationInfo,
-                                                     User user) {
-        return IterationExpenses.builder()
-                .originalExpense(originalExpense)
-                .generatedExpense(generatedExpense)
-                .iterationInfo(iterationInfo)
-                .user(user)
                 .build();
     }
 
