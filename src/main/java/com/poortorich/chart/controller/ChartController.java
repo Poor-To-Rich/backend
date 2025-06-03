@@ -1,5 +1,6 @@
 package com.poortorich.chart.controller;
 
+import com.poortorich.accountbook.enums.AccountBookType;
 import com.poortorich.chart.facade.ChartFacade;
 import com.poortorich.chart.response.enums.ChartResponse;
 import com.poortorich.global.response.BaseResponse;
@@ -43,6 +44,17 @@ public class ChartController {
         return DataResponse.toResponseEntity(
                 ChartResponse.GET_CATEGORY_SECTION_SUCCESS,
                 chartFacade.getCategorySection(userDetails.getUsername(), categoryId, date, cursor)
+        );
+    }
+
+    @GetMapping("/category/expense")
+    public ResponseEntity<BaseResponse> getExpenseCategoryChart(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @RequestParam("date") @Nullable String date
+    ) {
+        return DataResponse.toResponseEntity(
+                ChartResponse.GET_CATEGORY_CHART_SUCCESS,
+                chartFacade.getCategoryChart(userDetails.getUsername(), date, AccountBookType.EXPENSE)
         );
     }
 }
