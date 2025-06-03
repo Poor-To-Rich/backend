@@ -43,9 +43,9 @@ public class IncomeFacade {
     }
 
     public void createIteration(User user, IncomeRequest incomeRequest, AccountBook income) {
-        List<AccountBook> iterationExpenses
+        List<AccountBook> iterationIncomes
                 = iterationService.createIterations(user, incomeRequest.getCustomIteration(), income, accountBookType);
-        List<AccountBook> savedExpenses = accountBookService.createAccountBookAll(iterationExpenses, accountBookType);
-        iterationService.createIterationInfo(user, incomeRequest, income, savedExpenses, accountBookType);
+        List<AccountBook> savedIncomes = accountBookService.createAccountBookAll(iterationIncomes, accountBookType);
+        iterationService.createIterationInfo(user, incomeRequest, income, savedIncomes, accountBookType);
     }
 }
