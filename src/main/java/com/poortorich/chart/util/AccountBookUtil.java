@@ -8,16 +8,18 @@ import com.poortorich.chart.response.TransactionRecord;
 import com.poortorich.global.statistics.util.StatCalculator;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class TransactionUtil {
+public class AccountBookUtil {
 
-    public static List<AccountBook> mergeAccountBookByDate(List<? extends AccountBook> baseAccountBook,
-                                                           List<? extends AccountBook> additionalAccountBook) {
+    public static List<AccountBook> mergeAccountBooksByDate(List<? extends AccountBook> baseAccountBook,
+                                                            List<? extends AccountBook> additionalAccountBook) {
         return Stream.concat(
                         baseAccountBook.stream(),
                         additionalAccountBook.stream()
@@ -56,6 +58,10 @@ public class TransactionUtil {
     }
 
     public static List<CategoryChart> mapToCategoryCharts(List<List<AccountBook>> accountBooksGroupByCategory) {
+        if (Objects.isNull(accountBooksGroupByCategory) || accountBooksGroupByCategory.isEmpty()) {
+            return Collections.emptyList();
+        }
+
         List<Long> categoryAmounts = accountBooksGroupByCategory.stream()
                 .map(AccountBookCostExtractor::extract)
                 .map(StatCalculator::calculateSum)
@@ -76,8 +82,7 @@ public class TransactionUtil {
                             .name(category.getName())
                             .rate(percentages.get(i))
                             .amount(categoryAmounts.get(i))
-                            .build()
-            );
+                            .build());
         }
 
         return categoryCharts;
