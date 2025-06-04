@@ -4,11 +4,8 @@ import com.poortorich.category.entity.Category;
 import com.poortorich.expense.entity.Expense;
 import com.poortorich.expense.repository.ExpenseRepository;
 import com.poortorich.expense.request.ExpenseRequest;
-import com.poortorich.expense.response.ExpenseInfoResponse;
 import com.poortorich.expense.response.ExpenseResponse;
 import com.poortorich.global.exceptions.NotFoundException;
-import com.poortorich.iteration.entity.IterationExpenses;
-import com.poortorich.iteration.response.CustomIterationInfoResponse;
 import com.poortorich.user.entity.User;
 import java.beans.Transient;
 import java.time.LocalDate;
@@ -45,25 +42,6 @@ public class ExpenseService {
                 .memo(expenseRequest.getMemo())
                 .iterationType(expenseRequest.parseIterationType())
                 .user(user)
-                .build();
-    }
-
-    public IterationExpenses getIterationExpenses(Long id, User user) {
-        Expense expense = getExpenseOrThrow(id, user);
-        return expense.getGeneratedIterationExpenses();
-    }
-
-    public ExpenseInfoResponse getExpenseInfoResponse(Long id, User user, CustomIterationInfoResponse customIteration) {
-        Expense expense = getExpenseOrThrow(id, user);
-        return ExpenseInfoResponse.builder()
-                .date(expense.getExpenseDate())
-                .categoryName(expense.getCategory().getName())
-                .title(expense.getTitle())
-                .cost(expense.getCost())
-                .paymentMethod(expense.getPaymentMethod().toString())
-                .memo(expense.getMemo())
-                .iterationType(expense.getIterationType().toString())
-                .customIteration(customIteration)
                 .build();
     }
 

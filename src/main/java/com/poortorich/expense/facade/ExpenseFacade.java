@@ -4,6 +4,7 @@ import com.poortorich.accountbook.entity.AccountBook;
 import com.poortorich.accountbook.entity.enums.IterationType;
 import com.poortorich.accountbook.enums.AccountBookType;
 import com.poortorich.accountbook.request.enums.IterationAction;
+import com.poortorich.accountbook.response.InfoResponse;
 import com.poortorich.accountbook.response.IterationDetailsResponse;
 import com.poortorich.accountbook.service.AccountBookService;
 import com.poortorich.category.entity.Category;
@@ -11,10 +12,10 @@ import com.poortorich.category.service.CategoryService;
 import com.poortorich.expense.entity.Expense;
 import com.poortorich.expense.request.ExpenseDeleteRequest;
 import com.poortorich.expense.request.ExpenseRequest;
-import com.poortorich.expense.response.ExpenseInfoResponse;
 import com.poortorich.expense.response.ExpenseResponse;
 import com.poortorich.expense.service.ExpenseService;
 import com.poortorich.global.response.Response;
+import com.poortorich.iteration.entity.Iteration;
 import com.poortorich.iteration.entity.IterationExpenses;
 import com.poortorich.iteration.response.CustomIterationInfoResponse;
 import com.poortorich.iteration.service.IterationService;
@@ -59,16 +60,16 @@ public class ExpenseFacade {
     }
 
     @Transactional
-    public ExpenseInfoResponse getExpense(Long id, String username) {
+    public InfoResponse getExpense(Long id, String username) {
         User user = userService.findUserByUsername(username);
-        IterationExpenses iterationExpenses = expenseService.getIterationExpenses(id, user);
+        Iteration iterationExpenses = accountBookService.getIteration(user, id, accountBookType);
 
         CustomIterationInfoResponse customIteration = null;
         if (iterationExpenses != null) {
             customIteration = iterationService.getCustomIteration(iterationExpenses);
         }
 
-        return expenseService.getExpenseInfoResponse(id, user, customIteration);
+        return accountBookService.getInfoResponse(user, id, customIteration, accountBookType);
     }
 
     @Transactional

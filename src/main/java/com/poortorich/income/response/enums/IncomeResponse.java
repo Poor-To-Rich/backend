@@ -8,7 +8,8 @@ import org.springframework.http.HttpStatus;
 @RequiredArgsConstructor
 public enum IncomeResponse implements Response {
 
-    CREATE_INCOME_SUCCESS(HttpStatus.CREATED, IncomeResponseMessages.CREATE_INCOME_SUCCESS, null);
+    CREATE_INCOME_SUCCESS(HttpStatus.CREATED, IncomeResponseMessages.CREATE_INCOME_SUCCESS, null),
+    GET_INCOME_SUCCESS(HttpStatus.CREATED, IncomeResponseMessages.GET_INCOME_SUCCESS, null);
 
     private final HttpStatus status;
     private final String message;
