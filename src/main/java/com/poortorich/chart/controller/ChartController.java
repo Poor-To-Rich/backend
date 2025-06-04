@@ -57,4 +57,15 @@ public class ChartController {
                 chartFacade.getCategoryChart(userDetails.getUsername(), date, AccountBookType.EXPENSE)
         );
     }
+
+    @GetMapping("/expense/bar")
+    public ResponseEntity<BaseResponse> getExpenseBar(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @RequestParam("date") @Nullable String date
+    ) {
+        return DataResponse.toResponseEntity(
+                ChartResponse.GET_EXPENSE_BAR_SUCCESS,
+                chartFacade.getAccountBookBar(userDetails.getUsername(), date, AccountBookType.EXPENSE)
+        );
+    }
 }
