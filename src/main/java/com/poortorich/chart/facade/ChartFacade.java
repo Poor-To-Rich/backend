@@ -6,11 +6,13 @@ import com.poortorich.accountbook.service.AccountBookService;
 import com.poortorich.category.domain.model.enums.DefaultExpenseCategory;
 import com.poortorich.category.entity.Category;
 import com.poortorich.category.service.CategoryService;
+import com.poortorich.chart.response.CategoryChart;
+import com.poortorich.chart.response.CategoryChartResponse;
 import com.poortorich.chart.response.CategoryLog;
 import com.poortorich.chart.response.CategorySectionResponse;
 import com.poortorich.chart.response.TotalAmountAndSavingResponse;
 import com.poortorich.chart.service.ChartService;
-import com.poortorich.chart.util.TransactionUtil;
+import com.poortorich.chart.util.AccountBookUtil;
 import com.poortorich.global.date.constants.DateConstants;
 import com.poortorich.global.date.domain.DateInfo;
 import com.poortorich.global.date.util.DateInfoProvider;
@@ -19,6 +21,7 @@ import com.poortorich.user.service.UserService;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -73,7 +76,7 @@ public class ChartFacade {
         );
 
         List<CategoryLog> categoryLogs = chartService.getCategoryLogs(
-                TransactionUtil.mergeAccountBookByDate(
+                AccountBookUtil.mergeAccountBooksByDate(
                         accountBooks.getContent(),
                         accountBooksByLastDate));
 
@@ -83,6 +86,27 @@ public class ChartFacade {
                 .nextCursor(nextCursor.toString())
                 .countOfLogs((long) categoryLogs.size())
                 .categoryLogs(categoryLogs)
+                .build();
+    }
+
+    public CategoryChartResponse getCategoryChart(String username, String date, AccountBookType accountBookType) {
+        User user = userService.findUserByUsername(username);
+        DateInfo dateInfo = DateInfoProvider.getDateInfo(date);
+
+        List<AccountBook> accountBooks = accountBookService.getAccountBookBetweenDates(
+                user,
+                dateInfo.getStartDate(),
+                dateInfo.getEndDate(),
+                accountBookType);
+
+        List<CategoryChart> categoryCharts = chartService.getCategoryChart(accountBooks);
+
+        return CategoryChartResponse.builder()
+                .aggregatedData(categoryCharts.stream()
+                        .collect(Collectors.toMap(CategoryChart::getName, CategoryChart::getRate)))
+                .categoryColors(categoryCharts.stream()
+                        .collect(Collectors.toMap(CategoryChart::getName, CategoryChart::getColor)))
+                .categoryCharts(categoryCharts)
                 .build();
     }
 }

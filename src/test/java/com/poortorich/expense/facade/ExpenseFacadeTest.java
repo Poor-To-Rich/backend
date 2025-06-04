@@ -25,6 +25,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class ExpenseFacadeTest {
 
+    private static final AccountBookType accountBookType = AccountBookType.EXPENSE;
+
     @Mock
     private AccountBookService accountBookService;
 
@@ -39,8 +41,6 @@ class ExpenseFacadeTest {
 
     @InjectMocks
     private ExpenseFacade expenseFacade;
-
-    private static final AccountBookType accountBookType = AccountBookType.EXPENSE;
 
     private ExpenseRequest expenseRequest;
     private Category category;

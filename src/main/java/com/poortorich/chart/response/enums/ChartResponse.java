@@ -17,6 +17,11 @@ public enum ChartResponse implements Response {
             HttpStatus.OK,
             ChartResponseMessage.GET_CATEGORY_SECTION_SUCCESS,
             null
+    ),
+    GET_CATEGORY_CHART_SUCCESS(
+            HttpStatus.OK,
+            ChartResponseMessage.GET_CATEGORY_CHART_SUCCESS,
+            null
     );
 
     private final HttpStatus httpStatus;

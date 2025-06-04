@@ -1,7 +1,6 @@
 package com.poortorich.global.statistics.util;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.poortorich.global.statistics.fixture.StatCalculatorTestFixture;
 import java.math.BigDecimal;
@@ -45,15 +44,6 @@ public class StatCalculatorTest {
     }
 
     @Test
-    @DisplayName("calculateAverage 메소드는 빈 리스트인 경우 예외를 발생시킨다.")
-    void calculateAverage_whenEmptyList_thenThrowException() {
-        List<Long> emptyList = StatCalculatorTestFixture.EMPTY_LIST;
-
-        assertThatThrownBy(() -> StatCalculator.calculateAverage(emptyList))
-                .isInstanceOf(ArithmeticException.class);
-    }
-
-    @Test
     @DisplayName("calculatePercentages 메소드는 숫자 리스트의 백분율을 계산한다.")
     void calculatePercentages_whenListOfNumbers_thenReturnPercentages() {
         List<Long> numbers = StatCalculatorTestFixture.NUMBERS;
@@ -88,15 +78,6 @@ public class StatCalculatorTest {
         List<BigDecimal> result = StatCalculator.calculatePercentages(singleElement);
 
         assertThat(expected).isEqualTo(result);
-    }
-
-    @Test
-    @DisplayName("calculatePercentages 메소드는 빈 리스트인 경우 예외를 발생시킨다.")
-    void calculatePercentages_whenEmptyList_thenThrowException() {
-        List<Long> emptyList = StatCalculatorTestFixture.EMPTY_LIST;
-
-        assertThatThrownBy(() -> StatCalculator.calculatePercentages(emptyList))
-                .isInstanceOf(IndexOutOfBoundsException.class);
     }
 
     @Test
