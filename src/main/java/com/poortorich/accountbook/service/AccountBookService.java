@@ -59,6 +59,7 @@ public class AccountBookService {
         return accountBook;
     }
 
+    @Transient
     public void modifyAccountBook(AccountBook accountBook, AccountBookRequest request, Category category) {
         accountBook.updateAccountBook(
                 request.trimTitle(),
