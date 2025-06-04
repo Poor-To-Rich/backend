@@ -10,7 +10,6 @@ import com.poortorich.category.service.CategoryService;
 import com.poortorich.expense.entity.Expense;
 import com.poortorich.expense.fixture.ExpenseFixture;
 import com.poortorich.expense.request.ExpenseRequest;
-import com.poortorich.expense.service.ExpenseService;
 import com.poortorich.expense.util.ExpenseRequestTestBuilder;
 import com.poortorich.iteration.service.IterationService;
 import com.poortorich.user.entity.User;
@@ -26,11 +25,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class ExpenseFacadeTest {
 
-    @Mock
-    private AccountBookService accountBookService;
+    private static final AccountBookType accountBookType = AccountBookType.EXPENSE;
 
     @Mock
-    private ExpenseService expenseService;
+    private AccountBookService accountBookService;
 
     @Mock
     private CategoryService categoryService;
@@ -66,11 +64,11 @@ class ExpenseFacadeTest {
     void createExpense_shouldCallServiceMethods() {
         when(userService.findUserByUsername(user.getUsername())).thenReturn(user);
         when(categoryService.findCategoryByName(expenseRequest.getCategoryName(), user)).thenReturn(category);
-        when(accountBookService.create(user, category, expenseRequest, AccountBookType.EXPENSE)).thenReturn(expense);
+        when(accountBookService.create(user, category, expenseRequest, accountBookType)).thenReturn(expense);
 
         expenseFacade.createExpense(expenseRequest, user.getUsername());
-        verify(accountBookService).create(user, category, expenseRequest, AccountBookType.EXPENSE);
+        verify(accountBookService).create(user, category, expenseRequest, accountBookType);
         verify(categoryService).findCategoryByName(expenseRequest.getCategoryName(), user);
-        verify(iterationService).createIterationExpenses(expenseRequest.getCustomIteration(), expense, user);
+        verify(iterationService).createIterations(user, expenseRequest.getCustomIteration(), expense, accountBookType);
     }
 }

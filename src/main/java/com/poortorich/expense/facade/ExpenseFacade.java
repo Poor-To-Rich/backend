@@ -44,18 +44,17 @@ public class ExpenseFacade {
         Category category = categoryService.findCategoryByName(expenseRequest.getCategoryName(), user);
         AccountBook expense = accountBookService.create(user, category, expenseRequest, accountBookType);
         if (expense.getIterationType() != IterationType.DEFAULT) {
-            createIterationExpense(expenseRequest, (Expense) expense, user); // Need To Resolve The Explicit Casting
+            createIterationExpense(user, expenseRequest, expense);
         }
 
         return ExpenseResponse.CREATE_EXPENSE_SUCCESS;
     }
 
-    // IterationService Needed For AccountBook Entity
-    public void createIterationExpense(ExpenseRequest expenseRequest, Expense expense, User user) {
-        List<Expense> iterationExpenses
-                = iterationService.createIterationExpenses(expenseRequest.getCustomIteration(), expense, user);
-        List<Expense> savedExpenses = expenseService.createExpenseAll(iterationExpenses);
-        iterationService.createIterationInfo(expenseRequest, expense, savedExpenses, user);
+    public void createIterationExpense(User user, ExpenseRequest expenseRequest, AccountBook expense) {
+        List<AccountBook> iterationExpenses
+                = iterationService.createIterations(user, expenseRequest.getCustomIteration(), expense, accountBookType);
+        List<AccountBook> savedExpenses = accountBookService.createAccountBookAll(iterationExpenses, accountBookType);
+        iterationService.createIterationInfo(user, expenseRequest, expense, savedExpenses, accountBookType);
     }
 
     @Transactional
@@ -115,7 +114,7 @@ public class ExpenseFacade {
         expenseService.modifyExpenseDate(expense, expenseRequest.parseDate());
 
         if (expenseRequest.getIsIterationModified()) {
-            createIterationExpense(expenseRequest, expense, user);
+            createIterationExpense(user, expenseRequest, expense);
         }
     }
 
@@ -145,7 +144,7 @@ public class ExpenseFacade {
                 iterationService.deleteIterationExpenses(expense, user, iterationAction)
         );
         Expense newExpense = expenseService.create(expenseRequest, category, user);
-        createIterationExpense(expenseRequest, newExpense, user);
+        createIterationExpense(user, expenseRequest, newExpense);
     }
 
     private void handleUnmodifiedIteration(
