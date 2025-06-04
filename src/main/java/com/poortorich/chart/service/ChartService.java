@@ -9,7 +9,6 @@ import com.poortorich.chart.response.TotalAmountAndSavingResponse;
 import com.poortorich.chart.response.TransactionRecord;
 import com.poortorich.chart.util.AccountBookUtil;
 import com.poortorich.global.statistics.util.StatCalculator;
-import java.math.BigDecimal;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -54,16 +53,6 @@ public class ChartService {
     }
 
     public List<CategoryChart> getCategoryChart(List<AccountBook> accountBooks) {
-        List<List<AccountBook>> accountBooksGroupByCategory = AccountBookUtil.groupAccountBooksByCategory(accountBooks);
-
-        List<Long> accountBookCostGroupByCategory = accountBooksGroupByCategory.stream()
-                .map(AccountBookCostExtractor::extract)
-                .map(StatCalculator::calculateSum)
-                .map(BigDecimal::longValue)
-                .toList();
-
-        List<BigDecimal> aggregatedData = StatCalculator.calculatePercentages(accountBookCostGroupByCategory);
-
-        return AccountBookUtil.mapToCategoryCharts(accountBooksGroupByCategory);
+        return AccountBookUtil.mapToCategoryCharts(AccountBookUtil.groupAccountBooksByCategory(accountBooks));
     }
 }
