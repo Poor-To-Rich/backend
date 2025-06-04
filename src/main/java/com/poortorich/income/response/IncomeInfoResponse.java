@@ -1,4 +1,4 @@
-package com.poortorich.expense.response;
+package com.poortorich.income.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.poortorich.accountbook.response.InfoResponse;
@@ -15,13 +15,12 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class ExpenseInfoResponse implements InfoResponse {
+public class IncomeInfoResponse implements InfoResponse {
 
     private LocalDate date;
     private String categoryName;
     private String title;
     private Long cost;
-    private String paymentMethod;
     private String memo;
     private String iterationType;
     private CustomIterationInfoResponse customIteration;

@@ -3,6 +3,8 @@ package com.poortorich.income.entity;
 import com.poortorich.accountbook.entity.AccountBook;
 import com.poortorich.accountbook.entity.enums.IterationType;
 import com.poortorich.category.entity.Category;
+import com.poortorich.iteration.entity.Iteration;
+import com.poortorich.iteration.entity.IterationIncomes;
 import com.poortorich.user.entity.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -14,6 +16,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
@@ -66,7 +69,8 @@ public class Income implements AccountBook {
     @JoinColumn(name = "userId")
     private User user;
 
-    // 반복 데이터 테이블과의 연관관계
+    @OneToOne(mappedBy = "generatedIncome")
+    private IterationIncomes generatedIterationIncomes;
 
     @CreationTimestamp
     @Column(name = "createdDate")
@@ -79,5 +83,10 @@ public class Income implements AccountBook {
     @Override
     public LocalDate getAccountBookDate() {
         return incomeDate;
+    }
+
+    @Override
+    public Iteration getGeneratedIteration() {
+        return generatedIterationIncomes;
     }
 }
