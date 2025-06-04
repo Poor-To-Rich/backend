@@ -59,4 +59,14 @@ public class ExpenseController {
             @RequestBody @Valid ExpenseDeleteRequest expenseDeleteRequest) {
         return BaseResponse.toResponseEntity(expenseFacade.deleteExpense(expenseId, expenseDeleteRequest, userDetails.getUsername()));
     }
+
+    @GetMapping("/iteration/details")
+    public ResponseEntity<BaseResponse> getExpenseIterationDetails(
+            @AuthenticationPrincipal UserDetails userDetails
+    ) {
+        return DataResponse.toResponseEntity(
+                ExpenseResponse.GET_EXPENSE_ITERATION_DETAILS_SUCCESS,
+                expenseFacade.getExpenseIterationDetails(userDetails.getUsername())
+        );
+    }
 }

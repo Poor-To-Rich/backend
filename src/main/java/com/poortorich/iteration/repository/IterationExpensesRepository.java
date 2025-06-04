@@ -31,4 +31,10 @@ public interface IterationExpensesRepository extends JpaRepository<IterationExpe
             User user,
             LocalDate startDate
     );
+
+    @Query("""
+        SELECT DISTINCT ie.originalExpense.id
+        FROM IterationExpenses ie
+        """)
+    List<Long> getOriginalExpenseIds();
 }

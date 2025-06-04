@@ -7,6 +7,8 @@ import com.poortorich.iteration.entity.IterationIncomes;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Component
 @RequiredArgsConstructor
 public class IterationRepository {
@@ -19,5 +21,12 @@ public class IterationRepository {
             case EXPENSE -> iterationExpensesRepository.save((IterationExpenses) iteration);
             case INCOME -> iterationIncomesRepository.save((IterationIncomes) iteration);
         }
+    }
+
+    public List<Long> originalAccountBookIds(AccountBookType type) {
+        return switch (type) {
+            case EXPENSE -> iterationExpensesRepository.getOriginalExpenseIds();
+            case INCOME -> null;
+        };
     }
 }
