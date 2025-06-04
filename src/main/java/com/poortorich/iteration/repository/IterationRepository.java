@@ -26,7 +26,7 @@ public class IterationRepository {
     public List<Long> originalAccountBookIds(AccountBookType type) {
         return switch (type) {
             case EXPENSE -> iterationExpensesRepository.getOriginalExpenseIds();
-            case INCOME -> null;
+            case INCOME -> iterationIncomesRepository.getOriginalIncomeIds();
         };
     }
 }
