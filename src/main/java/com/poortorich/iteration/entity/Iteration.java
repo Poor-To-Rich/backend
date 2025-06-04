@@ -15,4 +15,6 @@ public interface Iteration {
     AccountBook getGeneratedAccountBook();
 
     IterationInfo getIterationInfo();
+
+    void updateOriginalAccountBook(AccountBook accountBook);
 }

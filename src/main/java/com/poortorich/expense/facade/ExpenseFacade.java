@@ -11,12 +11,10 @@ import com.poortorich.category.service.CategoryService;
 import com.poortorich.expense.entity.Expense;
 import com.poortorich.expense.request.ExpenseDeleteRequest;
 import com.poortorich.expense.request.ExpenseRequest;
-import com.poortorich.expense.response.ExpenseInfoResponse;
 import com.poortorich.expense.response.ExpenseResponse;
 import com.poortorich.expense.service.ExpenseService;
 import com.poortorich.global.response.Response;
 import com.poortorich.iteration.entity.Iteration;
-import com.poortorich.iteration.entity.IterationExpenses;
 import com.poortorich.iteration.response.CustomIterationInfoResponse;
 import com.poortorich.iteration.service.IterationService;
 import com.poortorich.user.entity.User;
@@ -83,11 +81,13 @@ public class ExpenseFacade {
         if (expenseDeleteRequest.parseIterationAction() != IterationAction.NONE) {
             AccountBook expenseToDelete = accountBookService.getAccountBookOrThrow(expenseId, user, accountBookType);
 //            Expense expenseToDelete = expenseService.getExpenseOrThrow(expenseId, user);
-            expenseService.deleteExpenseAll(
-                    iterationService.deleteIterationExpenses(
-                            (Expense) expenseToDelete, // Need To Resolve The Explicit Casting
+            accountBookService.deleteAccountBookAll(
+                    iterationService.deleteIterations(
+                            expenseToDelete,
                             user,
-                            expenseDeleteRequest.parseIterationAction())
+                            expenseDeleteRequest.parseIterationAction(),
+                            accountBookType),
+                    accountBookType
             );
         }
 
@@ -98,7 +98,8 @@ public class ExpenseFacade {
     public ExpenseResponse modifyExpense(String username, Long expenseId, ExpenseRequest expenseRequest) {
         User user = userService.findUserByUsername(username);
         Category category = categoryService.findCategoryByName(expenseRequest.getCategoryName(), user);
-        Expense expense = expenseService.modifyExpense(expenseId, expenseRequest, category, user);
+        AccountBook expense = accountBookService.modifyAccountBook(user, category, expenseId, expenseRequest, accountBookType);
+        expenseService.modifyPaymentMethod((Expense) expense, expenseRequest.parsePaymentMethod());
 
         IterationAction iterationAction = expenseRequest.parseIterationAction();
         if (iterationAction == IterationAction.NONE) {
@@ -112,8 +113,8 @@ public class ExpenseFacade {
         return ExpenseResponse.MODIFY_EXPENSE_SUCCESS;
     }
 
-    private void modifySingleExpense(Expense expense, ExpenseRequest expenseRequest, User user) {
-        expenseService.modifyExpenseDate(expense, expenseRequest.parseDate());
+    private void modifySingleExpense(AccountBook expense, ExpenseRequest expenseRequest, User user) {
+        expenseService.modifyExpenseDate((Expense) expense, expenseRequest.parseDate());
 
         if (expenseRequest.getIsIterationModified()) {
             createIterationExpense(user, expenseRequest, expense);
@@ -121,7 +122,7 @@ public class ExpenseFacade {
     }
 
     private void modifyIterationExpenses(
-            Expense expense,
+            AccountBook expense,
             ExpenseRequest expenseRequest,
             IterationAction iterationAction,
             Category category,
@@ -136,31 +137,32 @@ public class ExpenseFacade {
     }
 
     private void handleModifiedIteration(
-            Expense expense,
+            AccountBook expense,
             ExpenseRequest expenseRequest,
             IterationAction iterationAction,
             Category category,
             User user
     ) {
-        expenseService.deleteExpenseAll(
-                iterationService.deleteIterationExpenses(expense, user, iterationAction)
+        accountBookService.deleteAccountBookAll(
+                iterationService.deleteIterations(expense, user, iterationAction, accountBookType),
+                accountBookType
         );
-        Expense newExpense = expenseService.create(expenseRequest, category, user);
+        AccountBook newExpense = accountBookService.create(user, category, expenseRequest, accountBookType);
         createIterationExpense(user, expenseRequest, newExpense);
     }
 
     private void handleUnmodifiedIteration(
-            Expense expense,
+            AccountBook expense,
             ExpenseRequest expenseRequest,
             IterationAction iterationAction,
             Category category,
             User user
     ) {
-        LocalDate expenseDate = expense.getExpenseDate();
+        LocalDate expenseDate = expense.getAccountBookDate();
         LocalDate requestDate = expenseRequest.parseDate();
 
         if (iterationAction == IterationAction.THIS_ONLY && !expenseDate.equals(requestDate)) {
-            expenseService.modifyExpenseDate(expense, requestDate);
+            expenseService.modifyExpenseDate((Expense) expense, requestDate);
             return;
         }
 
@@ -168,16 +170,17 @@ public class ExpenseFacade {
     }
 
     private void modifyIterationGeneratedExpenses(
-            Expense expense,
+            AccountBook expense,
             ExpenseRequest expenseRequest,
             IterationAction iterationAction,
             Category category,
             User user
     ) {
-        List<IterationExpenses> modifyIterationExpenses
-                = iterationService.getIterationExpensesByIterationAction(expense, user, iterationAction);
-        for (IterationExpenses iterationExpenses : modifyIterationExpenses) {
-            expenseService.modifyExpense(iterationExpenses.getGeneratedExpense(), expenseRequest, category);
+        List<Iteration> modifyIterationExpenses
+                = iterationService.getIterationByIterationAction(expense, user, iterationAction, accountBookType);
+        for (Iteration iteration : modifyIterationExpenses) {
+            accountBookService.modifyAccountBook(iteration.getGeneratedAccountBook(), expenseRequest, category);
+            expenseService.modifyPaymentMethod((Expense) expense, expenseRequest.parsePaymentMethod());
         }
     }
 }

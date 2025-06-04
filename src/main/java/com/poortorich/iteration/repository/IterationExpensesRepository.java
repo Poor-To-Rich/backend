@@ -26,7 +26,7 @@ public interface IterationExpensesRepository extends JpaRepository<IterationExpe
           AND ge.expenseDate >= :startDate
         ORDER BY ge.expenseDate ASC
         """)
-    List<IterationExpenses> findAllByOriginalExpenseAndUserAndGeneratedExpenseDateAfterOrEqual(
+    List<IterationExpenses> getThisAndFutureIterationExpenses(
             Expense originalExpense,
             User user,
             LocalDate startDate

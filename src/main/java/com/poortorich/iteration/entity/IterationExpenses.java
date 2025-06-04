@@ -72,7 +72,8 @@ public class IterationExpenses implements Iteration {
         return generatedExpense;
     }
 
-    public void updateOriginalExpense(Expense originalExpense) {
-        this.originalExpense = originalExpense;
+    @Override
+    public void updateOriginalAccountBook(AccountBook originalExpense) {
+        this.originalExpense = (Expense) originalExpense;
     }
 }
