@@ -6,6 +6,7 @@ import com.poortorich.accountbook.service.AccountBookService;
 import com.poortorich.category.domain.model.enums.DefaultExpenseCategory;
 import com.poortorich.category.entity.Category;
 import com.poortorich.category.service.CategoryService;
+import com.poortorich.chart.response.AccountBookBarResponse;
 import com.poortorich.chart.response.CategoryChart;
 import com.poortorich.chart.response.CategoryChartResponse;
 import com.poortorich.chart.response.CategoryLog;
@@ -108,5 +109,20 @@ public class ChartFacade {
                         .collect(Collectors.toMap(CategoryChart::getName, CategoryChart::getColor)))
                 .categoryCharts(categoryCharts)
                 .build();
+    }
+
+    public AccountBookBarResponse getAccountBookBar(String username, String date, AccountBookType type) {
+        User user = userService.findUserByUsername(username);
+        List<DateInfo> dateInfos = DateInfoProvider.getPreviousDateInfos(date);
+
+        List<List<AccountBook>> accountBooksGroupByDateInfo = dateInfos.stream()
+                .map(dateInfo -> accountBookService.getAccountBookBetweenDates(
+                        user,
+                        dateInfo.getStartDate(),
+                        dateInfo.getEndDate(),
+                        type))
+                .toList();
+
+        return chartService.getAccountBookBar(dateInfos, accountBooksGroupByDateInfo);
     }
 }
