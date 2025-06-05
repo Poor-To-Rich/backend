@@ -7,6 +7,7 @@ import com.poortorich.chart.response.AccountBookBarResponse;
 import com.poortorich.chart.response.CategoryChart;
 import com.poortorich.chart.response.CategoryLineResponse;
 import com.poortorich.chart.response.CategoryLog;
+import com.poortorich.chart.response.CategoryVerticalResponse;
 import com.poortorich.chart.response.PeriodTotal;
 import com.poortorich.chart.response.TotalAmountAndSavingResponse;
 import com.poortorich.chart.response.TransactionRecord;
@@ -21,6 +22,7 @@ import com.poortorich.global.date.response.enums.DateResponse;
 import com.poortorich.global.exceptions.BadRequestException;
 import com.poortorich.global.statistics.util.StatCalculator;
 import java.math.BigDecimal;
+import java.time.Month;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -124,6 +126,30 @@ public class ChartService {
                 .period(PeriodFormatter.formatLocalDateRange(monthInfo.getStartDate(), monthInfo.getEndDate()))
                 .totalAmount(StatCalculator.calculateSum(AccountBookCostExtractor.extract(accountBooks)).longValue())
                 .weeklyAmounts(periodTotals)
+                .build();
+    }
+
+    public CategoryVerticalResponse getCategoryVertical(
+            YearInformation yearInfo,
+            List<AccountBook> accountBooks,
+            List<List<AccountBook>> monthlyAccountBooks
+    ) {
+        List<PeriodTotal> periodTotals = new ArrayList<>();
+        Month[] months = Month.values();
+        for (int i = 0; i < monthlyAccountBooks.size(); i++) {
+            Long totalAmount = StatCalculator.calculateSum(
+                            AccountBookCostExtractor.extract(monthlyAccountBooks.get(i)))
+                    .longValue();
+
+            periodTotals.add(PeriodTotal.builder()
+                    .period(PeriodFormatter.formatMonthKorean(months[i]))
+                    .totalAmount(totalAmount)
+                    .build());
+        }
+        return CategoryVerticalResponse.builder()
+                .period(PeriodFormatter.formatLocalDateRange(yearInfo.getStartDate(), yearInfo.getEndDate()))
+                .totalAmount(StatCalculator.calculateSum(AccountBookCostExtractor.extract(accountBooks)).longValue())
+                .monthlyAmounts(periodTotals)
                 .build();
     }
 }
