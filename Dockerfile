@@ -1,19 +1,19 @@
-### 배포 환경
-#FROM openjdk:21-jdk-slim
-#
-#ARG JAR_FILE=./build/libs/*.jar
-#
-#COPY ${JAR_FILE} /app.jar
-#
-#ENTRYPOINT ["java", "-jar", "/app.jar" ]
-#
-## 개발 환경
+## 배포 환경
 FROM openjdk:21-jdk-slim
 
-WORKDIR /app
+ARG JAR_FILE=./build/libs/*.jar
 
-COPY . .
+COPY ${JAR_FILE} /app.jar
 
-RUN chmod +x ./gradlew
+ENTRYPOINT ["java", "-jar", "/app.jar" ]
 
-ENTRYPOINT ["./gradlew", "bootRun"]
+### 개발 환경
+#FROM openjdk:21-jdk-slim
+#
+#WORKDIR /app
+#
+#COPY . .
+#
+#RUN chmod +x ./gradlew
+#
+#ENTRYPOINT ["./gradlew", "bootRun"]
