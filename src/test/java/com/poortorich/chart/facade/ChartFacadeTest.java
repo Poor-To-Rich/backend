@@ -65,7 +65,7 @@ public class ChartFacadeTest {
 
         when(categoryService.findCategoryByName(anyString(), any(User.class))).thenReturn(savingCategory);
 
-        chartFacade.getTotalExpenseAmountAndSaving(mockUser.getUsername(), date);
+        chartFacade.getTotalExpenseAmountAndSaving(mockUser.getUsername(), date, AccountBookType.EXPENSE);
 
         verify(userService, times(1)).findUserByUsername(mockUser.getUsername());
         verify(accountBookService, times(1)).getAccountBookBetweenDates(
