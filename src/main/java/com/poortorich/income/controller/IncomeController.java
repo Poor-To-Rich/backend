@@ -41,4 +41,14 @@ public class IncomeController {
                 incomeFacade.getIncome(userDetails.getUsername(), incomeId)
         );
     }
+
+    @GetMapping("/iteration/details")
+    public ResponseEntity<BaseResponse> getIncomeIterationDetails(
+            @AuthenticationPrincipal UserDetails userDetails
+    ) {
+        return DataResponse.toResponseEntity(
+                IncomeResponse.GET_INCOME_ITERATION_DETAILS_SUCCESS,
+                incomeFacade.getIncomeIterationDetails(userDetails.getUsername())
+        );
+    }
 }
