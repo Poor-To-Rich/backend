@@ -96,17 +96,21 @@ public class Expense implements AccountBook {
         return generatedIterationExpenses;
     }
 
-    public void updateExpense(String title, Long cost, PaymentMethod paymentMethod, String memo,
-                              IterationType iterationType, Category category) {
+    @Override
+    public void updateAccountBook(String title, Long cost, String memo, IterationType iterationType, Category category) {
         this.title = title;
         this.cost = cost;
-        this.paymentMethod = paymentMethod;
         this.memo = memo;
         this.iterationType = iterationType;
         this.category = category;
     }
 
-    public void updateExpenseDate(LocalDate expenseDate) {
-        this.expenseDate = expenseDate;
+    @Override
+    public void updateAccountBookDate(LocalDate accountBookDate) {
+        this.expenseDate = accountBookDate;
+    }
+
+    public void updatePaymentMethod(PaymentMethod paymentMethod) {
+        this.paymentMethod = paymentMethod;
     }
 }

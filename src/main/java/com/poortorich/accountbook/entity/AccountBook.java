@@ -25,4 +25,8 @@ public interface AccountBook {
     User getUser();
 
     Iteration getGeneratedIteration();
+
+    void updateAccountBook(String title, Long cost, String memo, IterationType iterationType, Category category);
+
+    void updateAccountBookDate(LocalDate accountBookDate);
 }

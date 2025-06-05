@@ -16,6 +16,7 @@ import com.poortorich.global.statistics.util.StatCalculator;
 import com.poortorich.iteration.entity.Iteration;
 import com.poortorich.iteration.response.CustomIterationInfoResponse;
 import com.poortorich.user.entity.User;
+import java.beans.Transient;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -53,6 +54,25 @@ public class AccountBookService {
                                         AccountBookType type) {
         AccountBook accountBook = getAccountBookOrThrow(id, user, type);
         return AccountBookBuilder.buildInfoResponse(accountBook, customIteration, type);
+    }
+
+    @Transient
+    public AccountBook modifyAccountBook(User user, Category category, Long id, AccountBookRequest request,
+                                         AccountBookType type) {
+        AccountBook accountBook = getAccountBookOrThrow(id, user, type);
+        modifyAccountBook(accountBook, request, category);
+        return accountBook;
+    }
+
+    @Transient
+    public void modifyAccountBook(AccountBook accountBook, AccountBookRequest request, Category category) {
+        accountBook.updateAccountBook(
+                request.trimTitle(),
+                request.getCost(),
+                request.getMemo(),
+                request.parseIterationType(),
+                category
+        );
     }
 
     public void deleteAccountBook(Long accountBookId, User user, AccountBookType type) {
