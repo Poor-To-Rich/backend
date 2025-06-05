@@ -13,6 +13,6 @@ import java.util.List;
 @AllArgsConstructor
 public class IterationDetailsResponse {
 
-    private Long totalBalance;
+    private Long totalAmount;
     private List<AccountBookInfoResponse> iterationAccountBooks;
 }
