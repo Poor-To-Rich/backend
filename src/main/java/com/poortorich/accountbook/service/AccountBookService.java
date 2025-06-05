@@ -141,19 +141,11 @@ public class AccountBookService {
     }
 
     private List<AccountBookInfoResponse> getAccountBookInfoResponses(
-            List<AccountBook> originalAccountBooks,
+            List<AccountBook> accountBooks,
             AccountBookType type
     ) {
-        return originalAccountBooks.stream()
-                .map(accountBook -> AccountBookInfoResponse.builder()
-                        .id(accountBook.getId())
-                        .categoryName(accountBook.getCategory().getName())
-                        .color(accountBook.getCategory().getColor())
-                        .title(accountBook.getTitle())
-                        .type(type.toString())
-                        .cost(accountBook.getCost())
-                        .build()
-                )
+        return accountBooks.stream()
+                .map(accountBook -> AccountBookBuilder.buildAccountBookInfoResponse(accountBook, type))
                 .toList();
     }
 }

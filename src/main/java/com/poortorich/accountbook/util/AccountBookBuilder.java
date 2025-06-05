@@ -3,6 +3,7 @@ package com.poortorich.accountbook.util;
 import com.poortorich.accountbook.entity.AccountBook;
 import com.poortorich.accountbook.enums.AccountBookType;
 import com.poortorich.accountbook.request.AccountBookRequest;
+import com.poortorich.accountbook.response.AccountBookInfoResponse;
 import com.poortorich.accountbook.response.InfoResponse;
 import com.poortorich.category.entity.Category;
 import com.poortorich.expense.entity.Expense;
@@ -120,6 +121,17 @@ public class AccountBookBuilder {
                 .memo(income.getMemo())
                 .iterationType(income.getIterationType().toString())
                 .customIteration(customIteration)
+                .build();
+    }
+
+    public static AccountBookInfoResponse buildAccountBookInfoResponse(AccountBook accountBook, AccountBookType type) {
+        return AccountBookInfoResponse.builder()
+                .id(accountBook.getId())
+                .categoryName(accountBook.getCategory().getName())
+                .color(accountBook.getCategory().getColor())
+                .title(accountBook.getTitle())
+                .type(type.toString())
+                .cost(accountBook.getCost())
                 .build();
     }
 }
