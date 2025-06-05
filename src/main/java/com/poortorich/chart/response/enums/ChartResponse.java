@@ -22,7 +22,11 @@ public enum ChartResponse implements Response {
             HttpStatus.OK,
             ChartResponseMessage.GET_CATEGORY_CHART_SUCCESS,
             null
-    );
+    ),
+    GET_EXPENSE_BAR_SUCCESS(
+            HttpStatus.OK,
+            ChartResponseMessage.GET_EXPENSE_BAR_SUCCESS,
+            null);
 
     private final HttpStatus httpStatus;
     private final String message;

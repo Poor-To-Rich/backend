@@ -5,6 +5,7 @@ import com.poortorich.accountbook.entity.enums.IterationType;
 import com.poortorich.accountbook.enums.AccountBookType;
 import com.poortorich.accountbook.request.enums.IterationAction;
 import com.poortorich.accountbook.response.InfoResponse;
+import com.poortorich.accountbook.response.IterationDetailsResponse;
 import com.poortorich.accountbook.service.AccountBookService;
 import com.poortorich.category.entity.Category;
 import com.poortorich.category.service.CategoryService;
@@ -156,5 +157,12 @@ public class IncomeFacade {
         for (Iteration iteration : modifyIterationIncomes) {
             accountBookService.modifyAccountBook(iteration.getGeneratedAccountBook(), incomeRequest, category);
         }
+    }
+
+    public IterationDetailsResponse getIncomeIterationDetails(String username) {
+        User user = userService.findUserByUsername(username);
+
+        List<Long> originalIncomeIds = iterationService.getIterationAccountBookIds(accountBookType);
+        return accountBookService.getIterationDetails(user, originalIncomeIds, accountBookType);
     }
 }

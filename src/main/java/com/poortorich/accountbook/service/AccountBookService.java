@@ -5,16 +5,22 @@ import com.poortorich.accountbook.enums.AccountBookType;
 import com.poortorich.accountbook.repository.AccountBookRepository;
 import com.poortorich.accountbook.request.AccountBookRequest;
 import com.poortorich.accountbook.response.InfoResponse;
+import com.poortorich.accountbook.response.AccountBookInfoResponse;
+import com.poortorich.accountbook.response.IterationDetailsResponse;
 import com.poortorich.accountbook.util.AccountBookBuilder;
+import com.poortorich.accountbook.util.AccountBookCostExtractor;
 import com.poortorich.category.entity.Category;
 import com.poortorich.expense.response.ExpenseResponse;
 import com.poortorich.global.exceptions.NotFoundException;
+import com.poortorich.global.statistics.util.StatCalculator;
 import com.poortorich.iteration.entity.Iteration;
 import com.poortorich.iteration.response.CustomIterationInfoResponse;
 import com.poortorich.user.entity.User;
 
+
 import java.beans.Transient;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -120,5 +126,33 @@ public class AccountBookService {
     public AccountBook getAccountBookOrThrow(Long id, User user, AccountBookType type) {
         return accountBookRepository.findByIdAndUser(id, user, type)
                 .orElseThrow(() -> new NotFoundException(ExpenseResponse.EXPENSE_NON_EXISTENT));
+    }
+
+    public IterationDetailsResponse getIterationDetails(User user, List<Long> originalAccountBookIds, AccountBookType type) {
+        List<AccountBook> originalAccountBooks = originalAccountBookIds.stream()
+                .map(id -> getAccountBookOrThrow(id, user, type))
+                .toList();
+
+        return IterationDetailsResponse.builder()
+                .totalAmount(StatCalculator.calculateSum(AccountBookCostExtractor.extract(originalAccountBooks)).longValue())
+                .iterationAccountBooks(getAccountBookInfoResponses(originalAccountBooks ,type))
+                .build();
+    }
+
+    private List<AccountBookInfoResponse> getAccountBookInfoResponses(
+            List<AccountBook> originalAccountBooks,
+            AccountBookType type
+    ) {
+        return originalAccountBooks.stream()
+                .map(accountBook -> AccountBookInfoResponse.builder()
+                        .id(accountBook.getId())
+                        .categoryName(accountBook.getCategory().getName())
+                        .color(accountBook.getCategory().getColor())
+                        .title(accountBook.getTitle())
+                        .type(type.toString())
+                        .cost(accountBook.getCost())
+                        .build()
+                )
+                .toList();
     }
 }

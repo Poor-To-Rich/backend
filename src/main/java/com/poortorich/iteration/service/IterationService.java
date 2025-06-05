@@ -488,4 +488,8 @@ public class IterationService {
         return iterationRepository
                 .getThisAndFutureIterations(originalAccountBook, user, targetAccountBook.getAccountBookDate(), type);
     }
+
+    public List<Long> getIterationAccountBookIds(AccountBookType type) {
+        return iterationRepository.originalAccountBookIds(type);
+    }
 }

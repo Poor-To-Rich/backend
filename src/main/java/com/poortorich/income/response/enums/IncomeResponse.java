@@ -11,6 +11,9 @@ public enum IncomeResponse implements Response {
     CREATE_INCOME_SUCCESS(HttpStatus.CREATED, IncomeResponseMessages.CREATE_INCOME_SUCCESS, null),
     GET_INCOME_SUCCESS(HttpStatus.OK, IncomeResponseMessages.GET_INCOME_SUCCESS, null),
     MODIFY_INCOME_SUCCESS(HttpStatus.CREATED, IncomeResponseMessages.MODIFY_INCOME_SUCCESS, null);
+    GET_INCOME_SUCCESS(HttpStatus.OK, IncomeResponseMessages.GET_INCOME_SUCCESS, null),
+
+    GET_INCOME_ITERATION_DETAILS_SUCCESS(HttpStatus.OK, IncomeResponseMessages.GET_INCOME_ITERATION_DETAILS_SUCCESS, null);
 
     private final HttpStatus status;
     private final String message;

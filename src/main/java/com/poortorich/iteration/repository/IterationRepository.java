@@ -69,4 +69,11 @@ public class IterationRepository {
                 .map(iteration -> (Iteration) iteration)
                 .toList();
     }
+
+    public List<Long> originalAccountBookIds(AccountBookType type) {
+        return switch (type) {
+            case EXPENSE -> iterationExpensesRepository.getOriginalExpenseIds();
+            case INCOME -> iterationIncomesRepository.getOriginalIncomeIds();
+        };
+    }
 }

@@ -31,4 +31,10 @@ public interface IterationIncomesRepository extends JpaRepository<IterationIncom
             User user,
             LocalDate accountBookDate
     );
+
+    @Query("""
+        SELECT DISTINCT ii.originalIncome.id
+        FROM IterationIncomes ii
+        """)
+    List<Long> getOriginalIncomeIds();
 }

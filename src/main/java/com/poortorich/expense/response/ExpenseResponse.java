@@ -13,6 +13,8 @@ public enum ExpenseResponse implements Response {
     MODIFY_EXPENSE_SUCCESS(HttpStatus.CREATED, ExpenseResponseMessages.MODIFY_EXPENSE_SUCCESS, null),
     DELETE_EXPENSE_SUCCESS(HttpStatus.OK, ExpenseResponseMessages.DELETE_EXPENSE_SUCCESS, null),
 
+    GET_EXPENSE_ITERATION_DETAILS_SUCCESS(HttpStatus.OK, ExpenseResponseMessages.GET_EXPENSE_ITERATION_DETAILS_SUCCESS, null),
+
     PAYMENT_METHOD_INVALID(HttpStatus.BAD_REQUEST, ExpenseResponseMessages.PAYMENT_METHOD_INVALID, "paymentMethod"),
 
     EXPENSE_NON_EXISTENT(HttpStatus.NOT_FOUND, ExpenseResponseMessages.EXPENSE_NON_EXISTENT, "expenseId");
