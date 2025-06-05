@@ -8,9 +8,11 @@ import com.poortorich.accountbook.response.InfoResponse;
 import com.poortorich.accountbook.response.AccountBookInfoResponse;
 import com.poortorich.accountbook.response.IterationDetailsResponse;
 import com.poortorich.accountbook.util.AccountBookBuilder;
+import com.poortorich.accountbook.util.AccountBookCostExtractor;
 import com.poortorich.category.entity.Category;
 import com.poortorich.expense.response.ExpenseResponse;
 import com.poortorich.global.exceptions.NotFoundException;
+import com.poortorich.global.statistics.util.StatCalculator;
 import com.poortorich.iteration.entity.Iteration;
 import com.poortorich.iteration.response.CustomIterationInfoResponse;
 import com.poortorich.user.entity.User;
@@ -112,15 +114,9 @@ public class AccountBookService {
                 .toList();
 
         return IterationDetailsResponse.builder()
-                .totalBalance(getTotalBalance(originalAccountBooks))
+                .totalAmount(StatCalculator.calculateSum(AccountBookCostExtractor.extract(originalAccountBooks)).longValue())
                 .iterationAccountBooks(getAccountBookInfoResponses(originalAccountBooks ,type))
                 .build();
-    }
-
-    private Long getTotalBalance(List<AccountBook> originalAccountBooks) {
-        return originalAccountBooks.stream()
-                .mapToLong(AccountBook::getCost)
-                .sum();
     }
 
     private List<AccountBookInfoResponse> getAccountBookInfoResponses(
