@@ -1,5 +1,6 @@
 package com.poortorich.income.controller;
 
+import com.poortorich.accountbook.request.AccountBookDeleteRequest;
 import com.poortorich.global.response.BaseResponse;
 import com.poortorich.global.response.DataResponse;
 import com.poortorich.income.facade.IncomeFacade;
@@ -10,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -50,6 +52,17 @@ public class IncomeController {
             @RequestBody @Valid IncomeRequest incomeRequest
     ) {
         return BaseResponse.toResponseEntity(incomeFacade.modifyIncome(userDetails.getUsername(), incomeId, incomeRequest));
+    }
+
+    @DeleteMapping("/{incomeId}")
+    public ResponseEntity<BaseResponse> deleteIncome(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @PathVariable Long incomeId,
+            @RequestBody @Valid AccountBookDeleteRequest accountBookDeleteRequest
+            ) {
+        return BaseResponse.toResponseEntity(
+                incomeFacade.deleteIncome(userDetails.getUsername(), incomeId, accountBookDeleteRequest)
+        );
     }
 
     @GetMapping("/iteration/details")
