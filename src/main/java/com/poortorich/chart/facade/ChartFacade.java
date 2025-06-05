@@ -12,16 +12,21 @@ import com.poortorich.chart.response.CategoryChartResponse;
 import com.poortorich.chart.response.CategoryLineResponse;
 import com.poortorich.chart.response.CategoryLog;
 import com.poortorich.chart.response.CategorySectionResponse;
+import com.poortorich.chart.response.CategoryVerticalResponse;
 import com.poortorich.chart.response.TotalAmountAndSavingResponse;
 import com.poortorich.chart.service.ChartService;
 import com.poortorich.chart.util.AccountBookUtil;
 import com.poortorich.global.date.constants.DateConstants;
 import com.poortorich.global.date.domain.DateInfo;
 import com.poortorich.global.date.domain.MonthInformation;
+import com.poortorich.global.date.domain.YearInformation;
 import com.poortorich.global.date.util.DateInfoProvider;
 import com.poortorich.user.entity.User;
 import com.poortorich.user.service.UserService;
 import java.time.LocalDate;
+import java.time.Month;
+import java.time.Year;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -146,5 +151,26 @@ public class ChartFacade {
                 .toList();
 
         return chartService.getCategoryLine(monthInfo, accountBooks, weeklyAccountBooks);
+    }
+
+    public CategoryVerticalResponse getCategoryVertical(String username, Long categoryId, String date) {
+        if (date == null) {
+            date = Year.now().toString();
+        }
+        
+        User user = userService.findUserByUsername(username);
+        Category category = categoryService.getCategoryOrThrow(categoryId, user);
+        YearInformation yearInfo = (YearInformation) DateInfoProvider.getDateInfo(date);
+
+        List<AccountBook> accountBooks = accountBookService.getAccountBookByCategoryBetweenDates(user, category,
+                yearInfo.getStartDate(), yearInfo.getEndDate());
+
+        List<List<AccountBook>> monthlyAccountBooks = Arrays.stream(Month.values()).sequential()
+                .map(month -> yearInfo.getMonths().get(month))
+                .map(monthInfo -> accountBookService.getAccountBookByCategoryBetweenDates(
+                        user, category, monthInfo.getStartDate(), monthInfo.getEndDate()
+                ))
+                .toList();
+        return chartService.getCategoryVertical(yearInfo, accountBooks, monthlyAccountBooks);
     }
 }
