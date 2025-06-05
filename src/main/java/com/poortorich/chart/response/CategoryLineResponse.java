@@ -9,6 +9,6 @@ import lombok.Data;
 public class CategoryLineResponse {
 
     private String period;
-    private Long totalAmounts;
+    private Long totalAmount;
     private List<PeriodTotal> weeklyAmounts;
 }
