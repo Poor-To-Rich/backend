@@ -18,7 +18,6 @@ import com.poortorich.iteration.response.CustomIterationInfoResponse;
 import com.poortorich.user.entity.User;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -120,19 +119,11 @@ public class AccountBookService {
     }
 
     private List<AccountBookInfoResponse> getAccountBookInfoResponses(
-            List<AccountBook> originalAccountBooks,
+            List<AccountBook> accountBooks,
             AccountBookType type
     ) {
-        return originalAccountBooks.stream()
-                .map(accountBook -> AccountBookInfoResponse.builder()
-                        .id(accountBook.getId())
-                        .categoryName(accountBook.getCategory().getName())
-                        .color(accountBook.getCategory().getColor())
-                        .title(accountBook.getTitle())
-                        .type(type.toString())
-                        .cost(accountBook.getCost())
-                        .build()
-                )
+        return accountBooks.stream()
+                .map(accountBook -> AccountBookBuilder.buildAccountBookInfoResponse(accountBook, type))
                 .toList();
     }
 }
