@@ -84,6 +84,22 @@ public class AccountBookRepository {
         return mapToAccountBooks(accountBooks);
     }
 
+    public List<AccountBook> getAccountBookByCategoryBetweenDates(
+            User user,
+            Category category,
+            LocalDate startDate,
+            LocalDate endDate
+    ) {
+        List<? extends AccountBook> accountBooks = switch (category.getType()) {
+            case DEFAULT_EXPENSE, CUSTOM_EXPENSE ->
+                    expenseRepository.findByUserAndCategoryAndExpenseDateBetween(user, category, startDate, endDate);
+            case DEFAULT_INCOME, CUSTOM_INCOME ->
+                    incomeRepository.findByUserAndCategoryAndIncomeDateBetween(user, category, startDate, endDate);
+        };
+
+        return mapToAccountBooks(accountBooks);
+    }
+
     public Slice<AccountBook> findByUserAndCategoryWithinDateRangeWithCursor(
             User user,
             Category category,

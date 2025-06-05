@@ -5,13 +5,10 @@ import com.poortorich.accountbook.enums.AccountBookType;
 import com.poortorich.accountbook.request.AccountBookRequest;
 import com.poortorich.accountbook.response.AccountBookResponse;
 import com.poortorich.accountbook.util.AccountBookBuilder;
-import com.poortorich.expense.entity.Expense;
 import com.poortorich.accountbook.entity.enums.IterationType;
-import com.poortorich.expense.request.ExpenseRequest;
 import com.poortorich.accountbook.request.enums.IterationAction;
 import com.poortorich.global.exceptions.BadRequestException;
 import com.poortorich.iteration.entity.Iteration;
-import com.poortorich.iteration.entity.IterationExpenses;
 import com.poortorich.iteration.entity.enums.Weekday;
 import com.poortorich.iteration.entity.enums.EndType;
 import com.poortorich.iteration.entity.enums.IterationRuleType;
@@ -21,7 +18,6 @@ import com.poortorich.iteration.entity.info.IterationInfo;
 import com.poortorich.iteration.entity.info.MonthlyIterationRule;
 import com.poortorich.iteration.entity.info.WeeklyIterationRule;
 import com.poortorich.iteration.entity.info.YearlyIterationRule;
-import com.poortorich.iteration.repository.IterationExpensesRepository;
 import com.poortorich.iteration.repository.IterationInfoRepository;
 import com.poortorich.iteration.repository.IterationRepository;
 import com.poortorich.iteration.request.CustomIteration;
@@ -52,8 +48,6 @@ public class IterationService {
     private final IterationDateCalculator dateCalculator;
     private final IterationRepository iterationRepository;
     private final IterationInfoRepository iterationInfoRepository;
-    // TODO: Change Repository Layer
-    private final IterationExpensesRepository iterationExpensesRepository;
 
     private static final String MODIFY_TYPE = "modify";
     private static final String DELETE_TYPE = "delete";
@@ -383,99 +377,116 @@ public class IterationService {
                 .build();
     }
 
-    public List<IterationExpenses> getIterationExpensesByIterationAction(Expense expense, User user, IterationAction iterationAction) {
-        IterationExpenses iterationExpense = iterationExpensesRepository.findByGeneratedExpenseAndUser(expense, user);
-        Expense originalExpense = iterationExpense.getOriginalExpense();
-        List<IterationExpenses> allIterationExpenses = iterationExpensesRepository.findAllByOriginalExpenseAndUser(originalExpense, user);
+    public List<Iteration> getIterationByIterationAction(
+            AccountBook accountBook,
+            User user,
+            IterationAction iterationAction,
+            AccountBookType type
+    ) {
+        Iteration iteration = iterationRepository.findByGeneratedAccountBookAndUser(user, accountBook, type);
+        AccountBook originalAccountBook = iteration.getOriginalAccountBook();
+        List<Iteration> allIterations
+                = iterationRepository.findAllByOriginalAccountBookAndUser(user, originalAccountBook, type);
 
-        return resolveIterationExpenses(
-                iterationAction, originalExpense, expense, iterationExpense, allIterationExpenses, user, MODIFY_TYPE
+        return resolveIterations(
+                iterationAction, originalAccountBook, accountBook, iteration, allIterations, user, MODIFY_TYPE, type
         );
     }
 
-    public List<Expense> deleteIterationExpenses(Expense expenseToDelete, User user, IterationAction iterationAction) {
-        IterationExpenses iterationExpense = iterationExpensesRepository.findByGeneratedExpenseAndUser(expenseToDelete, user);
-        Expense originalExpense = iterationExpense.getOriginalExpense();
-        List<IterationExpenses> allIterationExpenses = iterationExpensesRepository.findAllByOriginalExpenseAndUser(originalExpense, user);
+    public List<AccountBook> deleteIterations(
+            AccountBook accountBookToDelete,
+            User user,
+            IterationAction iterationAction,
+            AccountBookType type
+    ) {
+        Iteration iteration = iterationRepository.findByGeneratedAccountBookAndUser(user, accountBookToDelete, type);
+        AccountBook originalAccountBook = iteration.getOriginalAccountBook();
+        List<Iteration> allIterations
+                = iterationRepository.findAllByOriginalAccountBookAndUser(user, originalAccountBook, type);
 
-        List<IterationExpenses> deleteIterationExpenses = resolveIterationExpenses(
-                iterationAction, originalExpense, expenseToDelete, iterationExpense, allIterationExpenses, user, DELETE_TYPE
+        List<Iteration> deleteIterations = resolveIterations(
+                iterationAction, originalAccountBook, accountBookToDelete, iteration, allIterations, user, DELETE_TYPE, type
         );
 
-        iterationExpensesRepository.deleteAll(deleteIterationExpenses);
-        return deleteIterationExpenses.stream()
-                .map(IterationExpenses::getGeneratedExpense)
+        iterationRepository.deleteAll(deleteIterations, type);
+        return deleteIterations.stream()
+                .map(Iteration::getGeneratedAccountBook)
                 .toList();
     }
 
-    private List<IterationExpenses> resolveIterationExpenses(
+    private List<Iteration> resolveIterations(
             IterationAction iterationAction,
-            Expense originalExpense,
-            Expense expense,
-            IterationExpenses iterationExpense,
-            List<IterationExpenses> allIterationExpenses,
+            AccountBook originalAccountBook,
+            AccountBook accountBook,
+            Iteration iteration,
+            List<Iteration> allIterations,
             User user,
-            String type
+            String type,
+            AccountBookType accountBookType
     ) {
         if (iterationAction == IterationAction.THIS_ONLY) {
-            return handleThisOnly(originalExpense, expense, iterationExpense, allIterationExpenses);
+            return handleThisOnly(originalAccountBook, accountBook, iteration, allIterations);
         }
 
         if (iterationAction == IterationAction.ALL
-                || (iterationAction == IterationAction.THIS_AND_FUTURE && expense.equals(originalExpense))) {
+                || (iterationAction == IterationAction.THIS_AND_FUTURE && accountBook.equals(originalAccountBook))) {
             if (type.equals(MODIFY_TYPE)) {
-                return allIterationExpenses;
+                return allIterations;
             }
-            return handleAll(iterationExpense, allIterationExpenses);
+            return handleAll(iteration, allIterations);
         }
 
-        if (iterationAction == IterationAction.THIS_AND_FUTURE && !expense.equals(originalExpense)) {
-            return handleThisAndFuture(originalExpense, expense, user);
+        if (iterationAction == IterationAction.THIS_AND_FUTURE && !accountBook.equals(originalAccountBook)) {
+            return handleThisAndFuture(originalAccountBook, accountBook, user, accountBookType);
         }
 
         throw new BadRequestException(AccountBookResponse.ITERATION_ACTION_INVALID);
     }
 
-    private List<IterationExpenses> handleThisOnly(
-            Expense originalExpense,
-            Expense expenseToDelete,
-            IterationExpenses iterationExpense,
-            List<IterationExpenses> allIterationExpenses
+    private List<Iteration> handleThisOnly(
+            AccountBook originalAccountBook,
+            AccountBook accountBookToDelete,
+            Iteration iteration,
+            List<Iteration> allIterations
     ) {
-        if (expenseToDelete.equals(originalExpense) && allIterationExpenses.size() < 2) {
-            return handleAll(iterationExpense, allIterationExpenses);
+        if (accountBookToDelete.equals(originalAccountBook) && allIterations.size() < 2) {
+            return handleAll(iteration, allIterations);
         }
 
-        if (expenseToDelete.equals(originalExpense)) {
-            updateOriginalExpense(allIterationExpenses);
+        if (accountBookToDelete.equals(originalAccountBook)) {
+            updateOriginalAccountBook(allIterations);
         }
 
-        return List.of(iterationExpense);
+        return List.of(iteration);
     }
 
-    private void updateOriginalExpense(List<IterationExpenses> allIterationExpenses) {
-        Expense newOriginalExpense = allIterationExpenses.get(1).getGeneratedExpense();
-        for (IterationExpenses iterationExpense : allIterationExpenses) {
-            iterationExpense.updateOriginalExpense(newOriginalExpense);
+    private void updateOriginalAccountBook(List<Iteration> allIterations) {
+        AccountBook newOriginalAccountBook = allIterations.get(1).getGeneratedAccountBook();
+        for (Iteration iteration : allIterations) {
+            iteration.updateOriginalAccountBook(newOriginalAccountBook);
         }
     }
 
-    private List<IterationExpenses> handleAll(
-            IterationExpenses iterationExpenses,
-            List<IterationExpenses> deleteIterationExpenses
+    private List<Iteration> handleAll(
+            Iteration iteration,
+            List<Iteration> deleteIterations
     ) {
-        IterationInfo iterationInfo = iterationExpenses.getIterationInfo();
+        IterationInfo iterationInfo = iteration.getIterationInfo();
         if (iterationInfo != null) {
-            iterationInfoRepository.delete(deleteIterationExpenses.getFirst().getIterationInfo());
+            iterationInfoRepository.delete(deleteIterations.getFirst().getIterationInfo());
         }
 
-        return deleteIterationExpenses;
+        return deleteIterations;
     }
 
-    private List<IterationExpenses> handleThisAndFuture(Expense originalExpense, Expense targetExpense, User user) {
-        return iterationExpensesRepository.findAllByOriginalExpenseAndUserAndGeneratedExpenseDateAfterOrEqual(
-                originalExpense, user, targetExpense.getExpenseDate()
-        );
+    private List<Iteration> handleThisAndFuture(
+            AccountBook originalAccountBook,
+            AccountBook targetAccountBook,
+            User user,
+            AccountBookType type
+    ) {
+        return iterationRepository
+                .getThisAndFutureIterations(originalAccountBook, user, targetAccountBook.getAccountBookDate(), type);
     }
 
     public List<Long> getIterationAccountBookIds(AccountBookType type) {

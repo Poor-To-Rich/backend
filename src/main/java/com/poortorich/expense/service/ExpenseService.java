@@ -2,6 +2,7 @@ package com.poortorich.expense.service;
 
 import com.poortorich.category.entity.Category;
 import com.poortorich.expense.entity.Expense;
+import com.poortorich.expense.entity.enums.PaymentMethod;
 import com.poortorich.expense.repository.ExpenseRepository;
 import com.poortorich.expense.request.ExpenseRequest;
 import com.poortorich.expense.response.ExpenseResponse;
@@ -46,25 +47,13 @@ public class ExpenseService {
     }
 
     @Transient
-    public Expense modifyExpense(Long expenseId, ExpenseRequest expenseRequest, Category category, User user) {
-        Expense expense = getExpenseOrThrow(expenseId, user);
-        modifyExpense(expense, expenseRequest, category);
-        return expense;
-    }
-
-    public void modifyExpense(Expense expense, ExpenseRequest expenseRequest, Category category) {
-        expense.updateExpense(
-                expenseRequest.trimTitle(),
-                expenseRequest.getCost(),
-                expenseRequest.parsePaymentMethod(),
-                expenseRequest.getMemo(),
-                expenseRequest.parseIterationType(),
-                category);
+    public void modifyPaymentMethod(Expense expense, PaymentMethod paymentMethod) {
+        expense.updatePaymentMethod(paymentMethod);
     }
 
     @Transient
     public void modifyExpenseDate(Expense expense, LocalDate expenseDate) {
-        expense.updateExpenseDate(expenseDate);
+        expense.updateAccountBookDate(expenseDate);
     }
 
     public void deleteExpense(Long expenseId, User user) {

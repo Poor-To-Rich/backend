@@ -6,8 +6,10 @@ import com.poortorich.accountbook.service.AccountBookService;
 import com.poortorich.category.domain.model.enums.DefaultExpenseCategory;
 import com.poortorich.category.entity.Category;
 import com.poortorich.category.service.CategoryService;
+import com.poortorich.chart.response.AccountBookBarResponse;
 import com.poortorich.chart.response.CategoryChart;
 import com.poortorich.chart.response.CategoryChartResponse;
+import com.poortorich.chart.response.CategoryLineResponse;
 import com.poortorich.chart.response.CategoryLog;
 import com.poortorich.chart.response.CategorySectionResponse;
 import com.poortorich.chart.response.TotalAmountAndSavingResponse;
@@ -15,6 +17,7 @@ import com.poortorich.chart.service.ChartService;
 import com.poortorich.chart.util.AccountBookUtil;
 import com.poortorich.global.date.constants.DateConstants;
 import com.poortorich.global.date.domain.DateInfo;
+import com.poortorich.global.date.domain.MonthInformation;
 import com.poortorich.global.date.util.DateInfoProvider;
 import com.poortorich.user.entity.User;
 import com.poortorich.user.service.UserService;
@@ -108,5 +111,37 @@ public class ChartFacade {
                         .collect(Collectors.toMap(CategoryChart::getName, CategoryChart::getColor)))
                 .categoryCharts(categoryCharts)
                 .build();
+    }
+
+    public AccountBookBarResponse getAccountBookBar(String username, String date, AccountBookType type) {
+        User user = userService.findUserByUsername(username);
+        List<DateInfo> dateInfos = DateInfoProvider.getPreviousDateInfos(date);
+
+        List<List<AccountBook>> accountBooksGroupByDateInfo = dateInfos.stream()
+                .map(dateInfo -> accountBookService.getAccountBookBetweenDates(
+                        user,
+                        dateInfo.getStartDate(),
+                        dateInfo.getEndDate(),
+                        type))
+                .toList();
+
+        return chartService.getAccountBookBar(dateInfos, accountBooksGroupByDateInfo);
+    }
+
+    public CategoryLineResponse getCategoryLine(String username, Long categoryId, String date) {
+        User user = userService.findUserByUsername(username);
+        Category category = categoryService.getCategoryOrThrow(categoryId, user);
+        MonthInformation monthInfo = (MonthInformation) DateInfoProvider.getDateInfo(date);
+
+        List<AccountBook> accountBooks = accountBookService.getAccountBookByCategoryBetweenDates(user, category,
+                monthInfo.getStartDate(), monthInfo.getEndDate());
+
+        List<List<AccountBook>> weeklyAccountBooks = monthInfo.getWeeks().stream()
+                .map(weekInfo -> accountBookService.getAccountBookByCategoryBetweenDates(
+                        user, category, weekInfo.getStartDate(), weekInfo.getEndDate()
+                ))
+                .toList();
+
+        return chartService.getCategoryLine(monthInfo, accountBooks, weeklyAccountBooks);
     }
 }
