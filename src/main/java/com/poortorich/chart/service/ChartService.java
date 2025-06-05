@@ -34,6 +34,7 @@ public class ChartService {
 
     public TotalAmountAndSavingResponse getTotalAmountAndSavings(
             List<AccountBook> accountBooks,
+            List<AccountBook> savingAccountBooks,
             Category savingCategory
     ) {
         long totalExpense = StatCalculator.calculateSum(
@@ -41,7 +42,7 @@ public class ChartService {
         ).longValue();
 
         long totalSavings = StatCalculator.calculateSum(
-                AccountBookCostExtractor.extractByCategory(accountBooks, savingCategory)
+                AccountBookCostExtractor.extract(savingAccountBooks)
         ).longValue();
 
         return TotalAmountAndSavingResponse.builder()
