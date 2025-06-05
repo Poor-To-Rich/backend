@@ -51,7 +51,7 @@ public class ChartControllerTest extends BaseSecurityTest {
                 .totalSaving(10000L)
                 .build();
 
-        when(chartFacade.getTotalExpenseAmountAndSaving(anyString(), anyString(), any(AccountBookType.class)))
+        when(chartFacade.getTotalAccountBookAmountAndSaving(anyString(), anyString(), any(AccountBookType.class)))
                 .thenReturn(mockResponse);
 
         ResultActions actions = mockMvc.perform(get("/chart/expense/total")
@@ -71,6 +71,6 @@ public class ChartControllerTest extends BaseSecurityTest {
                 .andExpect(jsonPath("$.data.totalSaving").value(mockResponse.getTotalSaving()));
 
         verify(chartFacade, times(1))
-                .getTotalExpenseAmountAndSaving(anyString(), anyString(), any(AccountBookType.class));
+                .getTotalAccountBookAmountAndSaving(anyString(), anyString(), any(AccountBookType.class));
     }
 }

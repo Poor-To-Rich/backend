@@ -45,7 +45,7 @@ public class ChartServiceTest {
                 savingCategory);
 
         assertThat(result.getTotalAmount()).isEqualTo(expectedTotalExpense);
-        assertThat(result.getTotalSaving()).isEqualTo(expectedTotalSavings);
+        assertThat(result.getTotalSaving()).isEqualTo(expectedTotalExpense + expectedTotalSavings);
     }
 
     @Test
@@ -110,6 +110,6 @@ public class ChartServiceTest {
         TotalAmountAndSavingResponse result = chartService.getTotalAmountAndSavings(expenses, expenses, savingCategory);
 
         assertThat(result.getTotalAmount()).isEqualTo(expectedExpense);
-        assertThat(result.getTotalSaving()).isEqualTo(expectedSavings);
+        assertThat(result.getTotalSaving()).isEqualTo(expectedExpense + expectedSavings);
     }
 }
