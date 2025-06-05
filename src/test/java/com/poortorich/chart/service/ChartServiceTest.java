@@ -41,7 +41,7 @@ public class ChartServiceTest {
         long expectedTotalSavings = ExpenseFixture.SAVINGS_INVESTMENT_EXPENSE_1().getCost();
 
         TotalAmountAndSavingResponse result = chartService.getTotalAmountAndSavings(
-                expenses,
+                expenses, expenses,
                 savingCategory);
 
         assertThat(result.getTotalAmount()).isEqualTo(expectedTotalExpense);
@@ -61,6 +61,7 @@ public class ChartServiceTest {
 
         TotalAmountAndSavingResponse result = chartService.getTotalAmountAndSavings(
                 expenses,
+                expenses,
                 savingCategory
         );
 
@@ -78,6 +79,7 @@ public class ChartServiceTest {
         long expectedTotalSaving = 0L;
 
         TotalAmountAndSavingResponse result = chartService.getTotalAmountAndSavings(
+                expenses,
                 expenses,
                 savingCategory
         );
@@ -105,7 +107,7 @@ public class ChartServiceTest {
         long expectedSavings = ExpenseFixture.SAVINGS_INVESTMENT_EXPENSE_1().getCost()
                 + ExpenseFixture.SAVINGS_INVESTMENT_EXPENSE_1().getCost();
 
-        TotalAmountAndSavingResponse result = chartService.getTotalAmountAndSavings(expenses, savingCategory);
+        TotalAmountAndSavingResponse result = chartService.getTotalAmountAndSavings(expenses, expenses, savingCategory);
 
         assertThat(result.getTotalAmount()).isEqualTo(expectedExpense);
         assertThat(result.getTotalSaving()).isEqualTo(expectedSavings);

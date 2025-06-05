@@ -40,7 +40,8 @@ public class ChartFacade {
     private final CategoryService categoryService;
     private final AccountBookService accountBookService;
 
-    public TotalAmountAndSavingResponse getTotalExpenseAmountAndSaving(String username, String date, AccountBookType type) {
+    public TotalAmountAndSavingResponse getTotalExpenseAmountAndSaving(String username, String date,
+                                                                       AccountBookType type) {
         User user = userService.findUserByUsername(username);
         DateInfo dateInfo = DateInfoProvider.getDateInfo(date);
 
@@ -53,8 +54,9 @@ public class ChartFacade {
                 user, dateInfo.getStartDate(), dateInfo.getEndDate(), type
         );
 
-        List<AccountBook> savingAccountBook = accountBookService.
-        return chartService.getTotalAmountAndSavings(userAccountBooks, savingCategory);
+        List<AccountBook> savingAccountBooks = accountBookService.getAccountBookByCategoryBetweenDates(
+                user, savingCategory, dateInfo.getStartDate(), dateInfo.getEndDate());
+        return chartService.getTotalAmountAndSavings(userAccountBooks, savingAccountBooks, savingCategory);
     }
 
     public CategorySectionResponse getCategorySection(String username, Long categoryId, String date, String cursor) {
