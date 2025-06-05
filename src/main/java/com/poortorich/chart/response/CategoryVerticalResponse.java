@@ -6,7 +6,7 @@ import lombok.Data;
 
 @Data
 @Builder
-public class ChartVerticalResponse {
+public class CategoryVerticalResponse {
 
     private String period;
     private Long totalAmount;
