@@ -3,6 +3,7 @@ package com.poortorich.income.facade;
 import com.poortorich.accountbook.entity.AccountBook;
 import com.poortorich.accountbook.entity.enums.IterationType;
 import com.poortorich.accountbook.enums.AccountBookType;
+import com.poortorich.accountbook.request.AccountBookDeleteRequest;
 import com.poortorich.accountbook.request.enums.IterationAction;
 import com.poortorich.accountbook.response.InfoResponse;
 import com.poortorich.accountbook.response.IterationDetailsResponse;
@@ -69,6 +70,28 @@ public class IncomeFacade {
         }
 
         return accountBookService.getInfoResponse(user, id, customIteration, accountBookType);
+    }
+
+    @Transactional
+    public IncomeResponse deleteIncome(String username, Long incomeId, AccountBookDeleteRequest accountBookDeleteRequest) {
+        User user = userService.findUserByUsername(username);
+        if (accountBookDeleteRequest.parseIterationAction() == IterationAction.NONE) {
+            accountBookService.deleteAccountBook(incomeId, user, accountBookType);
+        }
+
+        if (accountBookDeleteRequest.parseIterationAction() != IterationAction.NONE) {
+            AccountBook incomeToDelete = accountBookService.getAccountBookOrThrow(incomeId, user, accountBookType);
+            accountBookService.deleteAccountBookAll(
+                    iterationService.deleteIterations(
+                            incomeToDelete,
+                            user,
+                            accountBookDeleteRequest.parseIterationAction(),
+                            accountBookType),
+                    accountBookType
+            );
+        }
+
+        return IncomeResponse.DELETE_INCOME_SUCCESS;
     }
 
     @Transactional

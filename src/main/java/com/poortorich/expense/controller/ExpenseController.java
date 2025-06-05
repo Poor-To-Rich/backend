@@ -1,7 +1,7 @@
 package com.poortorich.expense.controller;
 
 import com.poortorich.expense.facade.ExpenseFacade;
-import com.poortorich.expense.request.ExpenseDeleteRequest;
+import com.poortorich.accountbook.request.AccountBookDeleteRequest;
 import com.poortorich.expense.request.ExpenseRequest;
 import com.poortorich.expense.response.ExpenseResponse;
 import com.poortorich.global.response.BaseResponse;
@@ -56,8 +56,8 @@ public class ExpenseController {
     public ResponseEntity<BaseResponse> deleteExpense(
             @AuthenticationPrincipal UserDetails userDetails,
             @PathVariable Long expenseId,
-            @RequestBody @Valid ExpenseDeleteRequest expenseDeleteRequest) {
-        return BaseResponse.toResponseEntity(expenseFacade.deleteExpense(expenseId, expenseDeleteRequest, userDetails.getUsername()));
+            @RequestBody @Valid AccountBookDeleteRequest accountBookDeleteRequest) {
+        return BaseResponse.toResponseEntity(expenseFacade.deleteExpense(expenseId, accountBookDeleteRequest, userDetails.getUsername()));
     }
 
     @GetMapping("/iteration/details")

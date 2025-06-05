@@ -10,7 +10,7 @@ import com.poortorich.accountbook.service.AccountBookService;
 import com.poortorich.category.entity.Category;
 import com.poortorich.category.service.CategoryService;
 import com.poortorich.expense.entity.Expense;
-import com.poortorich.expense.request.ExpenseDeleteRequest;
+import com.poortorich.accountbook.request.AccountBookDeleteRequest;
 import com.poortorich.expense.request.ExpenseRequest;
 import com.poortorich.expense.response.ExpenseResponse;
 import com.poortorich.expense.service.ExpenseService;
@@ -36,7 +36,6 @@ public class ExpenseFacade {
     private final CategoryService categoryService;
     private final IterationService iterationService;
     private final UserService userService;
-    // Change Service Layer
     private final AccountBookService accountBookService;
 
     @Transactional
@@ -72,21 +71,19 @@ public class ExpenseFacade {
     }
 
     @Transactional
-    public ExpenseResponse deleteExpense(Long expenseId, ExpenseDeleteRequest expenseDeleteRequest, String username) {
+    public ExpenseResponse deleteExpense(Long expenseId, AccountBookDeleteRequest accountBookDeleteRequest, String username) {
         User user = userService.findUserByUsername(username);
-        if (expenseDeleteRequest.parseIterationAction() == IterationAction.NONE) {
+        if (accountBookDeleteRequest.parseIterationAction() == IterationAction.NONE) {
             accountBookService.deleteAccountBook(expenseId, user, accountBookType);
-            // expenseService.deleteExpense(expenseId, user);
         }
 
-        if (expenseDeleteRequest.parseIterationAction() != IterationAction.NONE) {
+        if (accountBookDeleteRequest.parseIterationAction() != IterationAction.NONE) {
             AccountBook expenseToDelete = accountBookService.getAccountBookOrThrow(expenseId, user, accountBookType);
-//            Expense expenseToDelete = expenseService.getExpenseOrThrow(expenseId, user);
             accountBookService.deleteAccountBookAll(
                     iterationService.deleteIterations(
                             expenseToDelete,
                             user,
-                            expenseDeleteRequest.parseIterationAction(),
+                            accountBookDeleteRequest.parseIterationAction(),
                             accountBookType),
                     accountBookType
             );
