@@ -3,6 +3,7 @@ package com.poortorich.income.entity;
 import com.poortorich.accountbook.entity.AccountBook;
 import com.poortorich.accountbook.entity.enums.IterationType;
 import com.poortorich.category.entity.Category;
+import com.poortorich.expense.entity.enums.PaymentMethod;
 import com.poortorich.iteration.entity.Iteration;
 import com.poortorich.iteration.entity.IterationIncomes;
 import com.poortorich.user.entity.User;
@@ -88,5 +89,10 @@ public class Income implements AccountBook {
     @Override
     public Iteration getGeneratedIteration() {
         return generatedIterationIncomes;
+    }
+
+    @Override
+    public PaymentMethod getPaymentMethod() {
+        return null;
     }
 }
