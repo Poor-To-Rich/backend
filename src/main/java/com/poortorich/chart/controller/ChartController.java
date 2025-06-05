@@ -33,7 +33,18 @@ public class ChartController {
     ) {
         return DataResponse.toResponseEntity(
                 ChartResponse.GET_TOTAL_EXPENSE_AND_SAVINGS_SUCCESS,
-                chartFacade.getTotalExpenseAmountAndSaving(userDetails.getUsername(), date)
+                chartFacade.getTotalAccountBookAmountAndSaving(userDetails.getUsername(), date, AccountBookType.EXPENSE)
+        );
+    }
+
+    @GetMapping("/income/total")
+    public ResponseEntity<BaseResponse> getTotalIncomeAmountAndSaving(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @RequestParam("date") @Nullable String date
+    ) {
+        return DataResponse.toResponseEntity(
+                ChartResponse.GET_TOTAL_INCOME_AND_SAVINGS_SUCCESS,
+                chartFacade.getTotalAccountBookAmountAndSaving(userDetails.getUsername(), date, AccountBookType.INCOME)
         );
     }
 

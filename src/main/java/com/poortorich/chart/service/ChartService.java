@@ -32,6 +32,7 @@ public class ChartService {
 
     public TotalAmountAndSavingResponse getTotalAmountAndSavings(
             List<AccountBook> accountBooks,
+            List<AccountBook> savingAccountBooks,
             Category savingCategory
     ) {
         long totalExpense = StatCalculator.calculateSum(
@@ -39,7 +40,7 @@ public class ChartService {
         ).longValue();
 
         long totalSavings = StatCalculator.calculateSum(
-                AccountBookCostExtractor.extractByCategory(accountBooks, savingCategory)
+                AccountBookCostExtractor.extract(savingAccountBooks)
         ).longValue();
 
         return TotalAmountAndSavingResponse.builder()
@@ -121,7 +122,7 @@ public class ChartService {
 
         return CategoryLineResponse.builder()
                 .period(PeriodFormatter.formatLocalDateRange(monthInfo.getStartDate(), monthInfo.getEndDate()))
-                .totalAmounts(StatCalculator.calculateSum(AccountBookCostExtractor.extract(accountBooks)).longValue())
+                .totalAmount(StatCalculator.calculateSum(AccountBookCostExtractor.extract(accountBooks)).longValue())
                 .weeklyAmounts(periodTotals)
                 .build();
     }

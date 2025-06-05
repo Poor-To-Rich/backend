@@ -103,7 +103,7 @@ public class AccountBookService {
                         accountBookRepository.getAccountBookByCategoryBetweenDates(user, category, startDate, endDate))
                 .orElseThrow(() -> new NotFoundException(ExpenseResponse.EXPENSE_NON_EXISTENT));
     }
-
+    
     public Slice<AccountBook> getAccountBookByUserAndCategoryWithinDateRangeWithCursor(
             User user,
             Category category,

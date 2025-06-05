@@ -32,6 +32,12 @@ public enum ChartResponse implements Response {
             HttpStatus.OK,
             ChartResponseMessage.GET_CATEGORY_LINE_SUCCESS,
             null
+    ),
+
+    GET_TOTAL_INCOME_AND_SAVINGS_SUCCESS(
+            HttpStatus.OK,
+            ChartResponseMessage.GET_TOTAL_INCOME_AND_SAVINGS_SUCCESS,
+            null
     );
 
     private final HttpStatus httpStatus;
