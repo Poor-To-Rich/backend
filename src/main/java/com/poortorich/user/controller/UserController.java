@@ -18,6 +18,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -82,6 +83,12 @@ public class UserController {
             @RequestBody @Valid PasswordUpdateRequest passwordUpdateRequest
     ) {
         Response response = userFacade.updateUserPassword(userDetails.getUsername(), passwordUpdateRequest);
+        return BaseResponse.toResponseEntity(response);
+    }
+
+    @DeleteMapping("/reset")
+    public ResponseEntity<BaseResponse> resetUserData(@AuthenticationPrincipal UserDetails userDetails) {
+        Response response = userFacade.resetAllByUser(userDetails.getUsername());
         return BaseResponse.toResponseEntity(response);
     }
 }
