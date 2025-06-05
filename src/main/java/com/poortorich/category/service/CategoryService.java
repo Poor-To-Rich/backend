@@ -81,9 +81,7 @@ public class CategoryService {
     public Response createCategory(CategoryInfoRequest customCategory, CategoryType type, String username) {
         User user = userService.findUserByUsername(username);
 
-        if (categoryRepository.findByNameAndUser(customCategory.getName(), user).isPresent()) {
-            return CategoryResponse.CATEGORY_NAME_DUPLICATE;
-        }
+        validateCategoryNameDuplication(user, customCategory.getName(), type);
 
         categoryRepository.save(buildCategory(customCategory, type, user));
         return CategoryResponse.CREATE_CATEGORY_SUCCESS;
@@ -126,8 +124,7 @@ public class CategoryService {
     public Response modifyCategory(Long id, CategoryInfoRequest categoryRequest, String username) {
         User user = userService.findUserByUsername(username);
 
-        categoryRepository.findByNameAndUser(categoryRequest.getName(), user)
-                .orElseThrow(() -> new BadRequestException(CategoryResponse.CATEGORY_NAME_DUPLICATE));
+        validateCategoryNameDuplication(user, categoryRequest.getName(), CategoryType.CUSTOM_INCOME);
 
         Category category = getCategoryOrThrow(id, user);
         category.updateCategory(categoryRequest.getName(), categoryRequest.getColor());
@@ -140,6 +137,12 @@ public class CategoryService {
         categoryRepository.delete(category);
 
         return CategoryResponse.DELETE_CATEGORY_SUCCESS;
+    }
+
+    public void validateCategoryNameDuplication(User user, String name, CategoryType type) {
+        if (categoryRepository.findByUserAndNameAndTypeIn(user, name, type.getSameGroupTypes()).isPresent()) {
+            throw new BadRequestException(CategoryResponse.CATEGORY_NAME_DUPLICATE);
+        }
     }
 
     public Category findCategoryByName(String name, User user) {
