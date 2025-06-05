@@ -8,11 +8,10 @@ import com.poortorich.iteration.entity.Iteration;
 import com.poortorich.iteration.entity.IterationExpenses;
 import com.poortorich.iteration.entity.IterationIncomes;
 import com.poortorich.user.entity.User;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
-
 import java.time.LocalDate;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
@@ -28,17 +27,22 @@ public class IterationRepository {
         }
     }
 
-    public Iteration findByGeneratedAccountBookAndUser(User user, AccountBook accountBookToDelete, AccountBookType type) {
+    public Iteration findByGeneratedAccountBookAndUser(User user, AccountBook accountBookToDelete,
+                                                       AccountBookType type) {
         return switch (type) {
-            case EXPENSE -> iterationExpensesRepository.findByGeneratedExpenseAndUser((Expense) accountBookToDelete, user);
+            case EXPENSE ->
+                    iterationExpensesRepository.findByGeneratedExpenseAndUser((Expense) accountBookToDelete, user);
             case INCOME -> iterationIncomesRepository.findByGeneratedIncomeAndUser((Income) accountBookToDelete, user);
         };
     }
 
-    public List<Iteration> findAllByOriginalAccountBookAndUser(User user, AccountBook originalAccountBook, AccountBookType type) {
+    public List<Iteration> findAllByOriginalAccountBookAndUser(User user, AccountBook originalAccountBook,
+                                                               AccountBookType type) {
         List<? extends Iteration> allIteration = switch (type) {
-            case EXPENSE -> iterationExpensesRepository.findAllByOriginalExpenseAndUser((Expense) originalAccountBook, user);
-            case INCOME -> iterationIncomesRepository.findAllByOriginalIncomeAndUser((Income) originalAccountBook, user);
+            case EXPENSE ->
+                    iterationExpensesRepository.findAllByOriginalExpenseAndUser((Expense) originalAccountBook, user);
+            case INCOME ->
+                    iterationIncomesRepository.findAllByOriginalIncomeAndUser((Income) originalAccountBook, user);
         };
         return mapToIteration(allIteration);
     }
@@ -54,7 +58,8 @@ public class IterationRepository {
         }
     }
 
-    public List<Iteration> getThisAndFutureIterations(AccountBook originalAccountBook, User user, LocalDate accountBookDate, AccountBookType type) {
+    public List<Iteration> getThisAndFutureIterations(AccountBook originalAccountBook, User user,
+                                                      LocalDate accountBookDate, AccountBookType type) {
         List<? extends Iteration> thisAndFutureIterations = switch (type) {
             case EXPENSE -> iterationExpensesRepository
                     .getThisAndFutureIterationExpenses((Expense) originalAccountBook, user, accountBookDate);
@@ -75,5 +80,10 @@ public class IterationRepository {
             case EXPENSE -> iterationExpensesRepository.getOriginalExpenseIds();
             case INCOME -> iterationIncomesRepository.getOriginalIncomeIds();
         };
+    }
+
+    public void deleteAllIterationByUser(User user) {
+        iterationExpensesRepository.deleteByUser(user);
+        iterationIncomesRepository.deleteByUser(user);
     }
 }
