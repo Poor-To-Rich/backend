@@ -26,7 +26,13 @@ public enum ChartResponse implements Response {
     GET_EXPENSE_BAR_SUCCESS(
             HttpStatus.OK,
             ChartResponseMessage.GET_EXPENSE_BAR_SUCCESS,
-            null);
+            null
+    ),
+    GET_CATEGORY_LINE_SUCCESS(
+            HttpStatus.OK,
+            ChartResponseMessage.GET_CATEGORY_LINE_SUCCESS,
+            null
+    );
 
     private final HttpStatus httpStatus;
     private final String message;

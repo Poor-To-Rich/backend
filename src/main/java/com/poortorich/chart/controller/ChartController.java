@@ -3,9 +3,12 @@ package com.poortorich.chart.controller;
 import com.poortorich.accountbook.enums.AccountBookType;
 import com.poortorich.chart.facade.ChartFacade;
 import com.poortorich.chart.response.enums.ChartResponse;
+import com.poortorich.global.date.constants.DatePattern;
+import com.poortorich.global.date.constants.DateResponseMessage;
 import com.poortorich.global.response.BaseResponse;
 import com.poortorich.global.response.DataResponse;
 import jakarta.annotation.Nullable;
+import jakarta.validation.constraints.Pattern;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -66,6 +69,20 @@ public class ChartController {
         return DataResponse.toResponseEntity(
                 ChartResponse.GET_EXPENSE_BAR_SUCCESS,
                 chartFacade.getAccountBookBar(userDetails.getUsername(), date, AccountBookType.EXPENSE)
+        );
+    }
+
+    @GetMapping("/{categoryId}/line")
+    public ResponseEntity<BaseResponse> getCategoryLine(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @PathVariable("categoryId") Long categoryId,
+            @RequestParam("date")
+            @Pattern(regexp = DatePattern.YEAR_MONTH_REGEX, message = DateResponseMessage.UNSUPPORTED_DATE_FORMAT)
+            String date
+    ) {
+        return DataResponse.toResponseEntity(
+                ChartResponse.GET_CATEGORY_LINE_SUCCESS,
+                chartFacade.getCategoryLine(userDetails.getUsername(), categoryId, date)
         );
     }
 }

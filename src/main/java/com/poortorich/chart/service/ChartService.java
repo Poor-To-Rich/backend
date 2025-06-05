@@ -5,14 +5,17 @@ import com.poortorich.accountbook.util.AccountBookCostExtractor;
 import com.poortorich.category.entity.Category;
 import com.poortorich.chart.response.AccountBookBarResponse;
 import com.poortorich.chart.response.CategoryChart;
+import com.poortorich.chart.response.CategoryLineResponse;
 import com.poortorich.chart.response.CategoryLog;
 import com.poortorich.chart.response.PeriodTotal;
 import com.poortorich.chart.response.TotalAmountAndSavingResponse;
 import com.poortorich.chart.response.TransactionRecord;
 import com.poortorich.chart.util.AccountBookUtil;
 import com.poortorich.chart.util.AmountFormatter;
+import com.poortorich.chart.util.PeriodFormatter;
 import com.poortorich.global.date.domain.DateInfo;
 import com.poortorich.global.date.domain.MonthInformation;
+import com.poortorich.global.date.domain.WeekInformation;
 import com.poortorich.global.date.domain.YearInformation;
 import com.poortorich.global.date.response.enums.DateResponse;
 import com.poortorich.global.exceptions.BadRequestException;
@@ -95,6 +98,31 @@ public class ChartService {
                         totalAmounts.get(totalAmounts.size() - 2)))
                 .averageAmount(AmountFormatter.convertAmount(StatCalculator.calculateAverage(totalAmounts).longValue()))
                 .totalAmounts(periodTotals)
+                .build();
+    }
+
+    public CategoryLineResponse getCategoryLine(MonthInformation monthInfo, List<AccountBook> accountBooks,
+                                                List<List<AccountBook>> weeklyAccountBooks) {
+        List<WeekInformation> weekInfos = monthInfo.getWeeks();
+        List<PeriodTotal> periodTotals = new ArrayList<>();
+        for (int i = 0; i < weekInfos.size(); i++) {
+            WeekInformation weekInfo = weekInfos.get(i);
+            String period = PeriodFormatter.formatMonthDayRange(weekInfo.getStartDate(), weekInfo.getEndDate());
+            Long totalAmount = StatCalculator.calculateSum(AccountBookCostExtractor.extract(weeklyAccountBooks.get(i)))
+                    .longValue();
+
+            periodTotals.add(
+                    PeriodTotal.builder()
+                            .period(period)
+                            .totalAmount(totalAmount)
+                            .build()
+            );
+        }
+
+        return CategoryLineResponse.builder()
+                .period(PeriodFormatter.formatLocalDateRange(monthInfo.getStartDate(), monthInfo.getEndDate()))
+                .totalAmounts(StatCalculator.calculateSum(AccountBookCostExtractor.extract(accountBooks)).longValue())
+                .weeklyAmounts(periodTotals)
                 .build();
     }
 }
