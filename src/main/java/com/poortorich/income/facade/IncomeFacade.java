@@ -151,9 +151,9 @@ public class IncomeFacade {
             Category category,
             User user
     ) {
-        List<Iteration> modifyIterationExpenses
+        List<Iteration> modifyIterationIncomes
                 = iterationService.getIterationByIterationAction(income, user, iterationAction, accountBookType);
-        for (Iteration iteration : modifyIterationExpenses) {
+        for (Iteration iteration : modifyIterationIncomes) {
             accountBookService.modifyAccountBook(iteration.getGeneratedAccountBook(), incomeRequest, category);
         }
     }
