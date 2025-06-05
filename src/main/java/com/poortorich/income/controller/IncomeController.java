@@ -13,6 +13,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -40,6 +41,15 @@ public class IncomeController {
                 IncomeResponse.GET_INCOME_SUCCESS,
                 incomeFacade.getIncome(userDetails.getUsername(), incomeId)
         );
+    }
+
+    @PutMapping("/{incomeId}")
+    public ResponseEntity<BaseResponse> modifyIncome(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @PathVariable Long incomeId,
+            @RequestBody @Valid IncomeRequest incomeRequest
+    ) {
+        return BaseResponse.toResponseEntity(incomeFacade.modifyIncome(userDetails.getUsername(), incomeId, incomeRequest));
     }
 
     @GetMapping("/iteration/details")

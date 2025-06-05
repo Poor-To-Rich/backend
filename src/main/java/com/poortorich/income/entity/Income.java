@@ -89,4 +89,18 @@ public class Income implements AccountBook {
     public Iteration getGeneratedIteration() {
         return generatedIterationIncomes;
     }
+
+    @Override
+    public void updateAccountBook(String title, Long cost, String memo, IterationType iterationType, Category category) {
+        this.title = title;
+        this.cost = cost;
+        this.memo = memo;
+        this.iterationType = iterationType;
+        this.category = category;
+    }
+
+    @Override
+    public void updateAccountBookDate(LocalDate accountBookDate) {
+        this.incomeDate = accountBookDate;
+    }
 }

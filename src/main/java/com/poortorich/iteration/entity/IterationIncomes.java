@@ -72,7 +72,8 @@ public class IterationIncomes implements Iteration{
         return generatedIncome;
     }
 
-    public void updateOriginalIncome(Income originalIncome) {
-        this.originalIncome = originalIncome;
+    @Override
+    public void updateOriginalAccountBook(AccountBook originalIncome) {
+        this.originalIncome = (Income) originalIncome;
     }
 }
