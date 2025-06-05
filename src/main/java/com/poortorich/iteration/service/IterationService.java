@@ -477,4 +477,8 @@ public class IterationService {
                 originalExpense, user, targetExpense.getExpenseDate()
         );
     }
+
+    public List<Long> getIterationAccountBookIds(AccountBookType type) {
+        return iterationRepository.originalAccountBookIds(type);
+    }
 }
