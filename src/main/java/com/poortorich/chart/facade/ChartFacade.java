@@ -40,8 +40,8 @@ public class ChartFacade {
     private final CategoryService categoryService;
     private final AccountBookService accountBookService;
 
-    public TotalAmountAndSavingResponse getTotalExpenseAmountAndSaving(String username, String date,
-                                                                       AccountBookType type) {
+    public TotalAmountAndSavingResponse getTotalAccountBookAmountAndSaving(String username, String date,
+                                                                           AccountBookType type) {
         User user = userService.findUserByUsername(username);
         DateInfo dateInfo = DateInfoProvider.getDateInfo(date);
 
