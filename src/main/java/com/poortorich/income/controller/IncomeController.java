@@ -59,7 +59,7 @@ public class IncomeController {
             @AuthenticationPrincipal UserDetails userDetails,
             @PathVariable Long incomeId,
             @RequestBody @Valid AccountBookDeleteRequest accountBookDeleteRequest
-            ) {
+    ) {
         return BaseResponse.toResponseEntity(
                 incomeFacade.deleteIncome(userDetails.getUsername(), incomeId, accountBookDeleteRequest)
         );
