@@ -85,4 +85,18 @@ public class ChartController {
                 chartFacade.getCategoryLine(userDetails.getUsername(), categoryId, date)
         );
     }
+
+    @GetMapping("/{categoryId}/vertical")
+    public ResponseEntity<BaseResponse> getCategoryVertical(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @PathVariable("categoryId") Long categoryId,
+            @RequestParam("date")
+            @Pattern(regexp = DatePattern.YEAR_REGEX, message = DateResponseMessage.UNSUPPORTED_DATE_FORMAT)
+            String date
+    ) {
+        return DataResponse.toResponseEntity(
+                ChartResponse.GET_CATEGORY_VERTICAL_SUCCESS,
+                chartFacade.getCategoryVertical(userDetails.getUsername(), categoryId, date)
+        );
+    }
 }
