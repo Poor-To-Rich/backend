@@ -121,7 +121,7 @@ public class ChartService {
 
         return CategoryLineResponse.builder()
                 .period(PeriodFormatter.formatLocalDateRange(monthInfo.getStartDate(), monthInfo.getEndDate()))
-                .totalAmounts(StatCalculator.calculateSum(AccountBookCostExtractor.extract(accountBooks)).longValue())
+                .totalAmount(StatCalculator.calculateSum(AccountBookCostExtractor.extract(accountBooks)).longValue())
                 .weeklyAmounts(periodTotals)
                 .build();
     }
