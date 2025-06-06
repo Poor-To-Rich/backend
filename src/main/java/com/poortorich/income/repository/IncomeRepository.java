@@ -59,4 +59,6 @@ public interface IncomeRepository extends JpaRepository<Income, Long> {
             @Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate
     );
+
+    void deleteByUser(User user);
 }

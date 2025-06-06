@@ -59,4 +59,6 @@ public interface ExpenseRepository extends JpaRepository<Expense, Long> {
             @Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate
     );
+
+    void deleteByUser(User user);
 }

@@ -160,4 +160,9 @@ public class AccountBookRepository {
                 .map(accountBook -> (AccountBook) accountBook)
                 .toList();
     }
+
+    public void deleteAllAccountBooksByUser(User user) {
+        expenseRepository.deleteByUser(user);
+        incomeRepository.deleteByUser(user);
+    }
 }

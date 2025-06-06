@@ -13,6 +13,7 @@ import com.poortorich.user.response.UserDetailResponse;
 import com.poortorich.user.response.UserEmailResponse;
 import com.poortorich.user.response.enums.UserResponse;
 import com.poortorich.user.service.RedisUserReservationService;
+import com.poortorich.user.service.UserResetService;
 import com.poortorich.user.service.UserService;
 import com.poortorich.user.service.UserValidationService;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +28,7 @@ public class UserFacade {
     private final UserValidationService userValidationService;
     private final FileUploadService fileUploadService;
     private final RedisUserReservationService userReservationService;
-
+    private final UserResetService userResetService;
     private final CategoryService categoryService;
 
     @Transactional
@@ -79,5 +80,11 @@ public class UserFacade {
         userValidationService.validateUpdateUserPassword(username, passwordUpdateRequest);
         userService.updatePassword(username, passwordUpdateRequest.getNewPassword());
         return UserResponse.PASSWORD_UPDATE_SUCCESS;
+    }
+
+    public Response resetAllByUser(String username) {
+        User user = userService.findUserByUsername(username);
+        userResetService.deleteUserAllData(user);
+        return UserResponse.RESET_SUCCESS;
     }
 }
