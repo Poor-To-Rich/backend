@@ -5,16 +5,14 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Getter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class MonthlyTotalReportResponse {
+public class Logs {
 
-    private Long yearTotalIncome;
-    private Long yearTotalExpense;
-    private Long yearTotalAmount;
-    private List<Logs> logs;
+    private String period;
+    private Long totalIncome;
+    private Long totalExpense;
+    private Long totalAmount;
 }

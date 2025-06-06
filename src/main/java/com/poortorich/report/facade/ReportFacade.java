@@ -7,16 +7,18 @@ import com.poortorich.accountbook.util.AccountBookCostExtractor;
 import com.poortorich.global.date.constants.DateConstants;
 import com.poortorich.global.date.constants.DatePattern;
 import com.poortorich.global.date.domain.MonthInformation;
+import com.poortorich.global.date.domain.WeekInformation;
 import com.poortorich.global.date.domain.YearInformation;
 import com.poortorich.global.date.util.DateInfoProvider;
 import com.poortorich.global.date.util.DateParser;
 import com.poortorich.global.exceptions.BadRequestException;
 import com.poortorich.global.statistics.util.StatCalculator;
 import com.poortorich.report.response.DailyDetailsResponse;
-import com.poortorich.report.response.MonthlyLogs;
+import com.poortorich.report.response.Logs;
 import com.poortorich.report.response.MonthlyTotalReportResponse;
 import com.poortorich.report.response.MonthlyTotalResponse;
 import com.poortorich.report.response.WeeklyDetailsResponse;
+import com.poortorich.report.response.WeeklyTotalReportResponse;
 import com.poortorich.report.response.enums.ReportResponse;
 import com.poortorich.report.service.ReportService;
 import com.poortorich.user.entity.User;
@@ -33,8 +35,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-
-import static com.poortorich.global.date.constants.DateConstants.MONTHS_ORDERED;
 
 @Service
 @RequiredArgsConstructor
@@ -160,12 +160,12 @@ public class ReportFacade {
                 .yearTotalIncome(totalIncome)
                 .yearTotalExpense(totalExpense)
                 .yearTotalAmount(totalIncome - totalExpense)
-                .monthlyLogs(getMonthlyLogs(user, yearInfo))
+                .logs(getMonthlyLogs(user, yearInfo))
                 .build();
     }
 
-    private List<MonthlyLogs> getMonthlyLogs(User user, YearInformation yearInfo) {
-        List<MonthlyLogs> monthlyLogs = new ArrayList<>();
+    private List<Logs> getMonthlyLogs(User user, YearInformation yearInfo) {
+        List<Logs> logs = new ArrayList<>();
         for (Month month : DateConstants.MONTHS_ORDERED) {
             MonthInformation monthInfo = yearInfo.getMonths().get(month);
 
@@ -177,11 +177,39 @@ public class ReportFacade {
                     user, monthInfo.getStartDate(), monthInfo.getEndDate(), AccountBookType.EXPENSE
             );
 
-            monthlyLogs.add(reportService.getMonthlyLogs(
+            logs.add(reportService.getLogs(
                     monthInfo.getStartDate(), monthInfo.getEndDate(), monthlyIncomes, monthlyExpenses
             ));
         }
 
-        return monthlyLogs;
+        return logs;
+    }
+
+    public WeeklyTotalReportResponse getWeeklyTotalReport(String username, String date) {
+        User user = userService.findUserByUsername(username);
+        MonthInformation monthInfo = (MonthInformation) DateInfoProvider.getDateInfo(date);
+
+        return WeeklyTotalReportResponse.builder()
+                .weeklyLogs(getWeeklyLogs(user, monthInfo))
+                .build();
+    }
+
+    private List<Logs> getWeeklyLogs(User user, MonthInformation monthInfo) {
+        List<Logs> weeklyLogs = new ArrayList<>();
+        for (WeekInformation weekInfo : monthInfo.getWeeks()) {
+            List<AccountBook> weeklyIncomes = accountBookService.getAccountBookBetweenDates(
+                    user, weekInfo.getStartDate(), weekInfo.getEndDate(), AccountBookType.INCOME
+            );
+
+            List<AccountBook> weeklyExpenses = accountBookService.getAccountBookBetweenDates(
+                    user, weekInfo.getStartDate(), weekInfo.getEndDate(), AccountBookType.EXPENSE
+            );
+
+            weeklyLogs.add(reportService.getLogs(
+                    weekInfo.getStartDate(), weekInfo.getEndDate(), weeklyIncomes, weeklyExpenses
+            ));
+        }
+
+        return weeklyLogs;
     }
 }
