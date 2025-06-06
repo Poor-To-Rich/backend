@@ -11,7 +11,7 @@ import com.poortorich.global.statistics.util.StatCalculator;
 import com.poortorich.report.response.DailyDetailsResponse;
 import com.poortorich.report.response.DailyFinance;
 import com.poortorich.report.response.DailyTransaction;
-import com.poortorich.report.response.MonthlyLogs;
+import com.poortorich.report.response.Logs;
 import com.poortorich.report.response.WeeklyDetailsResponse;
 import org.springframework.stereotype.Service;
 
@@ -146,27 +146,17 @@ public class ReportService {
                 .toList();
     }
 
-    public MonthlyLogs getMonthlyLogs(
+    public Logs getLogs(
             LocalDate startDate, LocalDate endDate, List<AccountBook> monthlyIncomes, List<AccountBook> monthlyExpenses
     ) {
-        List<AccountBook> monthlyAccountBooks = mergeAccountBook(monthlyIncomes, monthlyExpenses);
-
-        Long totalIncome = 0L;
-        Long totalExpense = 0L;
-        for (AccountBook accountBook : monthlyAccountBooks) {
-            if (inferAccountBookType(accountBook) == AccountBookType.EXPENSE) {
-                totalExpense += accountBook.getCost();
-            }
-            else {
-                totalIncome += accountBook.getCost();
-            }
-        }
+        Long totalIncome = StatCalculator.calculateSum(AccountBookCostExtractor.extract(monthlyIncomes)).longValue();
+        Long totalExpense = StatCalculator.calculateSum(AccountBookCostExtractor.extract(monthlyExpenses)).longValue();
 
         String startDateString = startDate.format(DateTimeFormatter.ofPattern(DatePattern.MONTH_DAY_DOT_PATTERN));
         String endDateString = endDate.format(DateTimeFormatter.ofPattern(DatePattern.MONTH_DAY_DOT_PATTERN));
-        String period = startDateString + " ~ " + endDateString;
+        String period = startDateString + "~" + endDateString;
 
-        return MonthlyLogs.builder()
+        return Logs.builder()
                 .period(period)
                 .totalIncome(totalIncome)
                 .totalExpense(totalExpense)

@@ -67,4 +67,15 @@ public class ReportController {
                 reportFacade.getMonthlyTotalReport(userDetails.getUsername(), date)
         );
     }
+
+    @GetMapping("/weekly/total")
+    public ResponseEntity<BaseResponse> getWeeklyTotalReport(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @RequestParam("date") @Nullable String date
+    ) {
+        return DataResponse.toResponseEntity(
+                ReportResponse.GET_WEEKLY_TOTAL_REPORT_SUCCESS,
+                reportFacade.getWeeklyTotalReport(userDetails.getUsername(), date)
+        );
+    }
 }
