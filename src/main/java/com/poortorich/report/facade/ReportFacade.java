@@ -2,16 +2,17 @@ package com.poortorich.report.facade;
 
 import com.poortorich.accountbook.entity.AccountBook;
 import com.poortorich.accountbook.enums.AccountBookType;
-import com.poortorich.accountbook.response.AccountBookInfoResponse;
 import com.poortorich.accountbook.service.AccountBookService;
-import com.poortorich.chart.util.AccountBookUtil;
+import com.poortorich.accountbook.util.AccountBookCostExtractor;
 import com.poortorich.global.date.constants.DateConstants;
 import com.poortorich.global.date.constants.DatePattern;
 import com.poortorich.global.date.domain.MonthInformation;
 import com.poortorich.global.date.util.DateInfoProvider;
 import com.poortorich.global.date.util.DateParser;
 import com.poortorich.global.exceptions.BadRequestException;
+import com.poortorich.global.statistics.util.StatCalculator;
 import com.poortorich.report.response.DailyDetailsResponse;
+import com.poortorich.report.response.MonthlyTotalResponse;
 import com.poortorich.report.response.WeeklyDetailsResponse;
 import com.poortorich.report.response.enums.ReportResponse;
 import com.poortorich.report.service.ReportService;
@@ -50,7 +51,7 @@ public class ReportFacade {
 
     public WeeklyDetailsResponse getWeeklyDetailsReport(String username, String date, Long week, String cursor) {
         User user = userService.findUserByUsername(username);
-        MonthInformation monthInfo= (MonthInformation) DateInfoProvider.getDateInfo(date);
+        MonthInformation monthInfo = (MonthInformation) DateInfoProvider.getDateInfo(date);
         if (monthInfo.getWeeks().size() < week) {
             throw new BadRequestException(ReportResponse.WEEK_INVALID);
         }
@@ -99,5 +100,28 @@ public class ReportFacade {
         Boolean hasNext = accountBookService.hasNextPage(user, nextCursor, endDate);
 
         return reportService.getWeeklyDetailsReport(weeklyAccountBooks, period, nextCursor, hasNext);
+    }
+
+    public MonthlyTotalResponse getMonthlyTotalReport(String username, String date) {
+        User user = userService.findUserByUsername(username);
+        MonthInformation monthInfo = (MonthInformation) DateInfoProvider.getDateInfo(date);
+
+        List<AccountBook> monthlyIncomes = accountBookService.getAccountBookBetweenDates(
+                user, monthInfo.getStartDate(), monthInfo.getEndDate(), AccountBookType.INCOME
+        );
+
+        List<AccountBook> monthlyExpenses = accountBookService.getAccountBookBetweenDates(
+                user, monthInfo.getStartDate(), monthInfo.getEndDate(), AccountBookType.EXPENSE
+        );
+
+        Long totalIncome = StatCalculator.calculateSum(AccountBookCostExtractor.extract(monthlyIncomes)).longValue();
+        Long totalExpense = StatCalculator.calculateSum(AccountBookCostExtractor.extract(monthlyExpenses)).longValue();
+
+        return MonthlyTotalResponse.builder()
+                .totalAmount(totalIncome - totalExpense)
+                .totalIncome(totalIncome)
+                .totalExpense(totalExpense)
+                .transactions(reportService.getDailyFinance(monthlyIncomes, monthlyExpenses))
+                .build();
     }
 }
