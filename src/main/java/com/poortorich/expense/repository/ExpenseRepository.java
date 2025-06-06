@@ -1,5 +1,6 @@
 package com.poortorich.expense.repository;
 
+import com.poortorich.accountbook.entity.AccountBook;
 import com.poortorich.category.entity.Category;
 import com.poortorich.expense.entity.Expense;
 import com.poortorich.user.entity.User;
@@ -46,6 +47,25 @@ public interface ExpenseRepository extends JpaRepository<Expense, Long> {
     );
 
     @Query("""
+            SELECT e
+            FROM Expense e
+            WHERE e.user = :user
+              AND e.expenseDate >= :startDate
+              AND e.expenseDate <= :endDate
+              AND e.expenseDate >= :cursor
+            ORDER BY e.expenseDate ASC
+            """)
+    Slice<? extends AccountBook> findExpenseByUserWithinDateRangeWithCursor(
+            @Param("user") User user,
+            @Param("startDate") LocalDate startDate,
+            @Param("endDate") LocalDate endDate,
+            @Param("cursor") LocalDate cursor,
+            Pageable pageable
+    );
+
+    List<Expense> findByUserAndExpenseDate(User user, LocalDate expenseDate);
+
+    @Query("""
             SELECT COUNT(e)
             FROM Expense e
             WHERE e.category = :category
@@ -59,4 +79,13 @@ public interface ExpenseRepository extends JpaRepository<Expense, Long> {
             @Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate
     );
+
+    @Query("""
+            SELECT COUNT(e)
+            FROM Expense e
+            WHERE e.user = :user
+              AND e.expenseDate >= :startDate
+              AND e.expenseDate <= :endDate
+            """)
+    Long countByUserAndBetweenDates(User user, LocalDate startDate, LocalDate endDate);
 }

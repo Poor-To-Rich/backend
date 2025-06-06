@@ -126,6 +126,30 @@ public class AccountBookRepository {
                 accountBookPage.hasNext());
     }
 
+    public Slice<AccountBook> findByUserWithinDateRangeWithCursor(
+            User user,
+            LocalDate startDate,
+            LocalDate endDate,
+            LocalDate cursor,
+            Pageable pageable,
+            AccountBookType type
+    ) {
+        Slice<? extends AccountBook> accountBookPage = switch (type) {
+            case EXPENSE
+                    -> expenseRepository.findExpenseByUserWithinDateRangeWithCursor(user, startDate, endDate, cursor, pageable);
+            case INCOME
+                    -> incomeRepository.findIncomeByUserWithinDateRangeWithCursor(user, startDate, endDate, cursor, pageable);
+        };
+
+        return new SliceImpl<>(
+                accountBookPage.stream()
+                        .map(accountBook -> (AccountBook) accountBook)
+                        .toList(),
+                pageable,
+                accountBookPage.hasNext()
+        );
+    }
+
     public List<AccountBook> findByUserAndCategoryAndAccountBookDate(
             User user,
             Category category,
@@ -135,6 +159,15 @@ public class AccountBookRepository {
                     expenseRepository.findByUserAndCategoryAndExpenseDate(user, category, accountBookDate);
             case DEFAULT_INCOME, CUSTOM_INCOME ->
                     incomeRepository.findByUserAndCategoryAndIncomeDate(user, category, accountBookDate);
+        };
+
+        return mapToAccountBooks(accountBooks);
+    }
+
+    public List<AccountBook> findByUserAndDate(User user, LocalDate accountBookDate, AccountBookType type) {
+        List<? extends AccountBook> accountBooks = switch (type) {
+            case EXPENSE -> expenseRepository.findByUserAndExpenseDate(user, accountBookDate);
+            case INCOME -> incomeRepository.findByUserAndIncomeDate(user, accountBookDate);
         };
 
         return mapToAccountBooks(accountBooks);
@@ -153,6 +186,13 @@ public class AccountBookRepository {
                     user, category, startDate, endDate
             );
         };
+    }
+
+    public Long countByUserAndBetweenDates(User user, LocalDate startDate, LocalDate endDate) {
+        Long expenseCount = expenseRepository.countByUserAndBetweenDates(user, startDate, endDate);
+        Long incomeCount = incomeRepository.countByUserAndBetweenDates(user, startDate, endDate);
+
+        return expenseCount + incomeCount;
     }
 
     private List<AccountBook> mapToAccountBooks(List<? extends AccountBook> accountBooks) {
