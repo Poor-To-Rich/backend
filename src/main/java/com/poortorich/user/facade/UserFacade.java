@@ -95,4 +95,12 @@ public class UserFacade {
         userService.updateEmail(username, emailUpdateRequest);
         return UserResponse.USER_EMAIL_UPDATE_SUCCESS;
     }
+
+    @Transactional
+    public Response deleteUserAccount(String username) {
+        User user = userService.findUserByUsername(username);
+        userResetService.deleteDefaultCategories(user);
+        userService.deleteUserAccount(user);
+        return UserResponse.DELETE_USER_ACCOUNT_SUCCESS;
+    }
 }

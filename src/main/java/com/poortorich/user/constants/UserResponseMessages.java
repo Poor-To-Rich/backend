@@ -60,6 +60,7 @@ public class UserResponseMessages {
 
     public static final String USER_EMAIL_FIND_SUCCESS = "회원 이메일 조회 성공";
     public static final String RESET_SUCCESS = "모든 데이터를 삭제하였습니다.";
+    public static final String DELETE_USER_ACCOUNT_SUCCESS = "성공적으로 탈퇴되었습니다.";
 
     private UserResponseMessages() {
     }
