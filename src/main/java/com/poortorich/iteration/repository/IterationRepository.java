@@ -86,4 +86,13 @@ public class IterationRepository {
         iterationExpensesRepository.deleteByUser(user);
         iterationIncomesRepository.deleteByUser(user);
     }
+
+    public List<Iteration> findAllByUser(User user, AccountBookType type) {
+        return mapToIteration(
+                switch (type) {
+                    case EXPENSE -> iterationExpensesRepository.findByUser(user);
+                    case INCOME -> iterationIncomesRepository.findByUser(user);
+                }
+        );
+    }
 }

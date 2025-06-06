@@ -16,6 +16,8 @@ public interface IterationIncomesRepository extends JpaRepository<IterationIncom
 
     List<IterationIncomes> findAllByOriginalIncomeAndUser(Income originalAccountBook, User user);
 
+    List<IterationIncomes> findByUser(User user);
+    
     @Query("""
             SELECT DISTINCT ii
             FROM IterationIncomes ii

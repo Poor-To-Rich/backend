@@ -16,6 +16,8 @@ public interface IterationExpensesRepository extends JpaRepository<IterationExpe
 
     List<IterationExpenses> findAllByOriginalExpenseAndUser(Expense origianlExpense, User user);
 
+    List<IterationExpenses> findByUser(User user);
+
     @Query("""
             SELECT DISTINCT ie
             FROM IterationExpenses ie
