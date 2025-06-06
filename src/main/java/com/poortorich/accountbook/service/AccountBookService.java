@@ -18,11 +18,15 @@ import com.poortorich.iteration.response.CustomIterationInfoResponse;
 import com.poortorich.user.entity.User;
 import java.beans.Transient;
 import java.time.LocalDate;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -122,6 +126,19 @@ public class AccountBookService {
         );
     }
 
+    public Slice<AccountBook> getAccountBookByUserWithinDateRangeWithCursor(
+            User user,
+            LocalDate startDate,
+            LocalDate endDate,
+            LocalDate cursor,
+            Pageable pageable,
+            AccountBookType type
+    ) {
+        return accountBookRepository.findByUserWithinDateRangeWithCursor(
+                user, startDate, endDate, cursor, pageable, type
+        );
+    }
+
     public List<AccountBook> getAccountBooksByUserAndCategoryAndAccountBookDate(
             User user,
             Category category,
@@ -129,8 +146,20 @@ public class AccountBookService {
         return accountBookRepository.findByUserAndCategoryAndAccountBookDate(user, category, accountBookDate);
     }
 
+    public List<AccountBook> getAccountBooksByUserAndDate(
+            User user,
+            LocalDate accountBookDate,
+            AccountBookType type
+    ) {
+        return accountBookRepository.findByUserAndDate(user, accountBookDate, type);
+    }
+
     public Boolean hasNextPage(User user, Category category, LocalDate startDate, LocalDate endDate) {
         return accountBookRepository.countByUserAndCategoryBetweenDates(user, category, startDate, endDate) > 0L;
+    }
+
+    public Boolean hasNextPage(User user, LocalDate startDate, LocalDate endDate) {
+        return accountBookRepository.countByUserAndBetweenDates(user, startDate, endDate) > 0L;
     }
 
     public AccountBook getAccountBookOrThrow(Long id, User user, AccountBookType type) {

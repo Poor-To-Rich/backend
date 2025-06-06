@@ -46,6 +46,25 @@ public interface IncomeRepository extends JpaRepository<Income, Long> {
     );
 
     @Query("""
+            SELECT i
+            FROM Income i
+            WHERE i.user = :user
+              AND i.incomeDate >= :startDate
+              AND i.incomeDate <= :endDate
+              AND i.incomeDate >= :cursor
+            ORDER BY i.incomeDate ASC
+            """)
+    Slice<? extends AccountBook> findIncomeByUserWithinDateRangeWithCursor(
+            @Param("user") User user,
+            @Param("startDate") LocalDate startDate,
+            @Param("endDate") LocalDate endDate,
+            @Param("cursor") LocalDate cursor,
+            Pageable pageable
+    );
+
+    List<Income> findByUserAndIncomeDate(User user, LocalDate incomeDate);
+
+    @Query("""
             SELECT COUNT(i)
             FROM Income i
             WHERE i.category = :category
@@ -60,5 +79,15 @@ public interface IncomeRepository extends JpaRepository<Income, Long> {
             @Param("endDate") LocalDate endDate
     );
 
+    @Query("""
+            SELECT COUNT(i)
+            FROM Income i
+            WHERE i.user = :user
+              AND i.incomeDate >= :startDate
+              AND i.incomeDate <= :endDate
+            """)
+    Long countByUserAndBetweenDates(User user, LocalDate startDate, LocalDate endDate);
+
     void deleteByUser(User user);
+
 }
