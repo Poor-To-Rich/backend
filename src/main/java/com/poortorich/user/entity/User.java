@@ -115,4 +115,8 @@ public class User implements UserDetails {
     public void updatePassword(String password) {
         this.password = password;
     }
+
+    public void updateEmail(String newEmail) {
+        this.email = newEmail;
+    }
 }
