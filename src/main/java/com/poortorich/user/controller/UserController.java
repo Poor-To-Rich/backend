@@ -101,4 +101,11 @@ public class UserController {
         Response response = userFacade.resetAllByUser(userDetails.getUsername());
         return BaseResponse.toResponseEntity(response);
     }
+
+    @DeleteMapping("/leave")
+    public ResponseEntity<BaseResponse> deleteUserAccount(@AuthenticationPrincipal UserDetails userDetails) {
+        userFacade.resetAllByUser(userDetails.getUsername());
+        Response response = userFacade.deleteUserAccount(userDetails.getUsername());
+        return BaseResponse.toResponseEntity(response);
+    }
 }

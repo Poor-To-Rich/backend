@@ -89,4 +89,8 @@ public class UserService {
         User user = findUserByUsername(username);
         user.updateEmail(emailUpdateRequest.getNewEmail());
     }
+
+    public void deleteUserAccount(User user) {
+        userRepository.delete(user);
+    }
 }
