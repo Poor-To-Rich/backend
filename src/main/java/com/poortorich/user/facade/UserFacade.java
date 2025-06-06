@@ -4,6 +4,7 @@ import com.poortorich.category.service.CategoryService;
 import com.poortorich.global.response.Response;
 import com.poortorich.s3.service.FileUploadService;
 import com.poortorich.user.entity.User;
+import com.poortorich.user.request.EmailUpdateRequest;
 import com.poortorich.user.request.NicknameCheckRequest;
 import com.poortorich.user.request.PasswordUpdateRequest;
 import com.poortorich.user.request.ProfileUpdateRequest;
@@ -86,5 +87,12 @@ public class UserFacade {
         User user = userService.findUserByUsername(username);
         userResetService.deleteUserAllData(user);
         return UserResponse.RESET_SUCCESS;
+    }
+
+    @Transactional
+    public Response updateUserEmail(String username, EmailUpdateRequest emailUpdateRequest) {
+        userValidationService.validateEmail(emailUpdateRequest.getNewEmail());
+        userService.updateEmail(username, emailUpdateRequest);
+        return UserResponse.USER_EMAIL_UPDATE_SUCCESS;
     }
 }

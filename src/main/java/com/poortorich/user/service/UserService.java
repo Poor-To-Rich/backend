@@ -3,6 +3,7 @@ package com.poortorich.user.service;
 import com.poortorich.global.exceptions.NotFoundException;
 import com.poortorich.user.entity.User;
 import com.poortorich.user.repository.UserRepository;
+import com.poortorich.user.request.EmailUpdateRequest;
 import com.poortorich.user.request.ProfileUpdateRequest;
 import com.poortorich.user.request.UserRegistrationRequest;
 import com.poortorich.user.response.UserDetailResponse;
@@ -33,7 +34,7 @@ public class UserService {
                 .build();
 
         userRepository.save(user);
-        
+
         return user;
     }
 
@@ -82,5 +83,10 @@ public class UserService {
     public User findUserByUsername(String username) {
         return userRepository.findByUsername(username)
                 .orElseThrow(() -> new NotFoundException(UserResponse.USER_NOT_FOUND));
+    }
+
+    public void updateEmail(String username, EmailUpdateRequest emailUpdateRequest) {
+        User user = findUserByUsername(username);
+        user.updateEmail(emailUpdateRequest.getNewEmail());
     }
 }
