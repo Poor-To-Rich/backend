@@ -1,5 +1,6 @@
 package com.poortorich.report.controller;
 
+import com.poortorich.global.date.response.enums.DateResponse;
 import com.poortorich.global.response.BaseResponse;
 import com.poortorich.global.response.DataResponse;
 import com.poortorich.report.facade.ReportFacade;
@@ -46,12 +47,23 @@ public class ReportController {
     }
 
     @GetMapping("/monthly/total")
-    public ResponseEntity<BaseResponse> getMonthlyTotalReport(
+    public ResponseEntity<BaseResponse> getMonthlyTotal(
             @AuthenticationPrincipal UserDetails userDetails,
             @RequestParam("date") @Nullable String date
     ) {
         return DataResponse.toResponseEntity(
                 ReportResponse.GET_MONTHLY_TOTAL_SUCCESS,
+                reportFacade.getMonthlyTotal(userDetails.getUsername(), date)
+        );
+    }
+
+    @GetMapping("/yearly/total")
+    public ResponseEntity<BaseResponse> getMonthlyTotalReport(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @RequestParam("date") @Nullable String date
+    ) {
+        return DataResponse.toResponseEntity(
+                ReportResponse.GET_MONTHLY_TOTAL_REPORT_SUCCESS,
                 reportFacade.getMonthlyTotalReport(userDetails.getUsername(), date)
         );
     }

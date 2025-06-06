@@ -11,6 +11,7 @@ import com.poortorich.global.statistics.util.StatCalculator;
 import com.poortorich.report.response.DailyDetailsResponse;
 import com.poortorich.report.response.DailyFinance;
 import com.poortorich.report.response.DailyTransaction;
+import com.poortorich.report.response.MonthlyLogs;
 import com.poortorich.report.response.WeeklyDetailsResponse;
 import org.springframework.stereotype.Service;
 
@@ -125,7 +126,6 @@ public class ReportService {
         return AccountBookUtil.groupAccountBooksByDate(monthlyAccountBooks)
                 .stream()
                 .map(accountBooks -> {
-                    List<DailyTransaction> transactions = new ArrayList<>();
                     Long incomeAmount = 0L;
                     Long expenseAmount = 0L;
                     for (AccountBook accountBook : accountBooks) {
@@ -144,6 +144,34 @@ public class ReportService {
                             .build();
                 })
                 .toList();
+    }
+
+    public MonthlyLogs getMonthlyLogs(
+            LocalDate startDate, LocalDate endDate, List<AccountBook> monthlyIncomes, List<AccountBook> monthlyExpenses
+    ) {
+        List<AccountBook> monthlyAccountBooks = mergeAccountBook(monthlyIncomes, monthlyExpenses);
+
+        Long totalIncome = 0L;
+        Long totalExpense = 0L;
+        for (AccountBook accountBook : monthlyAccountBooks) {
+            if (inferAccountBookType(accountBook) == AccountBookType.EXPENSE) {
+                totalExpense += accountBook.getCost();
+            }
+            else {
+                totalIncome += accountBook.getCost();
+            }
+        }
+
+        String startDateString = startDate.format(DateTimeFormatter.ofPattern(DatePattern.MONTH_DAY_DOT_PATTERN));
+        String endDateString = endDate.format(DateTimeFormatter.ofPattern(DatePattern.MONTH_DAY_DOT_PATTERN));
+        String period = startDateString + " ~ " + endDateString;
+
+        return MonthlyLogs.builder()
+                .period(period)
+                .totalIncome(totalIncome)
+                .totalExpense(totalExpense)
+                .totalAmount(totalIncome - totalExpense)
+                .build();
     }
 
     private AccountBookType inferAccountBookType(AccountBook accountBook) {

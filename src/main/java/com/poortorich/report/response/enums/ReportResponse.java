@@ -11,6 +11,7 @@ public enum ReportResponse implements Response {
     GET_DAILY_DETAILS_SUCCESS(HttpStatus.OK, ReportResponseMessages.GET_DAILY_DETAILS_SUCCESS, null),
     GET_WEEKLY_DETAILS_SUCCESS(HttpStatus.OK, ReportResponseMessages.GET_WEEKLY_DETAILS_SUCCESS, null),
     GET_MONTHLY_TOTAL_SUCCESS(HttpStatus.OK, ReportResponseMessages.GET_MONTHLY_TOTAL_SUCCESS, null),
+    GET_MONTHLY_TOTAL_REPORT_SUCCESS(HttpStatus.OK, ReportResponseMessages.GET_MONTHLY_TOTAL_REPORT_SUCCESS, null),
 
     WEEK_INVALID(HttpStatus.BAD_REQUEST, ReportResponseMessages.WEEK_INVALID, "week"),
     CURSOR_INVALID(HttpStatus.BAD_REQUEST, ReportResponseMessages.CURSOR_INVALID, "cursor");
