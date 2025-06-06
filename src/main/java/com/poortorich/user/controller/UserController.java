@@ -5,6 +5,7 @@ import com.poortorich.global.response.DataResponse;
 import com.poortorich.global.response.Response;
 import com.poortorich.user.constants.UserResponseMessages;
 import com.poortorich.user.facade.UserFacade;
+import com.poortorich.user.request.EmailUpdateRequest;
 import com.poortorich.user.request.NicknameCheckRequest;
 import com.poortorich.user.request.PasswordUpdateRequest;
 import com.poortorich.user.request.ProfileUpdateRequest;
@@ -83,6 +84,15 @@ public class UserController {
             @RequestBody @Valid PasswordUpdateRequest passwordUpdateRequest
     ) {
         Response response = userFacade.updateUserPassword(userDetails.getUsername(), passwordUpdateRequest);
+        return BaseResponse.toResponseEntity(response);
+    }
+
+    @PutMapping("/email")
+    public ResponseEntity<BaseResponse> updateUserEmail(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @RequestBody @Valid EmailUpdateRequest emailUpdateRequest
+    ) {
+        Response response = userFacade.updateUserEmail(userDetails.getUsername(), emailUpdateRequest);
         return BaseResponse.toResponseEntity(response);
     }
 

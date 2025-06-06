@@ -38,6 +38,7 @@ public enum UserResponse implements Response {
     USER_DETAIL_FIND_SUCCESS(HttpStatus.OK, UserResponseMessages.USER_DETAIL_FIND_SUCCESS, null),
     USER_EMAIL_FIND_SUCCESS(HttpStatus.OK, UserResponseMessages.USER_EMAIL_FIND_SUCCESS, null),
     USER_PROFILE_UPDATE_SUCCESS(HttpStatus.OK, UserResponseMessages.USER_PROFILE_UPDATE_SUCCESS, null),
+    USER_EMAIL_UPDATE_SUCCESS(HttpStatus.OK, UserResponseMessages.USER_EMAIL_UPDATE_SUCCESS, null),
     RESET_SUCCESS(HttpStatus.OK, UserResponseMessages.RESET_SUCCESS, null);
 
     private final HttpStatus httpStatus;

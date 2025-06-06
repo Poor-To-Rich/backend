@@ -56,6 +56,7 @@ public class UserResponseMessages {
     public static final String USER_NOT_FOUND = "회원 정보를 찾을 수 없습니다.";
 
     public static final String USER_PROFILE_UPDATE_SUCCESS = "회원 프로필 편집 성공";
+    public static final String USER_EMAIL_UPDATE_SUCCESS = "이메일을 변경했습니다";
 
     public static final String USER_EMAIL_FIND_SUCCESS = "회원 이메일 조회 성공";
     public static final String RESET_SUCCESS = "모든 데이터를 삭제하였습니다.";
