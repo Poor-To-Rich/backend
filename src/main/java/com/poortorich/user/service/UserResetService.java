@@ -64,4 +64,15 @@ public class UserResetService {
                 .map(Iteration::getId)
                 .collect(Collectors.toSet());
     }
+
+    public void deleteDefaultCategories(User user) {
+        try {
+            log.info("[user ID: {}] 기본 카테고리 삭제", user.getId());
+            categoryRepository.deleteByUserAndType(user, CategoryType.DEFAULT_EXPENSE);
+            categoryRepository.deleteByUserAndType(user, CategoryType.DEFAULT_INCOME);
+        } catch (Exception e) {
+            log.error("모든 데이터 초기화 중 예외가 발생: {}", user.getId(), e);
+            throw new InternalServerErrorException(GlobalResponse.INTERNAL_SERVER_EXCEPTION);
+        }
+    }
 }
