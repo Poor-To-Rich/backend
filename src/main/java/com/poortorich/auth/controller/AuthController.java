@@ -4,6 +4,7 @@ import com.poortorich.auth.request.LoginRequest;
 import com.poortorich.auth.response.enums.AuthResponse;
 import com.poortorich.auth.service.AuthService;
 import com.poortorich.global.response.BaseResponse;
+import com.poortorich.global.response.DataResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -34,7 +35,7 @@ public class AuthController {
             @RequestBody @Valid LoginRequest loginRequest,
             HttpServletResponse response
     ) {
-        return BaseResponse.toResponseEntity(authService.login(loginRequest, response));
+        return DataResponse.toResponseEntity(AuthResponse.LOGIN_SUCCESS, authService.login(loginRequest, response));
     }
 
     @PostMapping("/refresh")
@@ -42,7 +43,9 @@ public class AuthController {
             HttpServletRequest request,
             HttpServletResponse response
     ) {
-        return BaseResponse.toResponseEntity(authService.refreshToken(request, response));
+        return DataResponse.toResponseEntity(
+                AuthResponse.TOKEN_REFRESH_SUCCESS, authService.refreshToken(request, response)
+        );
     }
 
     @PostMapping("/logout")

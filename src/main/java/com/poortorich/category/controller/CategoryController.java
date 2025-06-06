@@ -2,6 +2,7 @@ package com.poortorich.category.controller;
 
 import com.poortorich.category.entity.enums.CategoryType;
 import com.poortorich.category.request.CategoryInfoRequest;
+import com.poortorich.category.request.CategoryVisibilityRequest;
 import com.poortorich.category.response.CategoryResponse;
 import com.poortorich.category.response.CustomCategoriesResponse;
 import com.poortorich.category.response.CustomCategoryResponse;
@@ -73,6 +74,17 @@ public class CategoryController {
         return DataResponse.toResponseEntity(
                 CategoryResponse.GET_ACTIVE_CATEGORIES_SUCCESS,
                 categoryService.getActiveCategories(type, userDetails.getUsername())
+        );
+    }
+
+    @PutMapping("/active/{categoryId}")
+    public ResponseEntity<BaseResponse> updateActiveCategory(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @PathVariable Long categoryId,
+            @RequestBody @Valid CategoryVisibilityRequest visibilityRequest
+    ) {
+        return BaseResponse.toResponseEntity(
+                categoryService.updateActiveCategory(categoryId, visibilityRequest, userDetails.getUsername())
         );
     }
 

@@ -1,7 +1,10 @@
 package com.poortorich.user.facade;
 
+import com.poortorich.category.service.CategoryService;
 import com.poortorich.global.response.Response;
 import com.poortorich.s3.service.FileUploadService;
+import com.poortorich.user.entity.User;
+import com.poortorich.user.request.EmailUpdateRequest;
 import com.poortorich.user.request.NicknameCheckRequest;
 import com.poortorich.user.request.PasswordUpdateRequest;
 import com.poortorich.user.request.ProfileUpdateRequest;
@@ -11,6 +14,7 @@ import com.poortorich.user.response.UserDetailResponse;
 import com.poortorich.user.response.UserEmailResponse;
 import com.poortorich.user.response.enums.UserResponse;
 import com.poortorich.user.service.RedisUserReservationService;
+import com.poortorich.user.service.UserResetService;
 import com.poortorich.user.service.UserService;
 import com.poortorich.user.service.UserValidationService;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +29,8 @@ public class UserFacade {
     private final UserValidationService userValidationService;
     private final FileUploadService fileUploadService;
     private final RedisUserReservationService userReservationService;
+    private final UserResetService userResetService;
+    private final CategoryService categoryService;
 
     @Transactional
     public void registerNewUser(UserRegistrationRequest userRegistrationRequest) {
@@ -33,7 +39,9 @@ public class UserFacade {
         userReservationService.removeNicknameReservation(userRegistrationRequest.getNickname());
 
         String profileImageUrl = fileUploadService.uploadImage(userRegistrationRequest.getProfileImage());
-        userService.save(userRegistrationRequest, profileImageUrl);
+        User user = userService.save(userRegistrationRequest, profileImageUrl);
+
+        categoryService.saveAllDefaultCategories(user);
     }
 
     public Response checkUsernameAndReservation(UsernameCheckRequest usernameCheckRequest) {
@@ -73,5 +81,26 @@ public class UserFacade {
         userValidationService.validateUpdateUserPassword(username, passwordUpdateRequest);
         userService.updatePassword(username, passwordUpdateRequest.getNewPassword());
         return UserResponse.PASSWORD_UPDATE_SUCCESS;
+    }
+
+    public Response resetAllByUser(String username) {
+        User user = userService.findUserByUsername(username);
+        userResetService.deleteUserAllData(user);
+        return UserResponse.RESET_SUCCESS;
+    }
+
+    @Transactional
+    public Response updateUserEmail(String username, EmailUpdateRequest emailUpdateRequest) {
+        userValidationService.validateEmail(emailUpdateRequest.getNewEmail());
+        userService.updateEmail(username, emailUpdateRequest);
+        return UserResponse.USER_EMAIL_UPDATE_SUCCESS;
+    }
+
+    @Transactional
+    public Response deleteUserAccount(String username) {
+        User user = userService.findUserByUsername(username);
+        userResetService.deleteDefaultCategories(user);
+        userService.deleteUserAccount(user);
+        return UserResponse.DELETE_USER_ACCOUNT_SUCCESS;
     }
 }

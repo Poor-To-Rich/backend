@@ -1,6 +1,6 @@
-package com.poortorich.expense.constants;
+package com.poortorich.accountbook.constants;
 
-public class ExpenseValidationConstraints {
+public class AccountBookValidationConstraints {
 
     public static final int TITLE_MAX_SIZE = 15;
 
@@ -8,5 +8,5 @@ public class ExpenseValidationConstraints {
 
     public static final int MEMO_MAX_SIZE = 100;
 
-    private ExpenseValidationConstraints() {}
+    private AccountBookValidationConstraints() {}
 }

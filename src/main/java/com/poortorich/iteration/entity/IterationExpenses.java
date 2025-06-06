@@ -1,5 +1,6 @@
 package com.poortorich.iteration.entity;
 
+import com.poortorich.accountbook.entity.AccountBook;
 import com.poortorich.expense.entity.Expense;
 import com.poortorich.iteration.entity.info.IterationInfo;
 import com.poortorich.user.entity.User;
@@ -30,7 +31,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "iterationExpenses")
-public class IterationExpenses {
+public class IterationExpenses implements Iteration {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -60,4 +61,19 @@ public class IterationExpenses {
     @UpdateTimestamp
     @Column(name = "updatedDate")
     private LocalDateTime updatedDate;
+
+    @Override
+    public AccountBook getOriginalAccountBook() {
+        return originalExpense;
+    }
+
+    @Override
+    public AccountBook getGeneratedAccountBook() {
+        return generatedExpense;
+    }
+
+    @Override
+    public void updateOriginalAccountBook(AccountBook originalExpense) {
+        this.originalExpense = (Expense) originalExpense;
+    }
 }

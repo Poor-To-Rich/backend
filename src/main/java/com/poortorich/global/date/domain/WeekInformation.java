@@ -10,7 +10,7 @@ import lombok.Setter;
 @Setter
 @Builder
 @AllArgsConstructor
-public class WeekInformation {
+public class WeekInformation implements DateInfo {
 
     private final LocalDate startDate;
     private final LocalDate endDate;

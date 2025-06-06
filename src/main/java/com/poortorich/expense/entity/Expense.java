@@ -1,8 +1,10 @@
 package com.poortorich.expense.entity;
 
+import com.poortorich.accountbook.entity.AccountBook;
+import com.poortorich.accountbook.entity.enums.IterationType;
 import com.poortorich.category.entity.Category;
-import com.poortorich.expense.entity.enums.IterationType;
 import com.poortorich.expense.entity.enums.PaymentMethod;
+import com.poortorich.iteration.entity.Iteration;
 import com.poortorich.iteration.entity.IterationExpenses;
 import com.poortorich.user.entity.User;
 import jakarta.persistence.Column;
@@ -18,6 +20,8 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -26,9 +30,6 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-
 @Entity
 @Getter
 @Builder
@@ -36,7 +37,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "expense")
-public class Expense {
+public class Expense implements AccountBook {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -84,4 +85,32 @@ public class Expense {
     @UpdateTimestamp
     @Column(name = "updatedDate")
     private LocalDateTime updatedDate;
+
+    @Override
+    public LocalDate getAccountBookDate() {
+        return expenseDate;
+    }
+
+    @Override
+    public Iteration getGeneratedIteration() {
+        return generatedIterationExpenses;
+    }
+
+    @Override
+    public void updateAccountBook(String title, Long cost, String memo, IterationType iterationType, Category category) {
+        this.title = title;
+        this.cost = cost;
+        this.memo = memo;
+        this.iterationType = iterationType;
+        this.category = category;
+    }
+
+    @Override
+    public void updateAccountBookDate(LocalDate accountBookDate) {
+        this.expenseDate = accountBookDate;
+    }
+
+    public void updatePaymentMethod(PaymentMethod paymentMethod) {
+        this.paymentMethod = paymentMethod;
+    }
 }

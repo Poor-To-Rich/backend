@@ -29,7 +29,7 @@ public class FileUploadService {
     private String bucketName;
 
     public String uploadImage(MultipartFile imageFile) {
-        if (imageFile.isEmpty()) {
+        if (Objects.isNull(imageFile) || imageFile.isEmpty()) {
             return S3Constants.DEFAULT_PROFILE_IMAGE;
         }
 

@@ -2,6 +2,7 @@ package com.poortorich.global.date.util;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.poortorich.global.date.domain.DateInfo;
 import com.poortorich.global.date.domain.MonthInformation;
 import com.poortorich.global.date.domain.WeekInformation;
 import com.poortorich.global.date.domain.YearInformation;
@@ -17,13 +18,16 @@ public class DateInfoProviderTest {
     @Test
     @DisplayName("해당 연도의 정보를 반환받을 때, 유효한 구조로 반환이 되는지 확인")
     void getYearInformation_whenGivenYear_shouldReturnValidStructure() {
-        YearInformation result = DateInfoProvider.getYearInformation(DateTestFixture.TEST_YEAR);
+        DateInfo result = DateInfoProvider.getDateInfo(DateTestFixture.TEST_YEAR_2025);
         assertThat(result).isNotNull();
-        assertThat(result.getYear()).isEqualTo(DateTestFixture.TEST_YEAR);
         assertThat(result.getStartDate()).isEqualTo(DateTestFixture.YEAR_START);
         assertThat(result.getEndDate()).isEqualTo(DateTestFixture.YEAR_END);
 
-        Map<Month, MonthInformation> months = result.getMonths();
+        assertThat(result).isInstanceOf(YearInformation.class);
+
+        YearInformation yearInfo = (YearInformation) result;
+        assertThat(yearInfo.getYear()).isEqualTo(DateTestFixture.YEAR_2025);
+        Map<Month, MonthInformation> months = yearInfo.getMonths();
         assertThat(months).hasSize(12);
         assertThat(months.keySet()).containsExactlyInAnyOrder(Month.values());
 

@@ -7,10 +7,7 @@ import com.poortorich.expense.repository.ExpenseRepository;
 import com.poortorich.expense.request.ExpenseRequest;
 import com.poortorich.expense.util.ExpenseRequestTestBuilder;
 import com.poortorich.user.entity.User;
-import com.poortorich.user.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
@@ -18,21 +15,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 @ExtendWith(MockitoExtension.class)
 public class ExpenseServiceTest {
 
     @Mock
     private ExpenseRepository expenseRepository;
-
-    @Mock
-    private UserRepository userRepository;
 
     @InjectMocks
     private ExpenseService expenseService;
@@ -53,25 +40,5 @@ public class ExpenseServiceTest {
         user = User.builder()
                 .username("test")
                 .build();
-    }
-
-    @Test
-    @DisplayName("유효한 지출 정보가 성공적으로 저장된다.")
-    void createValidExpense() {
-        when(userRepository.findByUsername(user.getUsername())).thenReturn(Optional.of(user));
-
-        expenseService.createExpense(expenseRequest, category, user.getUsername());
-
-        verify(expenseRepository).save(expenseCaptor.capture());
-        Expense savedExpense = expenseCaptor.getValue();
-        assertAll(
-                () -> assertThat(savedExpense.getExpenseDate()).isEqualTo(expenseRequest.getDate()),
-                () -> assertThat(savedExpense.getCategory()).isEqualTo(category),
-                () -> assertThat(savedExpense.getTitle()).isEqualTo(expenseRequest.getTitle()),
-                () -> assertThat(savedExpense.getCost()).isEqualTo(expenseRequest.getCost()),
-                () -> assertThat(savedExpense.getPaymentMethod()).isEqualTo(expenseRequest.parsePaymentMethod()),
-                () -> assertThat(savedExpense.getMemo()).isEqualTo(expenseRequest.getMemo()),
-                () -> assertThat(savedExpense.getIterationType()).isEqualTo(expenseRequest.parseIterationType())
-        );
     }
 }

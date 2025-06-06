@@ -1,6 +1,7 @@
 package com.poortorich.expense.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.poortorich.accountbook.response.InfoResponse;
 import com.poortorich.iteration.response.CustomIterationInfoResponse;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -14,7 +15,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class ExpenseInfoResponse {
+public class ExpenseInfoResponse implements InfoResponse {
 
     private LocalDate date;
     private String categoryName;

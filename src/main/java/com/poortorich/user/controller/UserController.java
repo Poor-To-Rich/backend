@@ -5,6 +5,7 @@ import com.poortorich.global.response.DataResponse;
 import com.poortorich.global.response.Response;
 import com.poortorich.user.constants.UserResponseMessages;
 import com.poortorich.user.facade.UserFacade;
+import com.poortorich.user.request.EmailUpdateRequest;
 import com.poortorich.user.request.NicknameCheckRequest;
 import com.poortorich.user.request.PasswordUpdateRequest;
 import com.poortorich.user.request.ProfileUpdateRequest;
@@ -18,6 +19,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -82,6 +84,28 @@ public class UserController {
             @RequestBody @Valid PasswordUpdateRequest passwordUpdateRequest
     ) {
         Response response = userFacade.updateUserPassword(userDetails.getUsername(), passwordUpdateRequest);
+        return BaseResponse.toResponseEntity(response);
+    }
+
+    @PutMapping("/email")
+    public ResponseEntity<BaseResponse> updateUserEmail(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @RequestBody @Valid EmailUpdateRequest emailUpdateRequest
+    ) {
+        Response response = userFacade.updateUserEmail(userDetails.getUsername(), emailUpdateRequest);
+        return BaseResponse.toResponseEntity(response);
+    }
+
+    @DeleteMapping("/reset")
+    public ResponseEntity<BaseResponse> resetUserData(@AuthenticationPrincipal UserDetails userDetails) {
+        Response response = userFacade.resetAllByUser(userDetails.getUsername());
+        return BaseResponse.toResponseEntity(response);
+    }
+
+    @DeleteMapping("/leave")
+    public ResponseEntity<BaseResponse> deleteUserAccount(@AuthenticationPrincipal UserDetails userDetails) {
+        userFacade.resetAllByUser(userDetails.getUsername());
+        Response response = userFacade.deleteUserAccount(userDetails.getUsername());
         return BaseResponse.toResponseEntity(response);
     }
 }

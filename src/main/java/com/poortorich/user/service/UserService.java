@@ -3,6 +3,7 @@ package com.poortorich.user.service;
 import com.poortorich.global.exceptions.NotFoundException;
 import com.poortorich.user.entity.User;
 import com.poortorich.user.repository.UserRepository;
+import com.poortorich.user.request.EmailUpdateRequest;
 import com.poortorich.user.request.ProfileUpdateRequest;
 import com.poortorich.user.request.UserRegistrationRequest;
 import com.poortorich.user.response.UserDetailResponse;
@@ -19,7 +20,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public void save(UserRegistrationRequest userRegistrationRequest, String profileImageUrl) {
+    public User save(UserRegistrationRequest userRegistrationRequest, String profileImageUrl) {
         User user = User.builder()
                 .profileImage(profileImageUrl)
                 .username(userRegistrationRequest.getUsername())
@@ -33,6 +34,8 @@ public class UserService {
                 .build();
 
         userRepository.save(user);
+
+        return user;
     }
 
     public void update(String username, ProfileUpdateRequest userProfile, String newProfileImage) {
@@ -75,5 +78,19 @@ public class UserService {
         userRepository.findByUsername(username)
                 .orElseThrow(() -> new NotFoundException(UserResponse.USER_NOT_FOUND))
                 .updatePassword(passwordEncoder.encode(newPassword));
+    }
+
+    public User findUserByUsername(String username) {
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new NotFoundException(UserResponse.USER_NOT_FOUND));
+    }
+
+    public void updateEmail(String username, EmailUpdateRequest emailUpdateRequest) {
+        User user = findUserByUsername(username);
+        user.updateEmail(emailUpdateRequest.getNewEmail());
+    }
+
+    public void deleteUserAccount(User user) {
+        userRepository.delete(user);
     }
 }

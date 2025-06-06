@@ -37,7 +37,7 @@ public class UserResponseMessages {
     public static final String NEW_PASSWORD_REQUIRED = "새 비밀번호를 입력해주세요.";
     public static final String CURRENT_PASSWORD_IS_WRONG = "비밀번호가 틀렸습니다. 다시 입력해주세요.";
     public static final String NEW_PASSWORD_IS_DO_NOT_MATCH = "새 비밀번호가 일치하지 않습니다.";
-    
+
     public static final String BIRTHDAY_REQUIRED = "생년월일을 입력해주세요.";
     public static final String BIRTHDAY_FORMAT_INVALID = "yyyy-mm-dd 형식이어야 합니다.";
     public static final String BIRTHDAY_IN_FUTURE = "생년월일은 오늘 이전 날짜여야 합니다.";
@@ -56,8 +56,11 @@ public class UserResponseMessages {
     public static final String USER_NOT_FOUND = "회원 정보를 찾을 수 없습니다.";
 
     public static final String USER_PROFILE_UPDATE_SUCCESS = "회원 프로필 편집 성공";
+    public static final String USER_EMAIL_UPDATE_SUCCESS = "이메일을 변경했습니다";
 
     public static final String USER_EMAIL_FIND_SUCCESS = "회원 이메일 조회 성공";
+    public static final String RESET_SUCCESS = "모든 데이터를 삭제하였습니다.";
+    public static final String DELETE_USER_ACCOUNT_SUCCESS = "성공적으로 탈퇴되었습니다.";
 
     private UserResponseMessages() {
     }
