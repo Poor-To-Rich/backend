@@ -7,11 +7,14 @@ import com.poortorich.accountbook.util.AccountBookCostExtractor;
 import com.poortorich.global.date.constants.DateConstants;
 import com.poortorich.global.date.constants.DatePattern;
 import com.poortorich.global.date.domain.MonthInformation;
+import com.poortorich.global.date.domain.YearInformation;
 import com.poortorich.global.date.util.DateInfoProvider;
 import com.poortorich.global.date.util.DateParser;
 import com.poortorich.global.exceptions.BadRequestException;
 import com.poortorich.global.statistics.util.StatCalculator;
 import com.poortorich.report.response.DailyDetailsResponse;
+import com.poortorich.report.response.MonthlyLogs;
+import com.poortorich.report.response.MonthlyTotalReportResponse;
 import com.poortorich.report.response.MonthlyTotalResponse;
 import com.poortorich.report.response.WeeklyDetailsResponse;
 import com.poortorich.report.response.enums.ReportResponse;
@@ -25,9 +28,13 @@ import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.Month;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+
+import static com.poortorich.global.date.constants.DateConstants.MONTHS_ORDERED;
 
 @Service
 @RequiredArgsConstructor
@@ -102,7 +109,7 @@ public class ReportFacade {
         return reportService.getWeeklyDetailsReport(weeklyAccountBooks, period, nextCursor, hasNext);
     }
 
-    public MonthlyTotalResponse getMonthlyTotalReport(String username, String date) {
+    public MonthlyTotalResponse getMonthlyTotal(String username, String date) {
         User user = userService.findUserByUsername(username);
         MonthInformation monthInfo = (MonthInformation) DateInfoProvider.getDateInfo(date);
 
@@ -123,5 +130,58 @@ public class ReportFacade {
                 .totalExpense(totalExpense)
                 .transactions(reportService.getDailyFinance(monthlyIncomes, monthlyExpenses))
                 .build();
+    }
+
+    public MonthlyTotalReportResponse getMonthlyTotalReport(String username, String date) {
+        User user = userService.findUserByUsername(username);
+        YearInformation yearInfo;
+        if (date == null) {
+            MonthInformation monthInfo = (MonthInformation) DateInfoProvider.getDateInfo(date);
+            yearInfo = (YearInformation) DateInfoProvider.getDateInfo(
+                    monthInfo.getStartDate().format(DateTimeFormatter.ofPattern(DatePattern.YEAR_PATTERN))
+            );
+        }
+        else {
+            yearInfo = (YearInformation) DateInfoProvider.getDateInfo(date);
+        }
+
+        List<AccountBook> yearlyIncomes = accountBookService.getAccountBookBetweenDates(
+                user, yearInfo.getStartDate(), yearInfo.getEndDate(), AccountBookType.INCOME
+        );
+
+        List<AccountBook> yearlyExpenses = accountBookService.getAccountBookBetweenDates(
+                user, yearInfo.getStartDate(), yearInfo.getEndDate(), AccountBookType.EXPENSE
+        );
+
+        Long totalIncome = StatCalculator.calculateSum(AccountBookCostExtractor.extract(yearlyIncomes)).longValue();
+        Long totalExpense = StatCalculator.calculateSum(AccountBookCostExtractor.extract(yearlyExpenses)).longValue();
+
+        return MonthlyTotalReportResponse.builder()
+                .yearTotalIncome(totalIncome)
+                .yearTotalExpense(totalExpense)
+                .yearTotalAmount(totalIncome - totalExpense)
+                .monthlyLogs(getMonthlyLogs(user, yearInfo))
+                .build();
+    }
+
+    private List<MonthlyLogs> getMonthlyLogs(User user, YearInformation yearInfo) {
+        List<MonthlyLogs> monthlyLogs = new ArrayList<>();
+        for (Month month : DateConstants.MONTHS_ORDERED) {
+            MonthInformation monthInfo = yearInfo.getMonths().get(month);
+
+            List<AccountBook> monthlyIncomes = accountBookService.getAccountBookBetweenDates(
+                    user, monthInfo.getStartDate(), monthInfo.getEndDate(), AccountBookType.INCOME
+            );
+
+            List<AccountBook> monthlyExpenses = accountBookService.getAccountBookBetweenDates(
+                    user, monthInfo.getStartDate(), monthInfo.getEndDate(), AccountBookType.EXPENSE
+            );
+
+            monthlyLogs.add(reportService.getMonthlyLogs(
+                    monthInfo.getStartDate(), monthInfo.getEndDate(), monthlyIncomes, monthlyExpenses
+            ));
+        }
+
+        return monthlyLogs;
     }
 }
