@@ -31,4 +31,17 @@ public class ReportController {
                 reportFacade.getDailyDetailsReport(userDetails.getUsername(), date)
         );
     }
+
+    @GetMapping("/weekly/details")
+    public ResponseEntity<BaseResponse> getWeeklyDetailsReport(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @RequestParam("date") @Nullable String date,
+            @RequestParam("week") Long week,
+            @RequestParam("cursor") @Nullable String cursor
+    ) {
+        return DataResponse.toResponseEntity(
+                ReportResponse.GET_WEEKLY_DETAILS_SUCCESS,
+                reportFacade.getWeeklyDetailsReport(userDetails.getUsername(), date, week, cursor)
+        );
+    }
 }
