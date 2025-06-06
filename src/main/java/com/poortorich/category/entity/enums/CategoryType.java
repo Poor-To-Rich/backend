@@ -5,6 +5,7 @@ import com.poortorich.global.exceptions.BadRequestException;
 import lombok.RequiredArgsConstructor;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 
 @RequiredArgsConstructor
@@ -22,6 +23,12 @@ public enum CategoryType {
                 .filter(category -> Objects.equals(category.type, type))
                 .findFirst()
                 .orElseThrow(() -> new BadRequestException(CategoryResponse.CATEGORY_TYPE_INVALID));
+    }
+
+    public List<CategoryType> getSameGroupTypes() {
+        return Arrays.stream(CategoryType.values())
+                .filter(category -> Objects.equals(category.type, this.type))
+                .toList();
     }
 }
 
