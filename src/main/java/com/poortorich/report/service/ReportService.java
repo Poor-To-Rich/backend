@@ -6,10 +6,10 @@ import com.poortorich.accountbook.response.AccountBookInfoResponse;
 import com.poortorich.accountbook.util.AccountBookBuilder;
 import com.poortorich.accountbook.util.AccountBookCostExtractor;
 import com.poortorich.chart.util.AccountBookUtil;
-import com.poortorich.global.date.constants.DateConstants;
 import com.poortorich.global.date.constants.DatePattern;
 import com.poortorich.global.statistics.util.StatCalculator;
 import com.poortorich.report.response.DailyDetailsResponse;
+import com.poortorich.report.response.DailyFinance;
 import com.poortorich.report.response.DailyTransaction;
 import com.poortorich.report.response.WeeklyDetailsResponse;
 import org.springframework.stereotype.Service;
@@ -115,6 +115,32 @@ public class ReportService {
                             )
                             .countOfTransactions((long) transactions.size())
                             .transactions(transactions)
+                            .build();
+                })
+                .toList();
+    }
+
+    public List<DailyFinance> getDailyFinance(List<AccountBook> monthlyIncomes, List<AccountBook> monthlyExpenses) {
+        List<AccountBook> monthlyAccountBooks = mergeAccountBook(monthlyIncomes, monthlyExpenses);
+        return AccountBookUtil.groupAccountBooksByDate(monthlyAccountBooks)
+                .stream()
+                .map(accountBooks -> {
+                    List<DailyTransaction> transactions = new ArrayList<>();
+                    Long incomeAmount = 0L;
+                    Long expenseAmount = 0L;
+                    for (AccountBook accountBook : accountBooks) {
+                        if (inferAccountBookType(accountBook) == AccountBookType.EXPENSE) {
+                            expenseAmount += accountBook.getCost();
+                        }
+                        else {
+                            incomeAmount += accountBook.getCost();
+                        }
+                    }
+
+                    return DailyFinance.builder()
+                            .date(accountBooks.getFirst().getAccountBookDate().toString())
+                            .incomeAmount(incomeAmount)
+                            .expenseAmount(expenseAmount)
                             .build();
                 })
                 .toList();
