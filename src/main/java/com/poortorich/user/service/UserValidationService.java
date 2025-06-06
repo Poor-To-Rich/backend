@@ -79,4 +79,11 @@ public class UserValidationService {
             throw new BadRequestException(UserResponse.NEW_PASSWORD_DO_NOT_MATCH);
         }
     }
+
+    public void validateEmail(String email) {
+        userValidator.validateEmailDuplicate(email);
+        if (!emailVerificationPolicyManager.isEmailVerified(email)) {
+            throw new ForbiddenException(EmailResponse.EMAIL_NOT_VERIFIED);
+        }
+    }
 }

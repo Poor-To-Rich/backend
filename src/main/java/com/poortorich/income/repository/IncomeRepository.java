@@ -87,4 +87,7 @@ public interface IncomeRepository extends JpaRepository<Income, Long> {
               AND i.incomeDate <= :endDate
             """)
     Long countByUserAndBetweenDates(User user, LocalDate startDate, LocalDate endDate);
+
+    void deleteByUser(User user);
+
 }

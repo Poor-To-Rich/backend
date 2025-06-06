@@ -94,6 +94,17 @@ public class ChartController {
         );
     }
 
+    @GetMapping("/income/bar")
+    public ResponseEntity<BaseResponse> getIncomeBar(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @RequestParam("date") @Nullable String date
+    ) {
+        return DataResponse.toResponseEntity(
+                ChartResponse.GET_INCOME_BAR_SUCCESS,
+                chartFacade.getAccountBookBar(userDetails.getUsername(), date, AccountBookType.INCOME)
+        );
+    }
+
     @GetMapping("/{categoryId}/line")
     public ResponseEntity<BaseResponse> getCategoryLine(
             @AuthenticationPrincipal UserDetails userDetails,

@@ -57,7 +57,7 @@ public class EmailFacade {
             return EmailResponse.EMAIL_AUTH_REQUEST_BLOCKED;
         }
 
-        if (verificationPolicyManager.isVerificationCodeIssued(email,
+        if (!verificationPolicyManager.isVerificationCodeIssued(email,
                 EmailVerificationType.from(verificationPurpose))) {
             return EmailResponse.VERIFICATION_CODE_REQUIRED;
         }

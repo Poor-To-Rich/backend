@@ -88,4 +88,6 @@ public interface ExpenseRepository extends JpaRepository<Expense, Long> {
               AND e.expenseDate <= :endDate
             """)
     Long countByUserAndBetweenDates(User user, LocalDate startDate, LocalDate endDate);
+           
+    void deleteByUser(User user);
 }
