@@ -60,10 +60,6 @@ public class ReportFacade {
         LocalDate dateCursor = (Objects.isNull(cursor) ?  startDate : LocalDate.parse(cursor));
         Pageable pageable = PageRequest.of(0, 30);
 
-        if (startDate.isBefore(dateCursor) || endDate.isAfter(dateCursor)) {
-            throw new BadRequestException(ReportResponse.CURSOR_INVALID);
-        }
-
         return getWeeklyDetailsResponse(user, startDate, endDate, dateCursor, pageable);
     }
 
