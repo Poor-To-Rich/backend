@@ -20,6 +20,7 @@ public class JwtTokenManager {
                 .httpOnly(true)
                 .secure(true)
                 .sameSite(JwtConstants.COOKIE_SAME_SITE)
+                .domain("https://localhst:5173")
                 .path(JwtConstants.REFRESH_TOKEN_COOKIE_PATH)
                 .maxAge(JwtConstants.REFRESH_TOKEN_COOKIE_EXPIRY)
                 .build();
@@ -30,6 +31,7 @@ public class JwtTokenManager {
                 .httpOnly(true)
                 .secure(true)
                 .sameSite(JwtConstants.COOKIE_SAME_SITE)
+                .domain("https://localhst:5173")
                 .path(JwtConstants.REFRESH_TOKEN_COOKIE_PATH)
                 .maxAge(0)
                 .build();
