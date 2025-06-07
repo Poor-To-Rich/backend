@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class DefaultCategoryResponse {
 
+    private Long id;
     private String color;
     private String name;
     private boolean visibility;
