@@ -11,6 +11,7 @@ import com.poortorich.email.service.MailService;
 import com.poortorich.email.util.EmailVerificationPolicyManager;
 import com.poortorich.email.util.VerificationCodeGenerator;
 import com.poortorich.global.response.Response;
+import com.poortorich.user.validator.UserValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,9 +25,13 @@ public class EmailFacade {
     private final VerificationCodeGenerator codeGenerator;
     private final EmailVerificationPolicyManager verificationPolicyManager;
 
+    private final UserValidator userValidator;
+
     @Transactional
     public Response sendVerificationCode(EmailVerificationRequest emailVerificationRequest) {
         String email = emailVerificationRequest.getEmail();
+        userValidator.validateEmailDuplicate(email);
+        
         String verificationPurpose = emailVerificationRequest.getPurpose();
         String verificationCode = codeGenerator.generate();
 
