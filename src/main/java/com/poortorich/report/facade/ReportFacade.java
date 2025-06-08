@@ -160,7 +160,7 @@ public class ReportFacade {
                 .yearTotalIncome(totalIncome)
                 .yearTotalExpense(totalExpense)
                 .yearTotalAmount(totalIncome - totalExpense)
-                .logs(getMonthlyLogs(user, yearInfo))
+                .monthlyLogs(getMonthlyLogs(user, yearInfo))
                 .build();
     }
 
