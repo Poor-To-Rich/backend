@@ -32,6 +32,10 @@ public enum IterationType {
                 .orElseThrow(() -> new BadRequestException(AccountBookResponse.ITERATION_TYPE_INVALID));
     }
 
+    public Boolean isIteration() {
+        return !this.type.equals(IterationType.DEFAULT.type);
+    }
+
     @Override
     public String toString() {
         return type;

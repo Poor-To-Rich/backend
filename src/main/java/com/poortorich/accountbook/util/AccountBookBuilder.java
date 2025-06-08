@@ -130,6 +130,7 @@ public class AccountBookBuilder {
                 .categoryName(accountBook.getCategory().getName())
                 .color(accountBook.getCategory().getColor())
                 .title(accountBook.getTitle())
+                .isIteration(accountBook.getIterationType().isIteration())
                 .type(type.toString())
                 .cost(accountBook.getCost())
                 .build();
