@@ -31,7 +31,7 @@ public class CategoryService {
     private final UserService userService;
 
     public List<DefaultCategoryResponse> getDefaultCategories(CategoryType type, String username) {
-        return categoryRepository.findByTypeAndUser(type, userService.findUserByUsername(username)).stream()
+        return categoryRepository.findByUserAndType(userService.findUserByUsername(username), type).stream()
                 .map(category -> DefaultCategoryResponse.builder()
                         .id(category.getId())
                         .name(category.getName())
@@ -42,7 +42,7 @@ public class CategoryService {
     }
 
     public List<CustomCategoryResponse> getCustomCategories(CategoryType type, String username) {
-        return categoryRepository.findByTypeAndUser(type, userService.findUserByUsername(username)).stream()
+        return categoryRepository.findByUserAndType(userService.findUserByUsername(username), type).stream()
                 .map(category -> CustomCategoryResponse.builder()
                         .id(category.getId())
                         .color(category.getColor())
@@ -53,8 +53,10 @@ public class CategoryService {
 
     public ActiveCategoriesResponse getActiveCategories(String type, String username) {
         List<String> categories
-                = categoryRepository.findByTypeAndUser(CategoryType.from(type),
-                        userService.findUserByUsername(username)).stream()
+                = categoryRepository.findByUserAndTypeIn(
+                        userService.findUserByUsername(username),
+                        CategoryType.from(type).getSameGroupTypes())
+                .stream()
                 .filter(Category::getVisibility)
                 .map(Category::getName)
                 .toList();
