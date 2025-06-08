@@ -15,6 +15,7 @@ public class AccountBookInfoResponse {
     private String color;
     private String categoryName;
     private String title;
+    private Boolean isIteration;
     private String type;
     private Long cost;
 }

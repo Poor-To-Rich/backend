@@ -16,5 +16,5 @@ public class MonthlyTotalReportResponse {
     private Long yearTotalIncome;
     private Long yearTotalExpense;
     private Long yearTotalAmount;
-    private List<Logs> logs;
+    private List<Logs> monthlyLogs;
 }
