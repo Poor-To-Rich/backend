@@ -33,6 +33,7 @@ public class CategoryService {
     public List<DefaultCategoryResponse> getDefaultCategories(CategoryType type, String username) {
         return categoryRepository.findByTypeAndUser(type, userService.findUserByUsername(username)).stream()
                 .map(category -> DefaultCategoryResponse.builder()
+                        .id(category.getId())
                         .name(category.getName())
                         .color(category.getColor())
                         .visibility(category.getVisibility())
