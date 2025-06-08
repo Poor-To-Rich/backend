@@ -13,6 +13,7 @@ import com.poortorich.category.entity.Category;
 import com.poortorich.expense.response.ExpenseResponse;
 import com.poortorich.global.exceptions.NotFoundException;
 import com.poortorich.global.statistics.util.StatCalculator;
+import com.poortorich.income.response.enums.IncomeResponse;
 import com.poortorich.iteration.entity.Iteration;
 import com.poortorich.iteration.response.CustomIterationInfoResponse;
 import com.poortorich.user.entity.User;
@@ -164,7 +165,13 @@ public class AccountBookService {
 
     public AccountBook getAccountBookOrThrow(Long id, User user, AccountBookType type) {
         return accountBookRepository.findByIdAndUser(id, user, type)
-                .orElseThrow(() -> new NotFoundException(ExpenseResponse.EXPENSE_NON_EXISTENT));
+                .orElseThrow(() -> {
+                    if (type == AccountBookType.EXPENSE) {
+                        return new NotFoundException(ExpenseResponse.EXPENSE_NON_EXISTENT);
+                    }
+                    
+                    return new NotFoundException(IncomeResponse.INCOME_NON_EXISTENT);
+                });
     }
 
     public IterationDetailsResponse getIterationDetails(User user, List<Long> originalAccountBookIds,
