@@ -10,7 +10,7 @@ import lombok.Data;
 @Builder
 public class CategoryChartResponse {
 
-    Map<String, BigDecimal> aggregatedData;
+    List<Map<String, BigDecimal>> aggregatedData;
     Map<String, String> categoryColors;
     List<CategoryChart> categoryCharts;
 }

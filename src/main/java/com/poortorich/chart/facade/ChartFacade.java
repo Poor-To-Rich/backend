@@ -113,8 +113,8 @@ public class ChartFacade {
         List<CategoryChart> categoryCharts = chartService.getCategoryChart(accountBooks);
 
         return CategoryChartResponse.builder()
-                .aggregatedData(categoryCharts.stream()
-                        .collect(Collectors.toMap(CategoryChart::getName, CategoryChart::getRate)))
+                .aggregatedData(List.of(categoryCharts.stream()
+                        .collect(Collectors.toMap(CategoryChart::getName, CategoryChart::getRate))))
                 .categoryColors(categoryCharts.stream()
                         .collect(Collectors.toMap(CategoryChart::getName, CategoryChart::getColor)))
                 .categoryCharts(categoryCharts)
@@ -157,7 +157,7 @@ public class ChartFacade {
         if (date == null) {
             date = Year.now().toString();
         }
-        
+
         User user = userService.findUserByUsername(username);
         Category category = categoryService.getCategoryOrThrow(categoryId, user);
         YearInformation yearInfo = (YearInformation) DateInfoProvider.getDateInfo(date);
