@@ -91,7 +91,7 @@ public class ReportFacade {
 
         String startDateString = startDate.format(DateTimeFormatter.ofPattern(DatePattern.LOCAL_DATE_DOT_PATTERN));
         String endDateString = endDate.format(DateTimeFormatter.ofPattern(DatePattern.LOCAL_DATE_DOT_PATTERN));
-        String period = startDateString + " - " + endDateString;
+        String period = startDateString + " ~ " + endDateString;
 
         LocalDate nextCursor = getNextCursor(accountBooksByLastDate, endDate);
         Boolean hasNext = accountBookService.hasNextPage(user, nextCursor, endDate);
