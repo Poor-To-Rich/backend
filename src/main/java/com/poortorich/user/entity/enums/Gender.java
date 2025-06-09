@@ -10,21 +10,21 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum Gender {
-    MALE("MALE", "남자"),
-    FEMALE("FEMALE", "여자");
+
+    MALE("MALE"),
+    FEMALE("FEMALE");
 
     private final String value;
-    private final String koreanValue;
 
     public static Gender from(String value) {
         return Arrays.stream(Gender.values())
-                .filter(gender -> Objects.equals(gender.value, value) || Objects.equals(gender.koreanValue, value))
+                .filter(gender -> Objects.equals(gender.value, value))
                 .findFirst()
                 .orElseThrow(() -> new BadRequestException(UserResponse.GENDER_INVALID));
     }
 
     @Override
     public String toString() {
-        return koreanValue;
+        return value;
     }
 }
