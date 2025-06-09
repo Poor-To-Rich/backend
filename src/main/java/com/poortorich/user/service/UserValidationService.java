@@ -3,7 +3,6 @@ package com.poortorich.user.service;
 import com.poortorich.email.response.enums.EmailResponse;
 import com.poortorich.email.util.EmailVerificationPolicyManager;
 import com.poortorich.global.exceptions.BadRequestException;
-import com.poortorich.global.exceptions.ConflictException;
 import com.poortorich.global.exceptions.ForbiddenException;
 import com.poortorich.user.request.PasswordUpdateRequest;
 import com.poortorich.user.request.ProfileUpdateRequest;
@@ -48,16 +47,10 @@ public class UserValidationService {
 
     public void validateCheckUsername(String username) {
         userValidator.validateUsernameDuplicate(username);
-        if (userReservationService.existsByUsername(username)) {
-            throw new ConflictException(UserResponse.USERNAME_DUPLICATE);
-        }
     }
 
     public void validateCheckNickname(String nickname) {
         userValidator.validateNicknameDuplicate(nickname);
-        if (userReservationService.existsByNickname(nickname)) {
-            throw new ConflictException(UserResponse.NICKNAME_DUPLICATE);
-        }
     }
 
     public void validateUpdateUserProfile(String username, ProfileUpdateRequest userProfile) {
