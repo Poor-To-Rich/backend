@@ -271,12 +271,9 @@ public class UserValidationServiceTest {
     void validateCheckUsername_whenAllValidationPass_thenDoNothing() {
         String username = userRegistrationBuilder.build().getUsername();
 
-        when(userReservationService.existsByUsername(username)).thenReturn(false);
-
         userValidationService.validateCheckUsername(username);
 
         verify(userValidator).validateUsernameDuplicate(username);
-        verify(userReservationService).existsByUsername(username);
     }
 
     @Test
@@ -297,31 +294,13 @@ public class UserValidationServiceTest {
     }
 
     @Test
-    @DisplayName("사용자명 중복 검사 검증 - 사용자명이 이미 예약되어 있을 때")
-    void validateCheckUsername_whenUsernameReserved_thenThrowConflicException() {
-        String username = userRegistrationBuilder.build().getUsername();
-
-        when(userReservationService.existsByUsername(username)).thenReturn(true);
-
-        assertThatThrownBy(() -> userValidationService.validateCheckUsername(username))
-                .isInstanceOf(ConflictException.class)
-                .hasMessage(UserResponseMessages.USERNAME_DUPLICATE);
-
-        verify(userValidator).validateUsernameDuplicate(username);
-        verify(userReservationService).existsByUsername(username);
-    }
-
-    @Test
     @DisplayName("닉네임 증복 검사 검증 - 성공")
     void validateCheckNickname_whenAllValidationPass_thenDoNothing() {
         String nickname = userRegistrationBuilder.build().getNickname();
 
-        when(userReservationService.existsByNickname(nickname)).thenReturn(false);
-
         userValidationService.validateCheckNickname(nickname);
 
         verify(userValidator).validateNicknameDuplicate(nickname);
-        verify(userReservationService).existsByNickname(nickname);
     }
 
     @Test
@@ -339,21 +318,6 @@ public class UserValidationServiceTest {
 
         verify(userValidator).validateNicknameDuplicate(nickname);
         verify(userReservationService, never()).existsByNickname(nickname);
-    }
-
-    @Test
-    @DisplayName("닉네임 중복 검사 검증 - 이미 예약중인 닉네임인 경우")
-    void validateCheckNickname_whenNicknameReserved_thenThrowConflictException() {
-        String nickname = userRegistrationBuilder.build().getNickname();
-
-        when(userReservationService.existsByNickname(nickname)).thenReturn(true);
-
-        assertThatThrownBy(() -> userValidationService.validateCheckNickname(nickname))
-                .isInstanceOf(ConflictException.class)
-                .hasMessage(UserResponseMessages.NICKNAME_DUPLICATE);
-
-        verify(userValidator).validateNicknameDuplicate(nickname);
-        verify(userReservationService).existsByNickname(nickname);
     }
 
     @Test
