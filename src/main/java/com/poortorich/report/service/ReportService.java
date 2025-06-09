@@ -79,6 +79,7 @@ public class ReportService {
 
         Long totalIncome = 0L;
         Long totalExpense = 0L;
+        Long countOfLogs = 0L;
         for(AccountBook accountBook : weeklyAccountBooks) {
             if (inferAccountBookType(accountBook) == AccountBookType.EXPENSE) {
                 totalExpense += accountBook.getCost();
@@ -86,6 +87,7 @@ public class ReportService {
             else {
                 totalIncome += accountBook.getCost();
             }
+            countOfLogs++;
         }
 
         return WeeklyDetailsResponse.builder()
@@ -93,7 +95,7 @@ public class ReportService {
                 .totalIncome(totalIncome)
                 .totalExpense(totalExpense)
                 .totalAmount(totalIncome - totalExpense)
-                .countOfLogs((long) dailyTransactions.size())
+                .countOfLogs(countOfLogs)
                 .hasNext(hasNext)
                 .nextCursor(nextCursor.toString())
                 .dailyDetails(dailyTransactions)
