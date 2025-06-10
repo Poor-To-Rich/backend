@@ -14,7 +14,7 @@ public enum DefaultExpenseCategory {
     FOOD("식비", "#7ED321"),
     TRANSPORTATION("교통비", "#F5A623"),
     SHOPPING("쇼핑", "#FF6F61"),
-    HEALTH_MEDICAL("건상/의료", "#50E3C2"),
+    HEALTH_MEDICAL("건강/의료", "#50E3C2"),
     EDUCATION("교육", "#4A4A8A"),
     CULTURE_HOBBY("문화/취미", "#E563FF"),
     TRAVEL_ACCOMMODATION("여행/숙박", "#2AB6D9"),
