@@ -9,4 +9,5 @@ public class PeriodTotal {
 
     private String period;
     private Long totalAmount;
+    private String label;
 }

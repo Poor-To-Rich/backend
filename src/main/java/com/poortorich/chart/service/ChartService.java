@@ -94,6 +94,7 @@ public class ChartService {
                             }
                     )
                     .totalAmount(totalAmounts.get(i))
+                    .label(AmountFormatter.convertAmount(totalAmounts.get(i)))
                     .build());
         }
         return AccountBookBarResponse.builder()

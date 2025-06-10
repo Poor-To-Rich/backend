@@ -4,6 +4,7 @@ import com.poortorich.accountbook.entity.AccountBook;
 import com.poortorich.accountbook.enums.AccountBookType;
 import com.poortorich.accountbook.service.AccountBookService;
 import com.poortorich.accountbook.util.AccountBookCostExtractor;
+import com.poortorich.chart.util.PeriodFormatter;
 import com.poortorich.global.date.constants.DateConstants;
 import com.poortorich.global.date.constants.DatePattern;
 import com.poortorich.global.date.domain.MonthInformation;
@@ -77,36 +78,53 @@ public class ReportFacade {
         Slice<AccountBook> weeklyExpenses = accountBookService.getAccountBookByUserWithinDateRangeWithCursor(
                 user, startDate, endDate, dateCursor, pageable, AccountBookType.EXPENSE
         );
-
         Slice<AccountBook> weeklyIncomes = accountBookService.getAccountBookByUserWithinDateRangeWithCursor(
                 user, startDate, endDate, dateCursor, pageable, AccountBookType.INCOME
         );
 
         List<AccountBook> mergeSliceAccountBooks
                 = reportService.mergeAccountBookLimit(weeklyIncomes.getContent(), weeklyExpenses.getContent(), 20);
+        List<AccountBook> accountBooksByLastDate
+                = getAccountBooksByLastDate(user, mergeSliceAccountBooks, weeklyExpenses, weeklyIncomes);
 
-        List<AccountBook> expensesByLastDate = accountBookService.getAccountBooksByUserAndDate(
-                user, mergeSliceAccountBooks.getLast().getAccountBookDate(), AccountBookType.EXPENSE
-        );
+        List<AccountBook> weeklyAccountBooks
+                = reportService.mergeAccountBookDistinct(mergeSliceAccountBooks, accountBooksByLastDate);
 
-        List<AccountBook> incomesByLastDate = accountBookService.getAccountBooksByUserAndDate(
-                user, mergeSliceAccountBooks.getLast().getAccountBookDate(), AccountBookType.INCOME
-        );
-
-        List<AccountBook> accountBooksByLastDate = reportService.mergeAccountBook(incomesByLastDate, expensesByLastDate);
-
-        List<AccountBook> weeklyAccountBooks = reportService.mergeAccountBookDistinct(
-                mergeSliceAccountBooks, accountBooksByLastDate
-        );
-
-        String startDateString = startDate.format(DateTimeFormatter.ofPattern(DatePattern.LOCAL_DATE_DOT_PATTERN));
-        String endDateString = endDate.format(DateTimeFormatter.ofPattern(DatePattern.LOCAL_DATE_DOT_PATTERN));
-        String period = startDateString + " - " + endDateString;
-
-        LocalDate nextCursor = accountBooksByLastDate.getFirst().getAccountBookDate().plusDays(DateConstants.ONE_DAY);
+        LocalDate nextCursor = getNextCursor(accountBooksByLastDate, endDate);
         Boolean hasNext = accountBookService.hasNextPage(user, nextCursor, endDate);
 
-        return reportService.getWeeklyDetailsReport(weeklyAccountBooks, period, nextCursor, hasNext);
+        return reportService.getWeeklyDetailsReport(
+                weeklyAccountBooks, PeriodFormatter.formatWeeklyReportRange(startDate, endDate), nextCursor, hasNext
+        );
+    }
+
+    private List<AccountBook> getAccountBooksByLastDate(
+            User user, List<AccountBook> mergeSliceAccountBooks, Slice<AccountBook> weeklyExpenses, Slice<AccountBook> weeklyIncomes
+    ) {
+        List<AccountBook> expensesByLastDate = List.of();
+        List<AccountBook> incomesByLastDate = List.of();
+
+        if (!weeklyExpenses.isEmpty()) {
+            expensesByLastDate = accountBookService.getAccountBooksByUserAndDate(
+                    user, mergeSliceAccountBooks.getLast().getAccountBookDate(), AccountBookType.EXPENSE
+            );
+        }
+
+        if (!weeklyIncomes.isEmpty()) {
+            incomesByLastDate = accountBookService.getAccountBooksByUserAndDate(
+                    user, mergeSliceAccountBooks.getLast().getAccountBookDate(), AccountBookType.INCOME
+            );
+        }
+
+        return reportService.mergeAccountBook(incomesByLastDate, expensesByLastDate);
+    }
+
+    private LocalDate getNextCursor(List<AccountBook> accountBooksByLastDate, LocalDate endDate) {
+        if (accountBooksByLastDate.isEmpty()) {
+            return endDate.plusDays(DateConstants.ONE_DAY);
+        }
+
+        return accountBooksByLastDate.getFirst().getAccountBookDate().plusDays(DateConstants.ONE_DAY);
     }
 
     public MonthlyTotalResponse getMonthlyTotal(String username, String date) {

@@ -7,7 +7,7 @@ import lombok.Data;
 @Data
 @Builder
 public class CategoryChart {
-
+    
     private Long id;
     private String color;
     private String name;

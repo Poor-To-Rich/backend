@@ -8,6 +8,7 @@ import lombok.Data;
 public class UserDetailResponse {
 
     private String profileImage;
+    private Boolean isDefaultProfile;
     private String name;
     private String nickname;
     private String birth;

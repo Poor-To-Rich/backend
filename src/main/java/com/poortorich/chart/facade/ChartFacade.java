@@ -6,6 +6,7 @@ import com.poortorich.accountbook.service.AccountBookService;
 import com.poortorich.category.domain.model.enums.DefaultExpenseCategory;
 import com.poortorich.category.entity.Category;
 import com.poortorich.category.service.CategoryService;
+import com.poortorich.chart.constants.ChartConstants;
 import com.poortorich.chart.response.AccountBookBarResponse;
 import com.poortorich.chart.response.CategoryChart;
 import com.poortorich.chart.response.CategoryChartResponse;
@@ -23,11 +24,15 @@ import com.poortorich.global.date.domain.YearInformation;
 import com.poortorich.global.date.util.DateInfoProvider;
 import com.poortorich.user.entity.User;
 import com.poortorich.user.service.UserService;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.Year;
 import java.util.Arrays;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -80,6 +85,14 @@ public class ChartFacade {
                 pageable
         );
 
+        if (!accountBooks.hasContent()) {
+            return CategorySectionResponse.builder()
+                    .hasNext(false)
+                    .countOfLogs(0L)
+                    .categoryLogs(List.of())
+                    .build();
+        }
+
         List<AccountBook> accountBooksByLastDate = accountBookService.getAccountBooksByUserAndCategoryAndAccountBookDate(
                 user,
                 category,
@@ -110,13 +123,31 @@ public class ChartFacade {
                 dateInfo.getEndDate(),
                 accountBookType);
 
-        List<CategoryChart> categoryCharts = chartService.getCategoryChart(accountBooks);
+        List<CategoryChart> categoryCharts = chartService.getCategoryChart(accountBooks).stream()
+                .sorted(Comparator.comparing(CategoryChart::getRate).reversed())
+                .toList();
+
+        List<Map<String, BigDecimal>> aggregatedData = List.of(categoryCharts.stream()
+                .collect(Collectors.toMap(
+                        CategoryChart::getName,
+                        CategoryChart::getRate,
+                        (existing, replacement) -> existing,
+                        LinkedHashMap::new)));
+
+        Map<String, String> categoryColors = categoryCharts.stream()
+                .collect(Collectors.toMap(CategoryChart::getName,
+                        CategoryChart::getColor,
+                        (existing, replacement) -> existing,
+                        LinkedHashMap::new));
+
+        if (categoryCharts.isEmpty()) {
+            aggregatedData = List.of(Map.of(ChartConstants.DUMMY_CATEGORY, ChartConstants.DUMMY_RATE));
+            categoryColors = Map.of(ChartConstants.DUMMY_CATEGORY, ChartConstants.DUMMY_COLOR);
+        }
 
         return CategoryChartResponse.builder()
-                .aggregatedData(categoryCharts.stream()
-                        .collect(Collectors.toMap(CategoryChart::getName, CategoryChart::getRate)))
-                .categoryColors(categoryCharts.stream()
-                        .collect(Collectors.toMap(CategoryChart::getName, CategoryChart::getColor)))
+                .aggregatedData(aggregatedData)
+                .categoryColors(categoryColors)
                 .categoryCharts(categoryCharts)
                 .build();
     }
@@ -157,7 +188,7 @@ public class ChartFacade {
         if (date == null) {
             date = Year.now().toString();
         }
-        
+
         User user = userService.findUserByUsername(username);
         Category category = categoryService.getCategoryOrThrow(categoryId, user);
         YearInformation yearInfo = (YearInformation) DateInfoProvider.getDateInfo(date);
