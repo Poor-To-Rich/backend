@@ -29,6 +29,8 @@ import java.time.LocalDate;
 import java.time.Month;
 import java.time.Year;
 import java.util.Arrays;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -121,13 +123,22 @@ public class ChartFacade {
                 dateInfo.getEndDate(),
                 accountBookType);
 
-        List<CategoryChart> categoryCharts = chartService.getCategoryChart(accountBooks);
+        List<CategoryChart> categoryCharts = chartService.getCategoryChart(accountBooks).stream()
+                .sorted(Comparator.comparing(CategoryChart::getRate).reversed())
+                .toList();
 
         List<Map<String, BigDecimal>> aggregatedData = List.of(categoryCharts.stream()
-                .collect(Collectors.toMap(CategoryChart::getName, CategoryChart::getRate)));
+                .collect(Collectors.toMap(
+                        CategoryChart::getName,
+                        CategoryChart::getRate,
+                        (existing, replacement) -> existing,
+                        LinkedHashMap::new)));
 
         Map<String, String> categoryColors = categoryCharts.stream()
-                .collect(Collectors.toMap(CategoryChart::getName, CategoryChart::getColor));
+                .collect(Collectors.toMap(CategoryChart::getName,
+                        CategoryChart::getColor,
+                        (existing, replacement) -> existing,
+                        LinkedHashMap::new));
 
         if (categoryCharts.isEmpty()) {
             aggregatedData = List.of(Map.of(ChartConstants.DUMMY_CATEGORY, ChartConstants.DUMMY_RATE));
