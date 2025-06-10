@@ -83,6 +83,14 @@ public class ChartFacade {
                 pageable
         );
 
+        if (!accountBooks.hasContent()) {
+            return CategorySectionResponse.builder()
+                    .hasNext(false)
+                    .countOfLogs(0L)
+                    .categoryLogs(List.of())
+                    .build();
+        }
+
         List<AccountBook> accountBooksByLastDate = accountBookService.getAccountBooksByUserAndCategoryAndAccountBookDate(
                 user,
                 category,
