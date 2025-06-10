@@ -6,6 +6,7 @@ import com.poortorich.accountbook.response.AccountBookInfoResponse;
 import com.poortorich.accountbook.util.AccountBookBuilder;
 import com.poortorich.accountbook.util.AccountBookCostExtractor;
 import com.poortorich.chart.util.AccountBookUtil;
+import com.poortorich.chart.util.PeriodFormatter;
 import com.poortorich.global.date.constants.DatePattern;
 import com.poortorich.global.statistics.util.StatCalculator;
 import com.poortorich.report.response.DailyDetailsResponse;
@@ -154,12 +155,8 @@ public class ReportService {
         Long totalIncome = StatCalculator.calculateSum(AccountBookCostExtractor.extract(monthlyIncomes)).longValue();
         Long totalExpense = StatCalculator.calculateSum(AccountBookCostExtractor.extract(monthlyExpenses)).longValue();
 
-        String startDateString = startDate.format(DateTimeFormatter.ofPattern(DatePattern.MONTH_DAY_DOT_PATTERN));
-        String endDateString = endDate.format(DateTimeFormatter.ofPattern(DatePattern.MONTH_DAY_DOT_PATTERN));
-        String period = startDateString + "~" + endDateString;
-
         return Logs.builder()
-                .period(period)
+                .period(PeriodFormatter.formatMonthDayRange(startDate, endDate))
                 .totalIncome(totalIncome)
                 .totalExpense(totalExpense)
                 .totalAmount(totalIncome - totalExpense)

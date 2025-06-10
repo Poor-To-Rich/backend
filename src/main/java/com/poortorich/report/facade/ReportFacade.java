@@ -4,6 +4,7 @@ import com.poortorich.accountbook.entity.AccountBook;
 import com.poortorich.accountbook.enums.AccountBookType;
 import com.poortorich.accountbook.service.AccountBookService;
 import com.poortorich.accountbook.util.AccountBookCostExtractor;
+import com.poortorich.chart.util.PeriodFormatter;
 import com.poortorich.global.date.constants.DateConstants;
 import com.poortorich.global.date.constants.DatePattern;
 import com.poortorich.global.date.domain.MonthInformation;
@@ -89,14 +90,12 @@ public class ReportFacade {
         List<AccountBook> weeklyAccountBooks
                 = reportService.mergeAccountBookDistinct(mergeSliceAccountBooks, accountBooksByLastDate);
 
-        String startDateString = startDate.format(DateTimeFormatter.ofPattern(DatePattern.LOCAL_DATE_DOT_PATTERN));
-        String endDateString = endDate.format(DateTimeFormatter.ofPattern(DatePattern.LOCAL_DATE_DOT_PATTERN));
-        String period = startDateString + " ~ " + endDateString;
-
         LocalDate nextCursor = getNextCursor(accountBooksByLastDate, endDate);
         Boolean hasNext = accountBookService.hasNextPage(user, nextCursor, endDate);
 
-        return reportService.getWeeklyDetailsReport(weeklyAccountBooks, period, nextCursor, hasNext);
+        return reportService.getWeeklyDetailsReport(
+                weeklyAccountBooks, PeriodFormatter.formatWeeklyReportRange(startDate, endDate), nextCursor, hasNext
+        );
     }
 
     private List<AccountBook> getAccountBooksByLastDate(
