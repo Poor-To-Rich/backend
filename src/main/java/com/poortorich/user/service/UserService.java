@@ -1,6 +1,7 @@
 package com.poortorich.user.service;
 
 import com.poortorich.global.exceptions.NotFoundException;
+import com.poortorich.s3.constants.S3Constants;
 import com.poortorich.user.entity.User;
 import com.poortorich.user.repository.UserRepository;
 import com.poortorich.user.request.EmailUpdateRequest;
@@ -50,6 +51,7 @@ public class UserService {
 
         return UserDetailResponse.builder()
                 .profileImage(user.getProfileImage())
+                .isDefaultProfile(user.getProfileImage().equals(S3Constants.DEFAULT_PROFILE_IMAGE))
                 .name(user.getName())
                 .nickname(user.getNickname())
                 .birth(user.getBirth().toString())
