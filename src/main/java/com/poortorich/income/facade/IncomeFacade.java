@@ -185,7 +185,7 @@ public class IncomeFacade {
     public IterationDetailsResponse getIncomeIterationDetails(String username) {
         User user = userService.findUserByUsername(username);
 
-        List<Long> originalIncomeIds = iterationService.getIterationAccountBookIds(accountBookType);
+        List<Long> originalIncomeIds = iterationService.getIterationAccountBookIds(user, accountBookType);
         return accountBookService.getIterationDetails(user, originalIncomeIds, accountBookType);
     }
 }
