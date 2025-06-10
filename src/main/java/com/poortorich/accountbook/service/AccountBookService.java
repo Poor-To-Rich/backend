@@ -19,6 +19,7 @@ import com.poortorich.iteration.response.CustomIterationInfoResponse;
 import com.poortorich.user.entity.User;
 import java.beans.Transient;
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -135,9 +136,9 @@ public class AccountBookService {
             Pageable pageable,
             AccountBookType type
     ) {
-        return accountBookRepository.findByUserWithinDateRangeWithCursor(
+        return Optional.ofNullable(accountBookRepository.findByUserWithinDateRangeWithCursor(
                 user, startDate, endDate, cursor, pageable, type
-        );
+        )).orElseGet(() -> new SliceImpl<>(Collections.emptyList(), pageable, false));
     }
 
     public List<AccountBook> getAccountBooksByUserAndCategoryAndAccountBookDate(
@@ -152,7 +153,8 @@ public class AccountBookService {
             LocalDate accountBookDate,
             AccountBookType type
     ) {
-        return accountBookRepository.findByUserAndDate(user, accountBookDate, type);
+        return Optional.ofNullable(accountBookRepository.findByUserAndDate(user, accountBookDate, type))
+                .orElse(Collections.emptyList());
     }
 
     public Boolean hasNextPage(User user, Category category, LocalDate startDate, LocalDate endDate) {
