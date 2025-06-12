@@ -31,7 +31,10 @@ public class ExpenseController {
     public ResponseEntity<BaseResponse> createExpense(
             @AuthenticationPrincipal UserDetails userDetails,
             @RequestBody @Valid ExpenseRequest expenseRequest) {
-        return BaseResponse.toResponseEntity(expenseFacade.createExpense(expenseRequest, userDetails.getUsername()));
+        return DataResponse.toResponseEntity(
+                ExpenseResponse.CREATE_EXPENSE_SUCCESS,
+                expenseFacade.createExpense(expenseRequest, userDetails.getUsername())
+        );
     }
 
     @GetMapping("/{expenseId}")

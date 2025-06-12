@@ -5,13 +5,13 @@ import com.poortorich.accountbook.entity.enums.IterationType;
 import com.poortorich.accountbook.enums.AccountBookType;
 import com.poortorich.accountbook.request.AccountBookDeleteRequest;
 import com.poortorich.accountbook.request.enums.IterationAction;
+import com.poortorich.accountbook.response.AccountBookCreateResponse;
 import com.poortorich.accountbook.response.InfoResponse;
 import com.poortorich.accountbook.response.IterationDetailsResponse;
 import com.poortorich.accountbook.service.AccountBookService;
 import com.poortorich.category.entity.Category;
 import com.poortorich.category.entity.enums.CategoryType;
 import com.poortorich.category.service.CategoryService;
-import com.poortorich.global.response.Response;
 import com.poortorich.income.entity.Income;
 import com.poortorich.income.request.IncomeRequest;
 import com.poortorich.income.response.enums.IncomeResponse;
@@ -42,7 +42,7 @@ public class IncomeFacade {
     private final IncomeService incomeService;
 
     @Transactional
-    public Response createIncome(String username, IncomeRequest incomeRequest) {
+    public AccountBookCreateResponse createIncome(String username, IncomeRequest incomeRequest) {
         User user = userService.findUserByUsername(username);
         Category category = categoryService.findCategoryByName(user, incomeRequest.getCategoryName(), categoryType);
         AccountBook income = accountBookService.create(user, category, incomeRequest, accountBookType);
@@ -51,7 +51,9 @@ public class IncomeFacade {
             createIterationIncome(user, incomeRequest, income);
         }
 
-        return IncomeResponse.CREATE_INCOME_SUCCESS;
+        return AccountBookCreateResponse.builder()
+                .id(income.getId())
+                .build();
     }
 
     public void createIterationIncome(User user, IncomeRequest incomeRequest, AccountBook income) {

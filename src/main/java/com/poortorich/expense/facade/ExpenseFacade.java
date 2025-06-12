@@ -4,6 +4,7 @@ import com.poortorich.accountbook.entity.AccountBook;
 import com.poortorich.accountbook.entity.enums.IterationType;
 import com.poortorich.accountbook.enums.AccountBookType;
 import com.poortorich.accountbook.request.enums.IterationAction;
+import com.poortorich.accountbook.response.AccountBookCreateResponse;
 import com.poortorich.accountbook.response.InfoResponse;
 import com.poortorich.accountbook.response.IterationDetailsResponse;
 import com.poortorich.accountbook.service.AccountBookService;
@@ -15,7 +16,6 @@ import com.poortorich.accountbook.request.AccountBookDeleteRequest;
 import com.poortorich.expense.request.ExpenseRequest;
 import com.poortorich.expense.response.ExpenseResponse;
 import com.poortorich.expense.service.ExpenseService;
-import com.poortorich.global.response.Response;
 import com.poortorich.iteration.entity.Iteration;
 import com.poortorich.iteration.response.CustomIterationInfoResponse;
 import com.poortorich.iteration.service.IterationService;
@@ -41,7 +41,7 @@ public class ExpenseFacade {
     private final AccountBookService accountBookService;
 
     @Transactional
-    public Response createExpense(ExpenseRequest expenseRequest, String username) {
+    public AccountBookCreateResponse createExpense(ExpenseRequest expenseRequest, String username) {
         User user = userService.findUserByUsername(username);
         Category category = categoryService.findCategoryByName(user, expenseRequest.getCategoryName(), categoryType);
         AccountBook expense = accountBookService.create(user, category, expenseRequest, accountBookType);
@@ -49,7 +49,9 @@ public class ExpenseFacade {
             createIterationExpense(user, expenseRequest, expense);
         }
 
-        return ExpenseResponse.CREATE_EXPENSE_SUCCESS;
+        return AccountBookCreateResponse.builder()
+                .id(expense.getId())
+                .build();
     }
 
     public void createIterationExpense(User user, ExpenseRequest expenseRequest, AccountBook expense) {
