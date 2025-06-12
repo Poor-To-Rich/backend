@@ -4,17 +4,18 @@ import com.poortorich.accountbook.entity.AccountBook;
 import com.poortorich.accountbook.entity.enums.IterationType;
 import com.poortorich.accountbook.enums.AccountBookType;
 import com.poortorich.accountbook.request.enums.IterationAction;
+import com.poortorich.accountbook.response.AccountBookCreateResponse;
 import com.poortorich.accountbook.response.InfoResponse;
 import com.poortorich.accountbook.response.IterationDetailsResponse;
 import com.poortorich.accountbook.service.AccountBookService;
 import com.poortorich.category.entity.Category;
+import com.poortorich.category.entity.enums.CategoryType;
 import com.poortorich.category.service.CategoryService;
 import com.poortorich.expense.entity.Expense;
 import com.poortorich.accountbook.request.AccountBookDeleteRequest;
 import com.poortorich.expense.request.ExpenseRequest;
 import com.poortorich.expense.response.ExpenseResponse;
 import com.poortorich.expense.service.ExpenseService;
-import com.poortorich.global.response.Response;
 import com.poortorich.iteration.entity.Iteration;
 import com.poortorich.iteration.response.CustomIterationInfoResponse;
 import com.poortorich.iteration.service.IterationService;
@@ -31,6 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class ExpenseFacade {
 
     private static final AccountBookType accountBookType = AccountBookType.EXPENSE;
+    private static final CategoryType categoryType = CategoryType.DEFAULT_EXPENSE;
 
     private final ExpenseService expenseService;
     private final CategoryService categoryService;
@@ -39,15 +41,17 @@ public class ExpenseFacade {
     private final AccountBookService accountBookService;
 
     @Transactional
-    public Response createExpense(ExpenseRequest expenseRequest, String username) {
+    public AccountBookCreateResponse createExpense(ExpenseRequest expenseRequest, String username) {
         User user = userService.findUserByUsername(username);
-        Category category = categoryService.findCategoryByName(expenseRequest.getCategoryName(), user);
+        Category category = categoryService.findCategoryByName(user, expenseRequest.getCategoryName(), categoryType);
         AccountBook expense = accountBookService.create(user, category, expenseRequest, accountBookType);
         if (expense.getIterationType() != IterationType.DEFAULT) {
             createIterationExpense(user, expenseRequest, expense);
         }
 
-        return ExpenseResponse.CREATE_EXPENSE_SUCCESS;
+        return AccountBookCreateResponse.builder()
+                .id(expense.getId())
+                .build();
     }
 
     public void createIterationExpense(User user, ExpenseRequest expenseRequest, AccountBook expense) {
@@ -95,7 +99,7 @@ public class ExpenseFacade {
     @Transactional
     public ExpenseResponse modifyExpense(String username, Long expenseId, ExpenseRequest expenseRequest) {
         User user = userService.findUserByUsername(username);
-        Category category = categoryService.findCategoryByName(expenseRequest.getCategoryName(), user);
+        Category category = categoryService.findCategoryByName(user, expenseRequest.getCategoryName(), categoryType);
         AccountBook expense = accountBookService.modifyAccountBook(user, category, expenseId, expenseRequest, accountBookType);
         expenseService.modifyPaymentMethod((Expense) expense, expenseRequest.parsePaymentMethod());
 
@@ -185,7 +189,7 @@ public class ExpenseFacade {
     public IterationDetailsResponse getExpenseIterationDetails(String username) {
         User user = userService.findUserByUsername(username);
 
-        List<Long> originalExpenseIds = iterationService.getIterationAccountBookIds(accountBookType);
+        List<Long> originalExpenseIds = iterationService.getIterationAccountBookIds(user, accountBookType);
         return accountBookService.getIterationDetails(user, originalExpenseIds, accountBookType);
     }
 }

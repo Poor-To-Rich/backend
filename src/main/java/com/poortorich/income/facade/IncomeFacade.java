@@ -5,12 +5,13 @@ import com.poortorich.accountbook.entity.enums.IterationType;
 import com.poortorich.accountbook.enums.AccountBookType;
 import com.poortorich.accountbook.request.AccountBookDeleteRequest;
 import com.poortorich.accountbook.request.enums.IterationAction;
+import com.poortorich.accountbook.response.AccountBookCreateResponse;
 import com.poortorich.accountbook.response.InfoResponse;
 import com.poortorich.accountbook.response.IterationDetailsResponse;
 import com.poortorich.accountbook.service.AccountBookService;
 import com.poortorich.category.entity.Category;
+import com.poortorich.category.entity.enums.CategoryType;
 import com.poortorich.category.service.CategoryService;
-import com.poortorich.global.response.Response;
 import com.poortorich.income.entity.Income;
 import com.poortorich.income.request.IncomeRequest;
 import com.poortorich.income.response.enums.IncomeResponse;
@@ -32,6 +33,7 @@ import java.util.List;
 public class IncomeFacade {
 
     private static final AccountBookType accountBookType = AccountBookType.INCOME;
+    private static final CategoryType categoryType = CategoryType.DEFAULT_INCOME;
 
     private final UserService userService;
     private final CategoryService categoryService;
@@ -40,16 +42,18 @@ public class IncomeFacade {
     private final IncomeService incomeService;
 
     @Transactional
-    public Response createIncome(String username, IncomeRequest incomeRequest) {
+    public AccountBookCreateResponse createIncome(String username, IncomeRequest incomeRequest) {
         User user = userService.findUserByUsername(username);
-        Category category = categoryService.findCategoryByName(incomeRequest.getCategoryName(), user);
+        Category category = categoryService.findCategoryByName(user, incomeRequest.getCategoryName(), categoryType);
         AccountBook income = accountBookService.create(user, category, incomeRequest, accountBookType);
 
         if (income.getIterationType() != IterationType.DEFAULT) {
             createIterationIncome(user, incomeRequest, income);
         }
 
-        return IncomeResponse.CREATE_INCOME_SUCCESS;
+        return AccountBookCreateResponse.builder()
+                .id(income.getId())
+                .build();
     }
 
     public void createIterationIncome(User user, IncomeRequest incomeRequest, AccountBook income) {
@@ -97,7 +101,7 @@ public class IncomeFacade {
     @Transactional
     public IncomeResponse modifyIncome(String username, Long incomeId, IncomeRequest incomeRequest) {
         User user = userService.findUserByUsername(username);
-        Category category = categoryService.findCategoryByName(incomeRequest.getCategoryName(), user);
+        Category category = categoryService.findCategoryByName(user, incomeRequest.getCategoryName(), categoryType);
         AccountBook income = accountBookService.modifyAccountBook(user, category, incomeId, incomeRequest, accountBookType);
 
         IterationAction iterationAction = incomeRequest.parseIterationAction();
@@ -185,7 +189,7 @@ public class IncomeFacade {
     public IterationDetailsResponse getIncomeIterationDetails(String username) {
         User user = userService.findUserByUsername(username);
 
-        List<Long> originalIncomeIds = iterationService.getIterationAccountBookIds(accountBookType);
+        List<Long> originalIncomeIds = iterationService.getIterationAccountBookIds(user, accountBookType);
         return accountBookService.getIterationDetails(user, originalIncomeIds, accountBookType);
     }
 }

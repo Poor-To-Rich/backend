@@ -36,8 +36,9 @@ public interface IterationIncomesRepository extends JpaRepository<IterationIncom
     @Query("""
             SELECT DISTINCT ii.originalIncome.id
             FROM IterationIncomes ii
+            WHERE ii.user = :user
             """)
-    List<Long> getOriginalIncomeIds();
+    List<Long> getOriginalIncomeIds(User user);
 
     void deleteByUser(User user);
 }

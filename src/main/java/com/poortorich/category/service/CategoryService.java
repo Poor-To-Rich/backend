@@ -59,6 +59,11 @@ public class CategoryService {
                 .stream()
                 .filter(Category::getVisibility)
                 .map(Category::getName)
+                .sorted((a, b) -> {
+                    if (a.equals("기타")) return 1;
+                    if (b.equals("기타")) return -1;
+                    return 0;
+                })
                 .toList();
 
         return ActiveCategoriesResponse.builder()
@@ -146,6 +151,11 @@ public class CategoryService {
         if (categoryRepository.findByUserAndNameAndTypeIn(user, name, type.getSameGroupTypes()).isPresent()) {
             throw new BadRequestException(CategoryResponse.CATEGORY_NAME_DUPLICATE);
         }
+    }
+
+    public Category findCategoryByName(User user, String name, CategoryType type) {
+        return categoryRepository.findByUserAndNameAndTypeIn(user, name, type.getSameGroupTypes())
+                .orElseThrow(() -> new NotFoundException(CategoryResponse.CATEGORY_NON_EXISTENT));
     }
 
     public Category findCategoryByName(String name, User user) {
