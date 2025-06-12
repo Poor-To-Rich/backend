@@ -31,7 +31,10 @@ public class IncomeController {
     public ResponseEntity<BaseResponse> createIncome(
             @AuthenticationPrincipal UserDetails userDetails,
             @RequestBody @Valid IncomeRequest incomeRequest) {
-        return BaseResponse.toResponseEntity(incomeFacade.createIncome(userDetails.getUsername(), incomeRequest));
+        return DataResponse.toResponseEntity(
+                IncomeResponse.CREATE_INCOME_SUCCESS,
+                incomeFacade.createIncome(userDetails.getUsername(), incomeRequest)
+        );
     }
 
     @GetMapping("/{incomeId}")

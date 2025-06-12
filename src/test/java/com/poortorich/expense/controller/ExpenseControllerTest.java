@@ -13,6 +13,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.poortorich.accountbook.response.AccountBookCreateResponse;
 import com.poortorich.expense.facade.ExpenseFacade;
 import com.poortorich.expense.fixture.ExpenseApiFixture;
 import com.poortorich.expense.request.ExpenseRequest;
@@ -62,7 +63,7 @@ class ExpenseControllerTest extends BaseSecurityTest {
         String requestJson = objectMapper.writeValueAsString(expenseRequest);
 
         when(expenseFacade.createExpense(any(ExpenseRequest.class), anyString()))
-                .thenReturn(ExpenseResponse.CREATE_EXPENSE_SUCCESS);
+                .thenReturn(AccountBookCreateResponse.builder().build());
 
         mockMvc.perform(post(ExpenseApiFixture.CREATE_PATH)
                         .contentType(MediaType.APPLICATION_JSON)
