@@ -8,6 +8,7 @@ import com.poortorich.accountbook.response.InfoResponse;
 import com.poortorich.accountbook.response.IterationDetailsResponse;
 import com.poortorich.accountbook.service.AccountBookService;
 import com.poortorich.category.entity.Category;
+import com.poortorich.category.entity.enums.CategoryType;
 import com.poortorich.category.service.CategoryService;
 import com.poortorich.expense.entity.Expense;
 import com.poortorich.accountbook.request.AccountBookDeleteRequest;
@@ -31,6 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class ExpenseFacade {
 
     private static final AccountBookType accountBookType = AccountBookType.EXPENSE;
+    private static final CategoryType categoryType = CategoryType.DEFAULT_EXPENSE;
 
     private final ExpenseService expenseService;
     private final CategoryService categoryService;
@@ -41,7 +43,7 @@ public class ExpenseFacade {
     @Transactional
     public Response createExpense(ExpenseRequest expenseRequest, String username) {
         User user = userService.findUserByUsername(username);
-        Category category = categoryService.findCategoryByName(expenseRequest.getCategoryName(), user);
+        Category category = categoryService.findCategoryByName(user, expenseRequest.getCategoryName(), categoryType);
         AccountBook expense = accountBookService.create(user, category, expenseRequest, accountBookType);
         if (expense.getIterationType() != IterationType.DEFAULT) {
             createIterationExpense(user, expenseRequest, expense);
@@ -95,7 +97,7 @@ public class ExpenseFacade {
     @Transactional
     public ExpenseResponse modifyExpense(String username, Long expenseId, ExpenseRequest expenseRequest) {
         User user = userService.findUserByUsername(username);
-        Category category = categoryService.findCategoryByName(expenseRequest.getCategoryName(), user);
+        Category category = categoryService.findCategoryByName(user, expenseRequest.getCategoryName(), categoryType);
         AccountBook expense = accountBookService.modifyAccountBook(user, category, expenseId, expenseRequest, accountBookType);
         expenseService.modifyPaymentMethod((Expense) expense, expenseRequest.parsePaymentMethod());
 

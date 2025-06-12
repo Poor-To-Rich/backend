@@ -9,6 +9,7 @@ import com.poortorich.accountbook.response.InfoResponse;
 import com.poortorich.accountbook.response.IterationDetailsResponse;
 import com.poortorich.accountbook.service.AccountBookService;
 import com.poortorich.category.entity.Category;
+import com.poortorich.category.entity.enums.CategoryType;
 import com.poortorich.category.service.CategoryService;
 import com.poortorich.global.response.Response;
 import com.poortorich.income.entity.Income;
@@ -32,6 +33,7 @@ import java.util.List;
 public class IncomeFacade {
 
     private static final AccountBookType accountBookType = AccountBookType.INCOME;
+    private static final CategoryType categoryType = CategoryType.DEFAULT_INCOME;
 
     private final UserService userService;
     private final CategoryService categoryService;
@@ -42,7 +44,7 @@ public class IncomeFacade {
     @Transactional
     public Response createIncome(String username, IncomeRequest incomeRequest) {
         User user = userService.findUserByUsername(username);
-        Category category = categoryService.findCategoryByName(incomeRequest.getCategoryName(), user);
+        Category category = categoryService.findCategoryByName(user, incomeRequest.getCategoryName(), categoryType);
         AccountBook income = accountBookService.create(user, category, incomeRequest, accountBookType);
 
         if (income.getIterationType() != IterationType.DEFAULT) {
@@ -97,7 +99,7 @@ public class IncomeFacade {
     @Transactional
     public IncomeResponse modifyIncome(String username, Long incomeId, IncomeRequest incomeRequest) {
         User user = userService.findUserByUsername(username);
-        Category category = categoryService.findCategoryByName(incomeRequest.getCategoryName(), user);
+        Category category = categoryService.findCategoryByName(user, incomeRequest.getCategoryName(), categoryType);
         AccountBook income = accountBookService.modifyAccountBook(user, category, incomeId, incomeRequest, accountBookType);
 
         IterationAction iterationAction = incomeRequest.parseIterationAction();
