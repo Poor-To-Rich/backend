@@ -489,7 +489,7 @@ public class IterationService {
                 .getThisAndFutureIterations(originalAccountBook, user, targetAccountBook.getAccountBookDate(), type);
     }
 
-    public List<Long> getIterationAccountBookIds(AccountBookType type) {
-        return iterationRepository.originalAccountBookIds(type);
+    public List<Long> getIterationAccountBookIds(User user, AccountBookType type) {
+        return iterationRepository.originalAccountBookIds(user, type);
     }
 }

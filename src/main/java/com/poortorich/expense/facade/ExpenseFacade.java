@@ -185,7 +185,7 @@ public class ExpenseFacade {
     public IterationDetailsResponse getExpenseIterationDetails(String username) {
         User user = userService.findUserByUsername(username);
 
-        List<Long> originalExpenseIds = iterationService.getIterationAccountBookIds(accountBookType);
+        List<Long> originalExpenseIds = iterationService.getIterationAccountBookIds(user, accountBookType);
         return accountBookService.getIterationDetails(user, originalExpenseIds, accountBookType);
     }
 }

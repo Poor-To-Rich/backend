@@ -36,8 +36,9 @@ public interface IterationExpensesRepository extends JpaRepository<IterationExpe
     @Query("""
             SELECT DISTINCT ie.originalExpense.id
             FROM IterationExpenses ie
+            WHERE ie.user = :user
             """)
-    List<Long> getOriginalExpenseIds();
+    List<Long> getOriginalExpenseIds(User user);
 
     void deleteByUser(User user);
 }

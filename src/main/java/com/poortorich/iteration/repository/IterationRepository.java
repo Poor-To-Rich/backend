@@ -75,10 +75,10 @@ public class IterationRepository {
                 .toList();
     }
 
-    public List<Long> originalAccountBookIds(AccountBookType type) {
+    public List<Long> originalAccountBookIds(User user, AccountBookType type) {
         return switch (type) {
-            case EXPENSE -> iterationExpensesRepository.getOriginalExpenseIds();
-            case INCOME -> iterationIncomesRepository.getOriginalIncomeIds();
+            case EXPENSE -> iterationExpensesRepository.getOriginalExpenseIds(user);
+            case INCOME -> iterationIncomesRepository.getOriginalIncomeIds(user);
         };
     }
 
