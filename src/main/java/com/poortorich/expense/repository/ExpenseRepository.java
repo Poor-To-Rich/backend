@@ -55,8 +55,7 @@ public interface ExpenseRepository extends JpaRepository<Expense, Long> {
             AND e.expenseDate <= :endDate
             AND e.expenseDate <= :cursor
             ORDER BY e.expenseDate DESC
-            """
-    )
+            """)
     Slice<Expense> findExpenseByUserAndCategoryWithinDateRangeWithCursorDesc(
             @Param("user") User user,
             @Param("category") Category category,
