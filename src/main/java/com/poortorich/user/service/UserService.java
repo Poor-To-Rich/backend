@@ -49,9 +49,15 @@ public class UserService {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new NotFoundException(UserResponse.USER_NOT_FOUND));
 
+        boolean isDefaultProfile = user.getProfileImage().equals(S3Constants.DEFAULT_PROFILE_IMAGE);
+        String profileImage = null;
+        if (!isDefaultProfile) {
+            profileImage = user.getProfileImage();
+        }
+
         return UserDetailResponse.builder()
-                .profileImage(user.getProfileImage())
-                .isDefaultProfile(user.getProfileImage().equals(S3Constants.DEFAULT_PROFILE_IMAGE))
+                .profileImage(profileImage)
+                .isDefaultProfile(isDefaultProfile)
                 .name(user.getName())
                 .nickname(user.getNickname())
                 .birth(user.getBirth().toString())
