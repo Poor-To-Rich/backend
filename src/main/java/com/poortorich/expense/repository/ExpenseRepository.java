@@ -37,7 +37,26 @@ public interface ExpenseRepository extends JpaRepository<Expense, Long> {
             ORDER BY e.expenseDate ASC
             """
     )
-    Slice<Expense> findExpenseByUserAndCategoryWithinDateRangeWithCursor(
+    Slice<Expense> findExpenseByUserAndCategoryWithinDateRangeWithCursorAsc(
+            @Param("user") User user,
+            @Param("category") Category category,
+            @Param("startDate") LocalDate startDate,
+            @Param("cursor") LocalDate cursor,
+            @Param("endDate") LocalDate endDate,
+            Pageable pageable
+    );
+
+    @Query("""
+            SELECT e
+            FROM Expense e
+            WHERE e.category = :category
+            AND e.user = :user
+            AND e.expenseDate >= :startDate
+            AND e.expenseDate <= :endDate
+            AND e.expenseDate <= :cursor
+            ORDER BY e.expenseDate DESC
+            """)
+    Slice<Expense> findExpenseByUserAndCategoryWithinDateRangeWithCursorDesc(
             @Param("user") User user,
             @Param("category") Category category,
             @Param("startDate") LocalDate startDate,
@@ -55,7 +74,24 @@ public interface ExpenseRepository extends JpaRepository<Expense, Long> {
               AND e.expenseDate >= :cursor
             ORDER BY e.expenseDate ASC
             """)
-    Slice<? extends AccountBook> findExpenseByUserWithinDateRangeWithCursor(
+    Slice<? extends AccountBook> findExpenseByUserWithinDateRangeWithCursorAsc(
+            @Param("user") User user,
+            @Param("startDate") LocalDate startDate,
+            @Param("endDate") LocalDate endDate,
+            @Param("cursor") LocalDate cursor,
+            Pageable pageable
+    );
+
+    @Query("""
+            SELECT e
+            FROM Expense e
+            WHERE e.user = :user
+              AND e.expenseDate >= :startDate
+              AND e.expenseDate <= :endDate
+              AND e.expenseDate <= :cursor
+            ORDER BY e.expenseDate DESC
+            """)
+    Slice<? extends AccountBook> findExpenseByUserWithinDateRangeWithCursorDesc(
             @Param("user") User user,
             @Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate,
@@ -88,6 +124,6 @@ public interface ExpenseRepository extends JpaRepository<Expense, Long> {
               AND e.expenseDate <= :endDate
             """)
     Long countByUserAndBetweenDates(User user, LocalDate startDate, LocalDate endDate);
-           
+
     void deleteByUser(User user);
 }

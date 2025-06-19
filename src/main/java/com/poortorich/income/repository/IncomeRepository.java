@@ -36,7 +36,26 @@ public interface IncomeRepository extends JpaRepository<Income, Long> {
             AND i.incomeDate >= :cursor
             ORDER BY i.incomeDate ASC
             """)
-    Slice<Income> findIncomeByUserAndCategoryWithinDateRangeWithCursor(
+    Slice<Income> findIncomeByUserAndCategoryWithinDateRangeWithCursorAsc(
+            @Param("user") User user,
+            @Param("category") Category category,
+            @Param("startDate") LocalDate startDate,
+            @Param("cursor") LocalDate cursor,
+            @Param("endDate") LocalDate endDate,
+            Pageable pageable
+    );
+
+    @Query("""
+            SELECT i
+            FROM Income i
+            WHERE i.category = :category
+            AND i.user = :user
+            AND i.incomeDate >= :startDate
+            AND i.incomeDate <= :endDate
+            AND i.incomeDate <= :cursor
+            ORDER BY i.incomeDate Desc
+            """)
+    Slice<Income> findIncomeByUserAndCategoryWithinDateRangeWithCursorDesc(
             @Param("user") User user,
             @Param("category") Category category,
             @Param("startDate") LocalDate startDate,
@@ -54,7 +73,24 @@ public interface IncomeRepository extends JpaRepository<Income, Long> {
               AND i.incomeDate >= :cursor
             ORDER BY i.incomeDate ASC
             """)
-    Slice<? extends AccountBook> findIncomeByUserWithinDateRangeWithCursor(
+    Slice<? extends AccountBook> findIncomeByUserWithinDateRangeWithCursorAsc(
+            @Param("user") User user,
+            @Param("startDate") LocalDate startDate,
+            @Param("endDate") LocalDate endDate,
+            @Param("cursor") LocalDate cursor,
+            Pageable pageable
+    );
+
+    @Query("""
+            SELECT i
+            FROM Income i
+            WHERE i.user = :user
+              AND i.incomeDate >= :startDate
+              AND i.incomeDate <= :endDate
+              AND i.incomeDate <= :cursor
+            ORDER BY i.incomeDate Desc
+            """)
+    Slice<? extends AccountBook> findIncomeByUserWithinDateRangeWithCursorDesc(
             @Param("user") User user,
             @Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate,

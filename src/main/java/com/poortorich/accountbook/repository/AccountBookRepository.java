@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -106,16 +107,30 @@ public class AccountBookRepository {
             LocalDate startDate,
             LocalDate cursor,
             LocalDate endDate,
+            Direction direction,
             Pageable pageable
     ) {
         Slice<? extends AccountBook> accountBookPage = switch (category.getType()) {
-            case DEFAULT_EXPENSE, CUSTOM_EXPENSE ->
-                    expenseRepository.findExpenseByUserAndCategoryWithinDateRangeWithCursor(
+            case DEFAULT_EXPENSE, CUSTOM_EXPENSE -> {
+                if (direction == Direction.ASC) {
+                    yield expenseRepository.findExpenseByUserAndCategoryWithinDateRangeWithCursorAsc(
                             user, category, startDate, cursor, endDate, pageable
                     );
-            case DEFAULT_INCOME, CUSTOM_INCOME -> incomeRepository.findIncomeByUserAndCategoryWithinDateRangeWithCursor(
-                    user, category, startDate, cursor, endDate, pageable
-            );
+                }
+                yield expenseRepository.findExpenseByUserAndCategoryWithinDateRangeWithCursorDesc(
+                        user, category, startDate, cursor, endDate, pageable
+                );
+            }
+            case DEFAULT_INCOME, CUSTOM_INCOME -> {
+                if (direction == Direction.ASC) {
+                    yield incomeRepository.findIncomeByUserAndCategoryWithinDateRangeWithCursorAsc(
+                            user, category, startDate, cursor, endDate, pageable
+                    );
+                }
+                yield incomeRepository.findIncomeByUserAndCategoryWithinDateRangeWithCursorDesc(
+                        user, category, startDate, cursor, endDate, pageable
+                );
+            }
         };
 
         return new SliceImpl<>(
@@ -135,10 +150,12 @@ public class AccountBookRepository {
             AccountBookType type
     ) {
         Slice<? extends AccountBook> accountBookPage = switch (type) {
-            case EXPENSE
-                    -> expenseRepository.findExpenseByUserWithinDateRangeWithCursor(user, startDate, endDate, cursor, pageable);
-            case INCOME
-                    -> incomeRepository.findIncomeByUserWithinDateRangeWithCursor(user, startDate, endDate, cursor, pageable);
+            case EXPENSE ->
+                    expenseRepository.findExpenseByUserWithinDateRangeWithCursorAsc(user, startDate, endDate, cursor,
+                            pageable);
+            case INCOME ->
+                    incomeRepository.findIncomeByUserWithinDateRangeWithCursorAsc(user, startDate, endDate, cursor,
+                            pageable);
         };
 
         return new SliceImpl<>(

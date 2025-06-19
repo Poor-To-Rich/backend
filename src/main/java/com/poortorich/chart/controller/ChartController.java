@@ -53,11 +53,12 @@ public class ChartController {
             @AuthenticationPrincipal UserDetails userDetails,
             @PathVariable("categoryId") Long categoryId,
             @RequestParam("date") @Nullable String date,
-            @RequestParam("cursor") @Nullable String cursor
+            @RequestParam("cursor") @Nullable String cursor,
+            @RequestParam(name = "sortDirection", defaultValue = "asc") @Nullable String sortDirection
     ) {
         return DataResponse.toResponseEntity(
                 ChartResponse.GET_CATEGORY_SECTION_SUCCESS,
-                chartFacade.getCategorySection(userDetails.getUsername(), categoryId, date, cursor)
+                chartFacade.getCategorySection(userDetails.getUsername(), categoryId, date, cursor, sortDirection)
         );
     }
 
