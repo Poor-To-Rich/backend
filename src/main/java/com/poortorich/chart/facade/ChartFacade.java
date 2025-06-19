@@ -39,6 +39,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -69,11 +70,19 @@ public class ChartFacade {
         return chartService.getTotalAmountAndSavings(userAccountBooks, savingAccountBooks, savingCategory);
     }
 
-    public CategorySectionResponse getCategorySection(String username, Long categoryId, String date, String cursor) {
+    public CategorySectionResponse getCategorySection(String username, Long categoryId, String date, String cursor,
+                                                      String sortDirection) {
         User user = userService.findUserByUsername(username);
         Category category = categoryService.getCategoryOrThrow(categoryId, user);
         DateInfo dateInfo = DateInfoProvider.getDateInfo(date);
-        LocalDate dateCursor = (Objects.isNull(cursor) ? dateInfo.getStartDate() : LocalDate.parse(cursor));
+        Direction direction = (sortDirection.equals("asc") ? Direction.ASC : Direction.DESC);
+        LocalDate dateCursor;
+        if (Objects.isNull(cursor)) {
+            dateCursor = (direction == Direction.ASC) ? dateInfo.getStartDate() : dateInfo.getEndDate();
+        } else {
+            dateCursor = LocalDate.parse(cursor);
+        }
+
         Pageable pageable = PageRequest.of(0, 20);
 
         Slice<AccountBook> accountBooks = accountBookService.getAccountBookByUserAndCategoryWithinDateRangeWithCursor(
@@ -82,6 +91,7 @@ public class ChartFacade {
                 dateInfo.getStartDate(),
                 dateCursor,
                 dateInfo.getEndDate(),
+                direction,
                 pageable
         );
 
@@ -102,11 +112,23 @@ public class ChartFacade {
         List<CategoryLog> categoryLogs = chartService.getCategoryLogs(
                 AccountBookUtil.mergeAccountBooksByDate(
                         accountBooks.getContent(),
-                        accountBooksByLastDate));
+                        accountBooksByLastDate),
+                direction);
 
-        LocalDate nextCursor = accountBooksByLastDate.getFirst().getAccountBookDate().plusDays(DateConstants.ONE_DAY);
+        LocalDate nextCursor;
+        if (direction == Direction.ASC) {
+            nextCursor = accountBooksByLastDate.getFirst().getAccountBookDate().plusDays(DateConstants.ONE_DAY);
+        } else {
+            nextCursor = accountBooksByLastDate.getFirst().getAccountBookDate().minusDays(DateConstants.ONE_DAY);
+        }
+
         return CategorySectionResponse.builder()
-                .hasNext(accountBookService.hasNextPage(user, category, nextCursor, dateInfo.getEndDate()))
+                .hasNext(accountBookService.hasNextPage(
+                        user,
+                        category,
+                        dateInfo.getStartDate(),
+                        dateInfo.getEndDate(),
+                        nextCursor, direction))
                 .nextCursor(nextCursor.toString())
                 .countOfLogs((long) categoryLogs.size())
                 .categoryLogs(categoryLogs)
