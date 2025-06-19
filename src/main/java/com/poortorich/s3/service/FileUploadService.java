@@ -49,7 +49,7 @@ public class FileUploadService {
             return S3Constants.DEFAULT_PROFILE_IMAGE;
         }
 
-        if (newProfileImage.isEmpty()) {
+        if (Objects.isNull(newProfileImage) || newProfileImage.isEmpty()) {
             return currentProfileImage;
         }
 
