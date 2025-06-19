@@ -26,6 +26,7 @@ import java.time.Month;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -52,8 +53,8 @@ public class ChartService {
                 .build();
     }
 
-    public List<CategoryLog> getCategoryLogs(List<AccountBook> accountBooks) {
-        return AccountBookUtil.groupAccountBooksByDate(accountBooks)
+    public List<CategoryLog> getCategoryLogs(List<AccountBook> accountBooks, Direction direction) {
+        return AccountBookUtil.groupAccountBooksByDate(accountBooks, direction)
                 .stream()
                 .map(accountBooksOnDate -> {
                     List<TransactionRecord> transactions = AccountBookUtil.mapToTransactionRecord(
