@@ -66,14 +66,15 @@ public class IncomeFacade {
     @Transactional
     public InfoResponse getIncome(String username, Long id) {
         User user = userService.findUserByUsername(username);
-        Iteration iterationIncomes = accountBookService.getIteration(user, id, accountBookType);
+        AccountBook income = accountBookService.getAccountBookOrThrow(id, user, accountBookType);
+        Iteration iterationIncomes = accountBookService.getIteration(income);
 
         CustomIterationInfoResponse customIteration = null;
-        if (iterationIncomes != null) {
+        if (income.getIterationType() == IterationType.CUSTOM) {
             customIteration = iterationService.getCustomIteration(iterationIncomes);
         }
 
-        return accountBookService.getInfoResponse(user, id, customIteration, accountBookType);
+        return accountBookService.getInfoResponse(income, customIteration, accountBookType);
     }
 
     @Transactional
