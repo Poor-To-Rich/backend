@@ -20,15 +20,14 @@ import com.poortorich.user.entity.User;
 import java.beans.Transient;
 import java.time.LocalDate;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Stream;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -109,13 +108,14 @@ public class AccountBookService {
                         accountBookRepository.getAccountBookByCategoryBetweenDates(user, category, startDate, endDate))
                 .orElseThrow(() -> new NotFoundException(ExpenseResponse.EXPENSE_NON_EXISTENT));
     }
-    
+
     public Slice<AccountBook> getAccountBookByUserAndCategoryWithinDateRangeWithCursor(
             User user,
             Category category,
             LocalDate startDate,
             LocalDate cursor,
             LocalDate endDate,
+            Sort.Direction direction,
             Pageable pageable
     ) {
         return accountBookRepository.findByUserAndCategoryWithinDateRangeWithCursor(
@@ -124,6 +124,7 @@ public class AccountBookService {
                 startDate,
                 cursor,
                 endDate,
+                direction,
                 pageable
         );
     }
@@ -157,8 +158,16 @@ public class AccountBookService {
                 .orElse(Collections.emptyList());
     }
 
-    public Boolean hasNextPage(User user, Category category, LocalDate startDate, LocalDate endDate) {
-        return accountBookRepository.countByUserAndCategoryBetweenDates(user, category, startDate, endDate) > 0L;
+    public Boolean hasNextPage(User user,
+                               Category category,
+                               LocalDate startDate,
+                               LocalDate endDate,
+                               LocalDate cursor,
+                               Direction direction) {
+        if (direction == Direction.ASC) {
+            return accountBookRepository.countByUserAndCategoryBetweenDates(user, category, cursor, endDate) > 0L;
+        }
+        return accountBookRepository.countByUserAndCategoryBetweenDates(user, category, startDate, cursor) > 0L;
     }
 
     public Boolean hasNextPage(User user, LocalDate startDate, LocalDate endDate) {
@@ -171,7 +180,7 @@ public class AccountBookService {
                     if (type == AccountBookType.EXPENSE) {
                         return new NotFoundException(ExpenseResponse.EXPENSE_NON_EXISTENT);
                     }
-                    
+
                     return new NotFoundException(IncomeResponse.INCOME_NON_EXISTENT);
                 });
     }
