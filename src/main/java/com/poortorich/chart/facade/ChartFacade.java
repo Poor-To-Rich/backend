@@ -149,12 +149,13 @@ public class ChartFacade {
                 .sorted(Comparator.comparing(CategoryChart::getRate).reversed())
                 .toList();
 
-        List<Map<String, BigDecimal>> aggregatedData = List.of(categoryCharts.stream()
+        BigDecimal minRate = new BigDecimal("1.5");
+        Map<String, BigDecimal> aggregatedData = categoryCharts.stream()
                 .collect(Collectors.toMap(
                         CategoryChart::getName,
-                        CategoryChart::getRate,
+                        chart -> chart.getRate().max(minRate),
                         (existing, replacement) -> existing,
-                        LinkedHashMap::new)));
+                        LinkedHashMap::new));
 
         Map<String, String> categoryColors = categoryCharts.stream()
                 .collect(Collectors.toMap(CategoryChart::getName,
@@ -163,12 +164,12 @@ public class ChartFacade {
                         LinkedHashMap::new));
 
         if (categoryCharts.isEmpty()) {
-            aggregatedData = List.of(Map.of(ChartConstants.DUMMY_CATEGORY, ChartConstants.DUMMY_RATE));
+            aggregatedData = Map.of(ChartConstants.DUMMY_CATEGORY, ChartConstants.DUMMY_RATE);
             categoryColors = Map.of(ChartConstants.DUMMY_CATEGORY, ChartConstants.DUMMY_COLOR);
         }
 
         return CategoryChartResponse.builder()
-                .aggregatedData(aggregatedData)
+                .aggregatedData(List.of(aggregatedData))
                 .categoryColors(categoryColors)
                 .categoryCharts(categoryCharts)
                 .build();
