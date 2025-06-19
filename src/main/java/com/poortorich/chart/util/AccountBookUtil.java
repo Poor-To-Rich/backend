@@ -7,6 +7,7 @@ import com.poortorich.chart.response.CategoryChart;
 import com.poortorich.chart.response.TransactionRecord;
 import com.poortorich.global.statistics.util.StatCalculator;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -15,6 +16,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.springframework.data.domain.Sort.Direction;
 
 public class AccountBookUtil {
 
@@ -35,6 +37,19 @@ public class AccountBookUtil {
                 .entrySet()
                 .stream()
                 .sorted(Map.Entry.comparingByKey())
+                .map(Map.Entry::getValue)
+                .toList();
+    }
+
+    public static List<List<AccountBook>> groupAccountBooksByDate(List<AccountBook> accountBooks, Direction direction) {
+        return accountBooks.stream()
+                .collect(Collectors.groupingBy(AccountBook::getAccountBookDate))
+                .entrySet()
+                .stream()
+                .sorted(
+                        (direction == Direction.ASC)
+                                ? Map.Entry.comparingByKey()
+                                : Map.Entry.<LocalDate, List<AccountBook>>comparingByKey().reversed())
                 .map(Map.Entry::getValue)
                 .toList();
     }
