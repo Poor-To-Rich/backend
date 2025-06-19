@@ -45,12 +45,12 @@ import java.util.List;
 @RequiredArgsConstructor
 public class IterationService {
 
+    private static final String MODIFY_TYPE = "modify";
+    private static final String DELETE_TYPE = "delete";
+
     private final IterationDateCalculator dateCalculator;
     private final IterationRepository iterationRepository;
     private final IterationInfoRepository iterationInfoRepository;
-
-    private static final String MODIFY_TYPE = "modify";
-    private static final String DELETE_TYPE = "delete";
 
     public List<AccountBook> createIterations(
             User user,
@@ -467,10 +467,7 @@ public class IterationService {
         }
     }
 
-    private List<Iteration> handleAll(
-            Iteration iteration,
-            List<Iteration> deleteIterations
-    ) {
+    private List<Iteration> handleAll(Iteration iteration, List<Iteration> deleteIterations) {
         IterationInfo iterationInfo = iteration.getIterationInfo();
         if (iterationInfo != null) {
             iterationInfoRepository.delete(deleteIterations.getFirst().getIterationInfo());
