@@ -50,9 +50,11 @@ public class LogAspect {
 
     @Around("controller()")
     public Object loggingBefore(ProceedingJoinPoint joinPoint) throws Throwable {
-        HttpServletRequest request =
-                ((ServletRequestAttributes) Objects.requireNonNull(RequestContextHolder.getRequestAttributes()))
-                        .getRequest();
+        RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
+        if (!(requestAttributes instanceof ServletRequestAttributes servletRequestAttributes)) {
+            return joinPoint.proceed();
+        }
+        HttpServletRequest request = servletRequestAttributes.getRequest();
 
         String controllerName = joinPoint.getSignature().getDeclaringType().getName();
         String methodName = joinPoint.getSignature().getName();
