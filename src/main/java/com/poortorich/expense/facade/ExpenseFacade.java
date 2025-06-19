@@ -151,7 +151,9 @@ public class ExpenseFacade {
                 accountBookType
         );
         AccountBook newExpense = accountBookService.create(user, category, expenseRequest, accountBookType);
-        createIterationExpense(user, expenseRequest, newExpense);
+        if (newExpense.getIterationType() != IterationType.DEFAULT) {
+            createIterationExpense(user, expenseRequest, newExpense);
+        }
     }
 
     private void handleUnmodifiedIteration(

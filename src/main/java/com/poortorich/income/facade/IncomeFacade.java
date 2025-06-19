@@ -152,7 +152,9 @@ public class IncomeFacade {
                 accountBookType
         );
         AccountBook newIncome = accountBookService.create(user, category, incomeRequest, accountBookType);
-        createIterationIncome(user, incomeRequest, newIncome);
+        if (newIncome.getIterationType() != IterationType.DEFAULT) {
+            createIterationIncome(user, incomeRequest, newIncome);
+        }
     }
 
     private void handleUnmodifiedIteration(
