@@ -7,9 +7,11 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
@@ -32,13 +34,17 @@ public class LogAspect {
 
     @Around("all()")
     public Object logging(ProceedingJoinPoint joinPoint) throws Throwable {
+        String className = joinPoint.getSignature().getDeclaringType().getSimpleName();
+        String methodName = joinPoint.getSignature().getName();
+        log.info("[{}] {} start", className, methodName);
+
         long start = System.currentTimeMillis();
         try {
             return joinPoint.proceed();
         } finally {
             long end = System.currentTimeMillis();
             long timeInMs = end - start;
-            log.info("{} | time = {}ms", joinPoint.getSignature(), timeInMs);
+            log.info("[{}] {} end | time = {}ms", className, methodName, timeInMs);
         }
     }
 
