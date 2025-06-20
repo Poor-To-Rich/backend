@@ -9,8 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class AccountBookCreateResponse {
+public class AccountBookActionResponse {
 
-    private Long id;
     private Long categoryId;
 }

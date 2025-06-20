@@ -5,6 +5,7 @@ import com.poortorich.accountbook.entity.enums.IterationType;
 import com.poortorich.accountbook.enums.AccountBookType;
 import com.poortorich.accountbook.request.AccountBookDeleteRequest;
 import com.poortorich.accountbook.request.enums.IterationAction;
+import com.poortorich.accountbook.response.AccountBookActionResponse;
 import com.poortorich.accountbook.response.AccountBookCreateResponse;
 import com.poortorich.accountbook.response.InfoResponse;
 import com.poortorich.accountbook.response.IterationDetailsResponse;
@@ -53,6 +54,7 @@ public class IncomeFacade {
 
         return AccountBookCreateResponse.builder()
                 .id(income.getId())
+                .categoryId(category.getId())
                 .build();
     }
 
@@ -78,8 +80,11 @@ public class IncomeFacade {
     }
 
     @Transactional
-    public IncomeResponse deleteIncome(String username, Long incomeId, AccountBookDeleteRequest accountBookDeleteRequest) {
+    public AccountBookActionResponse deleteIncome(String username, Long incomeId, AccountBookDeleteRequest accountBookDeleteRequest) {
         User user = userService.findUserByUsername(username);
+        AccountBook income = accountBookService.getAccountBookOrThrow(incomeId, user, accountBookType);
+        Long categoryId = income.getCategory().getId();
+
         if (accountBookDeleteRequest.parseIterationAction() == IterationAction.NONE) {
             accountBookService.deleteAccountBook(incomeId, user, accountBookType);
         }
@@ -96,11 +101,13 @@ public class IncomeFacade {
             );
         }
 
-        return IncomeResponse.DELETE_INCOME_SUCCESS;
+        return AccountBookActionResponse.builder()
+                .categoryId(categoryId)
+                .build();
     }
 
     @Transactional
-    public IncomeResponse modifyIncome(String username, Long incomeId, IncomeRequest incomeRequest) {
+    public AccountBookActionResponse modifyIncome(String username, Long incomeId, IncomeRequest incomeRequest) {
         User user = userService.findUserByUsername(username);
         Category category = categoryService.findCategoryByName(user, incomeRequest.getCategoryName(), categoryType);
         AccountBook income = accountBookService.modifyAccountBook(user, category, incomeId, incomeRequest, accountBookType);
@@ -114,7 +121,9 @@ public class IncomeFacade {
             modifyIterationIncomes(income, incomeRequest, iterationAction, category, user);
         }
 
-        return IncomeResponse.MODIFY_INCOME_SUCCESS;
+        return AccountBookActionResponse.builder()
+                .categoryId(category.getId())
+                .build();
     }
 
     private void modifySingleIncome(AccountBook income, IncomeRequest incomeRequest, User user) {
