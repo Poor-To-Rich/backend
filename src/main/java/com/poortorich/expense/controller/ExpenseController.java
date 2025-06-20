@@ -52,7 +52,10 @@ public class ExpenseController {
             @AuthenticationPrincipal UserDetails userDetails,
             @PathVariable Long expenseId,
             @RequestBody @Valid ExpenseRequest expenseRequest) {
-        return BaseResponse.toResponseEntity(expenseFacade.modifyExpense(userDetails.getUsername(), expenseId, expenseRequest));
+        return DataResponse.toResponseEntity(
+                ExpenseResponse.MODIFY_EXPENSE_SUCCESS,
+                expenseFacade.modifyExpense(userDetails.getUsername(), expenseId, expenseRequest)
+        );
     }
 
     @DeleteMapping("/{expenseId}")
@@ -60,7 +63,10 @@ public class ExpenseController {
             @AuthenticationPrincipal UserDetails userDetails,
             @PathVariable Long expenseId,
             @RequestBody @Valid AccountBookDeleteRequest accountBookDeleteRequest) {
-        return BaseResponse.toResponseEntity(expenseFacade.deleteExpense(expenseId, accountBookDeleteRequest, userDetails.getUsername()));
+        return DataResponse.toResponseEntity(
+                ExpenseResponse.DELETE_EXPENSE_SUCCESS,
+                expenseFacade.deleteExpense(expenseId, accountBookDeleteRequest, userDetails.getUsername())
+        );
     }
 
     @GetMapping("/iteration/details")

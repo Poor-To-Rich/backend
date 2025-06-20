@@ -11,6 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.poortorich.iteration.entity.enums.Weekday.sortWeekday;
+
 @Getter
 @AllArgsConstructor
 @IterationRuleCheck
@@ -32,9 +34,11 @@ public class IterationRule {
             return new ArrayList<>();
         }
 
-        return daysOfWeek.stream()
+        List<Weekday> weekdays = daysOfWeek.stream()
                 .map(Weekday::from)
                 .toList();
+
+        return sortWeekday(weekdays);
     }
 
     public String parseDaysOfWeek() {

@@ -50,14 +50,12 @@ public class AccountBookService {
         return accountBookRepository.saveAll(accountBooks, type);
     }
 
-    public Iteration getIteration(User user, Long id, AccountBookType type) {
-        AccountBook accountBook = getAccountBookOrThrow(id, user, type);
+    public Iteration getIteration(AccountBook accountBook) {
         return accountBook.getGeneratedIteration();
     }
 
-    public InfoResponse getInfoResponse(User user, Long id, CustomIterationInfoResponse customIteration,
-                                        AccountBookType type) {
-        AccountBook accountBook = getAccountBookOrThrow(id, user, type);
+    public InfoResponse getInfoResponse
+            (AccountBook accountBook, CustomIterationInfoResponse customIteration, AccountBookType type) {
         return AccountBookBuilder.buildInfoResponse(accountBook, customIteration, type);
     }
 
@@ -168,6 +166,10 @@ public class AccountBookService {
             return accountBookRepository.countByUserAndCategoryBetweenDates(user, category, cursor, endDate) > 0L;
         }
         return accountBookRepository.countByUserAndCategoryBetweenDates(user, category, startDate, cursor) > 0L;
+    }
+
+    public Long countByUserAndBetweenDates(User user, LocalDate startDate, LocalDate endDate) {
+        return accountBookRepository.countByUserAndBetweenDates(user, startDate, endDate);
     }
 
     public Boolean hasNextPage(User user, LocalDate startDate, LocalDate endDate) {
