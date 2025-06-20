@@ -50,14 +50,12 @@ public class AccountBookService {
         return accountBookRepository.saveAll(accountBooks, type);
     }
 
-    public Iteration getIteration(User user, Long id, AccountBookType type) {
-        AccountBook accountBook = getAccountBookOrThrow(id, user, type);
+    public Iteration getIteration(AccountBook accountBook) {
         return accountBook.getGeneratedIteration();
     }
 
-    public InfoResponse getInfoResponse(User user, Long id, CustomIterationInfoResponse customIteration,
-                                        AccountBookType type) {
-        AccountBook accountBook = getAccountBookOrThrow(id, user, type);
+    public InfoResponse getInfoResponse
+            (AccountBook accountBook, CustomIterationInfoResponse customIteration, AccountBookType type) {
         return AccountBookBuilder.buildInfoResponse(accountBook, customIteration, type);
     }
 

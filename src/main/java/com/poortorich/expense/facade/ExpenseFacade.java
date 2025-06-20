@@ -64,14 +64,15 @@ public class ExpenseFacade {
     @Transactional
     public InfoResponse getExpense(Long id, String username) {
         User user = userService.findUserByUsername(username);
-        Iteration iterationExpenses = accountBookService.getIteration(user, id, accountBookType);
+        AccountBook expense = accountBookService.getAccountBookOrThrow(id, user, accountBookType);
+        Iteration iterationExpenses = accountBookService.getIteration(expense);
 
         CustomIterationInfoResponse customIteration = null;
-        if (iterationExpenses != null) {
+        if (expense.getIterationType() == IterationType.CUSTOM) {
             customIteration = iterationService.getCustomIteration(iterationExpenses);
         }
 
-        return accountBookService.getInfoResponse(user, id, customIteration, accountBookType);
+        return accountBookService.getInfoResponse(expense, customIteration, accountBookType);
     }
 
     @Transactional
@@ -150,7 +151,9 @@ public class ExpenseFacade {
                 accountBookType
         );
         AccountBook newExpense = accountBookService.create(user, category, expenseRequest, accountBookType);
-        createIterationExpense(user, expenseRequest, newExpense);
+        if (newExpense.getIterationType() != IterationType.DEFAULT) {
+            createIterationExpense(user, expenseRequest, newExpense);
+        }
     }
 
     private void handleUnmodifiedIteration(
