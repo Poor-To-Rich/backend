@@ -74,13 +74,12 @@ public class ReportService {
     }
 
     public WeeklyDetailsResponse getWeeklyDetailsReport(
-            List<AccountBook> weeklyAccountBooks, String period, LocalDate nextCursor, Boolean hasNext
+            List<AccountBook> weeklyAccountBooks, String period, Long countOfLogs, LocalDate nextCursor, Boolean hasNext
     ) {
         List<DailyTransaction> dailyTransactions = getDailyTransactions(weeklyAccountBooks);
 
         Long totalIncome = 0L;
         Long totalExpense = 0L;
-        Long countOfLogs = 0L;
         for(AccountBook accountBook : weeklyAccountBooks) {
             if (inferAccountBookType(accountBook) == AccountBookType.EXPENSE) {
                 totalExpense += accountBook.getCost();
@@ -88,7 +87,6 @@ public class ReportService {
             else {
                 totalIncome += accountBook.getCost();
             }
-            countOfLogs++;
         }
 
         return WeeklyDetailsResponse.builder()

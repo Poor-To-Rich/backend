@@ -92,9 +92,10 @@ public class ReportFacade {
 
         LocalDate nextCursor = getNextCursor(accountBooksByLastDate, endDate);
         Boolean hasNext = accountBookService.hasNextPage(user, nextCursor, endDate);
+        Long countOfLogs = accountBookService.countByUserAndBetweenDates(user, startDate, endDate);
 
         return reportService.getWeeklyDetailsReport(
-                weeklyAccountBooks, PeriodFormatter.formatWeeklyReportRange(startDate, endDate), nextCursor, hasNext
+                weeklyAccountBooks, PeriodFormatter.formatWeeklyReportRange(startDate, endDate), countOfLogs, nextCursor, hasNext
         );
     }
 
