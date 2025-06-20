@@ -130,7 +130,9 @@ public class ChartFacade {
                         dateInfo.getEndDate(),
                         nextCursor, direction))
                 .nextCursor(nextCursor.toString())
-                .countOfLogs((long) categoryLogs.size())
+                .countOfLogs(categoryLogs.stream()
+                        .mapToLong(CategoryLog::getCountOfTransactions)
+                        .sum())
                 .categoryLogs(categoryLogs)
                 .build();
     }
