@@ -6,6 +6,7 @@ import static org.mockito.Mockito.when;
 import com.poortorich.accountbook.enums.AccountBookType;
 import com.poortorich.accountbook.service.AccountBookService;
 import com.poortorich.category.entity.Category;
+import com.poortorich.category.entity.enums.CategoryType;
 import com.poortorich.category.service.CategoryService;
 import com.poortorich.expense.entity.Expense;
 import com.poortorich.expense.fixture.ExpenseFixture;
@@ -63,12 +64,13 @@ class ExpenseFacadeTest {
     @DisplayName("Category, Expense 서비스가 적절히 호출된다.")
     void createExpense_shouldCallServiceMethods() {
         when(userService.findUserByUsername(user.getUsername())).thenReturn(user);
-        when(categoryService.findCategoryByName(expenseRequest.getCategoryName(), user)).thenReturn(category);
+        when(categoryService.findCategoryByName(user, expenseRequest.getCategoryName(), CategoryType.DEFAULT_EXPENSE))
+                .thenReturn(category);
         when(accountBookService.create(user, category, expenseRequest, accountBookType)).thenReturn(expense);
 
         expenseFacade.createExpense(expenseRequest, user.getUsername());
         verify(accountBookService).create(user, category, expenseRequest, accountBookType);
-        verify(categoryService).findCategoryByName(expenseRequest.getCategoryName(), user);
+        verify(categoryService).findCategoryByName(user, expenseRequest.getCategoryName(), CategoryType.DEFAULT_EXPENSE);
         verify(iterationService).createIterations(user, expenseRequest.getCustomIteration(), expense, accountBookType);
     }
 }

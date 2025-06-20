@@ -4,6 +4,7 @@ import com.poortorich.accountbook.entity.AccountBook;
 import com.poortorich.accountbook.entity.enums.IterationType;
 import com.poortorich.accountbook.enums.AccountBookType;
 import com.poortorich.accountbook.request.enums.IterationAction;
+import com.poortorich.accountbook.response.AccountBookActionResponse;
 import com.poortorich.accountbook.response.AccountBookCreateResponse;
 import com.poortorich.accountbook.response.InfoResponse;
 import com.poortorich.accountbook.response.IterationDetailsResponse;
@@ -51,6 +52,7 @@ public class ExpenseFacade {
 
         return AccountBookCreateResponse.builder()
                 .id(expense.getId())
+                .categoryId(category.getId())
                 .build();
     }
 
@@ -64,19 +66,23 @@ public class ExpenseFacade {
     @Transactional
     public InfoResponse getExpense(Long id, String username) {
         User user = userService.findUserByUsername(username);
-        Iteration iterationExpenses = accountBookService.getIteration(user, id, accountBookType);
+        AccountBook expense = accountBookService.getAccountBookOrThrow(id, user, accountBookType);
+        Iteration iterationExpenses = accountBookService.getIteration(expense);
 
         CustomIterationInfoResponse customIteration = null;
-        if (iterationExpenses != null) {
+        if (expense.getIterationType() == IterationType.CUSTOM) {
             customIteration = iterationService.getCustomIteration(iterationExpenses);
         }
 
-        return accountBookService.getInfoResponse(user, id, customIteration, accountBookType);
+        return accountBookService.getInfoResponse(expense, customIteration, accountBookType);
     }
 
     @Transactional
-    public ExpenseResponse deleteExpense(Long expenseId, AccountBookDeleteRequest accountBookDeleteRequest, String username) {
+    public AccountBookActionResponse deleteExpense(Long expenseId, AccountBookDeleteRequest accountBookDeleteRequest, String username) {
         User user = userService.findUserByUsername(username);
+        AccountBook expense = accountBookService.getAccountBookOrThrow(expenseId, user, accountBookType);
+        Long categoryId = expense.getCategory().getId();
+
         if (accountBookDeleteRequest.parseIterationAction() == IterationAction.NONE) {
             accountBookService.deleteAccountBook(expenseId, user, accountBookType);
         }
@@ -93,11 +99,13 @@ public class ExpenseFacade {
             );
         }
 
-        return ExpenseResponse.DELETE_EXPENSE_SUCCESS;
+        return AccountBookActionResponse.builder()
+                .categoryId(categoryId)
+                .build();
     }
 
     @Transactional
-    public ExpenseResponse modifyExpense(String username, Long expenseId, ExpenseRequest expenseRequest) {
+    public AccountBookActionResponse modifyExpense(String username, Long expenseId, ExpenseRequest expenseRequest) {
         User user = userService.findUserByUsername(username);
         Category category = categoryService.findCategoryByName(user, expenseRequest.getCategoryName(), categoryType);
         AccountBook expense = accountBookService.modifyAccountBook(user, category, expenseId, expenseRequest, accountBookType);
@@ -112,7 +120,9 @@ public class ExpenseFacade {
             modifyIterationExpenses(expense, expenseRequest, iterationAction, category, user);
         }
 
-        return ExpenseResponse.MODIFY_EXPENSE_SUCCESS;
+        return AccountBookActionResponse.builder()
+                .categoryId(category.getId())
+                .build();
     }
 
     private void modifySingleExpense(AccountBook expense, ExpenseRequest expenseRequest, User user) {
@@ -150,7 +160,9 @@ public class ExpenseFacade {
                 accountBookType
         );
         AccountBook newExpense = accountBookService.create(user, category, expenseRequest, accountBookType);
-        createIterationExpense(user, expenseRequest, newExpense);
+        if (newExpense.getIterationType() != IterationType.DEFAULT) {
+            createIterationExpense(user, expenseRequest, newExpense);
+        }
     }
 
     private void handleUnmodifiedIteration(

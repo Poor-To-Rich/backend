@@ -54,7 +54,10 @@ public class IncomeController {
             @PathVariable Long incomeId,
             @RequestBody @Valid IncomeRequest incomeRequest
     ) {
-        return BaseResponse.toResponseEntity(incomeFacade.modifyIncome(userDetails.getUsername(), incomeId, incomeRequest));
+        return DataResponse.toResponseEntity(
+                IncomeResponse.MODIFY_INCOME_SUCCESS,
+                incomeFacade.modifyIncome(userDetails.getUsername(), incomeId, incomeRequest)
+        );
     }
 
     @DeleteMapping("/{incomeId}")
@@ -63,7 +66,8 @@ public class IncomeController {
             @PathVariable Long incomeId,
             @RequestBody @Valid AccountBookDeleteRequest accountBookDeleteRequest
     ) {
-        return BaseResponse.toResponseEntity(
+        return DataResponse.toResponseEntity(
+                IncomeResponse.DELETE_INCOME_SUCCESS,
                 incomeFacade.deleteIncome(userDetails.getUsername(), incomeId, accountBookDeleteRequest)
         );
     }

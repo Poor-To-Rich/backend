@@ -6,6 +6,8 @@ import lombok.RequiredArgsConstructor;
 
 import java.time.DayOfWeek;
 import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Objects;
 
 @RequiredArgsConstructor
@@ -32,13 +34,12 @@ public enum Weekday {
                 .orElseThrow(() -> new BadRequestException(IterationResponse.DAY_OF_WEEK_INVALID));
     }
 
-    public DayOfWeek toDayOfWeek() {
-        if (this.ordinal() == 0) {
-            return DayOfWeek.of(7);
-        }
-
-        return DayOfWeek.of(this.ordinal());
+    public static List<Weekday> sortWeekday(List<Weekday> weekdays) {
+        return weekdays.stream()
+                .sorted(Comparator.comparingInt(Enum::ordinal))
+                .toList();
     }
+
 
     public static Weekday fromDayOfWeek(DayOfWeek dayOfWeek) {
         return Weekday.values()[dayOfWeek.getValue() % 7];
