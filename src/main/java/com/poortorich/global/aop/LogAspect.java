@@ -11,11 +11,9 @@ import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 @Aspect
 @Slf4j
@@ -36,16 +34,21 @@ public class LogAspect {
     public Object logging(ProceedingJoinPoint joinPoint) throws Throwable {
         String className = joinPoint.getSignature().getDeclaringType().getSimpleName();
         String methodName = joinPoint.getSignature().getName();
-        log.info("[{}] {} start", className, methodName);
+        log.info("[START] [{}] {}", className, methodName);
 
         long start = System.currentTimeMillis();
+        Object result = null;
         try {
-            return joinPoint.proceed();
+            result = joinPoint.proceed();
+        } catch (Exception e) {
+            log.error("[ERROR] [{}] {} : {}", className, methodName, e.getMessage(), e);
         } finally {
             long end = System.currentTimeMillis();
             long timeInMs = end - start;
-            log.info("[{}] {} end | time = {}ms", className, methodName, timeInMs);
+            log.info("[END] [{}] {} | {}ms", className, methodName, timeInMs);
         }
+        
+        return result;
     }
 
     @Around("controller()")
@@ -71,9 +74,13 @@ public class LogAspect {
             log.error("LoggerAspect error", e);
         }
 
-        log.info("[{}] {}", params.get("http_method"), params.get("request_uri"));
-        log.info("method: {}.{}", params.get("controller") ,params.get("method"));
-        log.info("params: {}", params.get("params"));
+        String ip = request.getRemoteAddr();
+
+        log.info("");
+        log.info("[REQUEST] [{}] {}", params.get("http_method"), params.get("request_uri"));
+        log.info("[METHOD] {}.{}", params.get("controller") ,params.get("method"));
+        log.info("[PARAMS] {}", params.get("params"));
+        log.info("[IP] {}", ip);
 
         return joinPoint.proceed();
     }
