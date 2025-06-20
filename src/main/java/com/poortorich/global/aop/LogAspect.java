@@ -37,18 +37,16 @@ public class LogAspect {
         log.info("[START] [{}] {}", className, methodName);
 
         long start = System.currentTimeMillis();
-        Object result = null;
         try {
-            result = joinPoint.proceed();
+            return joinPoint.proceed();
         } catch (Exception e) {
             log.error("[ERROR] [{}] {} : {}", className, methodName, e.getMessage(), e);
+            throw e;
         } finally {
             long end = System.currentTimeMillis();
             long timeInMs = end - start;
             log.info("[END] [{}] {} | {}ms", className, methodName, timeInMs);
         }
-        
-        return result;
     }
 
     @Around("controller()")
