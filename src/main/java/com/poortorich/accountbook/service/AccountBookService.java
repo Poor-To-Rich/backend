@@ -172,6 +172,15 @@ public class AccountBookService {
         return accountBookRepository.countByUserAndBetweenDates(user, startDate, endDate);
     }
 
+    public Long countByUserAndCategoryAndBetweenDates(
+            User user,
+            Category category,
+            LocalDate startDate,
+            LocalDate endDate
+    ) {
+        return accountBookRepository.countByUserAndCategoryBetweenDates(user, category, startDate, endDate);
+    }
+
     public Boolean hasNextPage(User user, LocalDate startDate, LocalDate endDate) {
         return accountBookRepository.countByUserAndBetweenDates(user, startDate, endDate) > 0L;
     }
