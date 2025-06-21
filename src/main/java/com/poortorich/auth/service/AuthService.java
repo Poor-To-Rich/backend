@@ -43,8 +43,11 @@ public class AuthService {
     private final JwtTokenManager cookieManager;
 
     public AccessTokenResponse login(LoginRequest loginRequest, HttpServletResponse response) {
-        UserDetails userDetails = userDetailsService.loadUserByUsername(loginRequest.getUsername());
+        if (!userRepository.existsByUsername(loginRequest.getUsername())) {
+            throw new BadRequestException(AuthResponse.CREDENTIALS_INVALID);
+        }
 
+        UserDetails userDetails = userDetailsService.loadUserByUsername(loginRequest.getUsername());
         if (!passwordEncoder.matches(loginRequest.getPassword(), userDetails.getPassword())) {
             throw new BadRequestException(AuthResponse.CREDENTIALS_INVALID);
         }
