@@ -131,7 +131,7 @@ public class IterationService {
             }
 
             return calculateDateByRuleType(
-                    end.getCount() * customIteration.getCycle(), startDate, startDate, rule, rule.getMonthlyOption());
+                    end.getCount() * customIteration.getCycle() - 1, startDate, startDate, rule, rule.getMonthlyOption());
         }
 
         return end.parseDate();
