@@ -2,12 +2,14 @@ package com.poortorich.category.entity.enums;
 
 import com.poortorich.category.response.CategoryResponse;
 import com.poortorich.global.exceptions.BadRequestException;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
+@Getter
 @RequiredArgsConstructor
 public enum CategoryType {
 
@@ -30,5 +32,6 @@ public enum CategoryType {
                 .filter(category -> Objects.equals(category.type, this.type))
                 .toList();
     }
+
 }
 

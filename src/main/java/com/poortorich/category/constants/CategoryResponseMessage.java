@@ -18,6 +18,8 @@ public class CategoryResponseMessage {
     public static final String MODIFY_CATEGORY_SUCCESS = "카테고리를 성공적으로 편집하였습니다.";
     public static final String DELETE_CATEGORY_SUCCESS = "카테고리를 성공적으로 삭제하였습니다.";
 
+    public static final String NOT_DELETE_USED_CATEGORY = "사용중인 카테고리는 삭제할 수 없습니다.";
+
     public static final String CATEGORY_NON_EXISTENT = "존재하지 않는 카테고리입니다.";
 
     public static final String CATEGORY_TYPE_INVALID = "카테고리의 타입이 적절하지 않습니다.";
