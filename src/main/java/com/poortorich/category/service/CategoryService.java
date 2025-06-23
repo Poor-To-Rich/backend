@@ -131,10 +131,10 @@ public class CategoryService {
     @Transactional
     public Response modifyCategory(Long id, CategoryInfoRequest categoryRequest, String username) {
         User user = userService.findUserByUsername(username);
-
-        validateCategoryNameDuplication(user, categoryRequest.getName(), CategoryType.CUSTOM_INCOME);
-
         Category category = getCategoryOrThrow(id, user);
+
+        validateCategoryNameDuplication(user, categoryRequest.getName(), category.getType());
+
         category.updateCategory(categoryRequest.getName(), categoryRequest.getColor());
 
         return CategoryResponse.MODIFY_CATEGORY_SUCCESS;
