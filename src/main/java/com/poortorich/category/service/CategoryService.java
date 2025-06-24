@@ -143,15 +143,12 @@ public class CategoryService {
         return CategoryResponse.MODIFY_CATEGORY_SUCCESS;
     }
 
+    @Transactional
     public Response deleteCategory(Long id, String username) {
         User user = userService.findUserByUsername(username);
         Category category = getCategoryOrThrow(id, user);
 
-        if (accountBookService.isUsedCategory(user, category, category.getType())) {
-            return CategoryResponse.NOT_DELETE_USED_CATEGORY;
-        }
-
-        categoryRepository.delete(category);
+        category.delete();
 
         return CategoryResponse.DELETE_CATEGORY_SUCCESS;
     }
