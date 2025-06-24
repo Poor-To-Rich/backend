@@ -22,7 +22,6 @@ public enum CategoryResponse implements Response {
     MODIFY_CATEGORY_SUCCESS(HttpStatus.CREATED, CategoryResponseMessage.MODIFY_CATEGORY_SUCCESS, null),
     DELETE_CATEGORY_SUCCESS(HttpStatus.OK, CategoryResponseMessage.DELETE_CATEGORY_SUCCESS, null),
 
-    NOT_DELETE_USED_CATEGORY(HttpStatus.CONFLICT, CategoryResponseMessage.NOT_DELETE_USED_CATEGORY, null),
     CATEGORY_NAME_DUPLICATE(HttpStatus.CONFLICT, CategoryResponseMessage.CATEGORY_NAME_DUPLICATE, "name"),
     CATEGORY_NON_EXISTENT(HttpStatus.NOT_FOUND, CategoryResponseMessage.CATEGORY_NON_EXISTENT, "categoryId"),
     CATEGORY_TYPE_INVALID(HttpStatus.BAD_REQUEST,CategoryResponseMessage.CATEGORY_TYPE_INVALID, "categoryType"),
