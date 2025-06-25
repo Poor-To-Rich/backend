@@ -35,6 +35,7 @@ public enum DefaultExpenseCategory {
                 .name(name)
                 .color(color)
                 .visibility(Boolean.TRUE)
+                .isDeleted(Boolean.FALSE)
                 .user(user)
                 .build();
     }
