@@ -40,7 +40,7 @@ public class LogAspect {
         try {
             return joinPoint.proceed();
         } catch (Exception e) {
-            log.error("[ERROR] [{}] {} : {}", className, methodName, e.getMessage(), e);
+            log.error("[ERROR] [{}] {} : {}", className, methodName, e.getMessage());
             throw e;
         } finally {
             long end = System.currentTimeMillis();
@@ -69,7 +69,7 @@ public class LogAspect {
             params.put("request_uri", request.getRequestURI());
             params.put("http_method", request.getMethod());
         } catch (Exception e) {
-            log.error("LoggerAspect error", e);
+            log.error("[ERROR] : {}", e.getMessage());
         }
 
         String ip = request.getRemoteAddr();

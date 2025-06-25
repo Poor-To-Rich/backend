@@ -126,4 +126,5 @@ public interface IncomeRepository extends JpaRepository<Income, Long> {
 
     void deleteByUser(User user);
 
+    List<Income> findByUserAndCategory(User user, Category category);
 }
