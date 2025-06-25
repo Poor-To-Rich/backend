@@ -118,7 +118,7 @@ public class CategoryService {
                 .color(customCategory.getColor())
                 .visibility(true)
                 .user(user)
-                .isDeleted(false)
+                .isDeleted(Boolean.FALSE)
                 .build();
     }
 
