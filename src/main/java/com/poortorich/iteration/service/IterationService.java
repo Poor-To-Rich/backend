@@ -13,11 +13,7 @@ import com.poortorich.iteration.entity.enums.Weekday;
 import com.poortorich.iteration.entity.enums.EndType;
 import com.poortorich.iteration.entity.enums.IterationRuleType;
 import com.poortorich.iteration.entity.enums.MonthlyMode;
-import com.poortorich.iteration.entity.info.DailyIterationRule;
 import com.poortorich.iteration.entity.info.IterationInfo;
-import com.poortorich.iteration.entity.info.MonthlyIterationRule;
-import com.poortorich.iteration.entity.info.WeeklyIterationRule;
-import com.poortorich.iteration.entity.info.YearlyIterationRule;
 import com.poortorich.iteration.repository.IterationInfoRepository;
 import com.poortorich.iteration.repository.IterationRepository;
 import com.poortorich.iteration.request.CustomIteration;
@@ -25,15 +21,11 @@ import com.poortorich.iteration.request.End;
 import com.poortorich.iteration.request.IterationRule;
 import com.poortorich.iteration.request.MonthlyOption;
 import com.poortorich.iteration.response.CustomIterationInfoResponse;
-import com.poortorich.iteration.response.EndInfoResponse;
 import com.poortorich.iteration.response.IterationResponse;
-import com.poortorich.iteration.response.IterationRuleInfoResponse;
-import com.poortorich.iteration.response.MonthlyOptionInfoResponse;
 import com.poortorich.iteration.util.IterationBuilder;
 import com.poortorich.iteration.util.IterationDateCalculator;
 import com.poortorich.user.entity.User;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -243,132 +235,27 @@ public class IterationService {
         IterationRuleType ruleType = customIteration.getIterationRule().parseIterationType();
 
         if (ruleType == IterationRuleType.DAILY) {
-            return buildDailyIterationInfo(customIteration);
+            return IterationBuilder.buildDailyIterationInfo(customIteration);
         }
         if (ruleType == IterationRuleType.WEEKLY) {
-            return buildWeeklyIterationInfo(customIteration);
+            return IterationBuilder.buildWeeklyIterationInfo(customIteration);
         }
         if (ruleType == IterationRuleType.MONTHLY) {
-            return buildMonthlyIterationInfo(customIteration, customIteration.getIterationRule().getMonthlyOption());
+            return IterationBuilder.buildMonthlyIterationInfo(customIteration, customIteration.getIterationRule().getMonthlyOption());
         }
         if (ruleType == IterationRuleType.YEARLY) {
-            return buildYearlyIterationInfo(customIteration);
+            return IterationBuilder.buildYearlyIterationInfo(customIteration);
         }
 
         throw new BadRequestException(IterationResponse.ITERATION_RULE_TYPE_INVALID);
     }
 
-    private DailyIterationRule buildDailyIterationInfo(CustomIteration customIteration) {
-        return DailyIterationRule.builder()
-                .cycle(customIteration.getCycle())
-                .endType(customIteration.getEnd().parseEndType())
-                .endCount(customIteration.getEnd().getCount())
-                .endDate(customIteration.getEnd().parseDate())
-                .build();
-    }
-
-    private WeeklyIterationRule buildWeeklyIterationInfo(CustomIteration customIteration) {
-        return WeeklyIterationRule.builder()
-                .daysOfWeek(customIteration.getIterationRule().parseDaysOfWeek())
-                .cycle(customIteration.getCycle())
-                .endType(customIteration.getEnd().parseEndType())
-                .endCount(customIteration.getEnd().getCount())
-                .endDate(customIteration.getEnd().parseDate())
-                .build();
-    }
-
-    private MonthlyIterationRule buildMonthlyIterationInfo(CustomIteration customIteration,
-                                                           MonthlyOption monthlyOption) {
-        return MonthlyIterationRule.builder()
-                .monthlyMode(monthlyOption.parseMonthlyMode())
-                .monthlyDay(monthlyOption.getDay())
-                .monthlyWeek(monthlyOption.getWeek())
-                .monthlyDayOfWeek(monthlyOption.parseDayOfWeek())
-                .cycle(customIteration.getCycle())
-                .endType(customIteration.getEnd().parseEndType())
-                .endCount(customIteration.getEnd().getCount())
-                .endDate(customIteration.getEnd().parseDate())
-                .build();
-    }
-
-    private YearlyIterationRule buildYearlyIterationInfo(CustomIteration customIteration) {
-        return YearlyIterationRule.builder()
-                .cycle(customIteration.getCycle())
-                .endType(customIteration.getEnd().parseEndType())
-                .endCount(customIteration.getEnd().getCount())
-                .endDate(customIteration.getEnd().parseDate())
-                .build();
-    }
-
     public CustomIterationInfoResponse getCustomIteration(Iteration iteration) {
         IterationInfo iterationInfo = iteration.getIterationInfo();
         return CustomIterationInfoResponse.builder()
-                .iterationRule(buildIterationRuleByRuleType(iterationInfo))
+                .iterationRule(IterationBuilder.buildIterationRuleByRuleType(iterationInfo))
                 .cycle(iterationInfo.getCycle())
-                .end(buildEndInfoResponseByEndType(iterationInfo))
-                .build();
-    }
-
-    private IterationRuleInfoResponse buildIterationRuleByRuleType(IterationInfo info) {
-        IterationInfo unproxiedInfo = (IterationInfo) Hibernate.unproxy(info);
-
-        if (unproxiedInfo instanceof WeeklyIterationRule weekly) {
-            return IterationRuleInfoResponse.builder()
-                    .type(weekly.getIterationTypeLowerCase())
-                    .daysOfWeek(weekly.getDaysOfWeekList())
-                    .build();
-        }
-
-        if (unproxiedInfo instanceof MonthlyIterationRule monthly) {
-            return IterationRuleInfoResponse.builder()
-                    .type(monthly.getIterationTypeLowerCase())
-                    .monthlyOption(buildMonthlyOptionInfoResponseByMonthlyMode(monthly))
-                    .build();
-        }
-
-        return IterationRuleInfoResponse.builder()
-                .type(info.getIterationTypeLowerCase())
-                .build();
-    }
-
-    private MonthlyOptionInfoResponse buildMonthlyOptionInfoResponseByMonthlyMode(MonthlyIterationRule monthly) {
-        if (monthly.getMonthlyMode() == MonthlyMode.DAY) {
-            return MonthlyOptionInfoResponse.builder()
-                    .mode(monthly.getMonthlyMode().toString())
-                    .day(monthly.getMonthlyDay())
-                    .week(monthly.getMonthlyWeek())
-                    .build();
-        }
-
-        if (monthly.getMonthlyMode() == MonthlyMode.WEEKDAY) {
-            return MonthlyOptionInfoResponse.builder()
-                    .mode(monthly.getMonthlyMode().toString())
-                    .dayOfWeek(monthly.getMonthlyDayOfWeek().toString())
-                    .build();
-        }
-
-        return MonthlyOptionInfoResponse.builder()
-                .mode(monthly.getMonthlyMode().toString())
-                .build();
-    }
-
-    private EndInfoResponse buildEndInfoResponseByEndType(IterationInfo info) {
-        if (info.getEndType() == EndType.AFTER) {
-            return EndInfoResponse.builder()
-                    .type(info.getEndType().toString())
-                    .count(info.getEndCount())
-                    .build();
-        }
-
-        if (info.getEndType() == EndType.UNTIL) {
-            return EndInfoResponse.builder()
-                    .type(info.getEndType().toString())
-                    .date(info.getEndDate())
-                    .build();
-        }
-
-        return EndInfoResponse.builder()
-                .type(info.getEndType().toString())
+                .end(IterationBuilder.buildEndInfoResponseByEndType(iterationInfo))
                 .build();
     }
 
