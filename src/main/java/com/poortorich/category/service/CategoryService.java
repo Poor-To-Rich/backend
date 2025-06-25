@@ -1,6 +1,5 @@
 package com.poortorich.category.service;
 
-import com.poortorich.accountbook.service.AccountBookService;
 import com.poortorich.category.domain.model.enums.DefaultExpenseCategory;
 import com.poortorich.category.domain.model.enums.DefaultIncomeCategory;
 import com.poortorich.category.entity.Category;
@@ -30,7 +29,6 @@ public class CategoryService {
 
     private final CategoryRepository categoryRepository;
     private final UserService userService;
-    private final AccountBookService accountBookService;
 
     public List<DefaultCategoryResponse> getDefaultCategories(CategoryType type, String username) {
         return categoryRepository.findByUserAndTypeAndIsDeletedFalse(userService.findUserByUsername(username), type).stream()
