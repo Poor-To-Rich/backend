@@ -55,6 +55,10 @@ public class Category {
     @Column(name = "visibility", nullable = false)
     private Boolean visibility;
 
+    @NotNull
+    @Column(name = "isDeleted", nullable = false)
+    private Boolean isDeleted;
+
     @CreationTimestamp
     @Column(name = "createdDate")
     private LocalDateTime createdDate;
@@ -74,5 +78,9 @@ public class Category {
 
     public void updateVisibility(Boolean visibility) {
         this.visibility = visibility;
+    }
+
+    public void delete() {
+        this.isDeleted = true;
     }
 }
