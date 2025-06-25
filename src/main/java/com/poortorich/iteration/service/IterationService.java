@@ -186,14 +186,14 @@ public class IterationService {
 
         if (rule.parseIterationType() == IterationRuleType.MONTHLY) {
             return processCalculatorByMonthlyRule(
-                    date, cycle, startDate, monthlyOption, monthlyOption.parseMonthlyMode());
+                    date, cycle, monthlyOption, monthlyOption.parseMonthlyMode());
         }
 
         return dateCalculator.yearlyTypeDate(date, cycle, startDate);
     }
 
     private LocalDate processCalculatorByMonthlyRule(
-            LocalDate date, int cycle, LocalDate startDate, MonthlyOption option, MonthlyMode mode) {
+            LocalDate date, int cycle, MonthlyOption option, MonthlyMode mode) {
         LocalDate targetDate = date.plusMonths(cycle);
 
         if (mode == MonthlyMode.DAY) {
