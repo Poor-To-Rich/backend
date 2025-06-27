@@ -8,14 +8,19 @@ import com.poortorich.accountbook.response.AccountBookInfoResponse;
 import com.poortorich.accountbook.response.InfoResponse;
 import com.poortorich.accountbook.response.IterationDetailsResponse;
 import com.poortorich.accountbook.util.AccountBookBuilder;
+import com.poortorich.accountbook.util.AccountBookCalculator;
 import com.poortorich.accountbook.util.AccountBookCostExtractor;
+import com.poortorich.accountbook.util.AccountBookExtractor;
+import com.poortorich.accountbook.util.AccountBookMerger;
 import com.poortorich.category.entity.Category;
 import com.poortorich.expense.response.ExpenseResponse;
+import com.poortorich.global.date.domain.DateInfo;
 import com.poortorich.global.exceptions.NotFoundException;
 import com.poortorich.global.statistics.util.StatCalculator;
 import com.poortorich.income.response.enums.IncomeResponse;
 import com.poortorich.iteration.entity.Iteration;
 import com.poortorich.iteration.response.CustomIterationInfoResponse;
+import com.poortorich.page.domain.Pagination;
 import com.poortorich.user.entity.User;
 import java.beans.Transient;
 import java.time.LocalDate;
@@ -35,6 +40,7 @@ import org.springframework.stereotype.Service;
 public class AccountBookService {
 
     private final AccountBookRepository accountBookRepository;
+    private final Pagination pageProvider;
 
     public AccountBook create(
             User user,
@@ -116,7 +122,7 @@ public class AccountBookService {
             Sort.Direction direction,
             Pageable pageable
     ) {
-        return accountBookRepository.findByUserAndCategoryWithinDateRangeWithCursor(
+        return accountBookRepository.getPageByDate(
                 user,
                 category,
                 startDate,
@@ -207,5 +213,72 @@ public class AccountBookService {
         return accountBooks.stream()
                 .map(accountBook -> AccountBookBuilder.buildAccountBookInfoResponse(accountBook, type))
                 .toList();
+    }
+
+    // 리빌딩 중
+    // 특별한 경우를 제외하고선 서비스단에서 데이터를 가공해서 제공하는 것이 원칙인 것 같아 수정 중
+    public Long getTotalCostExcludingCategory(
+            User user, DateInfo dateInfo, Category category, AccountBookType type
+    ) {
+        List<AccountBook> accountBooks = getAccountBookBetweenDates(
+                user, dateInfo.getStartDate(), dateInfo.getEndDate(), type
+        );
+        accountBooks = AccountBookExtractor.extractExcludingCategory(accountBooks, category);
+
+        return AccountBookCalculator.sum(accountBooks);
+    }
+
+    public Long getTotalCostByCategory(User user, DateInfo dateInfo, Category category, AccountBookType type) {
+        List<AccountBook> accountBooks = getAccountBookBetweenDates(
+                user, dateInfo.getStartDate(), dateInfo.getEndDate(), type
+        );
+
+        return AccountBookCalculator.sum(accountBooks);
+    }
+
+    public List<AccountBook> getPageByDate(
+            User user, Category category, String cursor, DateInfo dateInfo, Direction direction
+    ) {
+        List<AccountBook> baseAccountBooks = accountBookRepository.getPageByDate(
+                user,
+                category,
+                dateInfo.getStartDate(),
+                pageProvider.getCursor(cursor, dateInfo, direction),
+                dateInfo.getEndDate(),
+                direction,
+                pageProvider.getChartPageable()).getContent();
+
+        if (baseAccountBooks.isEmpty()) {
+            return baseAccountBooks;
+        }
+
+        LocalDate lastDate = baseAccountBooks.getLast().getAccountBookDate();
+        List<AccountBook> additionalAccountBooks = accountBookRepository.findByUserAndCategoryAndAccountBookDate(
+                user, category, lastDate);
+
+        return AccountBookMerger.mergeByDate(baseAccountBooks, additionalAccountBooks);
+    }
+
+    public List<AccountBook> getAccountBookBetweenDates(User user, DateInfo dateInfo, AccountBookType type) {
+        return Optional.of(
+                        accountBookRepository.findByUserAndExpenseAndDateBetween(
+                                user,
+                                dateInfo.getStartDate(),
+                                dateInfo.getEndDate(),
+                                type))
+                .orElseThrow(() -> new NotFoundException(ExpenseResponse.EXPENSE_NON_EXISTENT));
+    }
+
+    public List<AccountBook> getAccountBookByCategoryBetweenDates(
+            User user,
+            Category category,
+            DateInfo dateInfo
+    ) {
+        return Optional.of(
+                        accountBookRepository.getAccountBookByCategoryBetweenDates(
+                                user, category, dateInfo.getStartDate(), dateInfo.getEndDate()
+                        )
+                )
+                .orElseThrow(() -> new NotFoundException(ExpenseResponse.EXPENSE_NON_EXISTENT));
     }
 }
