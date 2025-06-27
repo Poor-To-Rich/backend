@@ -3,7 +3,7 @@ package com.poortorich.report.facade;
 import com.poortorich.accountbook.entity.AccountBook;
 import com.poortorich.accountbook.enums.AccountBookType;
 import com.poortorich.accountbook.service.AccountBookService;
-import com.poortorich.accountbook.util.AccountBookCostExtractor;
+import com.poortorich.accountbook.util.AccountBookCalculator;
 import com.poortorich.chart.util.PeriodFormatter;
 import com.poortorich.global.date.constants.DateConstants;
 import com.poortorich.global.date.constants.DatePattern;
@@ -13,7 +13,6 @@ import com.poortorich.global.date.domain.YearInformation;
 import com.poortorich.global.date.util.DateInfoProvider;
 import com.poortorich.global.date.util.DateParser;
 import com.poortorich.global.exceptions.BadRequestException;
-import com.poortorich.global.statistics.util.StatCalculator;
 import com.poortorich.report.response.DailyDetailsResponse;
 import com.poortorich.report.response.Logs;
 import com.poortorich.report.response.MonthlyTotalReportResponse;
@@ -141,8 +140,8 @@ public class ReportFacade {
                 user, monthInfo.getStartDate(), monthInfo.getEndDate(), AccountBookType.EXPENSE
         );
 
-        Long totalIncome = StatCalculator.calculateSum(AccountBookCostExtractor.extract(monthlyIncomes)).longValue();
-        Long totalExpense = StatCalculator.calculateSum(AccountBookCostExtractor.extract(monthlyExpenses)).longValue();
+        Long totalIncome = AccountBookCalculator.sum(monthlyIncomes);
+        Long totalExpense = AccountBookCalculator.sum(monthlyExpenses);
 
         return MonthlyTotalResponse.builder()
                 .totalAmount(totalIncome - totalExpense)
@@ -172,8 +171,8 @@ public class ReportFacade {
                 user, yearInfo.getStartDate(), yearInfo.getEndDate(), AccountBookType.EXPENSE
         );
 
-        Long totalIncome = StatCalculator.calculateSum(AccountBookCostExtractor.extract(yearlyIncomes)).longValue();
-        Long totalExpense = StatCalculator.calculateSum(AccountBookCostExtractor.extract(yearlyExpenses)).longValue();
+        Long totalIncome = AccountBookCalculator.sum(yearlyIncomes);
+        Long totalExpense = AccountBookCalculator.sum(yearlyExpenses);
 
         return MonthlyTotalReportResponse.builder()
                 .yearTotalIncome(totalIncome)

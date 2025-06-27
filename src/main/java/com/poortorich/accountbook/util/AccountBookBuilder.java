@@ -14,7 +14,6 @@ import com.poortorich.income.request.IncomeRequest;
 import com.poortorich.income.response.IncomeInfoResponse;
 import com.poortorich.iteration.response.CustomIterationInfoResponse;
 import com.poortorich.user.entity.User;
-
 import java.time.LocalDate;
 
 public class AccountBookBuilder {
@@ -92,7 +91,8 @@ public class AccountBookBuilder {
                 .build();
     }
 
-    public static InfoResponse buildInfoResponse(AccountBook accountBook, CustomIterationInfoResponse customIteration, AccountBookType type) {
+    public static InfoResponse buildInfoResponse(AccountBook accountBook, CustomIterationInfoResponse customIteration,
+                                                 AccountBookType type) {
         return switch (type) {
             case EXPENSE -> AccountBookBuilder.buildExpenseInfoResponse((Expense) accountBook, customIteration);
             case INCOME -> AccountBookBuilder.buildIncomeInfoResponse((Income) accountBook, customIteration);
@@ -124,7 +124,7 @@ public class AccountBookBuilder {
                 .build();
     }
 
-    public static AccountBookInfoResponse buildAccountBookInfoResponse(AccountBook accountBook, AccountBookType type) {
+    public static AccountBookInfoResponse buildAccountBookInfoResponse(AccountBook accountBook) {
         return AccountBookInfoResponse.builder()
                 .id(accountBook.getId())
                 .categoryName(accountBook.getCategory().getName())
@@ -132,7 +132,7 @@ public class AccountBookBuilder {
                 .title(accountBook.getTitle())
                 .date(accountBook.getAccountBookDate().toString())
                 .isIteration(accountBook.getIterationType().isIteration())
-                .type(type.toString())
+                .type(accountBook.getType().toString())
                 .cost(accountBook.getCost())
                 .build();
     }

@@ -43,6 +43,10 @@ public class PeriodFormatter {
         return currentMonth.getValue() + MONTH_KOREAN_SUFFIX;
     }
 
+    public static String formatYearMonth(LocalDate date) {
+        return date.format(DateTimeFormatter.ofPattern(DatePattern.MONTH_DAY_DOT_PATTERN));
+    }
+
     public static String formatByDateInfo(DateInfo dateInfo) {
         return switch (dateInfo) {
             case YearInformation yearInfo -> yearInfo.getYear().toString();
