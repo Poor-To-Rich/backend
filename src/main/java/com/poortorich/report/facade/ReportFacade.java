@@ -24,18 +24,17 @@ import com.poortorich.report.response.enums.ReportResponse;
 import com.poortorich.report.service.ReportService;
 import com.poortorich.user.entity.User;
 import com.poortorich.user.service.UserService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
-import org.springframework.stereotype.Service;
-
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
@@ -59,14 +58,14 @@ public class ReportFacade {
 
     public WeeklyDetailsResponse getWeeklyDetailsReport(String username, String date, Long week, String cursor) {
         User user = userService.findUserByUsername(username);
-        MonthInformation monthInfo = (MonthInformation) DateInfoProvider.getDateInfo(date);
+        MonthInformation monthInfo = (MonthInformation) DateInfoProvider.get(date);
         if (monthInfo.getWeeks().size() < week) {
             throw new BadRequestException(ReportResponse.WEEK_INVALID);
         }
 
         LocalDate startDate = monthInfo.getWeeks().get((int) (week - 1)).getStartDate();
         LocalDate endDate = monthInfo.getWeeks().get((int) (week - 1)).getEndDate();
-        LocalDate dateCursor = (Objects.isNull(cursor) ?  startDate : LocalDate.parse(cursor));
+        LocalDate dateCursor = (Objects.isNull(cursor) ? startDate : LocalDate.parse(cursor));
         Pageable pageable = PageRequest.of(0, 30);
 
         return getWeeklyDetailsResponse(user, startDate, endDate, dateCursor, pageable);
@@ -95,12 +94,14 @@ public class ReportFacade {
         Long countOfLogs = accountBookService.countByUserAndBetweenDates(user, startDate, endDate);
 
         return reportService.getWeeklyDetailsReport(
-                weeklyAccountBooks, PeriodFormatter.formatWeeklyReportRange(startDate, endDate), countOfLogs, nextCursor, hasNext
+                weeklyAccountBooks, PeriodFormatter.formatWeeklyReportRange(startDate, endDate), countOfLogs,
+                nextCursor, hasNext
         );
     }
 
     private List<AccountBook> getAccountBooksByLastDate(
-            User user, List<AccountBook> mergeSliceAccountBooks, Slice<AccountBook> weeklyExpenses, Slice<AccountBook> weeklyIncomes
+            User user, List<AccountBook> mergeSliceAccountBooks, Slice<AccountBook> weeklyExpenses,
+            Slice<AccountBook> weeklyIncomes
     ) {
         List<AccountBook> expensesByLastDate = List.of();
         List<AccountBook> incomesByLastDate = List.of();
@@ -130,7 +131,7 @@ public class ReportFacade {
 
     public MonthlyTotalResponse getMonthlyTotal(String username, String date) {
         User user = userService.findUserByUsername(username);
-        MonthInformation monthInfo = (MonthInformation) DateInfoProvider.getDateInfo(date);
+        MonthInformation monthInfo = (MonthInformation) DateInfoProvider.get(date);
 
         List<AccountBook> monthlyIncomes = accountBookService.getAccountBookBetweenDates(
                 user, monthInfo.getStartDate(), monthInfo.getEndDate(), AccountBookType.INCOME
@@ -155,13 +156,12 @@ public class ReportFacade {
         User user = userService.findUserByUsername(username);
         YearInformation yearInfo;
         if (date == null) {
-            MonthInformation monthInfo = (MonthInformation) DateInfoProvider.getDateInfo(date);
-            yearInfo = (YearInformation) DateInfoProvider.getDateInfo(
+            MonthInformation monthInfo = (MonthInformation) DateInfoProvider.get(date);
+            yearInfo = (YearInformation) DateInfoProvider.get(
                     monthInfo.getStartDate().format(DateTimeFormatter.ofPattern(DatePattern.YEAR_PATTERN))
             );
-        }
-        else {
-            yearInfo = (YearInformation) DateInfoProvider.getDateInfo(date);
+        } else {
+            yearInfo = (YearInformation) DateInfoProvider.get(date);
         }
 
         List<AccountBook> yearlyIncomes = accountBookService.getAccountBookBetweenDates(
@@ -206,7 +206,7 @@ public class ReportFacade {
 
     public WeeklyTotalReportResponse getWeeklyTotalReport(String username, String date) {
         User user = userService.findUserByUsername(username);
-        MonthInformation monthInfo = (MonthInformation) DateInfoProvider.getDateInfo(date);
+        MonthInformation monthInfo = (MonthInformation) DateInfoProvider.get(date);
 
         return WeeklyTotalReportResponse.builder()
                 .weeklyLogs(getWeeklyLogs(user, monthInfo))
