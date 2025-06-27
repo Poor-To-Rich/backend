@@ -22,6 +22,7 @@ import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Objects;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -95,9 +96,10 @@ public class Income implements AccountBook {
     public PaymentMethod getPaymentMethod() {
         return null;
     }
-  
+
     @Override
-    public void updateAccountBook(String title, Long cost, String memo, IterationType iterationType, Category category) {
+    public void updateAccountBook(String title, Long cost, String memo, IterationType iterationType,
+                                  Category category) {
         this.title = title;
         this.cost = cost;
         this.memo = memo;
@@ -108,5 +110,34 @@ public class Income implements AccountBook {
     @Override
     public void updateAccountBookDate(LocalDate accountBookDate) {
         this.incomeDate = accountBookDate;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (Objects.isNull(obj) || getClass() != obj.getClass()) {
+            return false;
+        }
+        Income that = (Income) obj;
+
+        if (!Objects.isNull(id) && !Objects.isNull(that.id)) {
+            return Objects.equals(id, that.id);
+        }
+
+        return Objects.equals(title, that.title)
+                && Objects.equals(cost, that.cost)
+                && Objects.equals(incomeDate, that.incomeDate)
+                && Objects.equals(user, that.user)
+                && Objects.equals(category, that.category);
+    }
+
+    @Override
+    public int hashCode() {
+        if (!Objects.isNull(id)) {
+            return Objects.hash(id);
+        }
+        return Objects.hash(title, cost, incomeDate, user, category);
     }
 }
