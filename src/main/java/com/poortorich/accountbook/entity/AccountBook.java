@@ -1,6 +1,7 @@
 package com.poortorich.accountbook.entity;
 
 import com.poortorich.accountbook.entity.enums.IterationType;
+import com.poortorich.accountbook.enums.AccountBookType;
 import com.poortorich.category.entity.Category;
 import com.poortorich.expense.entity.enums.PaymentMethod;
 import com.poortorich.iteration.entity.Iteration;
@@ -31,6 +32,8 @@ public interface AccountBook {
     Iteration getGeneratedIteration();
 
     LocalDateTime getCreatedDate();
+
+    AccountBookType getType();
 
     void updateAccountBook(String title, Long cost, String memo, IterationType iterationType, Category category);
 

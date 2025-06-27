@@ -2,6 +2,7 @@ package com.poortorich.expense.entity;
 
 import com.poortorich.accountbook.entity.AccountBook;
 import com.poortorich.accountbook.entity.enums.IterationType;
+import com.poortorich.accountbook.enums.AccountBookType;
 import com.poortorich.category.entity.Category;
 import com.poortorich.expense.entity.enums.PaymentMethod;
 import com.poortorich.iteration.entity.Iteration;
@@ -97,6 +98,11 @@ public class Expense implements AccountBook {
         return generatedIterationExpenses;
     }
 
+    @Override
+    public AccountBookType getType() {
+        return AccountBookType.EXPENSE;
+    }
+    
     @Override
     public void updateAccountBook(String title, Long cost, String memo, IterationType iterationType,
                                   Category category) {
