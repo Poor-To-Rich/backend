@@ -3,6 +3,7 @@ package com.poortorich.chart.util;
 import com.poortorich.global.date.constants.DatePattern;
 import com.poortorich.global.date.domain.DateInfo;
 import com.poortorich.global.date.domain.MonthInformation;
+import com.poortorich.global.date.domain.WeekInformation;
 import com.poortorich.global.date.domain.YearInformation;
 import com.poortorich.global.date.response.enums.DateResponse;
 import com.poortorich.global.exceptions.BadRequestException;
@@ -50,7 +51,8 @@ public class PeriodFormatter {
     public static String formatByDateInfo(DateInfo dateInfo) {
         return switch (dateInfo) {
             case YearInformation yearInfo -> yearInfo.getYear().toString();
-            case MonthInformation monthInformation -> monthInformation.getYearMonth().toString();
+            case MonthInformation monthInfo -> monthInfo.getYearMonth().toString();
+            case WeekInformation weekInfo -> formatLocalDateRange(weekInfo.getStartDate(), weekInfo.getEndDate());
             default -> throw new BadRequestException(DateResponse.UNSUPPORTED_DATE_FORMAT);
         };
     }
