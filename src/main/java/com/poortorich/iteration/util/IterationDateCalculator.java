@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.Month;
 import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 
@@ -48,11 +49,10 @@ public class IterationDateCalculator {
     }
 
     public LocalDate monthlyTypeDayModeDate(LocalDate date, int day) {
-        while (day > date.lengthOfMonth()) {
-            date = date.plusMonths(1);
-        }
+        int lastDayOfMonth = date.lengthOfMonth();
+        int targetDay = Math.min(day, lastDayOfMonth);
 
-        return date.withDayOfMonth(day);
+        return date.withDayOfMonth(targetDay);
     }
 
     public LocalDate monthlyTypeWeekDayModeDate(LocalDate date, int week, Weekday weekday) {
@@ -74,7 +74,14 @@ public class IterationDateCalculator {
         return date.plusMonths(cycle);
     }
 
-    public LocalDate yearlyTypeDate(LocalDate date, int cycle) {
-        return date.plusYears(cycle);
+    public LocalDate yearlyTypeDate(LocalDate date, int cycle, LocalDate startDate) {
+        LocalDate targetDate = date.plusYears(cycle);
+
+        int lastDayOfTargetMonth = targetDate.lengthOfMonth();
+        if (startDate.getDayOfMonth() > lastDayOfTargetMonth) {
+            return targetDate.withDayOfMonth(lastDayOfTargetMonth);
+        }
+
+        return targetDate.withDayOfMonth(startDate.getDayOfMonth());
     }
 }

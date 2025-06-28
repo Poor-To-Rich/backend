@@ -98,6 +98,7 @@ public class AuthServiceTest {
     @Test
     @DisplayName("로그인 성공 - 인증정보가 일치하면 토큰을 생성하고 쿠키를 설정해야 함")
     void login_ShouldGenerateTokensAndSetCookies_WhenCredentialsMatch() {
+        when(userRepository.existsByUsername(loginRequest.getUsername())).thenReturn(true);
         when(userDetailsService.loadUserByUsername(loginRequest.getUsername())).thenReturn(testUser);
         when(passwordEncoder.matches(loginRequest.getPassword(), testUser.getPassword())).thenReturn(true);
         when(tokenGenerator.generateAccessToken(testUser)).thenReturn(accessToken);
@@ -112,6 +113,7 @@ public class AuthServiceTest {
     @Test
     @DisplayName("로그인 실패 - 잘못된 패스워트로 인증 실패 응답을 반환해야 함")
     void login_ShouldReturnCredentialsInvalid_WhenPasswordDoesNotMatches() {
+        when(userRepository.existsByUsername(loginRequest.getUsername())).thenReturn(true);
         when(userDetailsService.loadUserByUsername(loginRequest.getUsername())).thenReturn(testUser);
         when(passwordEncoder.matches(loginRequest.getPassword(), testUser.getPassword())).thenReturn(false);
 

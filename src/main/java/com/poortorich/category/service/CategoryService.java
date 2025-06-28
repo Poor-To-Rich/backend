@@ -31,7 +31,7 @@ public class CategoryService {
     private final UserService userService;
 
     public List<DefaultCategoryResponse> getDefaultCategories(CategoryType type, String username) {
-        return categoryRepository.findByUserAndType(userService.findUserByUsername(username), type).stream()
+        return categoryRepository.findByUserAndTypeAndIsDeletedFalse(userService.findUserByUsername(username), type).stream()
                 .map(category -> DefaultCategoryResponse.builder()
                         .id(category.getId())
                         .name(category.getName())
@@ -42,7 +42,7 @@ public class CategoryService {
     }
 
     public List<CustomCategoryResponse> getCustomCategories(CategoryType type, String username) {
-        return categoryRepository.findByUserAndType(userService.findUserByUsername(username), type).stream()
+        return categoryRepository.findByUserAndTypeAndIsDeletedFalse(userService.findUserByUsername(username), type).stream()
                 .map(category -> CustomCategoryResponse.builder()
                         .id(category.getId())
                         .color(category.getColor())
@@ -53,7 +53,7 @@ public class CategoryService {
 
     public ActiveCategoriesResponse getActiveCategories(String type, String username) {
         List<String> categories
-                = categoryRepository.findByUserAndTypeIn(
+                = categoryRepository.findByUserAndTypeInAndIsDeletedFalse(
                         userService.findUserByUsername(username),
                         CategoryType.from(type).getSameGroupTypes())
                 .stream()
@@ -116,6 +116,7 @@ public class CategoryService {
                 .color(customCategory.getColor())
                 .visibility(true)
                 .user(user)
+                .isDeleted(Boolean.FALSE)
                 .build();
     }
 
@@ -131,40 +132,43 @@ public class CategoryService {
     @Transactional
     public Response modifyCategory(Long id, CategoryInfoRequest categoryRequest, String username) {
         User user = userService.findUserByUsername(username);
-
-        validateCategoryNameDuplication(user, categoryRequest.getName(), CategoryType.CUSTOM_INCOME);
-
         Category category = getCategoryOrThrow(id, user);
+
+        validateCategoryNameDuplication(user, categoryRequest.getName(), category.getType());
+
         category.updateCategory(categoryRequest.getName(), categoryRequest.getColor());
 
         return CategoryResponse.MODIFY_CATEGORY_SUCCESS;
     }
 
+    @Transactional
     public Response deleteCategory(Long id, String username) {
-        Category category = getCategoryOrThrow(id, userService.findUserByUsername(username));
-        categoryRepository.delete(category);
+        User user = userService.findUserByUsername(username);
+        Category category = getCategoryOrThrow(id, user);
+
+        category.delete();
 
         return CategoryResponse.DELETE_CATEGORY_SUCCESS;
     }
 
     public void validateCategoryNameDuplication(User user, String name, CategoryType type) {
-        if (categoryRepository.findByUserAndNameAndTypeIn(user, name, type.getSameGroupTypes()).isPresent()) {
+        if (categoryRepository.findByUserAndNameAndTypeInAndIsDeletedFalse(user, name, type.getSameGroupTypes()).isPresent()) {
             throw new BadRequestException(CategoryResponse.CATEGORY_NAME_DUPLICATE);
         }
     }
 
     public Category findCategoryByName(User user, String name, CategoryType type) {
-        return categoryRepository.findByUserAndNameAndTypeIn(user, name, type.getSameGroupTypes())
+        return categoryRepository.findByUserAndNameAndTypeInAndIsDeletedFalse(user, name, type.getSameGroupTypes())
                 .orElseThrow(() -> new NotFoundException(CategoryResponse.CATEGORY_NON_EXISTENT));
     }
 
     public Category findCategoryByName(String name, User user) {
-        return categoryRepository.findByNameAndUser(name, user)
+        return categoryRepository.findByNameAndUserAndIsDeletedFalse(name, user)
                 .orElseThrow(() -> new NotFoundException(CategoryResponse.CATEGORY_NON_EXISTENT));
     }
 
     public Category getCategoryOrThrow(Long id, User user) {
-        return categoryRepository.findByIdAndUser(id, user)
+        return categoryRepository.findByIdAndUserAndIsDeletedFalse(id, user)
                 .orElseThrow(() -> new NotFoundException(CategoryResponse.CATEGORY_NON_EXISTENT));
     }
 }

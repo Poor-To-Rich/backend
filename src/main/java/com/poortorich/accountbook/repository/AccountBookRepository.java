@@ -72,6 +72,15 @@ public class AccountBookRepository {
         }
     }
 
+    public boolean findByUserAndCategory(User user, Category category, AccountBookType type) {
+        List<? extends AccountBook> accountBooks = switch (type) {
+            case EXPENSE -> expenseRepository.findByUserAndCategory(user, category);
+            case INCOME -> incomeRepository.findByUserAndCategory(user, category);
+        };
+
+        return !accountBooks.isEmpty();
+    }
+
     public List<AccountBook> findByUserAndExpenseAndDateBetween(
             User user,
             LocalDate startDate,

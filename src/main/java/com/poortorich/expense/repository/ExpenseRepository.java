@@ -126,4 +126,6 @@ public interface ExpenseRepository extends JpaRepository<Expense, Long> {
     Long countByUserAndBetweenDates(User user, LocalDate startDate, LocalDate endDate);
 
     void deleteByUser(User user);
+
+    List<Expense> findByUserAndCategory(User user, Category category);
 }

@@ -18,7 +18,7 @@ public enum IterationResponse implements Response {
     END_DATE_INVALID(HttpStatus.BAD_REQUEST, IterationResponseMessages.END_DATE_INVALID, "customIteration.end.date"),
     END_DATE_NOT_BEFORE(HttpStatus.BAD_REQUEST, IterationResponseMessages.END_DATE_NOT_BEFORE, "customIteration.end.date"),
 
-    ITERATIONS_TOO_LONG(HttpStatus.BAD_REQUEST, IterationResponseMessages.ITERATIONS_TOO_LONG, null),
+    ITERATIONS_TOO_LONG(HttpStatus.INTERNAL_SERVER_ERROR, IterationResponseMessages.ITERATIONS_TOO_LONG, null),
 
     ITERATION_EXPENSES_NOT_FOUND(HttpStatus.NOT_FOUND, IterationResponseMessages.ITERATION_EXPENSES_NOT_FOUND, null);
 

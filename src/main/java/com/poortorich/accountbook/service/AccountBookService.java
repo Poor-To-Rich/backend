@@ -12,6 +12,7 @@ import com.poortorich.accountbook.util.AccountBookCalculator;
 import com.poortorich.accountbook.util.AccountBookExtractor;
 import com.poortorich.accountbook.util.AccountBookMerger;
 import com.poortorich.category.entity.Category;
+import com.poortorich.category.entity.enums.CategoryType;
 import com.poortorich.expense.response.ExpenseResponse;
 import com.poortorich.global.date.domain.DateInfo;
 import com.poortorich.global.exceptions.NotFoundException;
@@ -25,6 +26,8 @@ import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -89,6 +92,14 @@ public class AccountBookService {
 
     public void deleteAccountBookAll(List<AccountBook> accountBooks, AccountBookType type) {
         accountBookRepository.deleteAll(accountBooks, type);
+    }
+
+    public boolean isUsedCategory(User user, Category category, CategoryType categoryType) {
+        AccountBookType type = AccountBookType.EXPENSE;
+        if (categoryType.getType().equals("income")) {
+            type = AccountBookType.INCOME;
+        }
+        return accountBookRepository.findByUserAndCategory(user, category, type);
     }
 
     public List<AccountBook> getAccountBookBetweenDates(
@@ -174,6 +185,15 @@ public class AccountBookService {
 
     public Long countByUserAndBetweenDates(User user, LocalDate startDate, LocalDate endDate) {
         return accountBookRepository.countByUserAndBetweenDates(user, startDate, endDate);
+    }
+
+    public Long countByUserAndCategoryAndBetweenDates(
+            User user,
+            Category category,
+            LocalDate startDate,
+            LocalDate endDate
+    ) {
+        return accountBookRepository.countByUserAndCategoryBetweenDates(user, category, startDate, endDate);
     }
 
     public Boolean hasNextPage(User user, LocalDate startDate, LocalDate endDate) {
