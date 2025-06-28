@@ -12,6 +12,7 @@ import com.poortorich.chart.util.AmountFormatter;
 import com.poortorich.chart.util.PeriodFormatter;
 import com.poortorich.global.date.domain.DateInfo;
 import io.jsonwebtoken.lang.Objects;
+import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -36,7 +37,7 @@ public class ChartDataMapper {
             return Collections.emptyList();
         }
 
-        Map<Category, Double> rateByCategory = AccountBookCalculator.percentages(accountBooksGroupByCategory);
+        Map<Category, BigDecimal> rateByCategory = AccountBookCalculator.percentages(accountBooksGroupByCategory);
 
         return accountBooksGroupByCategory.entrySet().stream()
                 .map(entry -> {

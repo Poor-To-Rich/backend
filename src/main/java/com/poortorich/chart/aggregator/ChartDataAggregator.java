@@ -7,6 +7,7 @@ import com.poortorich.chart.response.CategoryChart;
 import com.poortorich.chart.util.AmountFormatter;
 import com.poortorich.global.date.domain.DateInfo;
 import io.jsonwebtoken.lang.Objects;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -17,7 +18,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class ChartDataAggregator {
 
-    public Map<String, Double> getAggregatedDataFromCategoryChart(List<CategoryChart> categoryCharts) {
+    public Map<String, BigDecimal> getAggregatedDataFromCategoryChart(List<CategoryChart> categoryCharts) {
         if (Objects.isEmpty(categoryCharts)) {
             return Map.of(ChartConstants.DUMMY_CATEGORY, ChartConstants.DUMMY_RATE);
         }
@@ -25,7 +26,7 @@ public class ChartDataAggregator {
         return categoryCharts.stream()
                 .collect(Collectors.toMap(
                         CategoryChart::getName,
-                        categoryChart -> Math.max(categoryChart.getRate(), ChartConstants.AGGREGATED_DATE_MIN_RATE),
+                        categoryChart -> categoryChart.getRate().max(ChartConstants.AGGREGATED_DATE_MIN_RATE),
                         (e1, e2) -> e1,
                         LinkedHashMap::new
                 ));

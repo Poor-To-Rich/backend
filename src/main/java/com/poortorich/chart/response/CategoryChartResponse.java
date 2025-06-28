@@ -1,5 +1,6 @@
 package com.poortorich.chart.response;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import lombok.Builder;
@@ -9,7 +10,7 @@ import lombok.Data;
 @Builder
 public class CategoryChartResponse {
 
-    List<Map<String, Double>> aggregatedData;
+    List<Map<String, BigDecimal>> aggregatedData;
     Map<String, String> categoryColors;
     List<CategoryChart> categoryCharts;
 }
