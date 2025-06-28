@@ -41,7 +41,7 @@ public class ChartService {
 
     public List<CategoryChart> getCategoryChart(List<AccountBook> accountBooks) {
         Map<Category, List<AccountBook>> groupedByCategory =
-                AccountBookGrouper.groupByCategory(accountBooks, Direction.ASC);
+                AccountBookGrouper.groupByCategory(accountBooks, Direction.DESC);
 
         return dataMapper.mapToCategoryCharts(groupedByCategory);
     }
