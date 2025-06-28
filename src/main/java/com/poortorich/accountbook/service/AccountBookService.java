@@ -9,14 +9,12 @@ import com.poortorich.accountbook.response.InfoResponse;
 import com.poortorich.accountbook.response.IterationDetailsResponse;
 import com.poortorich.accountbook.util.AccountBookBuilder;
 import com.poortorich.accountbook.util.AccountBookCalculator;
-import com.poortorich.accountbook.util.AccountBookCostExtractor;
 import com.poortorich.accountbook.util.AccountBookExtractor;
 import com.poortorich.accountbook.util.AccountBookMerger;
 import com.poortorich.category.entity.Category;
 import com.poortorich.expense.response.ExpenseResponse;
 import com.poortorich.global.date.domain.DateInfo;
 import com.poortorich.global.exceptions.NotFoundException;
-import com.poortorich.global.statistics.util.StatCalculator;
 import com.poortorich.income.response.enums.IncomeResponse;
 import com.poortorich.iteration.entity.Iteration;
 import com.poortorich.iteration.response.CustomIterationInfoResponse;
@@ -200,23 +198,17 @@ public class AccountBookService {
                 .toList();
 
         return IterationDetailsResponse.builder()
-                .totalAmount(
-                        StatCalculator.calculateSum(AccountBookCostExtractor.extract(originalAccountBooks)).longValue())
-                .iterationAccountBooks(getAccountBookInfoResponses(originalAccountBooks, type))
+                .totalAmount(AccountBookCalculator.sum(originalAccountBooks))
+                .iterationAccountBooks(getAccountBookInfoResponses(originalAccountBooks))
                 .build();
     }
 
-    private List<AccountBookInfoResponse> getAccountBookInfoResponses(
-            List<AccountBook> accountBooks,
-            AccountBookType type
-    ) {
+    private List<AccountBookInfoResponse> getAccountBookInfoResponses(List<AccountBook> accountBooks) {
         return accountBooks.stream()
-                .map(accountBook -> AccountBookBuilder.buildAccountBookInfoResponse(accountBook, type))
+                .map(AccountBookBuilder::buildAccountBookInfoResponse)
                 .toList();
     }
 
-    // 리빌딩 중
-    // 특별한 경우를 제외하고선 서비스단에서 데이터를 가공해서 제공하는 것이 원칙인 것 같아 수정 중
     public Long getTotalCostExcludingCategory(
             User user, DateInfo dateInfo, Category category, AccountBookType type
     ) {
