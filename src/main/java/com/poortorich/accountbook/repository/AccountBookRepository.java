@@ -110,7 +110,7 @@ public class AccountBookRepository {
         return mapToAccountBooks(accountBooks);
     }
 
-    public Slice<AccountBook> findByUserAndCategoryWithinDateRangeWithCursor(
+    public Slice<AccountBook> getPageByDate(
             User user,
             Category category,
             LocalDate startDate,

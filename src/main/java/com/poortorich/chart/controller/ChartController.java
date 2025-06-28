@@ -10,6 +10,7 @@ import com.poortorich.global.response.DataResponse;
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.Pattern;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -54,7 +55,7 @@ public class ChartController {
             @PathVariable("categoryId") Long categoryId,
             @RequestParam("date") @Nullable String date,
             @RequestParam("cursor") @Nullable String cursor,
-            @RequestParam(name = "sortDirection", defaultValue = "asc") @Nullable String sortDirection
+            @RequestParam(name = "sortDirection", defaultValue = "ASC") @Nullable Direction sortDirection
     ) {
         return DataResponse.toResponseEntity(
                 ChartResponse.GET_CATEGORY_SECTION_SUCCESS,
