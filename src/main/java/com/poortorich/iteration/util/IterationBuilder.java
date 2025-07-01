@@ -132,23 +132,11 @@ public class IterationBuilder {
     }
 
     public static MonthlyOptionInfoResponse buildMonthlyOptionInfoResponseByMonthlyMode(MonthlyIterationRule monthly) {
-        if (monthly.getMonthlyMode() == MonthlyMode.DAY) {
-            return MonthlyOptionInfoResponse.builder()
-                    .mode(monthly.getMonthlyMode().toString())
-                    .day(monthly.getMonthlyDay())
-                    .week(monthly.getMonthlyWeek())
-                    .build();
-        }
-
-        if (monthly.getMonthlyMode() == MonthlyMode.WEEKDAY) {
-            return MonthlyOptionInfoResponse.builder()
-                    .mode(monthly.getMonthlyMode().toString())
-                    .dayOfWeek(monthly.getMonthlyDayOfWeek().toString())
-                    .build();
-        }
-
         return MonthlyOptionInfoResponse.builder()
                 .mode(monthly.getMonthlyMode().toString())
+                .day(monthly.getMonthlyDay())
+                .week(monthly.getMonthlyWeek())
+                .dayOfWeek(monthly.getMonthlyDayOfWeek().toString())
                 .build();
     }
 

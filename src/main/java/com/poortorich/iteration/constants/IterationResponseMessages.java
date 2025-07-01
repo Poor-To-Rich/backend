@@ -14,9 +14,9 @@ public class IterationResponseMessages {
     public static final String MONTHLY_MODE_INVALID = "매달 타입이 적절하지 않습니다.";
     public static final String MONTHLY_OPTION_REQUIRED_MONTHLY_TYPE = "매달 반복하는 경우 옵션은 필수입니다.";
 
-    public static final String MONTHLY_OPTION_DAY_REQUIRED = "매달 날짜 옵션을 선택한 경우 날짜 값은 필수입니다.";
-    public static final String MONTHLY_OPTION_WEEK_REQUIRED = "매달 요일 옵션을 선택한 경우 주차 값은 필수입니다.";
-    public static final String MONTHLY_OPTION_DAY_OF_WEEK_REQUIRED = "매달 요일 옵션을 선택한 경우 요일 옵션은 필수입니다.";
+    public static final String MONTHLY_OPTION_DAY_REQUIRED = "매달 옵션을 선택한 경우 날짜 값은 필수입니다.";
+    public static final String MONTHLY_OPTION_WEEK_REQUIRED = "매달 옵션을 선택한 경우 주차 값은 필수입니다.";
+    public static final String MONTHLY_OPTION_DAY_OF_WEEK_REQUIRED = "매달 옵션을 선택한 경우 요일 옵션은 필수입니다.";
 
     public static final String CYCLE_REQUIRED = "반복 주기는 필수입니다.";
     public static final String CYCLE_TOO_SMALL = "반복 주기는 " + IterationValidationConstraints.CYCLE_MIN + " 이상이어야 합니다.";
