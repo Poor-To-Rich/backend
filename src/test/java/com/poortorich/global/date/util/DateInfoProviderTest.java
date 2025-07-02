@@ -18,7 +18,7 @@ public class DateInfoProviderTest {
     @Test
     @DisplayName("해당 연도의 정보를 반환받을 때, 유효한 구조로 반환이 되는지 확인")
     void getYearInformation_whenGivenYear_shouldReturnValidStructure() {
-        DateInfo result = DateInfoProvider.getDateInfo(DateTestFixture.TEST_YEAR_2025);
+        DateInfo result = DateInfoProvider.get(DateTestFixture.TEST_YEAR_2025);
         assertThat(result).isNotNull();
         assertThat(result.getStartDate()).isEqualTo(DateTestFixture.YEAR_START);
         assertThat(result.getEndDate()).isEqualTo(DateTestFixture.YEAR_END);
