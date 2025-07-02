@@ -87,7 +87,10 @@ public class IterationService {
         if (type == IterationType.CUSTOM) {
             IterationRule rule = customIteration.getIterationRule();
             return calculatorProvider.calculateDateByRuleType(
-                    customIteration.getCycle(), date, startDate, rule, rule.getMonthlyOption()
+                    customIteration.getCycle(),
+                    date, startDate,
+                    rule,
+                    rule.getMonthlyOption()
             );
         }
 
@@ -132,7 +135,10 @@ public class IterationService {
             return IterationBuilder.buildWeeklyIterationInfo(customIteration);
         }
         if (ruleType == IterationRuleType.MONTHLY) {
-            return IterationBuilder.buildMonthlyIterationInfo(customIteration, customIteration.getIterationRule().getMonthlyOption());
+            return IterationBuilder.buildMonthlyIterationInfo(
+                    customIteration,
+                    customIteration.getIterationRule().getMonthlyOption()
+            );
         }
         if (ruleType == IterationRuleType.YEARLY) {
             return IterationBuilder.buildYearlyIterationInfo(customIteration);
@@ -178,7 +184,14 @@ public class IterationService {
                 = iterationRepository.findAllByOriginalAccountBookAndUser(user, originalAccountBook, type);
 
         List<Iteration> deleteIterations = resolveIterations(
-                iterationAction, originalAccountBook, accountBookToDelete, iteration, allIterations, user, DELETE_TYPE, type
+                iterationAction,
+                originalAccountBook,
+                accountBookToDelete,
+                iteration,
+                allIterations,
+                user,
+                DELETE_TYPE,
+                type
         );
 
         iterationRepository.deleteAll(deleteIterations, type);
