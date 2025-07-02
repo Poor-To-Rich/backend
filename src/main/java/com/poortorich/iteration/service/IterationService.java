@@ -9,28 +9,23 @@ import com.poortorich.accountbook.entity.enums.IterationType;
 import com.poortorich.accountbook.request.enums.IterationAction;
 import com.poortorich.global.exceptions.BadRequestException;
 import com.poortorich.iteration.entity.Iteration;
-import com.poortorich.iteration.entity.enums.Weekday;
-import com.poortorich.iteration.entity.enums.EndType;
 import com.poortorich.iteration.entity.enums.IterationRuleType;
-import com.poortorich.iteration.entity.enums.MonthlyMode;
 import com.poortorich.iteration.entity.info.IterationInfo;
+import com.poortorich.iteration.mapper.IterationMapper;
+import com.poortorich.iteration.provider.IterationCalculatorProvider;
 import com.poortorich.iteration.repository.IterationInfoRepository;
 import com.poortorich.iteration.repository.IterationRepository;
 import com.poortorich.iteration.request.CustomIteration;
-import com.poortorich.iteration.request.End;
 import com.poortorich.iteration.request.IterationRule;
-import com.poortorich.iteration.request.MonthlyOption;
 import com.poortorich.iteration.response.CustomIterationInfoResponse;
 import com.poortorich.iteration.response.IterationResponse;
 import com.poortorich.iteration.util.IterationBuilder;
-import com.poortorich.iteration.util.IterationDateCalculator;
 import com.poortorich.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.EnumSet;
 import java.util.List;
 
 @Service
@@ -40,7 +35,7 @@ public class IterationService {
     private static final String MODIFY_TYPE = "modify";
     private static final String DELETE_TYPE = "delete";
 
-    private final IterationDateCalculator dateCalculator;
+    private final IterationCalculatorProvider calculatorProvider;
     private final IterationRepository iterationRepository;
     private final IterationInfoRepository iterationInfoRepository;
 
@@ -69,7 +64,7 @@ public class IterationService {
     ) {
         List<AccountBook> iterations = new ArrayList<>();
         LocalDate date = getDateByIterationType(customIteration, startDate, startDate, accountBook.getIterationType());
-        LocalDate endDate = calculateEndDate(customIteration, accountBook, startDate);
+        LocalDate endDate = calculatorProvider.calculateEndDateByType(customIteration, accountBook, startDate);
         int maxIterations = 0;
         int allowedIterations = getAllowedIterations(accountBook.getIterationType(), customIteration);
 
@@ -91,54 +86,12 @@ public class IterationService {
             CustomIteration customIteration, LocalDate date, LocalDate startDate, IterationType type) {
         if (type == IterationType.CUSTOM) {
             IterationRule rule = customIteration.getIterationRule();
-            return calculateDateByRuleType(customIteration.getCycle(), date, startDate, rule, rule.getMonthlyOption());
+            return calculatorProvider.calculateDateByRuleType(
+                    customIteration.getCycle(), date, startDate, rule, rule.getMonthlyOption()
+            );
         }
 
-        return calculateDateByIterationType(type, date, startDate);
-    }
-
-    private LocalDate calculateEndDate(CustomIteration customIteration, AccountBook accountBook, LocalDate startDate) {
-        if (accountBook.getIterationType() == IterationType.CUSTOM) {
-            return calculateEndDate(customIteration.getEnd(), customIteration, startDate);
-        }
-
-        if (accountBook.getIterationType() == IterationType.DAILY || accountBook.getIterationType() == IterationType.WEEKDAY) {
-            return dateCalculator.yearlyTypeDate(startDate, 3, startDate);
-        }
-
-        return dateCalculator.yearlyTypeDate(startDate, 10, startDate);
-    }
-
-    private LocalDate calculateEndDate(End end, CustomIteration customIteration, LocalDate startDate) {
-        if (end.parseEndType() == EndType.NEVER) {
-            return calculateEndDateByIterationRule(customIteration.getIterationRule().parseIterationType(), startDate);
-        }
-
-        if (end.parseEndType() == EndType.AFTER) {
-            IterationRule rule = customIteration.getIterationRule();
-
-            if (rule.parseIterationType() == IterationRuleType.WEEKLY) {
-                return dateCalculator.weeklyEndDate(
-                        startDate, end.getCount() * customIteration.getCycle() - 1, rule.daysOfWeekToList());
-            }
-
-            return calculateDateByRuleType(
-                    end.getCount() * customIteration.getCycle() - 1, startDate, startDate, rule, rule.getMonthlyOption());
-        }
-
-        return end.parseDate();
-    }
-
-    private LocalDate calculateEndDateByIterationRule(IterationRuleType rule, LocalDate startDate) {
-        if (rule == IterationRuleType.DAILY) {
-            return dateCalculator.yearlyTypeDate(startDate, 3, startDate);
-        }
-
-        if (rule == IterationRuleType.WEEKLY) {
-            return dateCalculator.yearlyTypeDate(startDate, 5, startDate);
-        }
-
-        return dateCalculator.yearlyTypeDate(startDate, 10, startDate);
+        return calculatorProvider.defaultCalculateDateByType(type, date, startDate);
     }
 
     private int getAllowedIterations(IterationType type, CustomIteration customIteration) {
@@ -147,68 +100,6 @@ public class IterationService {
         }
 
         return IterationRuleType.DAILY.maxIterations;
-    }
-
-    private LocalDate calculateDateByIterationType(IterationType type, LocalDate date, LocalDate startDate) {
-        if (type == IterationType.DAILY) {
-            return dateCalculator.dailyTypeDate(date, 1);
-        }
-
-        if (type == IterationType.WEEKLY) {
-            return dateCalculator.weeklyTypeDate(date, 1);
-        }
-
-        if (type == IterationType.MONTHLY) {
-            return dateCalculator.monthlyTypeDate(date, 1);
-        }
-
-        if (type == IterationType.YEARLY) {
-            return dateCalculator.yearlyTypeDate(date, 1, startDate);
-        }
-
-        if (type == IterationType.WEEKDAY) {
-            List<Weekday> allWeekdays = new ArrayList<>(EnumSet.allOf(Weekday.class));
-            return dateCalculator.weeklyTypeDate(date, 1, allWeekdays);
-        }
-
-        return dateCalculator.monthlyTypeEndModeDate(date);
-    }
-
-    private LocalDate calculateDateByRuleType(
-            int cycle, LocalDate date, LocalDate startDate, IterationRule rule, MonthlyOption monthlyOption) {
-        if (rule.parseIterationType() == IterationRuleType.DAILY) {
-            return dateCalculator.dailyTypeDate(date, cycle);
-        }
-
-        if (rule.parseIterationType() == IterationRuleType.WEEKLY) {
-            return dateCalculator.weeklyTypeDate(date, cycle, rule.daysOfWeekToList());
-        }
-
-        if (rule.parseIterationType() == IterationRuleType.MONTHLY) {
-            return processCalculatorByMonthlyRule(
-                    date, cycle, monthlyOption, monthlyOption.parseMonthlyMode());
-        }
-
-        return dateCalculator.yearlyTypeDate(date, cycle, startDate);
-    }
-
-    private LocalDate processCalculatorByMonthlyRule(
-            LocalDate date, int cycle, MonthlyOption option, MonthlyMode mode) {
-        LocalDate targetDate = date.plusMonths(cycle);
-
-        if (mode == MonthlyMode.DAY) {
-            return dateCalculator.monthlyTypeDayModeDate(targetDate, option.getDay());
-        }
-
-        if (mode == MonthlyMode.WEEKDAY) {
-            return dateCalculator.monthlyTypeWeekDayModeDate(targetDate, option.getWeek(), option.parseDayOfWeek());
-        }
-
-        if (mode == MonthlyMode.END) {
-            return dateCalculator.monthlyTypeEndModeDate(targetDate);
-        }
-
-        return targetDate;
     }
 
     public void createIterationInfo(
@@ -253,9 +144,9 @@ public class IterationService {
     public CustomIterationInfoResponse getCustomIteration(Iteration iteration) {
         IterationInfo iterationInfo = iteration.getIterationInfo();
         return CustomIterationInfoResponse.builder()
-                .iterationRule(IterationBuilder.buildIterationRuleByRuleType(iterationInfo))
+                .iterationRule(IterationMapper.toIterationRuleInfo(iterationInfo))
                 .cycle(iterationInfo.getCycle())
-                .end(IterationBuilder.buildEndInfoResponseByEndType(iterationInfo))
+                .end(IterationMapper.toEndInfo(iterationInfo))
                 .build();
     }
 
