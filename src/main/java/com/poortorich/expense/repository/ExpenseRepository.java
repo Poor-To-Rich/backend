@@ -1,6 +1,5 @@
 package com.poortorich.expense.repository;
 
-import com.poortorich.accountbook.entity.AccountBook;
 import com.poortorich.category.entity.Category;
 import com.poortorich.expense.entity.Expense;
 import com.poortorich.user.entity.User;
@@ -17,7 +16,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ExpenseRepository extends JpaRepository<Expense, Long> {
 
-    Optional<Expense> findByIdAndUser(Long id, User user);
+    Optional<Expense> findByUserAndId(User user, Long id);
 
     List<Expense> findByUserAndExpenseDateBetween(User user, LocalDate startDate, LocalDate endDate);
 
@@ -74,7 +73,7 @@ public interface ExpenseRepository extends JpaRepository<Expense, Long> {
               AND e.expenseDate >= :cursor
             ORDER BY e.expenseDate ASC
             """)
-    Slice<? extends AccountBook> findExpenseByUserWithinDateRangeWithCursorAsc(
+    Slice<Expense> findExpenseByUserWithinDateRangeWithCursorAsc(
             @Param("user") User user,
             @Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate,
@@ -91,7 +90,7 @@ public interface ExpenseRepository extends JpaRepository<Expense, Long> {
               AND e.expenseDate <= :cursor
             ORDER BY e.expenseDate DESC
             """)
-    Slice<? extends AccountBook> findExpenseByUserWithinDateRangeWithCursorDesc(
+    Slice<Expense> findExpenseByUserWithinDateRangeWithCursorDesc(
             @Param("user") User user,
             @Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate,
