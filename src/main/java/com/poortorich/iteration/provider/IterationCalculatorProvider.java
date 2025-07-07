@@ -125,7 +125,7 @@ public class IterationCalculatorProvider {
         }
 
         if (type == IterationType.WEEKDAY) {
-            List<Weekday> allWeekdays = new ArrayList<>(EnumSet.allOf(Weekday.class));
+            List<Weekday> allWeekdays = Weekday.getWeekdays();
             return dateCalculator.weeklyTypeDate(date, 1, allWeekdays);
         }
 
