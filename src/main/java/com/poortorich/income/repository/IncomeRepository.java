@@ -17,7 +17,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface IncomeRepository extends JpaRepository<Income, Long> {
 
-    Optional<AccountBook> findByIdAndUser(Long id, User user);
+    Optional<AccountBook> findByUserAndId(User user, Long id);
 
     List<Income> findByUserAndIncomeDateBetween(User user, LocalDate startDate, LocalDate endDate);
 
@@ -73,7 +73,7 @@ public interface IncomeRepository extends JpaRepository<Income, Long> {
               AND i.incomeDate >= :cursor
             ORDER BY i.incomeDate ASC
             """)
-    Slice<? extends AccountBook> findIncomeByUserWithinDateRangeWithCursorAsc(
+    Slice<Income> findIncomeByUserWithinDateRangeWithCursorAsc(
             @Param("user") User user,
             @Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate,
@@ -90,7 +90,7 @@ public interface IncomeRepository extends JpaRepository<Income, Long> {
               AND i.incomeDate <= :cursor
             ORDER BY i.incomeDate Desc
             """)
-    Slice<? extends AccountBook> findIncomeByUserWithinDateRangeWithCursorDesc(
+    Slice<Income> findIncomeByUserWithinDateRangeWithCursorDesc(
             @Param("user") User user,
             @Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate,

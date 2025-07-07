@@ -2,19 +2,16 @@ package com.poortorich.accountbook.repository;
 
 import com.poortorich.accountbook.entity.AccountBook;
 import com.poortorich.accountbook.enums.AccountBookType;
+import com.poortorich.accountbook.util.strategy.AccountBookStrategyFactory;
 import com.poortorich.category.entity.Category;
-import com.poortorich.expense.entity.Expense;
-import com.poortorich.expense.repository.ExpenseRepository;
-import com.poortorich.income.entity.Income;
-import com.poortorich.income.repository.IncomeRepository;
 import com.poortorich.user.entity.User;
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
-import org.springframework.data.domain.SliceImpl;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Component;
 
@@ -22,76 +19,42 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class AccountBookRepository {
 
-    private final ExpenseRepository expenseRepository;
-    private final IncomeRepository incomeRepository;
+    private final AccountBookStrategyFactory strategyFactory;
 
     public void save(AccountBook accountBook, AccountBookType type) {
-        switch (type) {
-            case EXPENSE -> expenseRepository.save((Expense) accountBook);
-            case INCOME -> incomeRepository.save((Income) accountBook);
-        }
+        strategyFactory.getStrategy(type).save(accountBook);
     }
 
     public List<AccountBook> saveAll(List<AccountBook> accountBooks, AccountBookType type) {
-        List<? extends AccountBook> savedAccountBooks = switch (type) {
-            case EXPENSE -> expenseRepository.saveAll(accountBooks.stream()
-                    .map(accountBook -> (Expense) accountBook)
-                    .toList());
-            case INCOME -> incomeRepository.saveAll(accountBooks.stream()
-                    .map(accountBook -> (Income) accountBook)
-                    .toList());
-        };
-
-        return mapToAccountBooks(savedAccountBooks);
+        return strategyFactory.getStrategy(type).saveAll(accountBooks);
     }
 
     public Optional<AccountBook> findByIdAndUser(Long id, User user, AccountBookType type) {
-        Optional<? extends AccountBook> accountBook = switch (type) {
-            case EXPENSE -> expenseRepository.findByIdAndUser(id, user);
-            case INCOME -> incomeRepository.findByIdAndUser(id, user);
-        };
-
-        return accountBook.map(entity -> (AccountBook) entity);
+        return strategyFactory.getStrategy(type).findByUserAndId(user, id);
     }
 
     public void delete(AccountBook accountBook, AccountBookType type) {
-        switch (type) {
-            case EXPENSE -> expenseRepository.delete((Expense) accountBook);
-            case INCOME -> incomeRepository.delete((Income) accountBook);
-        }
+        strategyFactory.getStrategy(type).delete(accountBook);
     }
 
     public void deleteAll(List<AccountBook> accountBooks, AccountBookType type) {
-        switch (type) {
-            case EXPENSE -> expenseRepository.deleteAll(accountBooks.stream()
-                    .map(accountBook -> (Expense) accountBook)
-                    .toList());
-            case INCOME -> incomeRepository.deleteAll(accountBooks.stream()
-                    .map(accountBook -> (Income) accountBook)
-                    .toList());
-        }
+        strategyFactory.getStrategy(type).deleteAll(accountBooks);
     }
 
     public boolean findByUserAndCategory(User user, Category category, AccountBookType type) {
-        List<? extends AccountBook> accountBooks = switch (type) {
-            case EXPENSE -> expenseRepository.findByUserAndCategory(user, category);
-            case INCOME -> incomeRepository.findByUserAndCategory(user, category);
-        };
-
-        return !accountBooks.isEmpty();
+        return strategyFactory
+                .getStrategy(type)
+                .findByUserAndCategory(user, category)
+                .isEmpty();
     }
 
     public List<AccountBook> findByUserAndExpenseAndDateBetween(
             User user,
             LocalDate startDate,
             LocalDate endDate,
-            AccountBookType type) {
-        List<? extends AccountBook> accountBooks = switch (type) {
-            case EXPENSE -> expenseRepository.findByUserAndExpenseDateBetween(user, startDate, endDate);
-            case INCOME -> incomeRepository.findByUserAndIncomeDateBetween(user, startDate, endDate);
-        };
-
-        return mapToAccountBooks(accountBooks);
+            AccountBookType type
+    ) {
+        return strategyFactory.getStrategy(type).findByUserAndDateBetween(user, startDate, endDate);
     }
 
     public List<AccountBook> getAccountBookByCategoryBetweenDates(
@@ -100,17 +63,11 @@ public class AccountBookRepository {
             LocalDate startDate,
             LocalDate endDate
     ) {
-        List<? extends AccountBook> accountBooks = switch (category.getType()) {
-            case DEFAULT_EXPENSE, CUSTOM_EXPENSE ->
-                    expenseRepository.findByUserAndCategoryAndExpenseDateBetween(user, category, startDate, endDate);
-            case DEFAULT_INCOME, CUSTOM_INCOME ->
-                    incomeRepository.findByUserAndCategoryAndIncomeDateBetween(user, category, startDate, endDate);
-        };
-
-        return mapToAccountBooks(accountBooks);
+        return strategyFactory.getStrategy(category)
+                .findByUserAndCategoryAndDateBetween(user, category, startDate, endDate);
     }
 
-    public Slice<AccountBook> findByUserAndCategoryWithinDateRangeWithCursor(
+    public Slice<AccountBook> getPageByDate(
             User user,
             Category category,
             LocalDate startDate,
@@ -119,35 +76,16 @@ public class AccountBookRepository {
             Direction direction,
             Pageable pageable
     ) {
-        Slice<? extends AccountBook> accountBookPage = switch (category.getType()) {
-            case DEFAULT_EXPENSE, CUSTOM_EXPENSE -> {
-                if (direction == Direction.ASC) {
-                    yield expenseRepository.findExpenseByUserAndCategoryWithinDateRangeWithCursorAsc(
-                            user, category, startDate, cursor, endDate, pageable
-                    );
-                }
-                yield expenseRepository.findExpenseByUserAndCategoryWithinDateRangeWithCursorDesc(
-                        user, category, startDate, cursor, endDate, pageable
+        return strategyFactory.getStrategy(category)
+                .findByUserAndCategoryWithinDateRangeWithCursor(
+                        user,
+                        category,
+                        startDate,
+                        cursor,
+                        endDate,
+                        direction,
+                        pageable
                 );
-            }
-            case DEFAULT_INCOME, CUSTOM_INCOME -> {
-                if (direction == Direction.ASC) {
-                    yield incomeRepository.findIncomeByUserAndCategoryWithinDateRangeWithCursorAsc(
-                            user, category, startDate, cursor, endDate, pageable
-                    );
-                }
-                yield incomeRepository.findIncomeByUserAndCategoryWithinDateRangeWithCursorDesc(
-                        user, category, startDate, cursor, endDate, pageable
-                );
-            }
-        };
-
-        return new SliceImpl<>(
-                accountBookPage.stream()
-                        .map(accountBook -> (AccountBook) accountBook)
-                        .toList(),
-                pageable,
-                accountBookPage.hasNext());
     }
 
     public Slice<AccountBook> findByUserWithinDateRangeWithCursor(
@@ -158,67 +96,44 @@ public class AccountBookRepository {
             Pageable pageable,
             AccountBookType type
     ) {
-        Slice<? extends AccountBook> accountBookPage = switch (type) {
-            case EXPENSE ->
-                    expenseRepository.findExpenseByUserWithinDateRangeWithCursorAsc(user, startDate, endDate, cursor,
-                            pageable);
-            case INCOME ->
-                    incomeRepository.findIncomeByUserWithinDateRangeWithCursorAsc(user, startDate, endDate, cursor,
-                            pageable);
-        };
-
-        return new SliceImpl<>(
-                accountBookPage.stream()
-                        .map(accountBook -> (AccountBook) accountBook)
-                        .toList(),
-                pageable,
-                accountBookPage.hasNext()
-        );
+        return strategyFactory.getStrategy(type)
+                .findByUserWithinDateRangeWithCursor(
+                        user,
+                        startDate,
+                        endDate,
+                        cursor,
+                        pageable
+                );
     }
 
     public List<AccountBook> findByUserAndCategoryAndAccountBookDate(
             User user,
             Category category,
-            LocalDate accountBookDate) {
-        List<? extends AccountBook> accountBooks = switch (category.getType()) {
-            case DEFAULT_EXPENSE, CUSTOM_EXPENSE ->
-                    expenseRepository.findByUserAndCategoryAndExpenseDate(user, category, accountBookDate);
-            case DEFAULT_INCOME, CUSTOM_INCOME ->
-                    incomeRepository.findByUserAndCategoryAndIncomeDate(user, category, accountBookDate);
-        };
-
-        return mapToAccountBooks(accountBooks);
+            LocalDate accountBookDate
+    ) {
+        return strategyFactory.getStrategy(category)
+                .findByUserAndCategoryAndDateBetween(user, category, accountBookDate, accountBookDate);
     }
 
     public List<AccountBook> findByUserAndDate(User user, LocalDate accountBookDate, AccountBookType type) {
-        List<? extends AccountBook> accountBooks = switch (type) {
-            case EXPENSE -> expenseRepository.findByUserAndExpenseDate(user, accountBookDate);
-            case INCOME -> incomeRepository.findByUserAndIncomeDate(user, accountBookDate);
-        };
-
-        return mapToAccountBooks(accountBooks);
+        return strategyFactory.getStrategy(type).findByUserAndDate(user, accountBookDate);
     }
 
     public Long countByUserAndCategoryBetweenDates(
             User user,
             Category category,
             LocalDate startDate,
-            LocalDate endDate) {
-        return switch (category.getType()) {
-            case DEFAULT_EXPENSE, CUSTOM_EXPENSE -> expenseRepository.countByUserAndCategoryBetweenDates(
-                    user, category, startDate, endDate
-            );
-            case DEFAULT_INCOME, CUSTOM_INCOME -> incomeRepository.countByUserAndCategoryBetweenDates(
-                    user, category, startDate, endDate
-            );
-        };
+            LocalDate endDate
+    ) {
+        return strategyFactory.getStrategy(category)
+                .countByUserAndCategoryBetweenDates(user, category, startDate, endDate);
     }
 
     public Long countByUserAndBetweenDates(User user, LocalDate startDate, LocalDate endDate) {
-        Long expenseCount = expenseRepository.countByUserAndBetweenDates(user, startDate, endDate);
-        Long incomeCount = incomeRepository.countByUserAndBetweenDates(user, startDate, endDate);
-
-        return expenseCount + incomeCount;
+        return Arrays.stream(AccountBookType.values())
+                .mapToLong(type ->
+                        strategyFactory.getStrategy(type).countByUserAndBetweenDates(user, startDate, endDate))
+                .sum();
     }
 
     private List<AccountBook> mapToAccountBooks(List<? extends AccountBook> accountBooks) {
@@ -228,7 +143,8 @@ public class AccountBookRepository {
     }
 
     public void deleteAllAccountBooksByUser(User user) {
-        expenseRepository.deleteByUser(user);
-        incomeRepository.deleteByUser(user);
+        for (var type : AccountBookType.values()) {
+            strategyFactory.getStrategy(type).deleteByUser(user);
+        }
     }
 }
