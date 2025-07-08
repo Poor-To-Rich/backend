@@ -55,13 +55,27 @@ public class ChartDataMapper {
                 .toList();
     }
 
-    public List<PeriodTotal> mapToPeriodTotals(Map<DateInfo, List<AccountBook>> accountBookGroupByDateInfo) {
+    public List<PeriodTotal> mapToPeriodTotalsForBar(Map<DateInfo, List<AccountBook>> accountBookGroupByDateInfo) {
         return accountBookGroupByDateInfo.entrySet().stream()
                 .map(entry -> {
                     DateInfo dateInfo = entry.getKey();
                     Long total = AccountBookCalculator.sum(entry.getValue());
                     return PeriodTotal.builder()
                             .period(PeriodFormatter.formatByDateInfo(dateInfo))
+                            .totalAmount(total)
+                            .label(AmountFormatter.convertAmount(total))
+                            .build();
+                })
+                .toList();
+    }
+
+    public List<PeriodTotal> mapToPeriodTotalsForVertical(Map<DateInfo, List<AccountBook>> accountBookGroupByDateInfo) {
+        return accountBookGroupByDateInfo.entrySet().stream()
+                .map(entry -> {
+                    DateInfo dateInfo = entry.getKey();
+                    Long total = AccountBookCalculator.sum(entry.getValue());
+                    return PeriodTotal.builder()
+                            .period(PeriodFormatter.formatMonthKorean(dateInfo.getStartDate().getMonth()))
                             .totalAmount(total)
                             .label(AmountFormatter.convertAmount(total))
                             .build();
