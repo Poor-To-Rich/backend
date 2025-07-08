@@ -21,6 +21,8 @@ public enum Weekday {
     FRIDAY("금"),
     SATURDAY("토");
 
+    private static final List<Weekday> WEEKDAYS = List.of(MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY);
+
     private final String type;
 
     public static Weekday from(String type) {
@@ -40,6 +42,9 @@ public enum Weekday {
                 .toList();
     }
 
+    public static List<Weekday> getWeekdays() {
+        return WEEKDAYS;
+    }
 
     public static Weekday fromDayOfWeek(DayOfWeek dayOfWeek) {
         return Weekday.values()[dayOfWeek.getValue() % 7];
