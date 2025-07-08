@@ -12,6 +12,7 @@ import com.poortorich.user.request.ProfileUpdateRequest;
 import com.poortorich.user.request.UserRegistrationRequest;
 import com.poortorich.user.request.UsernameCheckRequest;
 import com.poortorich.user.response.enums.UserResponse;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -103,9 +104,11 @@ public class UserController {
     }
 
     @DeleteMapping("/leave")
-    public ResponseEntity<BaseResponse> deleteUserAccount(@AuthenticationPrincipal UserDetails userDetails) {
+    public ResponseEntity<BaseResponse> deleteUserAccount(
+            HttpServletResponse response,
+            @AuthenticationPrincipal UserDetails userDetails
+    ) {
         userFacade.resetAllByUser(userDetails.getUsername());
-        Response response = userFacade.deleteUserAccount(userDetails.getUsername());
-        return BaseResponse.toResponseEntity(response);
+        return BaseResponse.toResponseEntity(userFacade.deleteUserAccount(userDetails.getUsername(), response));
     }
 }
