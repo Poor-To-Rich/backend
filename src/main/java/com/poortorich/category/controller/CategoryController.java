@@ -3,7 +3,7 @@ package com.poortorich.category.controller;
 import com.poortorich.category.entity.enums.CategoryType;
 import com.poortorich.category.request.CategoryInfoRequest;
 import com.poortorich.category.request.CategoryVisibilityRequest;
-import com.poortorich.category.response.CategoryResponse;
+import com.poortorich.category.response.enums.CategoryResponse;
 import com.poortorich.category.response.CustomCategoriesResponse;
 import com.poortorich.category.response.CustomCategoryResponse;
 import com.poortorich.category.response.DefaultCategoriesResponse;

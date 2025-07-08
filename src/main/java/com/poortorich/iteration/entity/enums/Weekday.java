@@ -1,7 +1,7 @@
 package com.poortorich.iteration.entity.enums;
 
 import com.poortorich.global.exceptions.BadRequestException;
-import com.poortorich.iteration.response.IterationResponse;
+import com.poortorich.iteration.response.enums.IterationResponse;
 import lombok.RequiredArgsConstructor;
 
 import java.time.DayOfWeek;

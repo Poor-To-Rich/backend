@@ -1,4 +1,4 @@
-package com.poortorich.accountbook.response;
+package com.poortorich.accountbook.response.enums;
 
 import com.poortorich.accountbook.constants.AccountBookResponseMessages;
 import com.poortorich.global.response.Response;

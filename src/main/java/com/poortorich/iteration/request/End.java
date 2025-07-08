@@ -5,7 +5,7 @@ import com.poortorich.global.exceptions.BadRequestException;
 import com.poortorich.iteration.constants.IterationResponseMessages;
 import com.poortorich.iteration.constants.IterationValidationConstraints;
 import com.poortorich.iteration.entity.enums.EndType;
-import com.poortorich.iteration.response.IterationResponse;
+import com.poortorich.iteration.response.enums.IterationResponse;
 import com.poortorich.iteration.validator.EndCheck;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
