@@ -95,7 +95,7 @@ public class UserService {
 
     public void updateEmail(String username, EmailUpdateRequest emailUpdateRequest) {
         User user = findUserByUsername(username);
-        user.updateEmail(emailUpdateRequest.getNewEmail());
+        user.updateEmail(emailUpdateRequest.getEmail());
     }
 
     public void deleteUserAccount(User user) {

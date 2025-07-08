@@ -94,7 +94,7 @@ public class UserFacade {
 
     @Transactional
     public Response updateUserEmail(String username, EmailUpdateRequest emailUpdateRequest) {
-        userValidationService.validateEmail(emailUpdateRequest.getNewEmail());
+        userValidationService.validateEmail(emailUpdateRequest.getEmail());
         userService.updateEmail(username, emailUpdateRequest);
         return UserResponse.USER_EMAIL_UPDATE_SUCCESS;
     }
