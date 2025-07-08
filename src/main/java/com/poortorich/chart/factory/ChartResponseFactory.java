@@ -46,7 +46,7 @@ public class ChartResponseFactory {
     ) {
         long average = dataAggregator.calculateAverage(accountBookGroupByDateInfo);
         String differenceAmount = dataAggregator.calculateDifferenceAmount(accountBookGroupByDateInfo);
-        List<PeriodTotal> periodTotals = dataMapper.mapToPeriodTotals(accountBookGroupByDateInfo);
+        List<PeriodTotal> periodTotals = dataMapper.mapToPeriodTotalsForBar(accountBookGroupByDateInfo);
 
         return AccountBookBarResponse.builder()
                 .differenceAmount(differenceAmount)
@@ -63,7 +63,7 @@ public class ChartResponseFactory {
         return CategoryLineResponse.builder()
                 .period(PeriodFormatter.formatLocalDateRange(monthInfo.getStartDate(), monthInfo.getEndDate()))
                 .totalAmount(AccountBookCalculator.sum(accountBooks))
-                .weeklyAmounts(dataMapper.mapToPeriodTotals(weeklyAccountBooks))
+                .weeklyAmounts(dataMapper.mapToPeriodTotalsForBar(weeklyAccountBooks))
                 .build();
     }
 
@@ -75,7 +75,7 @@ public class ChartResponseFactory {
         return CategoryVerticalResponse.builder()
                 .period(PeriodFormatter.formatLocalDateRange(yearInfo.getStartDate(), yearInfo.getEndDate()))
                 .totalAmount(AccountBookCalculator.sum(accountBooks))
-                .monthlyAmounts(dataMapper.mapToPeriodTotals(monthlyAccountBooks))
+                .monthlyAmounts(dataMapper.mapToPeriodTotalsForVertical(monthlyAccountBooks))
                 .build();
     }
 
