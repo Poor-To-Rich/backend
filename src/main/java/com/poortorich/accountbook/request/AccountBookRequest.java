@@ -4,7 +4,7 @@ import com.poortorich.accountbook.constants.AccountBookResponseMessages;
 import com.poortorich.accountbook.constants.AccountBookValidationConstraints;
 import com.poortorich.accountbook.entity.enums.IterationType;
 import com.poortorich.accountbook.request.enums.IterationAction;
-import com.poortorich.accountbook.response.AccountBookResponse;
+import com.poortorich.accountbook.response.enums.AccountBookResponse;
 import com.poortorich.global.date.constants.DatePattern;
 import com.poortorich.global.exceptions.BadRequestException;
 import com.poortorich.iteration.request.CustomIteration;

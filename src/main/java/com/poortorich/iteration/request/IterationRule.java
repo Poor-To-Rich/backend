@@ -2,7 +2,7 @@ package com.poortorich.iteration.request;
 
 import com.poortorich.iteration.entity.enums.Weekday;
 import com.poortorich.iteration.entity.enums.IterationRuleType;
-import com.poortorich.iteration.validator.IterationRuleCheck;
+import com.poortorich.iteration.validator.annotations.IterationRuleCheck;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

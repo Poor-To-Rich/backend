@@ -3,7 +3,7 @@ package com.poortorich.expense.controller;
 import com.poortorich.expense.facade.ExpenseFacade;
 import com.poortorich.accountbook.request.AccountBookDeleteRequest;
 import com.poortorich.expense.request.ExpenseRequest;
-import com.poortorich.expense.response.ExpenseResponse;
+import com.poortorich.expense.response.enums.ExpenseResponse;
 import com.poortorich.global.response.BaseResponse;
 import com.poortorich.global.response.DataResponse;
 import jakarta.validation.Valid;

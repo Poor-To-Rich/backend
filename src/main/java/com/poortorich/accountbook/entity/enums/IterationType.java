@@ -1,6 +1,6 @@
 package com.poortorich.accountbook.entity.enums;
 
-import com.poortorich.accountbook.response.AccountBookResponse;
+import com.poortorich.accountbook.response.enums.AccountBookResponse;
 import com.poortorich.global.exceptions.BadRequestException;
 import lombok.RequiredArgsConstructor;
 

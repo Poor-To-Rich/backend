@@ -9,7 +9,7 @@ import com.poortorich.category.request.CategoryInfoRequest;
 import com.poortorich.category.request.CategoryVisibilityRequest;
 import com.poortorich.category.response.ActiveCategoriesResponse;
 import com.poortorich.category.response.CategoryInfoResponse;
-import com.poortorich.category.response.CategoryResponse;
+import com.poortorich.category.response.enums.CategoryResponse;
 import com.poortorich.category.response.CustomCategoryResponse;
 import com.poortorich.category.response.DefaultCategoryResponse;
 import com.poortorich.global.exceptions.BadRequestException;

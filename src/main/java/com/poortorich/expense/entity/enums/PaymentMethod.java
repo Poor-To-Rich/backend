@@ -1,6 +1,6 @@
 package com.poortorich.expense.entity.enums;
 
-import com.poortorich.expense.response.ExpenseResponse;
+import com.poortorich.expense.response.enums.ExpenseResponse;
 import com.poortorich.global.exceptions.BadRequestException;
 import lombok.RequiredArgsConstructor;
 

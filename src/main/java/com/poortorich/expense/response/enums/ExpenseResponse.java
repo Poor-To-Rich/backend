@@ -1,4 +1,4 @@
-package com.poortorich.expense.response;
+package com.poortorich.expense.response.enums;
 
 import com.poortorich.expense.constants.ExpenseResponseMessages;
 import com.poortorich.global.response.Response;

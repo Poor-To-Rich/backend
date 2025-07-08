@@ -2,7 +2,7 @@ package com.poortorich.iteration.request;
 
 import com.poortorich.iteration.entity.enums.Weekday;
 import com.poortorich.iteration.entity.enums.MonthlyMode;
-import com.poortorich.iteration.validator.MonthlyOptionCheck;
+import com.poortorich.iteration.validator.annotations.MonthlyOptionCheck;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

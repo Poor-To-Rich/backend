@@ -1,4 +1,4 @@
-package com.poortorich.iteration.response;
+package com.poortorich.iteration.response.enums;
 
 import com.poortorich.global.response.Response;
 import com.poortorich.iteration.constants.IterationResponseMessages;

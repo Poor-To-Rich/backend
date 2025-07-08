@@ -13,7 +13,7 @@ import com.poortorich.accountbook.util.AccountBookExtractor;
 import com.poortorich.accountbook.util.AccountBookMerger;
 import com.poortorich.category.entity.Category;
 import com.poortorich.category.entity.enums.CategoryType;
-import com.poortorich.expense.response.ExpenseResponse;
+import com.poortorich.expense.response.enums.ExpenseResponse;
 import com.poortorich.global.date.domain.DateInfo;
 import com.poortorich.global.exceptions.NotFoundException;
 import com.poortorich.income.response.enums.IncomeResponse;
