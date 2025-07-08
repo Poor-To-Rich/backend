@@ -51,7 +51,7 @@ public class PeriodFormatter {
     public static String formatByDateInfo(DateInfo dateInfo) {
         return switch (dateInfo) {
             case YearInformation yearInfo -> yearInfo.getYear().toString();
-            case MonthInformation monthInfo -> formatMonthKorean(monthInfo.getYearMonth().getMonth());
+            case MonthInformation monthInfo -> monthInfo.getYearMonth().toString();
             case WeekInformation weekInfo -> formatLocalDateRange(weekInfo.getStartDate(), weekInfo.getEndDate());
             default -> throw new BadRequestException(DateResponse.UNSUPPORTED_DATE_FORMAT);
         };
