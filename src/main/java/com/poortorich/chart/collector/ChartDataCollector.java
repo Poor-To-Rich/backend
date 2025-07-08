@@ -116,7 +116,10 @@ public class ChartDataCollector {
     }
 
     public Long getTotalCostExcludingCategory(
-            User user, DateInfo dateInfo, Category savingCategory, AccountBookType type
+            User user,
+            DateInfo dateInfo,
+            Category savingCategory,
+            AccountBookType type
     ) {
         return accountBookService.getTotalCostExcludingCategory(user, dateInfo, savingCategory, type);
     }

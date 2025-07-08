@@ -26,8 +26,6 @@ import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-
-import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -242,8 +240,12 @@ public class AccountBookService {
 
     public Long getTotalCostByCategory(User user, DateInfo dateInfo, Category category, AccountBookType type) {
         List<AccountBook> accountBooks = getAccountBookBetweenDates(
-                user, dateInfo.getStartDate(), dateInfo.getEndDate(), type
-        );
+                user,
+                dateInfo.getStartDate(),
+                dateInfo.getEndDate(),
+                type);
+        
+        accountBooks = AccountBookExtractor.extractByCategory(accountBooks, category);
 
         return AccountBookCalculator.sum(accountBooks);
     }
