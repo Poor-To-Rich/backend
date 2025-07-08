@@ -80,14 +80,14 @@ public class ChartResponseFactory {
     }
 
     public CategorySectionResponse createCategorySectionResponse(
-            List<CategoryLog> categoryLogs, PaginationResult paginationResult
+            List<CategoryLog> categoryLogs,
+            Long countOfLog,
+            PaginationResult paginationResult
     ) {
         return CategorySectionResponse.builder()
                 .hasNext(paginationResult.getHasNext())
                 .nextCursor(paginationResult.getNextCursor())
-                .countOfLogs(categoryLogs.stream()
-                        .mapToLong(CategoryLog::getCountOfTransactions)
-                        .sum())
+                .countOfLogs(countOfLog)
                 .categoryLogs(categoryLogs)
                 .build();
     }

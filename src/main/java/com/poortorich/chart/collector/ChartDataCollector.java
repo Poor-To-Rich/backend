@@ -127,4 +127,13 @@ public class ChartDataCollector {
     public Long getTotalCostByCategory(User user, DateInfo dateInfo, Category savingCategory, AccountBookType type) {
         return accountBookService.getTotalCostByCategory(user, dateInfo, savingCategory, type);
     }
+
+    public Long getCountOfLogs(ChartDataContext context) {
+        return accountBookService.countByUserAndCategoryAndBetweenDates(
+                context.getUser(),
+                context.getCategory(),
+                context.getDateInfo().getStartDate(),
+                context.getDateInfo().getEndDate()
+        );
+    }
 }
