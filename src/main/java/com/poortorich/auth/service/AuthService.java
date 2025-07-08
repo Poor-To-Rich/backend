@@ -40,7 +40,7 @@ public class AuthService {
     private final JwtTokenGenerator tokenGenerator;
     private final JwtTokenValidator tokenValidator;
     private final JwtTokenExtractor tokenExtractor;
-    private final JwtTokenManager cookieManager;
+    private final JwtTokenManager tokenManager;
 
     public AccessTokenResponse login(LoginRequest loginRequest, HttpServletResponse response) {
         if (!userRepository.existsByUsername(loginRequest.getUsername())) {
@@ -58,7 +58,7 @@ public class AuthService {
         String refreshToken = tokenGenerator.generateRefreshToken(user);
 
         refreshTokenRepository.save(user.getId(), refreshToken);
-        cookieManager.setRefreshTokens(response, refreshToken);
+        tokenManager.setRefreshTokens(response, refreshToken);
 
         return AccessTokenResponse.builder()
                 .accessToken(JwtConstants.TOKEN_PREFIX + accessToken)
@@ -66,7 +66,7 @@ public class AuthService {
     }
 
     public AccessTokenResponse refreshToken(HttpServletRequest request, HttpServletResponse response) {
-        Optional<String> refreshTokenOpt = cookieManager.extractRefreshTokenFromCookies(request);
+        Optional<String> refreshTokenOpt = tokenManager.extractRefreshTokenFromCookies(request);
 
         if (refreshTokenOpt.isEmpty()) {
             System.out.println("토큰이 없습니다.");
@@ -85,7 +85,7 @@ public class AuthService {
             refreshTokenRepository.deleteByUserIdAndToken(user.getId(), refreshToken);
             refreshTokenRepository.save(user.getId(), newRefreshToken);
 
-            cookieManager.setRefreshTokens(response, newRefreshToken);
+            tokenManager.setRefreshTokens(response, newRefreshToken);
 
             return AccessTokenResponse.builder()
                     .accessToken(JwtConstants.TOKEN_PREFIX + accessToken)
@@ -98,7 +98,7 @@ public class AuthService {
     }
 
     public Response logout(HttpServletResponse response) {
-        cookieManager.clearAuthTokens(response);
+        tokenManager.clearAuthTokens(response);
         return AuthResponse.LOGOUT_SUCCESS;
     }
 }
