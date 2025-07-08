@@ -15,7 +15,6 @@ import com.poortorich.category.service.CategoryService;
 import com.poortorich.expense.entity.Expense;
 import com.poortorich.accountbook.request.AccountBookDeleteRequest;
 import com.poortorich.expense.request.ExpenseRequest;
-import com.poortorich.expense.response.ExpenseResponse;
 import com.poortorich.expense.service.ExpenseService;
 import com.poortorich.iteration.entity.Iteration;
 import com.poortorich.iteration.response.CustomIterationInfoResponse;

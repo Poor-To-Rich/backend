@@ -13,9 +13,11 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface CategoryRepository extends JpaRepository<Category, Long> {
 
+    Optional<Category> findByIdAndUser(Long id, User user);
+
     Optional<Category> findByIdAndUserAndIsDeletedFalse(Long id, User user);
 
-    Optional<Category> findByNameAndUserAndIsDeletedFalse(String name, User user);
+    Optional<Category> findByNameAndUser(String name, User user);
 
     Optional<Category> findByUserAndNameAndTypeInAndIsDeletedFalse(User user, String name, List<CategoryType> type);
 

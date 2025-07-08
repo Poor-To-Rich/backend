@@ -17,7 +17,7 @@ import com.poortorich.accountbook.response.AccountBookCreateResponse;
 import com.poortorich.expense.facade.ExpenseFacade;
 import com.poortorich.expense.fixture.ExpenseApiFixture;
 import com.poortorich.expense.request.ExpenseRequest;
-import com.poortorich.expense.response.ExpenseResponse;
+import com.poortorich.expense.response.enums.ExpenseResponse;
 import com.poortorich.expense.util.ExpenseRequestTestBuilder;
 import com.poortorich.global.config.BaseSecurityTest;
 import com.poortorich.security.config.SecurityConfig;

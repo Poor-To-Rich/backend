@@ -1,7 +1,7 @@
 package com.poortorich.iteration.entity.enums;
 
 import com.poortorich.global.exceptions.BadRequestException;
-import com.poortorich.iteration.response.IterationResponse;
+import com.poortorich.iteration.response.enums.IterationResponse;
 import lombok.RequiredArgsConstructor;
 
 import java.time.DayOfWeek;
@@ -20,6 +20,8 @@ public enum Weekday {
     THURSDAY("목"),
     FRIDAY("금"),
     SATURDAY("토");
+
+    private static final List<Weekday> WEEKDAYS = List.of(MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY);
 
     private final String type;
 
@@ -40,6 +42,9 @@ public enum Weekday {
                 .toList();
     }
 
+    public static List<Weekday> getWeekdays() {
+        return WEEKDAYS;
+    }
 
     public static Weekday fromDayOfWeek(DayOfWeek dayOfWeek) {
         return Weekday.values()[dayOfWeek.getValue() % 7];

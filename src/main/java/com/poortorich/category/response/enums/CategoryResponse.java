@@ -1,4 +1,4 @@
-package com.poortorich.category.response;
+package com.poortorich.category.response.enums;
 
 import com.poortorich.category.constants.CategoryResponseMessage;
 import com.poortorich.global.response.Response;

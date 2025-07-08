@@ -1,6 +1,6 @@
 package com.poortorich.category.entity.enums;
 
-import com.poortorich.category.response.CategoryResponse;
+import com.poortorich.category.response.enums.CategoryResponse;
 import com.poortorich.global.exceptions.BadRequestException;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

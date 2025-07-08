@@ -12,5 +12,5 @@ public class EmailUpdateRequest {
 
     @Email
     @NotBlank(message = UserResponseMessages.EMAIL_REQUIRED)
-    private String newEmail;
+    private String email;
 }

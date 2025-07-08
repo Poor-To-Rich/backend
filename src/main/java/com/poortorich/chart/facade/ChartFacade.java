@@ -60,12 +60,14 @@ public class ChartFacade {
         List<AccountBook> accountBooks = dataCollector.getPagedAccountBooks(
                 context.getUser(), context.getCategory(), cursor, context.getDateInfo(), direction);
 
+        Long countOfLogs = dataCollector.getCountOfLogs(context);
+
         List<CategoryLog> categoryLogs = chartService.getCategoryLogs(accountBooks, direction);
 
         PaginationResult paginationResult = paginationHandler.handlePagination(
                 context.getUser(), context.getCategory(), context.getDateInfo(), accountBooks, direction);
 
-        return responseFactory.createCategorySectionResponse(categoryLogs, paginationResult);
+        return responseFactory.createCategorySectionResponse(categoryLogs, countOfLogs, paginationResult);
     }
 
     public CategoryChartResponse getCategoryChart(String username, String date, AccountBookType accountBookType) {

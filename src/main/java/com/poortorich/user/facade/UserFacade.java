@@ -1,5 +1,6 @@
 package com.poortorich.user.facade;
 
+import com.poortorich.auth.jwt.util.JwtTokenManager;
 import com.poortorich.category.service.CategoryService;
 import com.poortorich.global.response.Response;
 import com.poortorich.s3.service.FileUploadService;
@@ -17,6 +18,7 @@ import com.poortorich.user.service.RedisUserReservationService;
 import com.poortorich.user.service.UserResetService;
 import com.poortorich.user.service.UserService;
 import com.poortorich.user.service.UserValidationService;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,6 +33,7 @@ public class UserFacade {
     private final RedisUserReservationService userReservationService;
     private final UserResetService userResetService;
     private final CategoryService categoryService;
+    private final JwtTokenManager tokenManager;
 
     @Transactional
     public void registerNewUser(UserRegistrationRequest userRegistrationRequest) {
@@ -91,14 +94,15 @@ public class UserFacade {
 
     @Transactional
     public Response updateUserEmail(String username, EmailUpdateRequest emailUpdateRequest) {
-        userValidationService.validateEmail(emailUpdateRequest.getNewEmail());
+        userValidationService.validateEmail(emailUpdateRequest.getEmail());
         userService.updateEmail(username, emailUpdateRequest);
         return UserResponse.USER_EMAIL_UPDATE_SUCCESS;
     }
 
     @Transactional
-    public Response deleteUserAccount(String username) {
+    public Response deleteUserAccount(String username, HttpServletResponse response) {
         User user = userService.findUserByUsername(username);
+        tokenManager.clearAuthTokens(response);
         userResetService.deleteDefaultCategories(user);
         userService.deleteUserAccount(user);
         return UserResponse.DELETE_USER_ACCOUNT_SUCCESS;
