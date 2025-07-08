@@ -2,8 +2,8 @@ package com.poortorich.iteration.validator;
 
 import com.poortorich.iteration.constants.IterationResponseMessages;
 import com.poortorich.iteration.constants.IterationValidationConstraints;
-import com.poortorich.iteration.entity.enums.MonthlyMode;
 import com.poortorich.iteration.request.MonthlyOption;
+import com.poortorich.iteration.validator.annotations.MonthlyOptionCheck;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 

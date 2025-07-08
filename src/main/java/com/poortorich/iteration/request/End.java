@@ -6,7 +6,7 @@ import com.poortorich.iteration.constants.IterationResponseMessages;
 import com.poortorich.iteration.constants.IterationValidationConstraints;
 import com.poortorich.iteration.entity.enums.EndType;
 import com.poortorich.iteration.response.enums.IterationResponse;
-import com.poortorich.iteration.validator.EndCheck;
+import com.poortorich.iteration.validator.annotations.EndCheck;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import java.time.DateTimeException;
