@@ -2,6 +2,7 @@ package com.poortorich.user.entity;
 
 import com.poortorich.user.constants.UserValidationRules;
 import com.poortorich.user.entity.enums.Gender;
+import com.poortorich.user.entity.enums.Role;
 import com.poortorich.user.request.ProfileUpdateRequest;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -24,6 +25,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 @Entity
@@ -68,6 +70,11 @@ public class User implements UserDetails {
     @Column(name = "job")
     private String job;
 
+    @Column(name = "role", nullable = false)
+    @Enumerated(EnumType.STRING)
+    @Builder.Default
+    private Role role = Role.USER;
+
     @Column(name = "createdDate", nullable = false)
     @CreationTimestamp
     private LocalDateTime createdDate;
@@ -78,7 +85,7 @@ public class User implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of();
+        return List.of(new SimpleGrantedAuthority("ROLE_" + role.name()));
     }
 
     @Override

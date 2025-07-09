@@ -29,6 +29,10 @@ public class JwtTokenExtractor {
         return extractAllClaims(token).get("email", String.class);
     }
 
+    public String extractRole(String token) {
+        return extractAllClaims(token).get("role", String.class);
+    }
+
     public Date extractExpirationDate(String token) {
         return extractAllClaims(token).getExpiration();
     }
