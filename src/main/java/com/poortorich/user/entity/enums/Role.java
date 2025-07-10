@@ -1,5 +1,7 @@
 package com.poortorich.user.entity.enums;
 
+import com.poortorich.global.exceptions.BadRequestException;
+import com.poortorich.user.response.enums.UserResponse;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -14,6 +16,10 @@ public enum Role {
     private final String description;
 
     public static Role from(String role) {
-        return Role.valueOf(role.toUpperCase());
+        try {
+            return Role.valueOf(role.toUpperCase());
+        } catch (IllegalArgumentException | NullPointerException exception) {
+            throw new BadRequestException(UserResponse.USER_ROLE_INVALID);
+        }
     }
 }
