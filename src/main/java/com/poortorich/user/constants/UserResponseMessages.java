@@ -27,7 +27,7 @@ public class UserResponseMessages {
     public static final String PASSWORD_REQUIRED = "비밀번호를 입력해주세요.";
     public static final String PASSWORD_CONTAINS_KOREAN = "비밀번호에 한글은 사용할 수 없습니다.";
     public static final String PASSWORD_CONTAINS_BLANK = "비밀번호는 공백없이 작성해야 합니다.";
-    public static final String PASSWORD_INVALID = "비밀번호는 영문 대문자, 소문자, 숫자, 특수문자를 각각 최소 하나 이상 포함해야 합니다.";
+    public static final String PASSWORD_INVALID = "비밀번호는 영문 소문자, 숫자, 특수문자를 각각 최소 하나 이상 포함해야 합니다.";
     public static final String PASSWORD_LENGTH_INVALID = "비밀번호는 8 ~ 15자리로 작성해야 합니다.";
     public static final String PASSWORD_DO_NOT_MATCH = "비밀번호와 비밀번호 재입력이 일치하지 않습니다.";
     public static final String PASSWORD_CONFIRM_REQUIRED = "비밀번호 재입력칸을 입력해주세요.";
@@ -61,6 +61,9 @@ public class UserResponseMessages {
     public static final String USER_EMAIL_FIND_SUCCESS = "회원 이메일 조회 성공";
     public static final String RESET_SUCCESS = "모든 데이터를 삭제하였습니다.";
     public static final String DELETE_USER_ACCOUNT_SUCCESS = "성공적으로 탈퇴되었습니다.";
+    
+    public static final String USER_ROLE_FIND_SUCCESS = "사용자 역할 조회 성공";
+    public static final String USER_ROLE_INVALID = "유효하지 않은 역할입니다.";
 
     private UserResponseMessages() {
     }
