@@ -126,4 +126,8 @@ public class User implements UserDetails {
     public void updateEmail(String newEmail) {
         this.email = newEmail;
     }
+
+    public void updateRole(Role role) {
+        this.role = role;
+    }
 }
