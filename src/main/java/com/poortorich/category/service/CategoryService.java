@@ -91,10 +91,16 @@ public class CategoryService {
     public Response createCategory(CategoryInfoRequest customCategory, CategoryType type, String username) {
         User user = userService.findUserByUsername(username);
 
-        validateCategoryNameDuplication(user, customCategory.getName(), type);
+        validateNameDuplication(user, customCategory.getName(), type.getSameGroupTypes());
 
         categoryRepository.save(buildCategory(customCategory, type, user));
         return CategoryResponse.CREATE_CATEGORY_SUCCESS;
+    }
+
+    private void validateNameDuplication(User user, String name, List<CategoryType> type) {
+        if (categoryRepository.findByUserAndNameAndTypeInAndIsDeletedFalse(user, name, type).isPresent()) {
+            throw new BadRequestException(CategoryResponse.CATEGORY_NAME_DUPLICATE);
+        }
     }
 
     public void saveAllDefaultCategories(User user) {
@@ -139,11 +145,17 @@ public class CategoryService {
         Category category = categoryRepository.findByIdAndUserAndIsDeletedFalse(id, user)
                 .orElseThrow(() -> new NotFoundException(CategoryResponse.CATEGORY_NON_EXISTENT));
 
-        validateCategoryNameDuplication(user, categoryRequest.getName(), category.getType());
+        validateNameDuplicationExcludingId(user, categoryRequest.getName(), category.getType().getSameGroupTypes(), id);
 
         category.updateCategory(categoryRequest.getName(), categoryRequest.getColor());
 
         return CategoryResponse.MODIFY_CATEGORY_SUCCESS;
+    }
+
+    private void validateNameDuplicationExcludingId(User user, String name, List<CategoryType> type, Long id) {
+        if (categoryRepository.findByNameExcludingId(user, name, type, id).isPresent()) {
+            throw new BadRequestException(CategoryResponse.CATEGORY_NAME_DUPLICATE);
+        }
     }
 
     @Transactional
@@ -155,12 +167,6 @@ public class CategoryService {
         category.delete();
 
         return CategoryResponse.DELETE_CATEGORY_SUCCESS;
-    }
-
-    public void validateCategoryNameDuplication(User user, String name, CategoryType type) {
-        if (categoryRepository.findByUserAndNameAndTypeInAndIsDeletedFalse(user, name, type.getSameGroupTypes()).isPresent()) {
-            throw new BadRequestException(CategoryResponse.CATEGORY_NAME_DUPLICATE);
-        }
     }
 
     public Category findCategoryByName(User user, String name, CategoryType type) {
