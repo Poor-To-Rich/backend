@@ -2,9 +2,11 @@ package com.poortorich.security.config;
 
 import com.poortorich.security.constants.SecurityConstants;
 import com.poortorich.security.filter.auth.JwtAuthenticationFilter;
+import com.poortorich.security.handler.TestAccessDeniedHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -29,6 +31,7 @@ public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final UserDetailsService userDetailsService;
+    private final TestAccessDeniedHandler accessDeniedHandler;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -40,8 +43,11 @@ public class SecurityConfig {
                 )
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(SecurityConstants.PERMIT_ALL_ENDPOINTS).permitAll()
-                        .anyRequest().hasRole("USER")
+                        .requestMatchers(HttpMethod.PUT, "/user/email", "/user/password").hasRole("USER")
+                        .requestMatchers(HttpMethod.DELETE, "/user/reset", "/user/leave").hasRole("USER")
+                        .anyRequest().hasAnyRole("USER", "TEST")
                 )
+                .exceptionHandling(exception -> exception.accessDeniedHandler(accessDeniedHandler))
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
