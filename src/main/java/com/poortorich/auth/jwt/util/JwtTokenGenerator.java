@@ -26,6 +26,7 @@ public class JwtTokenGenerator {
                 .subject(user.getUsername())
                 .claim("userId", user.getId())
                 .claim("email", user.getEmail())
+                .claim("role", user.getRole())
                 .issuedAt(now)
                 .expiration(expiryDate)
                 .issuer(JwtConstants.TOKEN_ISSUER)

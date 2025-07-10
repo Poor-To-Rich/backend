@@ -40,7 +40,7 @@ public class SecurityConfig {
                 )
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(SecurityConstants.PERMIT_ALL_ENDPOINTS).permitAll()
-                        .anyRequest().authenticated()
+                        .anyRequest().hasRole("USER")
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
