@@ -111,4 +111,11 @@ public class UserController {
         userFacade.resetAllByUser(userDetails.getUsername());
         return BaseResponse.toResponseEntity(userFacade.deleteUserAccount(userDetails.getUsername(), response));
     }
+
+    @GetMapping("/role")
+    public ResponseEntity<BaseResponse> getUserRole(@AuthenticationPrincipal UserDetails userDetails) {
+        return DataResponse.toResponseEntity(
+                UserResponse.USER_ROLE_FIND_SUCCESS,
+                userFacade.getUserRole(userDetails.getUsername()));
+    }
 }

@@ -13,6 +13,7 @@ import com.poortorich.user.request.UserRegistrationRequest;
 import com.poortorich.user.request.UsernameCheckRequest;
 import com.poortorich.user.response.UserDetailResponse;
 import com.poortorich.user.response.UserEmailResponse;
+import com.poortorich.user.response.UserRoleResponse;
 import com.poortorich.user.response.enums.UserResponse;
 import com.poortorich.user.service.RedisUserReservationService;
 import com.poortorich.user.service.UserResetService;
@@ -106,5 +107,12 @@ public class UserFacade {
         userResetService.deleteDefaultCategories(user);
         userService.deleteUserAccount(user);
         return UserResponse.DELETE_USER_ACCOUNT_SUCCESS;
+    }
+
+    public UserRoleResponse getUserRole(String username) {
+        User user = userService.findUserByUsername(username);
+        return UserRoleResponse.builder()
+                .role(user.getRole().name())
+                .build();
     }
 }
