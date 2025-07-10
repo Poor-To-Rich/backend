@@ -22,7 +22,7 @@ public class AdminController {
 
     private final AdminFacade adminFacade;
 
-    @PutMapping("/{userId}/role")
+    @PutMapping("/user/{userId}/role")
     public ResponseEntity<BaseResponse> updateUserRole(
             @AuthenticationPrincipal UserDetails userDetails,
             @PathVariable @Nullable Long userId,
