@@ -63,4 +63,10 @@ public class UserValidator {
             throw new BadRequestException(UserResponse.CURRENT_PASSWORD_IS_WRONG);
         }
     }
+
+    public void validateEmailExists(String email) {
+        if (!userRepository.existsByEmail(email)) {
+            throw new NotFoundException(UserResponse.USER_NOT_FOUND);
+        }
+    }
 }

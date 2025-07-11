@@ -4,6 +4,7 @@ import com.poortorich.email.response.enums.EmailResponse;
 import com.poortorich.email.util.EmailVerificationPolicyManager;
 import com.poortorich.global.exceptions.BadRequestException;
 import com.poortorich.global.exceptions.ForbiddenException;
+import com.poortorich.user.request.PasswordResetRequest;
 import com.poortorich.user.request.PasswordUpdateRequest;
 import com.poortorich.user.request.ProfileUpdateRequest;
 import com.poortorich.user.request.UserRegistrationRequest;
@@ -73,10 +74,24 @@ public class UserValidationService {
         }
     }
 
-    public void validateEmail(String email) {
-        userValidator.validateEmailDuplicate(email);
+    public void validateEmailIsVerified(String email) {
         if (!emailVerificationPolicyManager.isEmailVerified(email)) {
             throw new ForbiddenException(EmailResponse.EMAIL_NOT_VERIFIED);
+        }
+    }
+
+    public void validateEmail(String email) {
+        userValidator.validateEmailDuplicate(email);
+        validateEmailIsVerified(email);
+    }
+
+    public void validateResetPassword(PasswordResetRequest passwordResetRequest) {
+        validateEmailIsVerified(passwordResetRequest.getEmail());
+        if (!userValidator.isPasswordMatch(
+                passwordResetRequest.getNewPassword(),
+                passwordResetRequest.getConfirmNewPassword()
+        )) {
+            throw new BadRequestException(UserResponse.NEW_PASSWORD_DO_NOT_MATCH);
         }
     }
 }

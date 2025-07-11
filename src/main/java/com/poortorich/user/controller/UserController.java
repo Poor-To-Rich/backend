@@ -6,7 +6,9 @@ import com.poortorich.global.response.Response;
 import com.poortorich.user.constants.UserResponseMessages;
 import com.poortorich.user.facade.UserFacade;
 import com.poortorich.user.request.EmailUpdateRequest;
+import com.poortorich.user.request.FindUsernameRequest;
 import com.poortorich.user.request.NicknameCheckRequest;
+import com.poortorich.user.request.PasswordResetRequest;
 import com.poortorich.user.request.PasswordUpdateRequest;
 import com.poortorich.user.request.ProfileUpdateRequest;
 import com.poortorich.user.request.UserRegistrationRequest;
@@ -117,5 +119,19 @@ public class UserController {
         return DataResponse.toResponseEntity(
                 UserResponse.USER_ROLE_FIND_SUCCESS,
                 userFacade.getUserRole(userDetails.getUsername()));
+    }
+
+    @PostMapping("/username-recovery")
+    public ResponseEntity<BaseResponse> findUsername(@RequestBody @Valid FindUsernameRequest findUsernameRequest) {
+        return DataResponse.toResponseEntity(
+                UserResponse.FIND_USERNAME_SUCCESS,
+                userFacade.findUsername(findUsernameRequest)
+        );
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<BaseResponse> resetPassword(@RequestBody @Valid PasswordResetRequest passwordResetRequest) {
+        userFacade.resetPassword(passwordResetRequest);
+        return BaseResponse.toResponseEntity(UserResponse.PASSWORD_UPDATE_SUCCESS);
     }
 }
