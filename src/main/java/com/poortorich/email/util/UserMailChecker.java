@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class MailChecker {
+public class UserMailChecker {
 
     private final UserValidator userValidator;
 

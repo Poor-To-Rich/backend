@@ -50,7 +50,9 @@ public class EmailVerificationPolicyManager {
 
     public boolean isVerificationCodeIssued(String mail, EmailVerificationType type) {
         return (type == EmailVerificationType.CHANGE_EMAIL
-                || type == EmailVerificationType.REGISTER)
+                || type == EmailVerificationType.REGISTER
+                || type == EmailVerificationType.FIND_USERNAME
+                || type == EmailVerificationType.CHANGE_PASSWORD)
                 && redisTemplate.hasKey(type.getRedisKey(mail));
     }
 
