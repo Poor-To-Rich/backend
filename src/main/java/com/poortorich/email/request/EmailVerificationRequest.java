@@ -9,6 +9,8 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class EmailVerificationRequest {
+
+    private String username;
     
     @NotBlank(message = EmailResponseMessage.EMAIL_INVALID)
     @Email

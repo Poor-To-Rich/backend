@@ -9,7 +9,7 @@ import com.poortorich.email.response.enums.EmailResponse;
 import com.poortorich.email.service.EmailVerificationService;
 import com.poortorich.email.service.MailService;
 import com.poortorich.email.util.EmailVerificationPolicyManager;
-import com.poortorich.email.util.UserMailChecker;
+import com.poortorich.email.util.UserVerifyValidator;
 import com.poortorich.email.util.VerificationCodeGenerator;
 import com.poortorich.global.response.Response;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +25,7 @@ public class EmailFacade {
     private final VerificationCodeGenerator codeGenerator;
     private final EmailVerificationPolicyManager verificationPolicyManager;
 
-    private final UserMailChecker userMailChecker;
+    private final UserVerifyValidator userVerifyValidator;
 
     @Transactional
     public Response sendVerificationCode(EmailVerificationRequest emailVerificationRequest) {
@@ -33,8 +33,6 @@ public class EmailFacade {
 
         String verificationPurpose = emailVerificationRequest.getPurpose();
         String verificationCode = codeGenerator.generate();
-
-        userMailChecker.checkByVerificationType(email, verificationPurpose);
 
         if (verificationPolicyManager.isEmailBlocked(email)) {
             return EmailResponse.EMAIL_AUTH_REQUEST_BLOCKED;
@@ -45,6 +43,8 @@ public class EmailFacade {
             verificationPolicyManager.blockEmail(email);
             return EmailResponse.TOO_MANY_CODE_RESEND_REQUESTS;
         }
+        userVerifyValidator.validateVerify(emailVerificationRequest);
+
         verificationPolicyManager.increaseAuthCodeResendAttempts(email);
 
         verificationService.saveCode(email, verificationPurpose, verificationCode);
