@@ -19,7 +19,9 @@ public class SecurityConstants {
             "/user/exists/nickname",
             "/email/send",
             "/email/verify",
-            "/email/block"
+            "/email/block",
+            "/user/username-recovery",
+            "/user/reset-password"
     };
     public static final String CORS_ALL_PATH = "/**";
 

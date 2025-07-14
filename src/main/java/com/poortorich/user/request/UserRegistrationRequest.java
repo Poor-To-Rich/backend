@@ -1,10 +1,10 @@
 package com.poortorich.user.request;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.poortorich.email.validator.annotations.Email;
 import com.poortorich.user.constants.UserResponseMessages;
 import com.poortorich.user.constants.UserValidationRules;
 import com.poortorich.user.entity.enums.Gender;
-import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
@@ -77,8 +77,8 @@ public class UserRegistrationRequest {
     @Pattern(regexp = UserValidationRules.BIRTHDAY_FORMAT_PATTERN, message = UserResponseMessages.BIRTHDAY_FORMAT_INVALID)
     private String birth;
 
+    @Email
     @NotBlank(message = UserResponseMessages.EMAIL_REQUIRED)
-    @Email(message = UserResponseMessages.EMAIL_INVALID)
     private String email;
 
     @NotBlank(message = UserResponseMessages.GENDER_REQUIRED)

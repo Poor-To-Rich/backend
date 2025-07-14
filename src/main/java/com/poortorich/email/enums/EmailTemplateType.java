@@ -11,8 +11,12 @@ public enum EmailTemplateType {
 
     REGISTRATION("register", "부자될거지(Poor To Rich) 회원 가입 인증 코드 안내", "회원 가입"),
 
-    EMAIL_CHANGE("changeEmail", "부자될거지(Poor To Rich) 이메일 변경 인증 코드 안내", "이메일 변경");
+    EMAIL_CHANGE("changeEmail", "부자될거지(Poor To Rich) 이메일 변경 인증 코드 안내", "이메일 변경"),
 
+    FIND_USERNAME("findUsername", "부자될거지(Poor To Rich) 아이디 찾기 인증 코드 안내", "아이디 찾기"),
+
+    CHANGE_PASSWORD("changePassword", "부자될거지(Poor To Rich) 비밀번호 찾기 인증 코드 안내", "비밀번호 찾기");
+    
     public static final String BODY_TEMPLATE = """
             안녕하세요, 고객님
             부자될거지(Poor To Rich) %s 인증 코드 안내 메일입니다.
