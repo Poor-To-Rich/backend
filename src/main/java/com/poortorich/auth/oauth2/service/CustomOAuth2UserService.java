@@ -24,17 +24,14 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest request) throws OAuth2AuthenticationException {
-        System.out.println("■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■");
         OAuth2User oAuth2User = super.loadUser(request);
         KakaoResponse response = new KakaoResponse(oAuth2User.getAttributes());
 
         User user = saveUser(response);
-        System.out.println("■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■");
         return new CustomOAuth2UserDetails(user);
     }
 
     private User saveUser(KakaoResponse response) {
-        System.out.println("□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□");
         String username = response.getProvider() + "_" + response.getProviderId();
         User user = userRepository.findByUsername(username)
                 .orElse(User.builder()
@@ -49,7 +46,6 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                         .profileImage(S3Constants.DEFAULT_PROFILE_IMAGE)
                         .role(Role.USER)
                         .build());
-        System.out.println("□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□");
         return userRepository.save(user);
     }
 }
