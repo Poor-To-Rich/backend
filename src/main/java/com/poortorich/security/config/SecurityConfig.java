@@ -1,5 +1,7 @@
 package com.poortorich.security.config;
 
+import com.poortorich.auth.oauth2.handler.CustomOAuth2LoginSuccessHandler;
+import com.poortorich.auth.oauth2.service.CustomOAuth2UserService;
 import com.poortorich.security.constants.SecurityConstants;
 import com.poortorich.security.filter.auth.JwtAuthenticationFilter;
 import com.poortorich.security.handler.TestAccessDeniedHandler;
@@ -33,6 +35,9 @@ public class SecurityConfig {
     private final UserDetailsService userDetailsService;
     private final TestAccessDeniedHandler accessDeniedHandler;
 
+    private final CustomOAuth2UserService customOAuth2UserService;
+    private final CustomOAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
@@ -52,6 +57,13 @@ public class SecurityConfig {
                 .exceptionHandling(exception -> exception.accessDeniedHandler(accessDeniedHandler))
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
+        http
+                .oauth2Login((oauth2) -> oauth2
+                        .userInfoEndpoint((userInfo) -> userInfo
+                                .userService(customOAuth2UserService))
+                        .successHandler(oAuth2LoginSuccessHandler)
+                        .permitAll());
+        
         return http.build();
     }
 
