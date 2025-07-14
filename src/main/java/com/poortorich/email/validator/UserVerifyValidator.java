@@ -1,7 +1,8 @@
-package com.poortorich.email.util;
+package com.poortorich.email.validator;
 
 import com.poortorich.email.enums.EmailVerificationType;
 import com.poortorich.email.request.EmailVerificationRequest;
+import com.poortorich.email.util.UserMailChecker;
 import com.poortorich.global.exceptions.BadRequestException;
 import com.poortorich.global.exceptions.NotFoundException;
 import com.poortorich.user.entity.User;
@@ -28,7 +29,7 @@ public class UserVerifyValidator {
                     .orElseThrow(() -> new NotFoundException(UserResponse.USER_NOT_FOUND));
 
             if (!user.getUsername().equals(emailVerificationRequest.getUsername())) {
-                throw new BadRequestException(UserResponse.USER_NOT_FOUND);
+                throw new BadRequestException(UserResponse.USERNAME_NOT_MATCH);
             }
         }
     }

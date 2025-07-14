@@ -43,7 +43,9 @@ public enum UserResponse implements Response {
     RESET_SUCCESS(HttpStatus.OK, UserResponseMessages.RESET_SUCCESS, null),
     DELETE_USER_ACCOUNT_SUCCESS(HttpStatus.OK, UserResponseMessages.DELETE_USER_ACCOUNT_SUCCESS, null),
     USER_ROLE_INVALID(HttpStatus.BAD_REQUEST, UserResponseMessages.USER_ROLE_INVALID, "role"),
-    FIND_USERNAME_SUCCESS(HttpStatus.OK, UserResponseMessages.FIND_USERNAME_SUCCESS, null);
+
+    FIND_USERNAME_SUCCESS(HttpStatus.OK, UserResponseMessages.FIND_USERNAME_SUCCESS, null),
+    USERNAME_NOT_MATCH(HttpStatus.BAD_REQUEST, UserResponseMessages.USERNAME_NOT_MATCH, "username");
 
     private final HttpStatus httpStatus;
     private final String message;

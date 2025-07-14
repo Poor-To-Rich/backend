@@ -23,6 +23,7 @@ public class UserResponseMessages {
     public static final String USERNAME_DUPLICATE = "이미 사용 중인 아이디입니다.";
     public static final String USERNAME_AVAILABLE = "사용 가능한 아이디입니다.";
     public static final String USERNAME_RESERVE_CHECK_REQUIRED = "아이디 중복 검사를 먼저 진행해주세요.";
+    public static final String USERNAME_NOT_MATCH = "입력한 회원 정보와 일치하는 회원을 찾을 수 없습니다";
 
     public static final String PASSWORD_REQUIRED = "비밀번호를 입력해주세요.";
     public static final String PASSWORD_CONTAINS_KOREAN = "비밀번호에 한글은 사용할 수 없습니다.";
@@ -64,7 +65,7 @@ public class UserResponseMessages {
 
     public static final String USER_ROLE_FIND_SUCCESS = "사용자 역할 조회 성공";
     public static final String USER_ROLE_INVALID = "유효하지 않은 역할입니다.";
-    
+
     public static final String FIND_USERNAME_SUCCESS = "아이디 찾기 성공";
 
     private UserResponseMessages() {
