@@ -10,8 +10,8 @@ import com.poortorich.email.service.EmailVerificationService;
 import com.poortorich.email.service.MailService;
 import com.poortorich.email.util.EmailVerificationPolicyManager;
 import com.poortorich.email.util.VerificationCodeGenerator;
+import com.poortorich.email.validator.UserVerifyValidator;
 import com.poortorich.global.response.Response;
-import com.poortorich.user.validator.UserValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,13 +25,12 @@ public class EmailFacade {
     private final VerificationCodeGenerator codeGenerator;
     private final EmailVerificationPolicyManager verificationPolicyManager;
 
-    private final UserValidator userValidator;
+    private final UserVerifyValidator userVerifyValidator;
 
     @Transactional
     public Response sendVerificationCode(EmailVerificationRequest emailVerificationRequest) {
         String email = emailVerificationRequest.getEmail();
-        userValidator.validateEmailDuplicate(email);
-        
+
         String verificationPurpose = emailVerificationRequest.getPurpose();
         String verificationCode = codeGenerator.generate();
 
@@ -44,6 +43,8 @@ public class EmailFacade {
             verificationPolicyManager.blockEmail(email);
             return EmailResponse.TOO_MANY_CODE_RESEND_REQUESTS;
         }
+        userVerifyValidator.validateVerify(emailVerificationRequest);
+
         verificationPolicyManager.increaseAuthCodeResendAttempts(email);
 
         verificationService.saveCode(email, verificationPurpose, verificationCode);

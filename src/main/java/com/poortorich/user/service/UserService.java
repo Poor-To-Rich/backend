@@ -5,10 +5,12 @@ import com.poortorich.s3.constants.S3Constants;
 import com.poortorich.user.entity.User;
 import com.poortorich.user.repository.UserRepository;
 import com.poortorich.user.request.EmailUpdateRequest;
+import com.poortorich.user.request.PasswordResetRequest;
 import com.poortorich.user.request.ProfileUpdateRequest;
 import com.poortorich.user.request.UserRegistrationRequest;
 import com.poortorich.user.response.UserDetailResponse;
 import com.poortorich.user.response.UserEmailResponse;
+import com.poortorich.user.response.UsernameResponse;
 import com.poortorich.user.response.enums.UserResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -100,5 +102,20 @@ public class UserService {
 
     public void deleteUserAccount(User user) {
         userRepository.delete(user);
+    }
+
+    public UsernameResponse findUsernameByEmail(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new NotFoundException(UserResponse.USER_NOT_FOUND));
+
+        return UsernameResponse.builder()
+                .username(user.getUsername())
+                .build();
+    }
+
+    public void resetPassword(PasswordResetRequest passwordResetRequest) {
+        userRepository.findByEmail(passwordResetRequest.getEmail())
+                .orElseThrow(() -> new NotFoundException(UserResponse.USER_NOT_FOUND))
+                .updatePassword(passwordEncoder.encode(passwordResetRequest.getNewPassword()));
     }
 }

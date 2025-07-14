@@ -6,7 +6,9 @@ import com.poortorich.global.response.Response;
 import com.poortorich.s3.service.FileUploadService;
 import com.poortorich.user.entity.User;
 import com.poortorich.user.request.EmailUpdateRequest;
+import com.poortorich.user.request.FindUsernameRequest;
 import com.poortorich.user.request.NicknameCheckRequest;
+import com.poortorich.user.request.PasswordResetRequest;
 import com.poortorich.user.request.PasswordUpdateRequest;
 import com.poortorich.user.request.ProfileUpdateRequest;
 import com.poortorich.user.request.UserRegistrationRequest;
@@ -14,6 +16,7 @@ import com.poortorich.user.request.UsernameCheckRequest;
 import com.poortorich.user.response.UserDetailResponse;
 import com.poortorich.user.response.UserEmailResponse;
 import com.poortorich.user.response.UserRoleResponse;
+import com.poortorich.user.response.UsernameResponse;
 import com.poortorich.user.response.enums.UserResponse;
 import com.poortorich.user.service.RedisUserReservationService;
 import com.poortorich.user.service.UserResetService;
@@ -114,5 +117,16 @@ public class UserFacade {
         return UserRoleResponse.builder()
                 .role(user.getRole().name())
                 .build();
+    }
+
+    public UsernameResponse findUsername(FindUsernameRequest findUsernameRequest) {
+        userValidationService.validateEmailIsVerified(findUsernameRequest.getEmail());
+        return userService.findUsernameByEmail(findUsernameRequest.getEmail());
+    }
+
+    @Transactional
+    public void resetPassword(PasswordResetRequest passwordResetRequest) {
+        userValidationService.validateResetPassword(passwordResetRequest);
+        userService.resetPassword(passwordResetRequest);
     }
 }

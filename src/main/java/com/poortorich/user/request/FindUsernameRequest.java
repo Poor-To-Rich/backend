@@ -1,4 +1,4 @@
-package com.poortorich.email.request;
+package com.poortorich.user.request;
 
 import com.poortorich.email.constants.EmailResponseMessage;
 import com.poortorich.email.validator.annotations.Email;
@@ -8,14 +8,9 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class EmailVerificationRequest {
+public class FindUsernameRequest {
 
-    private String username;
-    
-    @NotBlank(message = EmailResponseMessage.EMAIL_INVALID)
     @Email
+    @NotBlank(message = EmailResponseMessage.EMAIL_INVALID)
     private String email;
-
-    @NotBlank(message = EmailResponseMessage.PURPOSE_INVALID)
-    private String purpose;
 }
