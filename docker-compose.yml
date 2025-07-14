@@ -38,6 +38,8 @@ services:
       S3_SECRET_ACCESS_KEY: ${S3_SECRET_ACCESS_KEY}
       REDIS_HOST: ${REDIS_HOST}
       REDIS_PORT: ${REDIS_PORT}
+      KAKAO_KEY: ${KAKAO_KEY}
+      KAKAO_SECRET: ${KAKAO_SECRET}
     env_file:
       - .env
 volumes:
