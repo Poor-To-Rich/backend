@@ -36,14 +36,14 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                 .orElse(User.builder()
                         .username(username)
                         .password("kakao")
-                        .name(response.getName())
-                        .nickname(UUID.randomUUID().toString().replace("-", "").substring(0, 8)
+                        .name(UUID.randomUUID().toString().replace("-", "").substring(0, 8)
                                 + response.getProviderId())
+                        .nickname(response.getName())
                         .email(response.getEmail())
                         .gender(Gender.MALE)
                         .birth(LocalDate.now())
                         .profileImage(response.getProfileImage())
-                        .role(Role.USER)
+                        .role(Role.PENDING)
                         .build());
         return userRepository.save(user);
     }
