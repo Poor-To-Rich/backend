@@ -1,5 +1,6 @@
 package com.poortorich.category.service;
 
+import com.poortorich.category.constants.CategoryValidationConstraints;
 import com.poortorich.category.domain.model.enums.DefaultExpenseCategory;
 import com.poortorich.category.domain.model.enums.DefaultIncomeCategory;
 import com.poortorich.category.entity.Category;
@@ -13,6 +14,7 @@ import com.poortorich.category.response.enums.CategoryResponse;
 import com.poortorich.category.response.CustomCategoryResponse;
 import com.poortorich.category.response.DefaultCategoryResponse;
 import com.poortorich.global.exceptions.BadRequestException;
+import com.poortorich.global.exceptions.ConflictException;
 import com.poortorich.global.exceptions.NotFoundException;
 import com.poortorich.global.response.Response;
 import com.poortorich.user.entity.User;
@@ -92,9 +94,18 @@ public class CategoryService {
         User user = userService.findUserByUsername(username);
 
         validateNameDuplication(user, customCategory.getName(), type.getSameGroupTypes());
+        validateCategoryCountLimit(user, type);
 
         categoryRepository.save(buildCategory(customCategory, type, user));
         return CategoryResponse.CREATE_CATEGORY_SUCCESS;
+    }
+
+    private void validateCategoryCountLimit(User user, CategoryType type) {
+        int categoryCount = categoryRepository.countByUserAndTypeAndIsDeletedFalse(user, type);
+
+        if (categoryCount >= CategoryValidationConstraints.CATEGORY_LIMIT_COUNT) {
+           throw new ConflictException(CategoryResponse.CATEGORY_COUNT_LIMIT_EXCEEDED);
+        }
     }
 
     private void validateNameDuplication(User user, String name, List<CategoryType> type) {
