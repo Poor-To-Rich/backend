@@ -45,7 +45,9 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                )
+                );
+
+        http
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(SecurityConstants.PERMIT_ALL_ENDPOINTS).permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
@@ -63,7 +65,7 @@ public class SecurityConfig {
                                 .userService(customOAuth2UserService))
                         .successHandler(oAuth2LoginSuccessHandler)
                         .permitAll());
-        
+
         return http.build();
     }
 

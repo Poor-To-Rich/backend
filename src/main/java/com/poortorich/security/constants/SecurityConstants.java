@@ -21,7 +21,9 @@ public class SecurityConstants {
             "/email/verify",
             "/email/block",
             "/user/username-recovery",
-            "/user/reset-password"
+            "/user/reset-password",
+            "/chat-websocket/**",
+            "/chat/**"
     };
     public static final String CORS_ALL_PATH = "/**";
 
