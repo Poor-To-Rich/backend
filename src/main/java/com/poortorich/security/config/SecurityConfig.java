@@ -52,6 +52,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/user/role").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/user/email", "/user/password").hasRole("USER")
                         .requestMatchers(HttpMethod.DELETE, "/user/reset", "/user/leave").hasRole("USER")
+                        .requestMatchers("/user/oauth/**").hasRole("PENDING")
                         .anyRequest().hasAnyRole("USER", "TEST", "ADMIN")
                 )
                 .exceptionHandling(exception -> exception.accessDeniedHandler(accessDeniedHandler))
@@ -63,7 +64,7 @@ public class SecurityConfig {
                                 .userService(customOAuth2UserService))
                         .successHandler(oAuth2LoginSuccessHandler)
                         .permitAll());
-        
+
         return http.build();
     }
 
