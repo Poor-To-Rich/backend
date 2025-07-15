@@ -2,7 +2,6 @@ package com.poortorich.auth.oauth2.service;
 
 import com.poortorich.auth.oauth2.domain.model.CustomOAuth2UserDetails;
 import com.poortorich.auth.oauth2.domain.model.KakaoResponse;
-import com.poortorich.s3.constants.S3Constants;
 import com.poortorich.user.entity.User;
 import com.poortorich.user.entity.enums.Gender;
 import com.poortorich.user.entity.enums.Role;
@@ -43,7 +42,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                         .email(response.getEmail())
                         .gender(Gender.MALE)
                         .birth(LocalDate.now())
-                        .profileImage(S3Constants.DEFAULT_PROFILE_IMAGE)
+                        .profileImage(response.getProfileImage())
                         .role(Role.USER)
                         .build());
         return userRepository.save(user);
