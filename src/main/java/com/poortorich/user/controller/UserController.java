@@ -144,10 +144,10 @@ public class UserController {
         );
     }
 
-    @PutMapping("/oauth/profile")
+    @PutMapping(value = "/oauth/profile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<BaseResponse> updateOAuthUserProfile(
             @AuthenticationPrincipal UserDetails userDetails,
-            @RequestBody @Valid ProfileUpdateRequest profile
+            @Valid ProfileUpdateRequest profile
     ) {
         userFacade.updateUserProfile(userDetails.getUsername(), profile);
         userFacade.updateUserRole(userDetails.getUsername(), Role.USER);
