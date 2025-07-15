@@ -130,4 +130,10 @@ public class User implements UserDetails {
     public void updateRole(Role role) {
         this.role = role;
     }
+
+    public User updateOAuth(String name, String profileImage) {
+        this.profileImage = profileImage;
+        this.nickname = name;
+        return this;
+    }
 }
