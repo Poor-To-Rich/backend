@@ -49,10 +49,10 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(SecurityConstants.PERMIT_ALL_ENDPOINTS).permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.GET, "/user/role").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/user/email", "/user/password").hasRole("USER")
                         .requestMatchers(HttpMethod.DELETE, "/user/reset", "/user/leave").hasRole("USER")
                         .requestMatchers("/user/oauth/**").hasRole("PENDING")
+                        .requestMatchers(HttpMethod.GET, "/user/role").hasAnyRole("ADMIN", "USER", "TEST", "PENDING")
                         .anyRequest().hasAnyRole("USER", "TEST", "ADMIN")
                 )
                 .exceptionHandling(exception -> exception.accessDeniedHandler(accessDeniedHandler))
