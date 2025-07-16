@@ -61,7 +61,7 @@ public class AuthService {
         tokenManager.setRefreshTokens(response, refreshToken);
 
         return AccessTokenResponse.builder()
-                .accessToken(JwtConstants.TOKEN_PREFIX + accessToken)
+                .accessToken(accessToken)
                 .build();
     }
 
