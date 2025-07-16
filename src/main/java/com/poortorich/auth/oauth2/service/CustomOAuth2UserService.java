@@ -36,7 +36,6 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         String username = response.getProvider() + "_" + response.getProviderId();
 
         return userRepository.findByUsername(username)
-                .map(user -> user.updateOAuth(response.getName(), response.getProfileImage()))
                 .orElse(toUserEntity(response, username));
     }
 
