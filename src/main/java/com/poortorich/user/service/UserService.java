@@ -3,6 +3,7 @@ package com.poortorich.user.service;
 import com.poortorich.global.exceptions.NotFoundException;
 import com.poortorich.s3.constants.S3Constants;
 import com.poortorich.user.entity.User;
+import com.poortorich.user.entity.enums.Role;
 import com.poortorich.user.repository.UserRepository;
 import com.poortorich.user.request.EmailUpdateRequest;
 import com.poortorich.user.request.PasswordResetRequest;
@@ -117,5 +118,11 @@ public class UserService {
         userRepository.findByEmail(passwordResetRequest.getEmail())
                 .orElseThrow(() -> new NotFoundException(UserResponse.USER_NOT_FOUND))
                 .updatePassword(passwordEncoder.encode(passwordResetRequest.getNewPassword()));
+    }
+
+    public void updateRole(String username, Role role) {
+        userRepository.findByUsername(username)
+                .orElseThrow(() -> new NotFoundException(UserResponse.USER_NOT_FOUND))
+                .updateRole(role);
     }
 }

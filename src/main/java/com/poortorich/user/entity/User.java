@@ -85,7 +85,7 @@ public class User implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority("ROLE_" + role.name()));
+        return List.of(new SimpleGrantedAuthority(role.getValue()));
     }
 
     @Override
@@ -129,5 +129,11 @@ public class User implements UserDetails {
 
     public void updateRole(Role role) {
         this.role = role;
+    }
+
+    public User updateOAuth(String name, String profileImage) {
+        this.profileImage = profileImage;
+        this.nickname = name;
+        return this;
     }
 }

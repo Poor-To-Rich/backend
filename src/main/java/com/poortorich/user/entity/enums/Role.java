@@ -9,10 +9,12 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum Role {
 
-    ADMIN("관리자"),
-    USER("일반회원"),
-    TEST("테스트용");
+    ADMIN("ROLE_ADMIN", "관리자"),
+    USER("ROLE_USER", "일반회원"),
+    TEST("ROLE_TEST", "테스트용"),
+    PENDING("ROLE_PENDING", "보류중");
 
+    private final String value;
     private final String description;
 
     public static Role from(String role) {
