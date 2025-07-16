@@ -134,6 +134,19 @@ public class AccountBookBuilder {
                 .isIteration(accountBook.getIterationType().isIteration())
                 .type(accountBook.getType().toString())
                 .cost(accountBook.getCost())
+                .memo(truncateMemo(accountBook.getMemo()))
                 .build();
+    }
+
+    private static String truncateMemo(String memo) {
+        if (memo == null) {
+            return "";
+        }
+
+        if (memo.length() > 20) {
+            return memo.substring(0, 20);
+        }
+
+        return memo;
     }
 }
