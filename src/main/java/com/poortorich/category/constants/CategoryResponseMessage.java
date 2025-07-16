@@ -18,7 +18,8 @@ public class CategoryResponseMessage {
     public static final String MODIFY_CATEGORY_SUCCESS = "카테고리를 성공적으로 편집하였습니다.";
     public static final String DELETE_CATEGORY_SUCCESS = "카테고리를 성공적으로 삭제하였습니다.";
 
-    public static final String NOT_DELETE_USED_CATEGORY = "사용중인 카테고리는 삭제할 수 없습니다.";
+    public static final String CATEGORY_COUNT_LIMIT_EXCEEDED
+            = "생성할 수 있는 사용자 지정 카테고리 개수는 최대 " + CategoryValidationConstraints.CATEGORY_LIMIT_COUNT + "개입니다.";
 
     public static final String CATEGORY_NON_EXISTENT = "존재하지 않는 카테고리입니다.";
 

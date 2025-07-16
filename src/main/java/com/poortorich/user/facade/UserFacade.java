@@ -5,6 +5,7 @@ import com.poortorich.category.service.CategoryService;
 import com.poortorich.global.response.Response;
 import com.poortorich.s3.service.FileUploadService;
 import com.poortorich.user.entity.User;
+import com.poortorich.user.entity.enums.Role;
 import com.poortorich.user.request.EmailUpdateRequest;
 import com.poortorich.user.request.FindUsernameRequest;
 import com.poortorich.user.request.NicknameCheckRequest;
@@ -128,5 +129,10 @@ public class UserFacade {
     public void resetPassword(PasswordResetRequest passwordResetRequest) {
         userValidationService.validateResetPassword(passwordResetRequest);
         userService.resetPassword(passwordResetRequest);
+    }
+
+    @Transactional
+    public void updateUserRole(String username, Role role) {
+        userService.updateRole(username, role);
     }
 }
