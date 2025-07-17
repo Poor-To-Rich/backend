@@ -34,9 +34,8 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
     private User saveUser(KakaoResponse response) {
         String username = response.getProvider() + "_" + response.getProviderId();
-
         return userRepository.findByUsername(username)
-                .orElse(toUserEntity(response, username));
+                .orElseGet(() -> toUserEntity(response, username));
     }
 
     private User toUserEntity(KakaoResponse response, String username) {

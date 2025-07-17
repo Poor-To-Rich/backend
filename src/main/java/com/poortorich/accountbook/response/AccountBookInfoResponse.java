@@ -19,4 +19,5 @@ public class AccountBookInfoResponse {
     private Boolean isIteration;
     private String type;
     private Long cost;
+    private String memo;
 }
