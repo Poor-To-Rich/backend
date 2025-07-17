@@ -3,6 +3,7 @@ package com.poortorich.accountbook.util;
 import com.poortorich.accountbook.entity.AccountBook;
 import com.poortorich.accountbook.enums.AccountBookType;
 import com.poortorich.accountbook.request.AccountBookRequest;
+import com.poortorich.accountbook.response.AccountBookModifyResponse;
 import com.poortorich.accountbook.response.AccountBookInfoResponse;
 import com.poortorich.accountbook.response.InfoResponse;
 import com.poortorich.category.entity.Category;
@@ -148,5 +149,21 @@ public class AccountBookBuilder {
         }
 
         return memo;
+    }
+
+    public static AccountBookModifyResponse buildAccountBookModifyResponse(
+            Long currentCategoryId,
+            Long changeCategoryId
+    ) {
+        if (currentCategoryId.equals(changeCategoryId)) {
+            return AccountBookModifyResponse.builder()
+                    .categoryId(changeCategoryId)
+                    .build();
+        }
+
+        return AccountBookModifyResponse.builder()
+                .prevCategoryId(currentCategoryId)
+                .categoryId(changeCategoryId)
+                .build();
     }
 }

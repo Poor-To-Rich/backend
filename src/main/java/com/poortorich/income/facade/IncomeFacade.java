@@ -5,7 +5,7 @@ import com.poortorich.accountbook.entity.enums.IterationType;
 import com.poortorich.accountbook.enums.AccountBookType;
 import com.poortorich.accountbook.request.AccountBookDeleteRequest;
 import com.poortorich.accountbook.request.enums.IterationAction;
-import com.poortorich.accountbook.response.AccountBookActionResponse;
+import com.poortorich.accountbook.response.AccountBookModifyResponse;
 import com.poortorich.accountbook.response.AccountBookCreateResponse;
 import com.poortorich.accountbook.response.AccountBookDeleteResponse;
 import com.poortorich.accountbook.response.InfoResponse;
@@ -108,10 +108,14 @@ public class IncomeFacade {
     }
 
     @Transactional
-    public AccountBookActionResponse modifyIncome(String username, Long incomeId, IncomeRequest incomeRequest) {
+    public AccountBookModifyResponse modifyIncome(String username, Long incomeId, IncomeRequest incomeRequest) {
         User user = userService.findUserByUsername(username);
-        Category category = categoryService.findCategoryByName(user, incomeRequest.getCategoryName(), categoryType);
-        AccountBook income = accountBookService.modifyAccountBook(user, category, incomeId, incomeRequest, accountBookType);
+        Category currentCategory = accountBookService.getCurrentCategory(user, incomeId, accountBookType);
+        Category changeCategory
+                = categoryService.findCategoryByName(user, incomeRequest.getCategoryName(), categoryType);
+
+        AccountBook income
+                = accountBookService.modifyAccountBook(user, changeCategory, incomeId, incomeRequest, accountBookType);
 
         IterationAction iterationAction = incomeRequest.parseIterationAction();
         if (iterationAction == IterationAction.NONE) {
@@ -119,12 +123,10 @@ public class IncomeFacade {
         }
 
         if (iterationAction != IterationAction.NONE) {
-            modifyIterationIncomes(income, incomeRequest, iterationAction, category, user);
+            modifyIterationIncomes(income, incomeRequest, iterationAction, changeCategory, user);
         }
 
-        return AccountBookActionResponse.builder()
-                .categoryId(category.getId())
-                .build();
+        return AccountBookBuilder.buildAccountBookModifyResponse(currentCategory.getId(), changeCategory.getId());
     }
 
     private void modifySingleIncome(AccountBook income, IncomeRequest incomeRequest, User user) {

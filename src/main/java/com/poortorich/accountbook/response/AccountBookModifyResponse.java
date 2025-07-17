@@ -11,5 +11,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class AccountBookModifyResponse {
 
+    private Long prevCategoryId;
     private Long categoryId;
 }
