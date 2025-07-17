@@ -6,9 +6,11 @@ import com.poortorich.accountbook.enums.AccountBookType;
 import com.poortorich.accountbook.request.enums.IterationAction;
 import com.poortorich.accountbook.response.AccountBookActionResponse;
 import com.poortorich.accountbook.response.AccountBookCreateResponse;
+import com.poortorich.accountbook.response.AccountBookDeleteResponse;
 import com.poortorich.accountbook.response.InfoResponse;
 import com.poortorich.accountbook.response.IterationDetailsResponse;
 import com.poortorich.accountbook.service.AccountBookService;
+import com.poortorich.accountbook.util.AccountBookBuilder;
 import com.poortorich.category.entity.Category;
 import com.poortorich.category.entity.enums.CategoryType;
 import com.poortorich.category.service.CategoryService;
@@ -77,7 +79,7 @@ public class ExpenseFacade {
     }
 
     @Transactional
-    public AccountBookActionResponse deleteExpense(Long expenseId, AccountBookDeleteRequest accountBookDeleteRequest, String username) {
+    public AccountBookDeleteResponse deleteExpense(Long expenseId, AccountBookDeleteRequest accountBookDeleteRequest, String username) {
         User user = userService.findUserByUsername(username);
         AccountBook expense = accountBookService.getAccountBookOrThrow(expenseId, user, accountBookType);
         Long categoryId = expense.getCategory().getId();
@@ -98,7 +100,7 @@ public class ExpenseFacade {
             );
         }
 
-        return AccountBookActionResponse.builder()
+        return AccountBookDeleteResponse.builder()
                 .categoryId(categoryId)
                 .build();
     }
