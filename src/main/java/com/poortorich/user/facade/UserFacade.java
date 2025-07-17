@@ -107,7 +107,7 @@ public class UserFacade {
     @Transactional
     public Response deleteUserAccount(String username, HttpServletResponse response) {
         User user = userService.findUserByUsername(username);
-        tokenManager.clearAuthTokens(response);
+        tokenManager.clearAuthTokensTest(response);
         userResetService.deleteDefaultCategories(user);
         userService.deleteUserAccount(user);
         return UserResponse.DELETE_USER_ACCOUNT_SUCCESS;
