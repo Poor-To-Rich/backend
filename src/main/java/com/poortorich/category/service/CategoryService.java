@@ -1,5 +1,6 @@
 package com.poortorich.category.service;
 
+import com.poortorich.category.constants.CategoryValidationConstraints;
 import com.poortorich.category.domain.model.enums.DefaultExpenseCategory;
 import com.poortorich.category.domain.model.enums.DefaultIncomeCategory;
 import com.poortorich.category.entity.Category;
@@ -9,14 +10,16 @@ import com.poortorich.category.request.CategoryInfoRequest;
 import com.poortorich.category.request.CategoryVisibilityRequest;
 import com.poortorich.category.response.ActiveCategoriesResponse;
 import com.poortorich.category.response.CategoryInfoResponse;
-import com.poortorich.category.response.enums.CategoryResponse;
 import com.poortorich.category.response.CustomCategoryResponse;
 import com.poortorich.category.response.DefaultCategoryResponse;
+import com.poortorich.category.response.enums.CategoryResponse;
 import com.poortorich.global.exceptions.BadRequestException;
+import com.poortorich.global.exceptions.ConflictException;
 import com.poortorich.global.exceptions.NotFoundException;
 import com.poortorich.global.response.Response;
 import com.poortorich.user.entity.User;
-import com.poortorich.user.service.UserService;
+import com.poortorich.user.repository.UserRepository;
+import com.poortorich.user.response.enums.UserResponse;
 import jakarta.transaction.Transactional;
 import java.util.Arrays;
 import java.util.List;
@@ -28,10 +31,13 @@ import org.springframework.stereotype.Service;
 public class CategoryService {
 
     private final CategoryRepository categoryRepository;
-    private final UserService userService;
+    private final UserRepository userRepository;
 
     public List<DefaultCategoryResponse> getDefaultCategories(CategoryType type, String username) {
-        return categoryRepository.findByUserAndTypeAndIsDeletedFalse(userService.findUserByUsername(username), type).stream()
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new NotFoundException(UserResponse.USER_NOT_FOUND));
+        return categoryRepository.findByUserAndTypeAndIsDeletedFalse(user, type)
+                .stream()
                 .map(category -> DefaultCategoryResponse.builder()
                         .id(category.getId())
                         .name(category.getName())
@@ -42,7 +48,10 @@ public class CategoryService {
     }
 
     public List<CustomCategoryResponse> getCustomCategories(CategoryType type, String username) {
-        return categoryRepository.findByUserAndTypeAndIsDeletedFalse(userService.findUserByUsername(username), type).stream()
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new NotFoundException(UserResponse.USER_NOT_FOUND));
+        return categoryRepository.findByUserAndTypeAndIsDeletedFalse(user, type)
+                .stream()
                 .map(category -> CustomCategoryResponse.builder()
                         .id(category.getId())
                         .color(category.getColor())
@@ -52,16 +61,22 @@ public class CategoryService {
     }
 
     public ActiveCategoriesResponse getActiveCategories(String type, String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new NotFoundException(UserResponse.USER_NOT_FOUND));
         List<String> categories
                 = categoryRepository.findByUserAndTypeInAndIsDeletedFalse(
-                        userService.findUserByUsername(username),
+                        user,
                         CategoryType.from(type).getSameGroupTypes())
                 .stream()
                 .filter(Category::getVisibility)
                 .map(Category::getName)
                 .sorted((a, b) -> {
-                    if (a.equals("기타")) return 1;
-                    if (b.equals("기타")) return -1;
+                    if (a.equals("기타")) {
+                        return 1;
+                    }
+                    if (b.equals("기타")) {
+                        return -1;
+                    }
                     return 0;
                 })
                 .toList();
@@ -77,8 +92,10 @@ public class CategoryService {
             CategoryVisibilityRequest visibilityRequest,
             String username
     ) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new NotFoundException(UserResponse.USER_NOT_FOUND));
         Boolean visibility = visibilityRequest.getVisibility();
-        categoryRepository.findByIdAndUserAndIsDeletedFalse(categoryId, userService.findUserByUsername(username))
+        categoryRepository.findByIdAndUserAndIsDeletedFalse(categoryId, user)
                 .orElseThrow(() -> new NotFoundException(CategoryResponse.CATEGORY_NON_EXISTENT))
                 .updateVisibility(visibility);
 
@@ -89,12 +106,22 @@ public class CategoryService {
     }
 
     public Response createCategory(CategoryInfoRequest customCategory, CategoryType type, String username) {
-        User user = userService.findUserByUsername(username);
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new NotFoundException(UserResponse.USER_NOT_FOUND));
 
         validateNameDuplication(user, customCategory.getName(), type.getSameGroupTypes());
+        validateCategoryCountLimit(user, type);
 
         categoryRepository.save(buildCategory(customCategory, type, user));
         return CategoryResponse.CREATE_CATEGORY_SUCCESS;
+    }
+
+    private void validateCategoryCountLimit(User user, CategoryType type) {
+        int categoryCount = categoryRepository.countByUserAndTypeAndIsDeletedFalse(user, type);
+
+        if (categoryCount >= CategoryValidationConstraints.CATEGORY_LIMIT_COUNT) {
+            throw new ConflictException(CategoryResponse.CATEGORY_COUNT_LIMIT_EXCEEDED);
+        }
     }
 
     private void validateNameDuplication(User user, String name, List<CategoryType> type) {
@@ -129,8 +156,11 @@ public class CategoryService {
     }
 
     public CategoryInfoResponse getCategory(Long id, String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new NotFoundException(UserResponse.USER_NOT_FOUND));
+
         Category category = categoryRepository
-                .findByIdAndUserAndIsDeletedFalse(id, userService.findUserByUsername(username))
+                .findByIdAndUserAndIsDeletedFalse(id, user)
                 .orElseThrow(() -> new NotFoundException(CategoryResponse.CATEGORY_NON_EXISTENT));
 
         return CategoryInfoResponse.builder()
@@ -141,7 +171,8 @@ public class CategoryService {
 
     @Transactional
     public Response modifyCategory(Long id, CategoryInfoRequest categoryRequest, String username) {
-        User user = userService.findUserByUsername(username);
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new NotFoundException(UserResponse.USER_NOT_FOUND));
         Category category = categoryRepository.findByIdAndUserAndIsDeletedFalse(id, user)
                 .orElseThrow(() -> new NotFoundException(CategoryResponse.CATEGORY_NON_EXISTENT));
 
@@ -160,7 +191,8 @@ public class CategoryService {
 
     @Transactional
     public Response deleteCategory(Long id, String username) {
-        User user = userService.findUserByUsername(username);
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new NotFoundException(UserResponse.USER_NOT_FOUND));
         Category category = categoryRepository.findByIdAndUserAndIsDeletedFalse(id, user)
                 .orElseThrow(() -> new NotFoundException(CategoryResponse.CATEGORY_NON_EXISTENT));
 

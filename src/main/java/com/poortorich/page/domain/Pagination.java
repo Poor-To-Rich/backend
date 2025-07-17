@@ -36,10 +36,10 @@ public class Pagination {
         if (accountBooks.isEmpty()) {
             return LocalDate.now();
         }
-        LocalDate lastDate = accountBooks.getLast().getAccountBookDate();
+
         return switch (direction) {
-            case ASC -> lastDate.plusDays(DateConstants.ONE_DAY);
-            case DESC -> lastDate.minusDays(DateConstants.ONE_DAY);
+            case ASC -> accountBooks.getLast().getAccountBookDate().plusDays(DateConstants.ONE_DAY);
+            case DESC -> accountBooks.getFirst().getAccountBookDate().minusDays(DateConstants.ONE_DAY);
         };
     }
 }

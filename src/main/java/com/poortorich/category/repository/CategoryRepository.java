@@ -38,4 +38,6 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
     List<Category> findByUserAndTypeInAndIsDeletedFalse(User user, List<CategoryType> types);
 
     void deleteByUserAndType(User user, CategoryType type);
+
+    int countByUserAndTypeAndIsDeletedFalse(User user, CategoryType type);
 }

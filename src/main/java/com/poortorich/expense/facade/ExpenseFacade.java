@@ -4,11 +4,13 @@ import com.poortorich.accountbook.entity.AccountBook;
 import com.poortorich.accountbook.entity.enums.IterationType;
 import com.poortorich.accountbook.enums.AccountBookType;
 import com.poortorich.accountbook.request.enums.IterationAction;
-import com.poortorich.accountbook.response.AccountBookActionResponse;
+import com.poortorich.accountbook.response.AccountBookModifyResponse;
 import com.poortorich.accountbook.response.AccountBookCreateResponse;
+import com.poortorich.accountbook.response.AccountBookDeleteResponse;
 import com.poortorich.accountbook.response.InfoResponse;
 import com.poortorich.accountbook.response.IterationDetailsResponse;
 import com.poortorich.accountbook.service.AccountBookService;
+import com.poortorich.accountbook.util.AccountBookBuilder;
 import com.poortorich.category.entity.Category;
 import com.poortorich.category.entity.enums.CategoryType;
 import com.poortorich.category.service.CategoryService;
@@ -77,7 +79,7 @@ public class ExpenseFacade {
     }
 
     @Transactional
-    public AccountBookActionResponse deleteExpense(Long expenseId, AccountBookDeleteRequest accountBookDeleteRequest, String username) {
+    public AccountBookDeleteResponse deleteExpense(Long expenseId, AccountBookDeleteRequest accountBookDeleteRequest, String username) {
         User user = userService.findUserByUsername(username);
         AccountBook expense = accountBookService.getAccountBookOrThrow(expenseId, user, accountBookType);
         Long categoryId = expense.getCategory().getId();
@@ -98,16 +100,20 @@ public class ExpenseFacade {
             );
         }
 
-        return AccountBookActionResponse.builder()
+        return AccountBookDeleteResponse.builder()
                 .categoryId(categoryId)
                 .build();
     }
 
     @Transactional
-    public AccountBookActionResponse modifyExpense(String username, Long expenseId, ExpenseRequest expenseRequest) {
+    public AccountBookModifyResponse modifyExpense(String username, Long expenseId, ExpenseRequest expenseRequest) {
         User user = userService.findUserByUsername(username);
-        Category category = categoryService.findCategoryByName(user, expenseRequest.getCategoryName(), categoryType);
-        AccountBook expense = accountBookService.modifyAccountBook(user, category, expenseId, expenseRequest, accountBookType);
+        Category currentCategory = accountBookService.getCurrentCategory(user, expenseId, accountBookType);
+        Category changeCategory
+                = categoryService.findCategoryByName(user, expenseRequest.getCategoryName(), categoryType);
+
+        AccountBook expense
+                = accountBookService.modifyAccountBook(user, changeCategory, expenseId, expenseRequest, accountBookType);
         expenseService.modifyPaymentMethod((Expense) expense, expenseRequest.parsePaymentMethod());
 
         IterationAction iterationAction = expenseRequest.parseIterationAction();
@@ -116,12 +122,10 @@ public class ExpenseFacade {
         }
 
         if (iterationAction != IterationAction.NONE) {
-            modifyIterationExpenses(expense, expenseRequest, iterationAction, category, user);
+            modifyIterationExpenses(expense, expenseRequest, iterationAction, changeCategory, user);
         }
 
-        return AccountBookActionResponse.builder()
-                .categoryId(category.getId())
-                .build();
+        return AccountBookBuilder.buildAccountBookModifyResponse(currentCategory.getId(), changeCategory.getId());
     }
 
     private void modifySingleExpense(AccountBook expense, ExpenseRequest expenseRequest, User user) {

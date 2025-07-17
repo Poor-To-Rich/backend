@@ -4,6 +4,7 @@ import com.poortorich.global.response.BaseResponse;
 import com.poortorich.global.response.DataResponse;
 import com.poortorich.global.response.Response;
 import com.poortorich.user.constants.UserResponseMessages;
+import com.poortorich.user.entity.enums.Role;
 import com.poortorich.user.facade.UserFacade;
 import com.poortorich.user.request.EmailUpdateRequest;
 import com.poortorich.user.request.FindUsernameRequest;
@@ -133,5 +134,23 @@ public class UserController {
     public ResponseEntity<BaseResponse> resetPassword(@RequestBody @Valid PasswordResetRequest passwordResetRequest) {
         userFacade.resetPassword(passwordResetRequest);
         return BaseResponse.toResponseEntity(UserResponse.PASSWORD_UPDATE_SUCCESS);
+    }
+
+    @GetMapping("/oauth/profile")
+    public ResponseEntity<BaseResponse> getOAuthUserProfile(@AuthenticationPrincipal UserDetails userDetails) {
+        return DataResponse.toResponseEntity(
+                UserResponse.USER_DETAIL_FIND_SUCCESS,
+                userFacade.getUserDetails(userDetails.getUsername())
+        );
+    }
+
+    @PutMapping(value = "/oauth/profile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<BaseResponse> updateOAuthUserProfile(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @Valid ProfileUpdateRequest profile
+    ) {
+        userFacade.updateUserProfile(userDetails.getUsername(), profile);
+        userFacade.updateUserRole(userDetails.getUsername(), Role.USER);
+        return BaseResponse.toResponseEntity(UserResponse.USER_PROFILE_UPDATE_SUCCESS);
     }
 }
