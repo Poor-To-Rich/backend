@@ -295,4 +295,10 @@ public class AccountBookService {
                 )
                 .orElseThrow(() -> new NotFoundException(ExpenseResponse.EXPENSE_NON_EXISTENT));
     }
+
+    public Category getCurrentCategory(User user, Long expenseId, AccountBookType type) {
+        return accountBookRepository.findByIdAndUser(expenseId, user, type)
+                .orElseThrow(() -> new NotFoundException(ExpenseResponse.EXPENSE_NON_EXISTENT))
+                .getCategory();
+    }
 }
