@@ -46,7 +46,7 @@ public class IncomeFacade {
     @Transactional
     public AccountBookCreateResponse createIncome(String username, IncomeRequest incomeRequest) {
         User user = userService.findUserByUsername(username);
-        Category category = categoryService.findCategoryByName(user, incomeRequest.getCategoryName(), categoryType);
+        Category category = categoryService.findCategoryByNameNotDeleted(user, incomeRequest.getCategoryName(), categoryType);
         AccountBook income = accountBookService.create(user, category, incomeRequest, accountBookType);
 
         if (income.getIterationType() != IterationType.DEFAULT) {
