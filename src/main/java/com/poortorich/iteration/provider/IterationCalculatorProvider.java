@@ -15,8 +15,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.EnumSet;
 import java.util.List;
 
 @Component
@@ -129,6 +127,6 @@ public class IterationCalculatorProvider {
             return dateCalculator.weeklyTypeDate(date, 1, allWeekdays);
         }
 
-        return dateCalculator.monthlyTypeEndModeDate(date);
+        return dateCalculator.monthlyTypeEndModeDate(date.plusMonths(1));
     }
 }
