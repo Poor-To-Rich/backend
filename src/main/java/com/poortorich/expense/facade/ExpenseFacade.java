@@ -45,7 +45,7 @@ public class ExpenseFacade {
     @Transactional
     public AccountBookCreateResponse createExpense(ExpenseRequest expenseRequest, String username) {
         User user = userService.findUserByUsername(username);
-        Category category = categoryService.findCategoryByName(user, expenseRequest.getCategoryName(), categoryType);
+        Category category = categoryService.findCategoryByNameNotDeleted(user, expenseRequest.getCategoryName(), categoryType);
         AccountBook expense = accountBookService.create(user, category, expenseRequest, accountBookType);
         if (expense.getIterationType() != IterationType.DEFAULT) {
             createIterationExpense(user, expenseRequest, expense);

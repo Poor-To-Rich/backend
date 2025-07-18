@@ -64,13 +64,13 @@ class ExpenseFacadeTest {
     @DisplayName("Category, Expense 서비스가 적절히 호출된다.")
     void createExpense_shouldCallServiceMethods() {
         when(userService.findUserByUsername(user.getUsername())).thenReturn(user);
-        when(categoryService.findCategoryByName(user, expenseRequest.getCategoryName(), CategoryType.DEFAULT_EXPENSE))
+        when(categoryService.findCategoryByNameNotDeleted(user, expenseRequest.getCategoryName(), CategoryType.DEFAULT_EXPENSE))
                 .thenReturn(category);
         when(accountBookService.create(user, category, expenseRequest, accountBookType)).thenReturn(expense);
 
         expenseFacade.createExpense(expenseRequest, user.getUsername());
         verify(accountBookService).create(user, category, expenseRequest, accountBookType);
-        verify(categoryService).findCategoryByName(user, expenseRequest.getCategoryName(), CategoryType.DEFAULT_EXPENSE);
+        verify(categoryService).findCategoryByNameNotDeleted(user, expenseRequest.getCategoryName(), CategoryType.DEFAULT_EXPENSE);
         verify(iterationService).createIterations(user, expenseRequest.getCustomIteration(), expense, accountBookType);
     }
 }
