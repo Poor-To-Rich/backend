@@ -6,6 +6,7 @@ public class SecurityConstants {
 
     public static final List<String> ALLOWED_ORIGINS = List.of("http://localhost:8080",
             "https://localhost:5173",
+            "https://localhost:4173",
             "https://poortorich.site",
             "https://www.poortorich.site"
             // STOMP 연결 테스트 사이트
