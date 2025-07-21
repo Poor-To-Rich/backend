@@ -8,11 +8,14 @@ import com.poortorich.global.exceptions.InternalServerErrorException;
 import com.poortorich.s3.constants.S3Constants;
 import com.poortorich.s3.response.enums.S3Response;
 import com.poortorich.s3.util.S3FileUtils;
+import com.poortorich.s3.util.WebpConverter;
 import com.poortorich.s3.validator.FileValidator;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
+import org.apache.http.entity.ContentType;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -21,9 +24,9 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 public class FileUploadService {
 
-
     private final AmazonS3Client amazonS3Client;
     private final FileValidator fileValidator;
+    private final WebpConverter webpConverter;
 
     @Value("${cloud.aws.s3.bucket}")
     private String bucketName;
@@ -36,9 +39,10 @@ public class FileUploadService {
         fileValidator.validateFileType(imageFile);
         fileValidator.validateFileSize(imageFile);
 
+        byte[] webpBytes = webpConverter.convertToWebp(imageFile);
         String fileName = S3FileUtils.generateUniqueFileName(imageFile);
 
-        uploadToS3(imageFile, fileName);
+        uploadToS3(webpBytes, fileName);
 
         return amazonS3Client.getUrl(bucketName, fileName).toString();
     }
@@ -70,6 +74,18 @@ public class FileUploadService {
         metadata.setContentLength(file.getSize());
 
         try (InputStream inputStream = file.getInputStream()) {
+            amazonS3Client.putObject(new PutObjectRequest(bucketName, fileName, inputStream, metadata));
+        } catch (AmazonClientException | IOException exception) {
+            throw new InternalServerErrorException(S3Response.FILE_UPLOAD_FAILURE);
+        }
+    }
+
+    private void uploadToS3(byte[] bytes, String fileName) {
+        ObjectMetadata metadata = new ObjectMetadata();
+        metadata.setContentType(ContentType.IMAGE_WEBP.getMimeType());
+        metadata.setContentLength(bytes.length);
+
+        try (InputStream inputStream = new ByteArrayInputStream(bytes)) {
             amazonS3Client.putObject(new PutObjectRequest(bucketName, fileName, inputStream, metadata));
         } catch (AmazonClientException | IOException exception) {
             throw new InternalServerErrorException(S3Response.FILE_UPLOAD_FAILURE);
