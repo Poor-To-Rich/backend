@@ -67,6 +67,13 @@ public class JwtTokenManager {
     }
 
     public void clearAuthTokens(HttpServletResponse response) {
+        // response.setHeader(JwtConstants.AUTHORIZATION_HEADER, "");
+
+        // ResponseCookie deleteRefreshToken = deleteRefreshTokenCookie();
+        // response.addHeader(HttpHeaders.SET_COOKIE, deleteRefreshToken.toString());
+    }
+
+    public void clearAuthTokensTest(HttpServletResponse response) {
         response.setHeader(JwtConstants.AUTHORIZATION_HEADER, "");
 
         ResponseCookie deleteRefreshToken = deleteRefreshTokenCookie();

@@ -20,6 +20,8 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
 
     Optional<Category> findByNameAndUser(String name, User user);
 
+    Optional<Category> findByUserAndNameAndTypeIn(User user, String name, List<CategoryType> sameGroupTypes);
+
     Optional<Category> findByUserAndNameAndTypeInAndIsDeletedFalse(User user, String name, List<CategoryType> type);
 
     @Query("""

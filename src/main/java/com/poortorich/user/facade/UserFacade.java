@@ -14,6 +14,7 @@ import com.poortorich.user.request.PasswordUpdateRequest;
 import com.poortorich.user.request.ProfileUpdateRequest;
 import com.poortorich.user.request.UserRegistrationRequest;
 import com.poortorich.user.request.UsernameCheckRequest;
+import com.poortorich.user.response.OAuthUserDetailResponse;
 import com.poortorich.user.response.UserDetailResponse;
 import com.poortorich.user.response.UserEmailResponse;
 import com.poortorich.user.response.UserRoleResponse;
@@ -107,7 +108,7 @@ public class UserFacade {
     @Transactional
     public Response deleteUserAccount(String username, HttpServletResponse response) {
         User user = userService.findUserByUsername(username);
-        tokenManager.clearAuthTokens(response);
+        tokenManager.clearAuthTokensTest(response);
         userResetService.deleteDefaultCategories(user);
         userService.deleteUserAccount(user);
         return UserResponse.DELETE_USER_ACCOUNT_SUCCESS;
@@ -134,5 +135,17 @@ public class UserFacade {
     @Transactional
     public void updateUserRole(String username, Role role) {
         userService.updateRole(username, role);
+    }
+
+    public OAuthUserDetailResponse getOAuthUserDetails(String username) {
+        UserDetailResponse response = userService.findUserDetailByUsername(username);
+
+        return OAuthUserDetailResponse.builder()
+                .profileImage(response.getProfileImage())
+                .isDefaultProfile(response.getIsDefaultProfile())
+                .name(response.getName())
+                .gender(response.getGender())
+                .job(response.getJob())
+                .build();
     }
 }

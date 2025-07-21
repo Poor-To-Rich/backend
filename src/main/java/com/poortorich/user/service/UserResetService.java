@@ -8,7 +8,7 @@ import com.poortorich.global.exceptions.InternalServerErrorException;
 import com.poortorich.global.response.enums.GlobalResponse;
 import com.poortorich.iteration.entity.Iteration;
 import com.poortorich.iteration.repository.IterationInfoRepository;
-import com.poortorich.iteration.repository.IterationRepository;
+import com.poortorich.iteration.util.strategy.IterationStrategyFactory;
 import com.poortorich.user.entity.User;
 import java.util.List;
 import java.util.Set;
@@ -25,7 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 public class UserResetService {
 
-    private final IterationRepository iterationRepository;
+    private final IterationStrategyFactory iterationStrategyFactory;
     private final AccountBookRepository accountBookRepository;
     private final CategoryRepository categoryRepository;
     private final IterationInfoRepository iterationInfoRepository;
@@ -37,7 +37,8 @@ public class UserResetService {
             Set<Long> iterationInfoIds = getDeletedIterationInfo(user);
 
             log.info("[user ID: {}] 반복 데이터 삭제", user.getId());
-            iterationRepository.deleteAllIterationByUser(user);
+            iterationStrategyFactory.getStrategy(AccountBookType.EXPENSE).deleteByUser(user);
+            iterationStrategyFactory.getStrategy(AccountBookType.INCOME).deleteByUser(user);
 
             log.info("[user ID: {}] 지출/수입 데이터 삭제", user.getId());
             accountBookRepository.deleteAllAccountBooksByUser(user);
@@ -57,8 +58,10 @@ public class UserResetService {
     }
 
     private Set<Long> getDeletedIterationInfo(User user) {
-        List<Iteration> iterationExpenses = iterationRepository.findAllByUser(user, AccountBookType.EXPENSE);
-        List<Iteration> iterationIncomes = iterationRepository.findAllByUser(user, AccountBookType.INCOME);
+        List<Iteration> iterationExpenses
+                = iterationStrategyFactory.getStrategy(AccountBookType.EXPENSE).findAllByUser(user);
+        List<Iteration> iterationIncomes
+                = iterationStrategyFactory.getStrategy(AccountBookType.INCOME).findAllByUser(user);
 
         return Stream.concat(iterationExpenses.stream(), iterationIncomes.stream())
                 .map(Iteration::getId)

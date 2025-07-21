@@ -201,8 +201,13 @@ public class CategoryService {
         return CategoryResponse.DELETE_CATEGORY_SUCCESS;
     }
 
-    public Category findCategoryByName(User user, String name, CategoryType type) {
+    public Category findCategoryByNameNotDeleted(User user, String name, CategoryType type) {
         return categoryRepository.findByUserAndNameAndTypeInAndIsDeletedFalse(user, name, type.getSameGroupTypes())
+                .orElseThrow(() -> new NotFoundException(CategoryResponse.CATEGORY_NON_EXISTENT));
+    }
+
+    public Category findCategoryByName(User user, String name, CategoryType type) {
+        return categoryRepository.findByUserAndNameAndTypeIn(user, name, type.getSameGroupTypes())
                 .orElseThrow(() -> new NotFoundException(CategoryResponse.CATEGORY_NON_EXISTENT));
     }
 

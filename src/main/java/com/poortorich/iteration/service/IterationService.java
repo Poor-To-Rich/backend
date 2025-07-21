@@ -14,12 +14,12 @@ import com.poortorich.iteration.entity.info.IterationInfo;
 import com.poortorich.iteration.mapper.IterationMapper;
 import com.poortorich.iteration.provider.IterationCalculatorProvider;
 import com.poortorich.iteration.repository.IterationInfoRepository;
-import com.poortorich.iteration.repository.IterationRepository;
 import com.poortorich.iteration.request.CustomIteration;
 import com.poortorich.iteration.request.IterationRule;
 import com.poortorich.iteration.response.CustomIterationInfoResponse;
 import com.poortorich.iteration.response.enums.IterationResponse;
 import com.poortorich.iteration.util.IterationBuilder;
+import com.poortorich.iteration.util.strategy.IterationStrategyFactory;
 import com.poortorich.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -36,7 +36,7 @@ public class IterationService {
     private static final String DELETE_TYPE = "delete";
 
     private final IterationCalculatorProvider calculatorProvider;
-    private final IterationRepository iterationRepository;
+    private final IterationStrategyFactory strategyFactory;
     private final IterationInfoRepository iterationInfoRepository;
 
     public List<AccountBook> createIterations(
@@ -121,7 +121,7 @@ public class IterationService {
         for (AccountBook savedAccountBook : savedIterationAccountBooks) {
             Iteration iterations
                     = IterationBuilder.buildEntity(user, originalAccountBook, savedAccountBook, iterationInfo, type);
-            iterationRepository.save(iterations, type);
+            strategyFactory.getStrategy(type).save(iterations);
         }
     }
 
@@ -162,10 +162,10 @@ public class IterationService {
             IterationAction iterationAction,
             AccountBookType type
     ) {
-        Iteration iteration = iterationRepository.findByGeneratedAccountBookAndUser(user, accountBook, type);
+        Iteration iteration = strategyFactory.getStrategy(type).findByGeneratedAccountBookAndUser(user, accountBook);
         AccountBook originalAccountBook = iteration.getOriginalAccountBook();
         List<Iteration> allIterations
-                = iterationRepository.findAllByOriginalAccountBookAndUser(user, originalAccountBook, type);
+                = strategyFactory.getStrategy(type).findAllByOriginalAccountBookAndUser(user, originalAccountBook);
 
         return resolveIterations(
                 iterationAction, originalAccountBook, accountBook, iteration, allIterations, user, MODIFY_TYPE, type
@@ -178,10 +178,11 @@ public class IterationService {
             IterationAction iterationAction,
             AccountBookType type
     ) {
-        Iteration iteration = iterationRepository.findByGeneratedAccountBookAndUser(user, accountBookToDelete, type);
+        Iteration iteration
+                = strategyFactory.getStrategy(type).findByGeneratedAccountBookAndUser(user, accountBookToDelete);
         AccountBook originalAccountBook = iteration.getOriginalAccountBook();
         List<Iteration> allIterations
-                = iterationRepository.findAllByOriginalAccountBookAndUser(user, originalAccountBook, type);
+                = strategyFactory.getStrategy(type).findAllByOriginalAccountBookAndUser(user, originalAccountBook);
 
         List<Iteration> deleteIterations = resolveIterations(
                 iterationAction,
@@ -194,7 +195,7 @@ public class IterationService {
                 type
         );
 
-        iterationRepository.deleteAll(deleteIterations, type);
+        strategyFactory.getStrategy(type).deleteAll(deleteIterations);
         return deleteIterations.stream()
                 .map(Iteration::getGeneratedAccountBook)
                 .toList();
@@ -268,11 +269,11 @@ public class IterationService {
             User user,
             AccountBookType type
     ) {
-        return iterationRepository
-                .getThisAndFutureIterations(originalAccountBook, user, targetAccountBook.getAccountBookDate(), type);
+        return strategyFactory.getStrategy(type)
+                .getThisAndFutureIterations(user, originalAccountBook, targetAccountBook.getAccountBookDate());
     }
 
     public List<Long> getIterationAccountBookIds(User user, AccountBookType type) {
-        return iterationRepository.originalAccountBookIds(user, type);
+        return strategyFactory.getStrategy(type).originalAccountBookIds(user);
     }
 }

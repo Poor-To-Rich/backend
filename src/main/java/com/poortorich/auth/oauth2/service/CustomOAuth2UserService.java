@@ -34,23 +34,23 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
     private User saveUser(KakaoResponse response) {
         String username = response.getProvider() + "_" + response.getProviderId();
-
-        return userRepository.findByUsername(username)
-                .orElse(toUserEntity(response, username));
+        return userRepository.findByEmail(response.getEmail())
+                .orElseGet(() -> toUserEntity(response, username));
     }
 
     private User toUserEntity(KakaoResponse response, String username) {
         User user = User.builder()
                 .username(username)
                 .password(username)
-                .name(UUID.randomUUID().toString().replace("-", "").substring(0, 8)
+                .name(response.getName())
+                .nickname(UUID.randomUUID().toString().replace("-", "").substring(0, 8)
                         + response.getProviderId())
-                .nickname(response.getName())
                 .email(response.getEmail())
-                .gender(Gender.MALE)
+                .gender(Gender.FEMALE)
                 .birth(LocalDate.now())
                 .profileImage(response.getProfileImage())
                 .role(Role.PENDING)
+                .job("선택안함")
                 .build();
 
         userRepository.save(user);
