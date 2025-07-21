@@ -52,7 +52,7 @@ public class UserService {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new NotFoundException(UserResponse.USER_NOT_FOUND));
 
-        boolean isDefaultProfile = user.getProfileImage().equals(S3Constants.DEFAULT_PROFILE_IMAGE);
+        boolean isDefaultProfile = S3Constants.DEFAULT_PROFILES.contains(user.getProfileImage());
         String profileImage = null;
         if (!isDefaultProfile) {
             profileImage = user.getProfileImage();
