@@ -33,6 +33,6 @@ public class CustomOAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSucc
         String refreshToken = tokenGenerator.generateRefreshToken(userDetails.getUser());
         tokenManager.setRefreshTokens(response, refreshToken);
 
-        response.sendRedirect("https://localhost:5173/");
+        response.sendRedirect("https://www.poortorich.site/");
     }
 }
