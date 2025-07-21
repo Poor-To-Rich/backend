@@ -40,6 +40,8 @@ dependencies {
     implementation 'jakarta.xml.bind:jakarta.xml.bind-api:4.0.0'
     implementation 'org.glassfish.jaxb:jaxb-runtime:4.0.3'
     implementation 'com.fasterxml.jackson.core:jackson-databind'
+    implementation 'com.sksamuel.scrimage:scrimage-core:4.0.32'
+    implementation 'com.sksamuel.scrimage:scrimage-webp:4.0.32'
     compileOnly 'org.projectlombok:lombok'
 
     runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'

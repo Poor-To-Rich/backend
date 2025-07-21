@@ -5,6 +5,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 public class S3FileUtils {
 
+    public static final String WEBP_EXTENSION = ".webp";
     public static final String EXTENSION_SEPARATOR = ".";
     public static final String PATH_SEPARATOR = "/";
     public static final int NEXT_CHARACTER_OFFSET = 1;
@@ -17,10 +18,9 @@ public class S3FileUtils {
     }
 
     public static String generateUniqueFileName(String originalFileName) {
-        String extension = extractExtension(originalFileName);
-        return UUID.randomUUID() + extension;
+        return UUID.randomUUID() + WEBP_EXTENSION;
     }
-    
+
     public static String extractFileNameFromUrl(String urlString) {
         return urlString.substring(
                 urlString.lastIndexOf(PATH_SEPARATOR) + NEXT_CHARACTER_OFFSET
