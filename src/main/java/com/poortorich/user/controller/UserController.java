@@ -140,7 +140,7 @@ public class UserController {
     public ResponseEntity<BaseResponse> getOAuthUserProfile(@AuthenticationPrincipal UserDetails userDetails) {
         return DataResponse.toResponseEntity(
                 UserResponse.USER_DETAIL_FIND_SUCCESS,
-                userFacade.getUserDetails(userDetails.getUsername())
+                userFacade.getOAuthUserDetails(userDetails.getUsername())
         );
     }
 

@@ -42,14 +42,15 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         User user = User.builder()
                 .username(username)
                 .password(username)
-                .name(UUID.randomUUID().toString().replace("-", "").substring(0, 8)
+                .name(response.getName())
+                .nickname(UUID.randomUUID().toString().replace("-", "").substring(0, 8)
                         + response.getProviderId())
-                .nickname(response.getName())
                 .email(response.getEmail())
-                .gender(Gender.MALE)
+                .gender(Gender.FEMALE)
                 .birth(LocalDate.now())
                 .profileImage(response.getProfileImage())
                 .role(Role.PENDING)
+                .job("선택안함")
                 .build();
 
         userRepository.save(user);
