@@ -33,6 +33,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
     implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
     implementation 'io.jsonwebtoken:jjwt-api:0.12.3'
     implementation 'io.jsonwebtoken:jjwt-impl:0.12.3'
@@ -40,6 +41,8 @@ dependencies {
     implementation 'jakarta.xml.bind:jakarta.xml.bind-api:4.0.0'
     implementation 'org.glassfish.jaxb:jaxb-runtime:4.0.3'
     implementation 'com.fasterxml.jackson.core:jackson-databind'
+    implementation 'com.sksamuel.scrimage:scrimage-core:4.0.32'
+    implementation 'com.sksamuel.scrimage:scrimage-webp:4.0.32'
     compileOnly 'org.projectlombok:lombok'
 
     runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
