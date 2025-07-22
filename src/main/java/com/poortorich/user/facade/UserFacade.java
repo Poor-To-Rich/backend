@@ -1,6 +1,7 @@
 package com.poortorich.user.facade;
 
 import com.poortorich.auth.jwt.util.JwtTokenManager;
+import com.poortorich.auth.kakao.service.KakaoService;
 import com.poortorich.category.service.CategoryService;
 import com.poortorich.global.response.Response;
 import com.poortorich.s3.service.FileUploadService;
@@ -39,6 +40,7 @@ public class UserFacade {
     private final RedisUserReservationService userReservationService;
     private final UserResetService userResetService;
     private final CategoryService categoryService;
+    private final KakaoService kakaoService;
     private final JwtTokenManager tokenManager;
 
     @Transactional
@@ -109,6 +111,7 @@ public class UserFacade {
     public Response deleteUserAccount(String username, HttpServletResponse response) {
         User user = userService.findUserByUsername(username);
         tokenManager.clearAuthTokensTest(response);
+        kakaoService.callUnlinkAPI(username);
         userResetService.deleteDefaultCategories(user);
         userService.deleteUserAccount(user);
         return UserResponse.DELETE_USER_ACCOUNT_SUCCESS;
