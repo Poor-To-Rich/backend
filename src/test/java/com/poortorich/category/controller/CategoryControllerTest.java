@@ -163,12 +163,12 @@ class CategoryControllerTest extends BaseSecurityTest {
         String requestJson = objectMapper.writeValueAsString(request);
 
         when(categoryService.updateActiveCategory(
-                eq(CategoryFixture.VALID_CATEGORY_ID),
+                eq(CategoryFixture.VALID_CATEGORY_ID_1),
                 any(CategoryVisibilityRequest.class),
                 eq(UserFixture.VALID_USERNAME_SAMPLE_1))
         ).thenReturn(CategoryResponse.CATEGORY_VISIBILITY_TRUE_SUCCESS);
 
-        mockMvc.perform(put(CategoryApiFixture.UPDATE_ACTIVE_CATEGORY_PATH + CategoryFixture.VALID_CATEGORY_ID)
+        mockMvc.perform(put(CategoryApiFixture.UPDATE_ACTIVE_CATEGORY_PATH + CategoryFixture.VALID_CATEGORY_ID_1)
                         .content(requestJson)
                         .contentType(MediaType.APPLICATION_JSON)
                         .with(csrf()))
@@ -183,7 +183,7 @@ class CategoryControllerTest extends BaseSecurityTest {
     @DisplayName("사용자 지정 지출 카테고리 생성 성공")
     void createExpenseCategorySuccess() throws Exception {
         CategoryInfoRequest request
-                = new CategoryInfoRequest(CategoryFixture.VALID_CATEGORY_NAME, CategoryFixture.VALID_CATEGORY_COLOR);
+                = new CategoryInfoRequest(CategoryFixture.VALID_CATEGORY_NAME_1, CategoryFixture.VALID_CATEGORY_COLOR);
         String requestJson = objectMapper.writeValueAsString(request);
 
         when(categoryService.createCategory(
@@ -206,7 +206,7 @@ class CategoryControllerTest extends BaseSecurityTest {
     @DisplayName("사용자 지정 수입 카테고리 생성 성공")
     void createIncomeCategorySuccess() throws Exception {
         CategoryInfoRequest request
-                = new CategoryInfoRequest(CategoryFixture.VALID_CATEGORY_NAME, CategoryFixture.VALID_CATEGORY_COLOR);
+                = new CategoryInfoRequest(CategoryFixture.VALID_CATEGORY_NAME_1, CategoryFixture.VALID_CATEGORY_COLOR);
         String requestJson = objectMapper.writeValueAsString(request);
 
         when(categoryService.createCategory(
@@ -228,10 +228,10 @@ class CategoryControllerTest extends BaseSecurityTest {
     @WithMockUser(username = UserFixture.VALID_USERNAME_SAMPLE_1)
     @DisplayName("사용자 지정 카테고리 조회 성공")
     void getCategorySuccess() throws Exception {
-        when(categoryService.getCategory(CategoryFixture.VALID_CATEGORY_ID, UserFixture.VALID_USERNAME_SAMPLE_1))
+        when(categoryService.getCategory(CategoryFixture.VALID_CATEGORY_ID_1, UserFixture.VALID_USERNAME_SAMPLE_1))
                 .thenReturn(CategoryInfoResponse.builder().build());
 
-        mockMvc.perform(get(CategoryApiFixture.GET_CATEGORY_PATH + CategoryFixture.VALID_CATEGORY_ID)
+        mockMvc.perform(get(CategoryApiFixture.GET_CATEGORY_PATH + CategoryFixture.VALID_CATEGORY_ID_1)
                         .with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message")
@@ -244,16 +244,16 @@ class CategoryControllerTest extends BaseSecurityTest {
     @DisplayName("사용자 지정 카테고리 수정 성공")
     void modifyCategorySuccess() throws Exception {
         CategoryInfoRequest request
-                = new CategoryInfoRequest(CategoryFixture.VALID_CATEGORY_NAME, CategoryFixture.VALID_CATEGORY_COLOR);
+                = new CategoryInfoRequest(CategoryFixture.VALID_CATEGORY_NAME_1, CategoryFixture.VALID_CATEGORY_COLOR);
         String requestJson = objectMapper.writeValueAsString(request);
 
         when(categoryService.modifyCategory(
-                eq(CategoryFixture.VALID_CATEGORY_ID),
+                eq(CategoryFixture.VALID_CATEGORY_ID_1),
                 any(CategoryInfoRequest.class),
                 eq(UserFixture.VALID_USERNAME_SAMPLE_1))
         ).thenReturn(CategoryResponse.MODIFY_CATEGORY_SUCCESS);
 
-        mockMvc.perform(put(CategoryApiFixture.MODIFY_CATEGORY_PATH + CategoryFixture.VALID_CATEGORY_ID)
+        mockMvc.perform(put(CategoryApiFixture.MODIFY_CATEGORY_PATH + CategoryFixture.VALID_CATEGORY_ID_1)
                         .content(requestJson)
                         .contentType(MediaType.APPLICATION_JSON)
                         .with(csrf()))
@@ -268,11 +268,11 @@ class CategoryControllerTest extends BaseSecurityTest {
     @DisplayName("사용자 지정 카테고리 삭제 성공")
     void deleteCategorySuccess() throws Exception {
         when(categoryService.deleteCategory(
-                eq(CategoryFixture.VALID_CATEGORY_ID),
+                eq(CategoryFixture.VALID_CATEGORY_ID_1),
                 eq(UserFixture.VALID_USERNAME_SAMPLE_1))
         ).thenReturn(CategoryResponse.DELETE_CATEGORY_SUCCESS);
 
-        mockMvc.perform(delete(CategoryApiFixture.DELETE_CATEGORY_PATH + CategoryFixture.VALID_CATEGORY_ID)
+        mockMvc.perform(delete(CategoryApiFixture.DELETE_CATEGORY_PATH + CategoryFixture.VALID_CATEGORY_ID_1)
                         .with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message")
