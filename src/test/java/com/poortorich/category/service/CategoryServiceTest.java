@@ -12,6 +12,7 @@ import com.poortorich.category.response.CategoryInfoResponse;
 import com.poortorich.category.response.CustomCategoryResponse;
 import com.poortorich.category.response.DefaultCategoryResponse;
 import com.poortorich.category.response.enums.CategoryResponse;
+import com.poortorich.category.util.CategoryTestBuilder;
 import com.poortorich.global.exceptions.BadRequestException;
 import com.poortorich.global.exceptions.ConflictException;
 import com.poortorich.global.exceptions.NotFoundException;
@@ -63,8 +64,11 @@ class CategoryServiceTest {
     @Test
     @DisplayName("기본 지출 카테고리 목록 조회 성공")
     void getDefaultExpenseCategoriesSuccess() {
-        Category category1 = CategoryFixture.createDefaultExpenseCategory1(user);
-        Category category2 = CategoryFixture.createDefaultExpenseCategory2(user);
+        Category category1 = CategoryTestBuilder.builder().build(CategoryType.DEFAULT_EXPENSE, user);
+        Category category2 = CategoryTestBuilder.builder()
+                .id(CategoryFixture.VALID_CATEGORY_ID_2)
+                .name(CategoryFixture.VALID_CATEGORY_NAME_2)
+                .build(CategoryType.DEFAULT_EXPENSE, user);
 
         when(userRepository.findByUsername(UserFixture.VALID_USERNAME_SAMPLE_1)).thenReturn(Optional.of(user));
         when(categoryRepository.findByUserAndTypeAndIsDeletedFalse(user, CategoryType.DEFAULT_EXPENSE))
@@ -84,8 +88,11 @@ class CategoryServiceTest {
     @Test
     @DisplayName("기본 수입 카테고리 목록 조회 성공")
     void getDefaultIncomeCategoriesSuccess() {
-        Category category1 = CategoryFixture.createDefaultIncomeCategory1(user);
-        Category category2 = CategoryFixture.createDefaultIncomeCategory2(user);
+        Category category1 = CategoryTestBuilder.builder().build(CategoryType.DEFAULT_INCOME, user);
+        Category category2 = CategoryTestBuilder.builder()
+                .id(CategoryFixture.VALID_CATEGORY_ID_2)
+                .name(CategoryFixture.VALID_CATEGORY_NAME_2)
+                .build(CategoryType.DEFAULT_INCOME, user);
 
         when(userRepository.findByUsername(UserFixture.VALID_USERNAME_SAMPLE_1)).thenReturn(Optional.of(user));
         when(categoryRepository.findByUserAndTypeAndIsDeletedFalse(user, CategoryType.DEFAULT_INCOME))
@@ -105,8 +112,11 @@ class CategoryServiceTest {
     @Test
     @DisplayName("사용자 지정 지출 카테고리 목록 조회 성공")
     void getCustomExpenseCategoriesSuccess() {
-        Category category1 = CategoryFixture.createCustomExpenseCategory1(user);
-        Category category2 = CategoryFixture.createCustomExpenseCategory2(user);
+        Category category1 = CategoryTestBuilder.builder().build(CategoryType.CUSTOM_EXPENSE, user);
+        Category category2 = CategoryTestBuilder.builder()
+                .id(CategoryFixture.VALID_CATEGORY_ID_2)
+                .name(CategoryFixture.VALID_CATEGORY_NAME_2)
+                .build(CategoryType.CUSTOM_EXPENSE, user);
 
         when(userRepository.findByUsername(UserFixture.VALID_USERNAME_SAMPLE_1)).thenReturn(Optional.of(user));
         when(categoryRepository.findByUserAndTypeAndIsDeletedFalse(user, CategoryType.CUSTOM_EXPENSE))
@@ -126,8 +136,11 @@ class CategoryServiceTest {
     @Test
     @DisplayName("사용자 지정 수입 카테고리 목록 조회 성공")
     void getCustomIncomeCategoriesSuccess() {
-        Category category1 = CategoryFixture.createCustomIncomeCategory1(user);
-        Category category2 = CategoryFixture.createCustomIncomeCategory2(user);
+        Category category1 = CategoryTestBuilder.builder().build(CategoryType.CUSTOM_INCOME, user);
+        Category category2 = CategoryTestBuilder.builder()
+                .id(CategoryFixture.VALID_CATEGORY_ID_2)
+                .name(CategoryFixture.VALID_CATEGORY_NAME_2)
+                .build(CategoryType.CUSTOM_INCOME, user);
 
         when(userRepository.findByUsername(UserFixture.VALID_USERNAME_SAMPLE_1)).thenReturn(Optional.of(user));
         when(categoryRepository.findByUserAndTypeAndIsDeletedFalse(user, CategoryType.CUSTOM_INCOME))
@@ -164,8 +177,11 @@ class CategoryServiceTest {
     @Test
     @DisplayName("활성화된 지출 카테고리 목록 조회 성공")
     void getActiveExpenseCategoriesSuccess() {
-        Category category1 = CategoryFixture.createDefaultExpenseCategory1(user);
-        Category category2 = CategoryFixture.createDefaultExpenseCategory2(user);
+        Category category1 = CategoryTestBuilder.builder().build(CategoryType.DEFAULT_EXPENSE, user);
+        Category category2 = CategoryTestBuilder.builder()
+                .id(CategoryFixture.VALID_CATEGORY_ID_2)
+                .name(CategoryFixture.VALID_CATEGORY_NAME_2)
+                .build(CategoryType.DEFAULT_EXPENSE, user);
 
         when(userRepository.findByUsername(UserFixture.VALID_USERNAME_SAMPLE_1)).thenReturn(Optional.of(user));
         when(categoryRepository.findByUserAndTypeInAndIsDeletedFalse(
@@ -191,8 +207,11 @@ class CategoryServiceTest {
     @Test
     @DisplayName("활성화된 수입 카테고리 목록 조회 성공")
     void getActiveIncomeCategoriesSuccess() {
-        Category category1 = CategoryFixture.createDefaultIncomeCategory1(user);
-        Category category2 = CategoryFixture.createDefaultIncomeCategory2(user);
+        Category category1 = CategoryTestBuilder.builder().build(CategoryType.DEFAULT_INCOME, user);
+        Category category2 = CategoryTestBuilder.builder()
+                .id(CategoryFixture.VALID_CATEGORY_ID_2)
+                .name(CategoryFixture.VALID_CATEGORY_NAME_2)
+                .build(CategoryType.DEFAULT_INCOME, user);
 
         when(userRepository.findByUsername(UserFixture.VALID_USERNAME_SAMPLE_1)).thenReturn(Optional.of(user));
         when(categoryRepository.findByUserAndTypeInAndIsDeletedFalse(
@@ -242,7 +261,7 @@ class CategoryServiceTest {
     @DisplayName("카테고리 활성화 상태 변경 성공")
     void updateActiveCategorySuccess() {
         CategoryVisibilityRequest request = new CategoryVisibilityRequest(CategoryFixture.CATEGORY_ACTIVE);
-        Category category = CategoryFixture.createDefaultCategory(user);
+        Category category = CategoryTestBuilder.builder().build(CategoryType.DEFAULT_EXPENSE, user);
 
         when(userRepository.findByUsername(UserFixture.VALID_USERNAME_SAMPLE_1)).thenReturn(Optional.of(user));
         when(categoryRepository.findByIdAndUserAndIsDeletedFalse(CategoryFixture.VALID_CATEGORY_ID_1, user))
@@ -264,7 +283,9 @@ class CategoryServiceTest {
     @DisplayName("카테고리 비활성화 상태로 변경 성공")
     void updateInactiveCategorySuccess() {
         CategoryVisibilityRequest request = new CategoryVisibilityRequest(CategoryFixture.CATEGORY_INACTIVE);
-        Category category = CategoryFixture.createInactiveCategory(user);
+        Category category = CategoryTestBuilder.builder()
+                .visibility(CategoryFixture.CATEGORY_INACTIVE)
+                .build(CategoryType.DEFAULT_EXPENSE, user);
 
         when(userRepository.findByUsername(UserFixture.VALID_USERNAME_SAMPLE_1)).thenReturn(Optional.of(user));
         when(categoryRepository.findByIdAndUserAndIsDeletedFalse(CategoryFixture.VALID_CATEGORY_ID_1, user))
@@ -326,13 +347,14 @@ class CategoryServiceTest {
                 CategoryFixture.VALID_CATEGORY_COLOR
         );
         CategoryType type = CategoryType.CUSTOM_EXPENSE;
+        Category category = CategoryTestBuilder.builder().build(type, user);
 
         when(userRepository.findByUsername(UserFixture.VALID_USERNAME_SAMPLE_1)).thenReturn(Optional.of(user));
         when(categoryRepository.findByUserAndNameAndTypeInAndIsDeletedFalse(
                 user,
                 request.getName(),
                 type.getSameGroupTypes())
-        ).thenReturn(Optional.of(CategoryFixture.createCustomExpenseCategory1(user)));
+        ).thenReturn(Optional.of(category));
 
         assertThatThrownBy(() -> categoryService.createCategory(request, type, UserFixture.VALID_USERNAME_SAMPLE_1))
                 .isInstanceOf(BadRequestException.class)
@@ -366,7 +388,7 @@ class CategoryServiceTest {
     @Test
     @DisplayName("카테고리 조회 성공")
     void getCategorySuccess() {
-        Category category = CategoryFixture.createCustomExpenseCategory1(user);
+        Category category = CategoryTestBuilder.builder().build(CategoryType.CUSTOM_EXPENSE, user);
 
         when(userRepository.findByUsername(UserFixture.VALID_USERNAME_SAMPLE_1)).thenReturn(Optional.of(user));
         when(categoryRepository.findByIdAndUserAndIsDeletedFalse(category.getId(), user))
@@ -405,7 +427,7 @@ class CategoryServiceTest {
                 CategoryFixture.VALID_CATEGORY_NAME_1,
                 CategoryFixture.VALID_CATEGORY_COLOR
         );
-        Category category = CategoryFixture.createCustomExpenseCategory1(user);
+        Category category = CategoryTestBuilder.builder().build(CategoryType.CUSTOM_EXPENSE, user);
 
         when(userRepository.findByUsername(UserFixture.VALID_USERNAME_SAMPLE_1)).thenReturn(Optional.of(user));
         when(categoryRepository.findByIdAndUserAndIsDeletedFalse(CategoryFixture.VALID_CATEGORY_ID_1, user))
@@ -450,7 +472,7 @@ class CategoryServiceTest {
                 CategoryFixture.VALID_CATEGORY_NAME_1,
                 CategoryFixture.VALID_CATEGORY_COLOR
         );
-        Category category = CategoryFixture.createCustomExpenseCategory1(user);
+        Category category = CategoryTestBuilder.builder().build(CategoryType.CUSTOM_EXPENSE, user);
 
         when(userRepository.findByUsername(UserFixture.VALID_USERNAME_SAMPLE_1)).thenReturn(Optional.of(user));
         when(categoryRepository.findByIdAndUserAndIsDeletedFalse(CategoryFixture.VALID_CATEGORY_ID_1, user))
@@ -475,7 +497,9 @@ class CategoryServiceTest {
     @Test
     @DisplayName("카테고리 삭제 성공")
     void deleteCategorySuccess() {
-        Category category = CategoryFixture.createDeletedCategory(user);
+        Category category = CategoryTestBuilder.builder()
+                .isDeleted(CategoryFixture.CATEGORY_DELETED)
+                .build(CategoryType.CUSTOM_EXPENSE, user);
 
         when(userRepository.findByUsername(UserFixture.VALID_USERNAME_SAMPLE_1)).thenReturn(Optional.of(user));
         when(categoryRepository.findByIdAndUserAndIsDeletedFalse(CategoryFixture.VALID_CATEGORY_ID_1, user))
@@ -510,7 +534,7 @@ class CategoryServiceTest {
     @Test
     @DisplayName("삭제되지 않은 카테고리 이름으로 조회 성공")
     void findCategoryByNameNotDeletedSuccess() {
-        Category category = CategoryFixture.createDefaultCategory(user);
+        Category category = CategoryTestBuilder.builder().build(CategoryType.CUSTOM_EXPENSE, user);
 
         when(categoryRepository.findByUserAndNameAndTypeInAndIsDeletedFalse(
                 user,
@@ -530,7 +554,7 @@ class CategoryServiceTest {
     @Test
     @DisplayName("카테고리 이름과 카테고리 타입으로 카테고리 조회 성공")
     void findCategoryByNameAndTypeInSuccess() {
-        Category category = CategoryFixture.createDefaultCategory(user);
+        Category category = CategoryTestBuilder.builder().build(CategoryType.CUSTOM_EXPENSE, user);
 
         when(categoryRepository.findByUserAndNameAndTypeIn(
                 user,
@@ -550,7 +574,7 @@ class CategoryServiceTest {
     @Test
     @DisplayName("카테고리 이름으로 카테고리 조회 성공")
     void findCategoryByNameSuccess() {
-        Category category = CategoryFixture.createDefaultCategory(user);
+        Category category = CategoryTestBuilder.builder().build(CategoryType.CUSTOM_EXPENSE, user);
 
         when(categoryRepository.findByNameAndUser(category.getName(), user)).thenReturn(Optional.of(category));
 
