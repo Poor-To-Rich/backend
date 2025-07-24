@@ -32,8 +32,8 @@ import java.time.LocalDateTime;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-@DiscriminatorColumn(name = "iterationType", discriminatorType = DiscriminatorType.STRING)
-@Table(name = "iterationInfo")
+@DiscriminatorColumn(name = "iteration_type", discriminatorType = DiscriminatorType.STRING)
+@Table(name = "iteration_info")
 public class IterationInfo {
 
     @Id
@@ -41,28 +41,28 @@ public class IterationInfo {
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "iterationType", insertable = false, updatable = false)
+    @Column(name = "iteration_type", insertable = false, updatable = false)
     private String iterationType;
 
     @Column(name = "cycle")
     private Integer cycle;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "endType")
+    @Column(name = "end_type")
     private EndType endType;
 
-    @Column(name = "endCount")
+    @Column(name = "end_count")
     private Integer endCount;
 
-    @Column(name = "endDate")
+    @Column(name = "end_date")
     private LocalDate endDate;
 
     @CreationTimestamp
-    @Column(name = "createdDate")
+    @Column(name = "created_date")
     private LocalDateTime createdDate;
 
     @UpdateTimestamp
-    @Column(name = "updatedDate")
+    @Column(name = "updated_date")
     private LocalDateTime updatedDate;
 
     public String getIterationTypeLowerCase() {
