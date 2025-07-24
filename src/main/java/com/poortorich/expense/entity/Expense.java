@@ -47,7 +47,7 @@ public class Expense implements AccountBook {
     private Long id;
 
     @NotNull
-    @Column(name = "expenseDate", nullable = false)
+    @Column(name = "expense_date", nullable = false)
     private LocalDate expenseDate;
 
     @Column(name = "title")
@@ -58,7 +58,7 @@ public class Expense implements AccountBook {
 
     @NotNull
     @Enumerated(EnumType.STRING)
-    @Column(name = "paymentMethod", nullable = false)
+    @Column(name = "payment_method", nullable = false)
     private PaymentMethod paymentMethod;
 
     @Column(name = "memo")
@@ -66,26 +66,26 @@ public class Expense implements AccountBook {
 
     @NotNull
     @Enumerated(EnumType.STRING)
-    @Column(name = "iterationType", nullable = false)
+    @Column(name = "iteration_type", nullable = false)
     private IterationType iterationType;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "categoryId")
+    @JoinColumn(name = "category_id")
     private Category category;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "userId")
+    @JoinColumn(name = "user_id")
     private User user;
 
     @OneToOne(mappedBy = "generatedExpense")
     private IterationExpenses generatedIterationExpenses;
 
     @CreationTimestamp
-    @Column(name = "createdDate")
+    @Column(name = "created_Date")
     private LocalDateTime createdDate;
 
     @UpdateTimestamp
-    @Column(name = "updatedDate")
+    @Column(name = "updated_date")
     private LocalDateTime updatedDate;
 
     @Override
