@@ -1,9 +1,9 @@
-package com.poortorich.websocket.stomp.handler;
+package com.poortorich.websocket.stomp.command.connect.handler;
 
 import com.poortorich.auth.jwt.constants.JwtConstants;
 import com.poortorich.auth.jwt.util.JwtTokenExtractor;
-import com.poortorich.websocket.stomp.StompSessionManager;
 import com.poortorich.websocket.stomp.util.StompHeaderExtractor;
+import com.poortorich.websocket.stomp.util.StompSessionManager;
 import com.poortorich.websocket.stomp.validator.StompValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,11 +15,11 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class StompConnectHandler {
 
-    StompHeaderExtractor headerExtractor;
-    StompSessionManager sessionManager;
-    StompValidator stompValidator;
+    private final StompHeaderExtractor headerExtractor;
+    private final StompSessionManager sessionManager;
+    private final StompValidator stompValidator;
 
-    JwtTokenExtractor tokenExtractor;
+    private final JwtTokenExtractor tokenExtractor;
 
     public void handle(StompHeaderAccessor accessor) {
         log.info("[CONNECT]: 연결 시작");
