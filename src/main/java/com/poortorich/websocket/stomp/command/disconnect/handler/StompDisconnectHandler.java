@@ -1,4 +1,4 @@
-package com.poortorich.websocket.stomp.handler;
+package com.poortorich.websocket.stomp.command.disconnect.handler;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
