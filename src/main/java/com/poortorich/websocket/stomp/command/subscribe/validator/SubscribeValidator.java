@@ -1,8 +1,9 @@
-package com.poortorich.websocket.stomp.validator;
+package com.poortorich.websocket.stomp.command.subscribe.validator;
 
 import com.poortorich.global.exceptions.NotFoundException;
-import com.poortorich.websocket.stomp.endpoint.SubscribeEndpoint;
+import com.poortorich.websocket.stomp.command.subscribe.endpoint.SubscribeEndpoint;
 import com.poortorich.websocket.stomp.response.StompResponse;
+import com.poortorich.websocket.stomp.validator.StompValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.stereotype.Component;

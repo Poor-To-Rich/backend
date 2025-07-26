@@ -1,8 +1,8 @@
-package com.poortorich.websocket.stomp.handler;
+package com.poortorich.websocket.stomp.command.subscribe.handler;
 
-import com.poortorich.websocket.stomp.StompSessionManager;
-import com.poortorich.websocket.stomp.util.SubscribeEndpointExtractor;
-import com.poortorich.websocket.stomp.validator.SubscribeValidator;
+import com.poortorich.websocket.stomp.command.subscribe.util.SubscribeEndpointExtractor;
+import com.poortorich.websocket.stomp.command.subscribe.validator.SubscribeValidator;
+import com.poortorich.websocket.stomp.util.StompSessionManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;

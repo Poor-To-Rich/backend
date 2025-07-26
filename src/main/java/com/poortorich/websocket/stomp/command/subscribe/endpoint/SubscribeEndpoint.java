@@ -1,4 +1,4 @@
-package com.poortorich.websocket.stomp.endpoint;
+package com.poortorich.websocket.stomp.command.subscribe.endpoint;
 
 import java.util.List;
 

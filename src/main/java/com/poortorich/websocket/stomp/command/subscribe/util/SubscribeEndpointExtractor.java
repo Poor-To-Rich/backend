@@ -1,7 +1,7 @@
-package com.poortorich.websocket.stomp.util;
+package com.poortorich.websocket.stomp.command.subscribe.util;
 
 import com.poortorich.global.exceptions.BadRequestException;
-import com.poortorich.websocket.stomp.endpoint.SubscribeEndpoint;
+import com.poortorich.websocket.stomp.command.subscribe.endpoint.SubscribeEndpoint;
 import com.poortorich.websocket.stomp.response.StompResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
