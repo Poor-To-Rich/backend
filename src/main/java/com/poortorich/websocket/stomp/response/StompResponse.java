@@ -1,0 +1,32 @@
+package com.poortorich.websocket.stomp.response;
+
+import com.poortorich.global.response.Response;
+import com.poortorich.websocket.stomp.constants.StompResponseMessage;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+
+@RequiredArgsConstructor
+public enum StompResponse implements Response {
+
+    SESSION_ATTRIBUTE_INVALID(HttpStatus.BAD_REQUEST, StompResponseMessage.SESSION_ATTRIBUTE_INVALID, "STOMP"),
+    DESTINATION_NOT_FOUND(HttpStatus.NOT_FOUND, StompResponseMessage.DESTINATION_NOT_FOUND, "STOMP"),
+    DESTINATION_INVALID(HttpStatus.BAD_REQUEST, StompResponseMessage.DESTINATION_INVALID, "STOMP");
+    private final HttpStatus httpStatus;
+    private final String message;
+    private final String field;
+
+    @Override
+    public HttpStatus getHttpStatus() {
+        return httpStatus;
+    }
+
+    @Override
+    public String getMessage() {
+        return message;
+    }
+
+    @Override
+    public String getField() {
+        return field;
+    }
+}
