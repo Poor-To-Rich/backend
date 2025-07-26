@@ -1,4 +1,4 @@
-package com.poortorich.websocket.stomp;
+package com.poortorich.websocket.stomp.util;
 
 import com.poortorich.websocket.stomp.validator.StompValidator;
 import lombok.RequiredArgsConstructor;
