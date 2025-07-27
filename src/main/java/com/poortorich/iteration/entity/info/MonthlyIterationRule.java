@@ -24,16 +24,16 @@ import org.hibernate.annotations.DynamicUpdate;
 public class MonthlyIterationRule extends IterationInfo {
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "monthlyMode")
+    @Column(name = "monthly_mode")
     private MonthlyMode monthlyMode;
 
-    @Column(name = "monthlyDay")
+    @Column(name = "monthly_day")
     private Integer monthlyDay;
 
-    @Column(name = "monthlyWeek")
+    @Column(name = "monthly_week")
     private Integer monthlyWeek;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "monthlyDayOfWeek")
+    @Column(name = "monthly_day_of_week")
     private Weekday monthlyDayOfWeek;
 }

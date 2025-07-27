@@ -64,7 +64,7 @@ public class User implements UserDetails {
     @Column(name = "birth", nullable = false)
     private LocalDate birth;
 
-    @Column(name = "profileImage", nullable = false)
+    @Column(name = "profile_image", nullable = false)
     private String profileImage;
 
     @Column(name = "job")
@@ -75,11 +75,11 @@ public class User implements UserDetails {
     @Builder.Default
     private Role role = Role.USER;
 
-    @Column(name = "createdDate", nullable = false)
+    @Column(name = "created_date", nullable = false)
     @CreationTimestamp
     private LocalDateTime createdDate;
 
-    @Column(name = "updatedDate", nullable = false)
+    @Column(name = "updated_date", nullable = false)
     @UpdateTimestamp
     private LocalDateTime updatedDate;
 
