@@ -8,6 +8,7 @@ import com.poortorich.security.handler.TestAccessDeniedHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -39,8 +40,31 @@ public class SecurityConfig {
     private final CustomOAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
 
     @Bean
+    @Order(1)
+    public SecurityFilterChain oAuth2FilterChain(HttpSecurity http) throws Exception {
+        http
+                .securityMatcher("/oauth2/**", "/login/oauth2/**")
+                .csrf(AbstractHttpConfigurer::disable)
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .oauth2Login(oauth2 -> oauth2
+                        .userInfoEndpoint(userInfo -> userInfo
+                                .userService(customOAuth2UserService))
+                        .successHandler(oAuth2LoginSuccessHandler));
+
+        return http.build();
+    }
+
+    @Bean
+    @Order(2)
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
+                .securityMatcher(request -> {
+                    String uri = request.getRequestURI();
+                    return !uri.startsWith("/oauth2/") &&
+                            !uri.startsWith("/login/oauth2/") &&
+                            !uri.equals("/login") &&
+                            !uri.equals("/favicon.ico");
+                })
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session ->
@@ -59,13 +83,6 @@ public class SecurityConfig {
                 )
                 .exceptionHandling(exception -> exception.accessDeniedHandler(accessDeniedHandler))
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
-
-        http
-                .oauth2Login((oauth2) -> oauth2
-                        .userInfoEndpoint((userInfo) -> userInfo
-                                .userService(customOAuth2UserService))
-                        .successHandler(oAuth2LoginSuccessHandler)
-                        .permitAll());
 
         return http.build();
     }
