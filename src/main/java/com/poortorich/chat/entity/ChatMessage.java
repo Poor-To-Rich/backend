@@ -50,6 +50,9 @@ public class ChatMessage {
     @Column(name = "photo_id")
     private Long photoId;
 
+    @Column(name = "user_id")
+    private Long userId;
+
     @Column(name = "content")
     private String content;
 
