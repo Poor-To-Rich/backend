@@ -6,7 +6,10 @@ import com.poortorich.chat.entity.enums.ChatroomRole;
 import com.poortorich.chat.entity.enums.NoticeStatus;
 import com.poortorich.chat.entity.enums.RankingStatus;
 import com.poortorich.chat.request.ChatroomCreateRequest;
+import com.poortorich.chat.response.ChatroomInfoResponse;
 import com.poortorich.user.entity.User;
+
+import java.util.List;
 
 public class ChatBuilder {
 
@@ -29,6 +32,18 @@ public class ChatBuilder {
                 .noticeStatus(NoticeStatus.DEFAULT)
                 .user(user)
                 .chatroom(chatroom)
+                .build();
+    }
+
+    public static ChatroomInfoResponse buildChatroomInfoResponse(Chatroom chatroom, List<String> hashtags) {
+        return ChatroomInfoResponse.builder()
+                .chatroomImage(chatroom.getImage())
+                .chatroomTitle(chatroom.getTitle())
+                .description(chatroom.getDescription())
+                .maxMemberCount(chatroom.getMaxMemberCount())
+                .hashtags(hashtags)
+                .isRankingEnabled(chatroom.getIsRankingEnabled())
+                .chatroomPassword(chatroom.getPassword())
                 .build();
     }
 }

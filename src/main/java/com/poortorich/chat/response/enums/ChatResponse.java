@@ -10,7 +10,10 @@ import org.springframework.http.HttpStatus;
 @RequiredArgsConstructor
 public enum ChatResponse implements Response {
 
-    CREATE_CHATROOM_SUCCESS(HttpStatus.CREATED, ChatResponseMessage.CREATE_CHATROOM_SUCCESS, null);
+    CREATE_CHATROOM_SUCCESS(HttpStatus.CREATED, ChatResponseMessage.CREATE_CHATROOM_SUCCESS, null),
+    GET_CHATROOM_SUCCESS(HttpStatus.OK, ChatResponseMessage.GET_CHATROOM_SUCCESS, null),
+
+    CHATROOM_NON_EXISTENT(HttpStatus.NOT_FOUND, ChatResponseMessage.CHATROOM_NON_EXISTENT, "chatroomId");
 
     private final HttpStatus httpStatus;
     private final String message;
