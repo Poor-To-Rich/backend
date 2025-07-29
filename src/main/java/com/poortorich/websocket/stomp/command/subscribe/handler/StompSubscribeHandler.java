@@ -1,5 +1,13 @@
 package com.poortorich.websocket.stomp.command.subscribe.handler;
 
+import com.poortorich.chat.entity.Chatroom;
+import com.poortorich.chat.repository.ChatroomRepository;
+import com.poortorich.chat.response.enums.ChatResponse;
+import com.poortorich.chat.validator.ChatroomValidator;
+import com.poortorich.global.exceptions.NotFoundException;
+import com.poortorich.user.entity.User;
+import com.poortorich.user.repository.UserRepository;
+import com.poortorich.user.response.enums.UserResponse;
 import com.poortorich.websocket.stomp.command.subscribe.util.SubscribeEndpointExtractor;
 import com.poortorich.websocket.stomp.command.subscribe.validator.SubscribeValidator;
 import com.poortorich.websocket.stomp.util.StompSessionManager;
@@ -13,21 +21,28 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class StompSubscribeHandler {
 
+    private final UserRepository userRepository;
+    private final ChatroomRepository chatroomRepository;
+    private final ChatroomValidator chatroomValidator;
+
     private final StompSessionManager sessionManager;
     private final SubscribeValidator subscribeValidator;
     private final SubscribeEndpointExtractor endpointExtractor;
 
     public void handle(StompHeaderAccessor accessor) {
         log.info("[SUBSCRIBE]: 구독 시작---------------------------");
-        log.info("[SUBSCRIBE]: 엔드포인트 검증 시작");
         subscribeValidator.validateEndPoint(accessor);
         Long chatRoomId = endpointExtractor.getChatroomId(accessor.getDestination());
-        log.info("[SUBSCRIBE]: 엔드포인트 검증 성공, 채팅방 아이디: {}", chatRoomId);
-        log.info("[SUBSCRIBE]: 유저 정보 추출 시작");
+        Chatroom chatroom = chatroomRepository.findById(chatRoomId)
+                .orElseThrow(() -> new NotFoundException(ChatResponse.CHATROOM_NOT_FOUND));
+        log.info("[SUBSCRIBE]: 유효한 채팅방 엔드포인트: {}", chatRoomId);
+
         String username = sessionManager.getUsername(accessor);
-        log.info("[SUBSCRIBE]: 유저 정보 추출 성공, username: {}", username);
-        log.info("[SUBSCRIBE]: 채팅방[id={}]에 참여자[username:{}]가 참여할 수 있는지 검증", chatRoomId, username);
-        log.info("[SUBSCRIBE]: 채팅방 검증 성공");
-        log.info("[SUBSCRIBE]: 구독 성공---------------------------");
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new NotFoundException(UserResponse.USER_NOT_FOUND));
+        log.info("[SUBSCRIBE]: 유저 조회 성공: {}", username);
+
+        chatroomValidator.validateSubscribe(user, chatroom);
+        log.info("[SUBSCRIBE]: 유저 `{}`가 채팅방[{}] 구독 완료", username, chatroom.getId());
     }
 }
