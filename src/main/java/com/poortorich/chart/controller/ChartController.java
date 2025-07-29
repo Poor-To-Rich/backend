@@ -3,10 +3,14 @@ package com.poortorich.chart.controller;
 import com.poortorich.accountbook.enums.AccountBookType;
 import com.poortorich.chart.facade.ChartFacade;
 import com.poortorich.chart.response.enums.ChartResponse;
+import com.poortorich.global.date.constants.DatePattern;
+import com.poortorich.global.date.constants.DateResponseMessage;
 import com.poortorich.global.response.BaseResponse;
 import com.poortorich.global.response.DataResponse;
 import jakarta.annotation.Nullable;
+import jakarta.validation.constraints.Pattern;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -30,7 +34,18 @@ public class ChartController {
     ) {
         return DataResponse.toResponseEntity(
                 ChartResponse.GET_TOTAL_EXPENSE_AND_SAVINGS_SUCCESS,
-                chartFacade.getTotalExpenseAmountAndSaving(userDetails.getUsername(), date)
+                chartFacade.getTotalAccountBookAmountAndSaving(userDetails.getUsername(), date, AccountBookType.EXPENSE)
+        );
+    }
+
+    @GetMapping("/income/total")
+    public ResponseEntity<BaseResponse> getTotalIncomeAmountAndSaving(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @RequestParam("date") @Nullable String date
+    ) {
+        return DataResponse.toResponseEntity(
+                ChartResponse.GET_TOTAL_INCOME_AND_SAVINGS_SUCCESS,
+                chartFacade.getTotalAccountBookAmountAndSaving(userDetails.getUsername(), date, AccountBookType.INCOME)
         );
     }
 
@@ -39,11 +54,12 @@ public class ChartController {
             @AuthenticationPrincipal UserDetails userDetails,
             @PathVariable("categoryId") Long categoryId,
             @RequestParam("date") @Nullable String date,
-            @RequestParam("cursor") @Nullable String cursor
+            @RequestParam("cursor") @Nullable String cursor,
+            @RequestParam(name = "sortDirection", defaultValue = "ASC") @Nullable Direction sortDirection
     ) {
         return DataResponse.toResponseEntity(
                 ChartResponse.GET_CATEGORY_SECTION_SUCCESS,
-                chartFacade.getCategorySection(userDetails.getUsername(), categoryId, date, cursor)
+                chartFacade.getCategorySection(userDetails.getUsername(), categoryId, date, cursor, sortDirection)
         );
     }
 
@@ -58,6 +74,17 @@ public class ChartController {
         );
     }
 
+    @GetMapping("/category/income")
+    public ResponseEntity<BaseResponse> getIncomeCategoryChart(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @RequestParam("date") @Nullable String date
+    ) {
+        return DataResponse.toResponseEntity(
+                ChartResponse.GET_CATEGORY_CHART_SUCCESS,
+                chartFacade.getCategoryChart(userDetails.getUsername(), date, AccountBookType.INCOME)
+        );
+    }
+
     @GetMapping("/expense/bar")
     public ResponseEntity<BaseResponse> getExpenseBar(
             @AuthenticationPrincipal UserDetails userDetails,
@@ -66,6 +93,45 @@ public class ChartController {
         return DataResponse.toResponseEntity(
                 ChartResponse.GET_EXPENSE_BAR_SUCCESS,
                 chartFacade.getAccountBookBar(userDetails.getUsername(), date, AccountBookType.EXPENSE)
+        );
+    }
+
+    @GetMapping("/income/bar")
+    public ResponseEntity<BaseResponse> getIncomeBar(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @RequestParam("date") @Nullable String date
+    ) {
+        return DataResponse.toResponseEntity(
+                ChartResponse.GET_INCOME_BAR_SUCCESS,
+                chartFacade.getAccountBookBar(userDetails.getUsername(), date, AccountBookType.INCOME)
+        );
+    }
+
+    @GetMapping("/{categoryId}/line")
+    public ResponseEntity<BaseResponse> getCategoryLine(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @PathVariable("categoryId") Long categoryId,
+            @RequestParam("date")
+            @Pattern(regexp = DatePattern.YEAR_MONTH_REGEX, message = DateResponseMessage.UNSUPPORTED_DATE_FORMAT)
+            String date
+    ) {
+        return DataResponse.toResponseEntity(
+                ChartResponse.GET_CATEGORY_LINE_SUCCESS,
+                chartFacade.getCategoryLine(userDetails.getUsername(), categoryId, date)
+        );
+    }
+
+    @GetMapping("/{categoryId}/vertical")
+    public ResponseEntity<BaseResponse> getCategoryVertical(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @PathVariable("categoryId") Long categoryId,
+            @RequestParam("date")
+            @Pattern(regexp = DatePattern.YEAR_REGEX, message = DateResponseMessage.UNSUPPORTED_DATE_FORMAT)
+            String date
+    ) {
+        return DataResponse.toResponseEntity(
+                ChartResponse.GET_CATEGORY_VERTICAL_SUCCESS,
+                chartFacade.getCategoryVertical(userDetails.getUsername(), categoryId, date)
         );
     }
 }
