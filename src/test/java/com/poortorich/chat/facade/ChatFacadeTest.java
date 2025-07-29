@@ -3,12 +3,14 @@ package com.poortorich.chat.facade;
 import com.poortorich.chat.entity.Chatroom;
 import com.poortorich.chat.request.ChatroomCreateRequest;
 import com.poortorich.chat.response.ChatroomCreateResponse;
+import com.poortorich.chat.response.ChatroomInfoResponse;
 import com.poortorich.chat.service.ChatParticipantService;
 import com.poortorich.chat.service.ChatroomService;
 import com.poortorich.s3.service.FileUploadService;
 import com.poortorich.tag.service.TagService;
 import com.poortorich.user.entity.User;
 import com.poortorich.user.service.UserService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -41,22 +43,37 @@ class ChatFacadeTest {
     @InjectMocks
     private ChatFacade chatFacade;
 
+    private final Long chatroomId = 1L;
+    private final MultipartFile image = Mockito.mock(MultipartFile.class);
+    private final String imageUrl = "https://image.com";
+    private final String chatroomTitle = "채팅방";
+    private final Long maxMemberCount = 10L;
+    private final List<String> hashtags = List.of("부자", "거지");
+    private final Boolean isRankingEnabled = false;
+    private final String chatroomPassword = "부자12";
+
+    private Chatroom chatroom;
+
+    @BeforeEach
+    void setUp() {
+        chatroom = Chatroom.builder()
+                .id(chatroomId)
+                .title(chatroomTitle)
+                .image(imageUrl)
+                .maxMemberCount(maxMemberCount)
+                .isRankingEnabled(isRankingEnabled)
+                .password(chatroomPassword)
+                .build();
+    }
+
     @Test
     @DisplayName("채팅방 추가 성공")
     void createChatroomSuccess() {
         String username = "test";
-        MultipartFile image = Mockito.mock(MultipartFile.class);
-        String imageUrl = "https://image.com";
-        String chatroomTitle = "채팅방";
-        Long maxMemberCount = 10L;
-        List<String> hashtags = List.of("부자", "거지");
-        Boolean isRankingEnabled = false;
-        String chatroomPassword = "부자12";
         ChatroomCreateRequest request = new ChatroomCreateRequest(
                 chatroomTitle, maxMemberCount, null, hashtags, isRankingEnabled, chatroomPassword
         );
         User user = User.builder().username(username).build();
-        Chatroom chatroom = Chatroom.builder().id(1L).title(chatroomTitle).build();
 
         when(userService.findUserByUsername(username)).thenReturn(user);
         when(fileUploadService.uploadImage(image)).thenReturn(imageUrl);
@@ -68,5 +85,23 @@ class ChatFacadeTest {
         verify(tagService).createTag(hashtags, chatroom);
 
         assertThat(response.getNewChatroomId()).isEqualTo(chatroom.getId());
+    }
+
+    @Test
+    @DisplayName("채팅방 정보 조회 성공")
+    void getChatroomSuccess() {
+        when(chatroomService.findChatroomById(chatroomId)).thenReturn(chatroom);
+        when(tagService.getTagNames(chatroom)).thenReturn(hashtags);
+
+        ChatroomInfoResponse response = chatFacade.getChatroom(chatroomId);
+
+        assertThat(response.getChatroomImage()).isEqualTo(chatroom.getImage());
+        assertThat(response.getChatroomTitle()).isEqualTo(chatroom.getTitle());
+        assertThat(response.getMaxMemberCount()).isEqualTo(chatroom.getMaxMemberCount());
+        assertThat(response.getIsRankingEnabled()).isEqualTo(chatroom.getIsRankingEnabled());
+        assertThat(response.getChatroomPassword()).isEqualTo(chatroom.getPassword());
+
+        assertThat(response.getHashtags().get(0)).isEqualTo(hashtags.get(0));
+        assertThat(response.getHashtags().get(1)).isEqualTo(hashtags.get(1));
     }
 }
