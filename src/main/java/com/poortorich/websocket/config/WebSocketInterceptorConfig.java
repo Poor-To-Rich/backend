@@ -11,9 +11,11 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 public class WebSocketInterceptorConfig implements WebSocketMessageBrokerConfigurer {
 
     private final StompInterceptor stompInterceptor;
+    private final ExecutorStompInterceptor executorStompInterceptor;
 
     @Override
     public void configureClientInboundChannel(ChannelRegistration registration) {
         registration.interceptors(stompInterceptor);
+        registration.interceptors(executorStompInterceptor);
     }
 }
