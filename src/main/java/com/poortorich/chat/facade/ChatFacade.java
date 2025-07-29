@@ -48,7 +48,7 @@ public class ChatFacade {
     }
 
     public ChatroomInfoResponse getChatroom(Long chatroomId) {
-        Chatroom chatroom = chatroomService.findChatroomById(chatroomId);
+        Chatroom chatroom = chatroomService.findById(chatroomId);
         List<String> hashtags = tagService.getTagNames(chatroom);
 
         return ChatBuilder.buildChatroomInfoResponse(chatroom, hashtags);
@@ -59,7 +59,7 @@ public class ChatFacade {
             Long chatroomId,
             ChatroomEnterRequest chatroomEnterRequest
     ) {
-        Chatroom chatroom = chatroomService.findByChatroomId(chatroomId);
+        Chatroom chatroom = chatroomService.findById(chatroomId);
         User user = userService.findUserByUsername(username);
 
         chatroomValidator.validateEnter(user, chatroom);
