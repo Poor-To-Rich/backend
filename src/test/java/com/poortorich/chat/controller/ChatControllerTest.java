@@ -4,9 +4,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.poortorich.chat.facade.ChatFacade;
+import com.poortorich.chat.request.ChatroomCreateRequest;
+import com.poortorich.chat.response.ChatroomCreateResponse;
 import com.poortorich.chat.response.ChatroomInfoResponse;
 import com.poortorich.chat.response.enums.ChatResponse;
 import com.poortorich.global.config.BaseSecurityTest;
+import com.poortorich.s3.util.S3TestFileGenerator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,13 +17,19 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -33,6 +42,30 @@ public class ChatControllerTest extends BaseSecurityTest {
 
     @MockitoBean
     private ChatFacade chatFacade;
+
+    @Test
+    @WithMockUser(username = "test")
+    @DisplayName("채팅방 추가 성공")
+    void createChatroomSuccess() throws Exception {
+        MockMultipartFile chatroomImage = S3TestFileGenerator.createJpegFile();
+        when(chatFacade.createChatroom(eq("test"), any(ChatroomCreateRequest.class)))
+                .thenReturn(ChatroomCreateResponse.builder().build());
+
+        mockMvc.perform(multipart("/chatrooms")
+                        .file(chatroomImage)
+                        .param("chatroomTitle", "부자될거지")
+                        .param("maxMemberCount", "10")
+                        .param("description", "부자될거죠?")
+                        .param("hashtags", "태그1", "태그2")
+                        .param("isRankingEnabled", "false")
+                        .param("chatroomPassword", "비밀번호123")
+                        .with(csrf())
+                        .contentType(MediaType.MULTIPART_FORM_DATA_VALUE))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath(("$.message"))
+                        .value(ChatResponse.CREATE_CHATROOM_SUCCESS.getMessage())
+                );
+    }
 
     @Test
     @WithMockUser(username = "test")
