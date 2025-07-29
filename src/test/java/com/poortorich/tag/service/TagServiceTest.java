@@ -6,6 +6,7 @@ import com.poortorich.tag.constants.TagValidationConstraints;
 import com.poortorich.tag.entity.Tag;
 import com.poortorich.tag.repository.TagRepository;
 import com.poortorich.tag.response.enums.TagResponse;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,6 +21,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class TagServiceTest {
@@ -33,16 +35,26 @@ class TagServiceTest {
     @Captor
     private ArgumentCaptor<List<Tag>> tagsCaptor;
 
+    private List<String> tagNames;
+    private Chatroom chatroom;
+    private Tag tag1;
+    private Tag tag2;
+    private Tag tag3;
+    private List<Tag> tags;
+
+    @BeforeEach
+    void setUp() {
+        tagNames = List.of("태그1", "태그2", "태그3");
+        chatroom = Chatroom.builder().build();
+        tag1 = Tag.builder().name("태그1").chatroom(chatroom).build();
+        tag2 = Tag.builder().name("태그2").chatroom(chatroom).build();
+        tag3 = Tag.builder().name("태그3").chatroom(chatroom).build();
+        tags = List.of(tag1, tag2, tag3);
+    }
+
     @Test
     @DisplayName("태그 리스트 저장 성공")
     void createTagSuccess() {
-        List<String> tagNames = List.of("태그1", "태그2", "태그3");
-        Chatroom chatroom = Chatroom.builder().build();
-        Tag tag1 = Tag.builder().name("태그1").chatroom(chatroom).build();
-        Tag tag2 = Tag.builder().name("태그2").chatroom(chatroom).build();
-        Tag tag3 = Tag.builder().name("태그3").chatroom(chatroom).build();
-        List<Tag> tags = List.of(tag1, tag2, tag3);
-
         tagService.createTag(tagNames, chatroom);
 
         verify(tagRepository).saveAll(tagsCaptor.capture());
@@ -64,5 +76,28 @@ class TagServiceTest {
         assertThatThrownBy(() -> tagService.createTag(tagNames, chatroom))
                 .isInstanceOf(BadRequestException.class)
                 .hasMessageContaining(TagResponse.TAG_NAME_TOO_LONG.getMessage());
+    }
+
+    @Test
+    @DisplayName("태그 이름 리스트 조회 성공")
+    void getTagNamesSuccess() {
+        when(tagRepository.findByChatroom(chatroom)).thenReturn(tags);
+
+        List<String> result = tagService.getTagNames(chatroom);
+
+        assertThat(result.size()).isEqualTo(3);
+        assertThat(result.get(0)).isEqualTo(tagNames.get(0));
+        assertThat(result.get(1)).isEqualTo(tagNames.get(1));
+        assertThat(result.get(2)).isEqualTo(tagNames.get(2));
+    }
+
+    @Test
+    @DisplayName("태그 이름 리스트가 없는 경우 빈 리스트 반환")
+    void getTagNamesEmptyList() {
+        when(tagRepository.findByChatroom(chatroom)).thenReturn(List.of());
+
+        List<String> result = tagService.getTagNames(chatroom);
+
+        assertThat(result.isEmpty()).isTrue();
     }
 }

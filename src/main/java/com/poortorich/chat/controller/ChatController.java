@@ -17,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -44,6 +45,14 @@ public class ChatController {
         );
     }
 
+    @GetMapping("/{chatroomId}/edit")
+    public ResponseEntity<BaseResponse> getChatroom(@PathVariable Long chatroomId) {
+        return DataResponse.toResponseEntity(
+                ChatResponse.GET_CHATROOM_SUCCESS,
+                chatFacade.getChatroom(chatroomId)
+        );
+    }
+  
     @PostMapping("/{chatroomId}/enter")
     public ResponseEntity<BaseResponse> enterChatroom(
             @AuthenticationPrincipal UserDetails userDetails,

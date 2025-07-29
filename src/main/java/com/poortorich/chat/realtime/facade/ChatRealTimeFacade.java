@@ -21,7 +21,7 @@ public class ChatRealTimeFacade {
 
     public ResponsePayload createUserEnterSystemMessage(String username, Long chatroomId) {
         User user = userService.findUserByUsername(username);
-        Chatroom chatroom = chatroomService.findByChatroomId(chatroomId);
+        Chatroom chatroom = chatroomService.findById(chatroomId);
 
         UserEnterResponsePayload payload = chatMessageService.saveUserEnterMessage(user, chatroom);
 

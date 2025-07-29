@@ -39,4 +39,10 @@ public class TagService {
 
         return tagName;
     }
+
+    public List<String> getTagNames(Chatroom chatroom) {
+        return tagRepository.findByChatroom(chatroom).stream()
+                .map(Tag::getName)
+                .toList();
+    }
 }

@@ -20,7 +20,7 @@ public class ChatroomService {
         return chatroomRepository.save(chatroom);
     }
 
-    public Chatroom findByChatroomId(Long chatroomId) {
+    public Chatroom findById(Long chatroomId) {
         return chatroomRepository.findById(chatroomId)
                 .orElseThrow(() -> new NotFoundException(ChatResponse.CHATROOM_NOT_FOUND));
     }

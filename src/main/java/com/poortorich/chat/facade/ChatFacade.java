@@ -4,9 +4,11 @@ import com.poortorich.chat.entity.Chatroom;
 import com.poortorich.chat.request.ChatroomCreateRequest;
 import com.poortorich.chat.request.ChatroomEnterRequest;
 import com.poortorich.chat.response.ChatroomCreateResponse;
-import com.poortorich.chat.response.ChatroomEnterResponse;
+import com.poortorich.chat.response.ChatroomInfoResponse;
 import com.poortorich.chat.service.ChatParticipantService;
 import com.poortorich.chat.service.ChatroomService;
+import com.poortorich.chat.util.ChatBuilder;
+import com.poortorich.chat.response.ChatroomEnterResponse;
 import com.poortorich.chat.validator.ChatroomValidator;
 import com.poortorich.s3.service.FileUploadService;
 import com.poortorich.tag.service.TagService;
@@ -15,6 +17,8 @@ import com.poortorich.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -43,12 +47,19 @@ public class ChatFacade {
         return ChatroomCreateResponse.builder().newChatroomId(chatroom.getId()).build();
     }
 
+    public ChatroomInfoResponse getChatroom(Long chatroomId) {
+        Chatroom chatroom = chatroomService.findById(chatroomId);
+        List<String> hashtags = tagService.getTagNames(chatroom);
+
+        return ChatBuilder.buildChatroomInfoResponse(chatroom, hashtags);
+    }
+  
     public ChatroomEnterResponse enterChatroom(
             String username,
             Long chatroomId,
             ChatroomEnterRequest chatroomEnterRequest
     ) {
-        Chatroom chatroom = chatroomService.findByChatroomId(chatroomId);
+        Chatroom chatroom = chatroomService.findById(chatroomId);
         User user = userService.findUserByUsername(username);
 
         chatroomValidator.validateEnter(user, chatroom);
