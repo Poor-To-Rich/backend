@@ -9,7 +9,6 @@ import com.poortorich.tag.response.enums.TagResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -19,16 +18,18 @@ public class TagService {
     private final TagRepository tagRepository;
 
     public void createTag(List<String> hashtags, Chatroom chatroom) {
-        List<Tag> tag = new ArrayList<>();
-        for (String tagName : hashtags) {
-            tag.add(Tag.builder()
-                    .name(validateTagName(tagName))
-                    .chatroom(chatroom)
-                    .build()
-            );
-        }
+        List<Tag> tag = hashtags.stream()
+                .map(tagName -> buildTag(tagName, chatroom))
+                .toList();
 
         tagRepository.saveAll(tag);
+    }
+
+    private Tag buildTag(String tagName, Chatroom chatroom) {
+        return Tag.builder()
+                .name(validateTagName(tagName))
+                .chatroom(chatroom)
+                .build();
     }
 
     private String validateTagName(String tagName) {
