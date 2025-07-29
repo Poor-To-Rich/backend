@@ -31,11 +31,10 @@ public class ChatFacade {
     @Transactional
     public ChatroomCreateResponse createChatroom(
             String username,
-            MultipartFile chatroomImage,
             ChatroomCreateRequest request
     ) {
         User user = userService.findUserByUsername(username);
-        String imageUrl = fileUploadService.uploadImage(chatroomImage);
+        String imageUrl = fileUploadService.uploadImage(request.getChatroomImage());
 
         Chatroom chatroom = chatroomService.createChatroom(imageUrl, request);
         chatParticipantService.createChatroomHost(user, chatroom);

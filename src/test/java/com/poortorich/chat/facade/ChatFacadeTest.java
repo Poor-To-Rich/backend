@@ -71,7 +71,7 @@ class ChatFacadeTest {
     void createChatroomSuccess() {
         String username = "test";
         ChatroomCreateRequest request = new ChatroomCreateRequest(
-                chatroomTitle, maxMemberCount, null, hashtags, isRankingEnabled, chatroomPassword
+                image, chatroomTitle, maxMemberCount, null, hashtags, isRankingEnabled, chatroomPassword
         );
         User user = User.builder().username(username).build();
 
@@ -79,7 +79,7 @@ class ChatFacadeTest {
         when(fileUploadService.uploadImage(image)).thenReturn(imageUrl);
         when(chatroomService.createChatroom(imageUrl, request)).thenReturn(chatroom);
 
-        ChatroomCreateResponse response = chatFacade.createChatroom(username, image, request);
+        ChatroomCreateResponse response = chatFacade.createChatroom(username, request);
 
         verify(chatParticipantService).createChatroomHost(user, chatroom);
         verify(tagService).createTag(hashtags, chatroom);

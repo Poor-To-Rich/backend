@@ -42,7 +42,7 @@ class ChatroomServiceTest {
         Boolean isRankingEnabled = false;
         String chatroomPassword = "부자12";
         ChatroomCreateRequest request = new ChatroomCreateRequest(
-                chatroomTitle, maxMemberCount, null, null, isRankingEnabled, chatroomPassword
+                null, chatroomTitle, maxMemberCount, null, null, isRankingEnabled, chatroomPassword
         );
 
         chatroomService.createChatroom(imageUrl, request);

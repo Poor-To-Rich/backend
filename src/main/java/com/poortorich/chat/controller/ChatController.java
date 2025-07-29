@@ -29,12 +29,11 @@ public class ChatController {
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<BaseResponse> createChatroom(
             @AuthenticationPrincipal UserDetails userDetails,
-            @RequestPart(value = "chatroomImage", required = false) MultipartFile chatroomImage,
-            @RequestPart("request") @Valid ChatroomCreateRequest request
+            @Valid ChatroomCreateRequest request
     ) {
         return DataResponse.toResponseEntity(
                 ChatResponse.CREATE_CHATROOM_SUCCESS,
-                chatFacade.createChatroom(userDetails.getUsername(), chatroomImage, request)
+                chatFacade.createChatroom(userDetails.getUsername(), request)
         );
     }
 
