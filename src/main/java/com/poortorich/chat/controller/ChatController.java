@@ -58,7 +58,6 @@ public class ChatController {
         ResponsePayload payload = realTimeFacade.createUserEnterSystemMessage(
                 userDetails.getUsername(),
                 chatroomId);
-
         messagingTemplate.convertAndSend(
                 SubscribeEndpoint.CHATROOM_SUBSCRIBE_PREFIX + chatroomId,
                 payload);
