@@ -90,7 +90,7 @@ class ChatFacadeTest {
     @Test
     @DisplayName("채팅방 정보 조회 성공")
     void getChatroomSuccess() {
-        when(chatroomService.findChatroomById(chatroomId)).thenReturn(chatroom);
+        when(chatroomService.findById(chatroomId)).thenReturn(chatroom);
         when(tagService.getTagNames(chatroom)).thenReturn(hashtags);
 
         ChatroomInfoResponse response = chatFacade.getChatroom(chatroomId);

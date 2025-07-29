@@ -65,7 +65,7 @@ class ChatroomServiceTest {
 
         when(chatroomRepository.findById(chatroomId)).thenReturn(Optional.of(chatroom));
 
-        Chatroom result = chatroomService.findChatroomById(chatroomId);
+        Chatroom result = chatroomService.findById(chatroomId);
 
         assertThat(result).isEqualTo(chatroom);
     }
@@ -76,8 +76,8 @@ class ChatroomServiceTest {
         Long chatroomId = 1L;
         when(chatroomRepository.findById(chatroomId)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> chatroomService.findChatroomById(chatroomId))
+        assertThatThrownBy(() -> chatroomService.findById(chatroomId))
                 .isInstanceOf(NotFoundException.class)
-                .hasMessageContaining(ChatResponse.CHATROOM_NON_EXISTENT.getMessage());
+                .hasMessageContaining(ChatResponse.CHATROOM_NOT_FOUND.getMessage());
     }
 }
