@@ -4,7 +4,9 @@ import com.poortorich.chat.realtime.facade.ChatRealTimeFacade;
 import com.poortorich.websocket.stomp.util.StompSessionManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.messaging.simp.annotation.SubscribeMapping;
 import org.springframework.stereotype.Controller;
 
 @Slf4j
@@ -17,4 +19,9 @@ public class ChatRealtimeController {
     private final SimpMessagingTemplate messagingTemplate;
     private final StompSessionManager sessionManager;
 
+    @SubscribeMapping("/chatroom/{chatroomId}")
+    public String test(@DestinationVariable Long chatroomId) throws Exception {
+        log.info("QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ");
+        return chatroomId + " HELLO";
+    }
 }
