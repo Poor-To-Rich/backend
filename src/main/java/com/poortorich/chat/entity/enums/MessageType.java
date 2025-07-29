@@ -10,5 +10,7 @@ public enum MessageType {
     TEXT,
     PHOTO,
     RANKING,
-    SYSTEM
+    SYSTEM,
+    ENTER,
+    LEAVE
 }
