@@ -15,7 +15,6 @@ import com.poortorich.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
@@ -56,7 +55,6 @@ public class ChatFacade {
         chatroomValidator.validatePassword(chatroom, chatroomEnterRequest.getChatroomPassword());
 
         chatParticipantService.enterUser(user, chatroom);
-
         return ChatroomEnterResponse.builder().chatroomId(chatroomId).build();
     }
 }
