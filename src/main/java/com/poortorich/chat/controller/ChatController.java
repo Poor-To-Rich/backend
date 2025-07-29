@@ -62,10 +62,10 @@ public class ChatController {
         messagingTemplate.convertAndSend(
                 SubscribeEndpoint.CHATROOM_SUBSCRIBE_PREFIX + chatroomId,
                 payload);
-        
+
         return DataResponse.toResponseEntity(
                 ChatResponse.CHATROOM_ENTER_SUCCESS,
-                chatFacade.enterChatroom(userDetails.getUsername(), chatroomId, chatroomEnterRequest)
+                response
         );
     }
 }

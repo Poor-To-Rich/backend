@@ -15,6 +15,7 @@ public class SystemMessageBuilder {
                 .messageType(MessageType.ENTER)
                 .type(ChatMessageType.SYSTEM_MESSAGE)
                 .content(user.getNickname() + ENTER_CONTENT_SUFFIX)
+                .chatroom(chatroom)
                 .build();
     }
 }
