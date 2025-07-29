@@ -2,30 +2,31 @@ package com.poortorich.chart.facade;
 
 import com.poortorich.accountbook.entity.AccountBook;
 import com.poortorich.accountbook.enums.AccountBookType;
+import com.poortorich.accountbook.service.AccountBookService;
+import com.poortorich.category.domain.model.enums.DefaultExpenseCategory;
 import com.poortorich.category.entity.Category;
-import com.poortorich.chart.collector.ChartDataCollector;
-import com.poortorich.chart.factory.ChartResponseFactory;
-import com.poortorich.chart.handler.ChartPaginationHandler;
-import com.poortorich.chart.model.domain.ChartDataContext;
-import com.poortorich.chart.model.domain.PaginationResult;
+import com.poortorich.category.service.CategoryService;
 import com.poortorich.chart.response.AccountBookBarResponse;
 import com.poortorich.chart.response.CategoryChart;
 import com.poortorich.chart.response.CategoryChartResponse;
-import com.poortorich.chart.response.CategoryLineResponse;
 import com.poortorich.chart.response.CategoryLog;
 import com.poortorich.chart.response.CategorySectionResponse;
-import com.poortorich.chart.response.CategoryVerticalResponse;
 import com.poortorich.chart.response.TotalAmountAndSavingResponse;
 import com.poortorich.chart.service.ChartService;
+import com.poortorich.chart.util.AccountBookUtil;
+import com.poortorich.global.date.constants.DateConstants;
 import com.poortorich.global.date.domain.DateInfo;
-import com.poortorich.global.date.domain.MonthInformation;
-import com.poortorich.global.date.domain.YearInformation;
 import com.poortorich.global.date.util.DateInfoProvider;
-import java.time.Year;
+import com.poortorich.user.entity.User;
+import com.poortorich.user.service.UserService;
+import java.time.LocalDate;
 import java.util.List;
-import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Sort.Direction;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -33,90 +34,95 @@ import org.springframework.stereotype.Service;
 public class ChartFacade {
 
     private final ChartService chartService;
-    private final ChartDataCollector dataCollector;
-    private final ChartPaginationHandler paginationHandler;
-    private final ChartResponseFactory responseFactory;
+    private final UserService userService;
+    private final CategoryService categoryService;
+    private final AccountBookService accountBookService;
 
-    public TotalAmountAndSavingResponse getTotalAccountBookAmountAndSaving(
-            String username, String date, AccountBookType type
-    ) {
-        ChartDataContext context = dataCollector.collectContext(username, date);
-        Category savingCategory = dataCollector.getSavingCategory(context.getUser());
+    public TotalAmountAndSavingResponse getTotalExpenseAmountAndSaving(String username, String date) {
+        User user = userService.findUserByUsername(username);
+        DateInfo dateInfo = DateInfoProvider.getDateInfo(date);
 
-        Long totalCost = dataCollector.getTotalCostExcludingCategory(
-                context.getUser(), context.getDateInfo(), savingCategory, type);
-        Long totalSaving = dataCollector.getTotalCostByCategory(
-                context.getUser(), context.getDateInfo(), savingCategory, type);
+        List<AccountBook> userAccountBooks = accountBookService.getAccountBookBetweenDates(
+                user, dateInfo.getStartDate(), dateInfo.getEndDate(), AccountBookType.EXPENSE
+        );
 
-        return chartService.getTotalAmountAndSavings(totalCost, totalSaving, savingCategory.getId());
+        Category savingCategory = categoryService.findCategoryByName(
+                DefaultExpenseCategory.SAVINGS_INVESTMENT.getName(),
+                user
+        );
+
+        return chartService.getTotalAmountAndSavings(userAccountBooks, savingCategory);
     }
 
+    public CategorySectionResponse getCategorySection(String username, Long categoryId, String date, String cursor) {
+        User user = userService.findUserByUsername(username);
+        Category category = categoryService.getCategoryOrThrow(categoryId, user);
+        DateInfo dateInfo = DateInfoProvider.getDateInfo(date);
+        LocalDate dateCursor = (Objects.isNull(cursor) ? dateInfo.getStartDate() : LocalDate.parse(cursor));
+        Pageable pageable = PageRequest.of(0, 20);
 
-    public CategorySectionResponse getCategorySection(
-            String username, Long categoryId, String date, String cursor, Direction direction
-    ) {
-        ChartDataContext context = dataCollector.collectCategoryContext(username, categoryId, date);
+        Slice<AccountBook> accountBooks = accountBookService.getAccountBookByUserAndCategoryWithinDateRangeWithCursor(
+                user,
+                category,
+                dateInfo.getStartDate(),
+                dateCursor,
+                dateInfo.getEndDate(),
+                pageable
+        );
 
-        List<AccountBook> accountBooks = dataCollector.getPagedAccountBooks(
-                context.getUser(), context.getCategory(), cursor, context.getDateInfo(), direction);
+        List<AccountBook> accountBooksByLastDate = accountBookService.getAccountBooksByUserAndCategoryAndAccountBookDate(
+                user,
+                category,
+                accountBooks.getContent().getLast().getAccountBookDate()
+        );
 
-        Long countOfLogs = dataCollector.getCountOfLogs(context);
+        List<CategoryLog> categoryLogs = chartService.getCategoryLogs(
+                AccountBookUtil.mergeAccountBooksByDate(
+                        accountBooks.getContent(),
+                        accountBooksByLastDate));
 
-        List<CategoryLog> categoryLogs = chartService.getCategoryLogs(accountBooks, direction);
-
-        PaginationResult paginationResult = paginationHandler.handlePagination(
-                context.getUser(), context.getCategory(), context.getDateInfo(), accountBooks, direction);
-
-        return responseFactory.createCategorySectionResponse(categoryLogs, countOfLogs, paginationResult);
+        LocalDate nextCursor = accountBooksByLastDate.getFirst().getAccountBookDate().plusDays(DateConstants.ONE_DAY);
+        return CategorySectionResponse.builder()
+                .hasNext(accountBookService.hasNextPage(user, category, nextCursor, dateInfo.getEndDate()))
+                .nextCursor(nextCursor.toString())
+                .countOfLogs((long) categoryLogs.size())
+                .categoryLogs(categoryLogs)
+                .build();
     }
 
     public CategoryChartResponse getCategoryChart(String username, String date, AccountBookType accountBookType) {
-        ChartDataContext context = dataCollector.collectContext(username, date);
+        User user = userService.findUserByUsername(username);
+        DateInfo dateInfo = DateInfoProvider.getDateInfo(date);
 
-        List<AccountBook> accountBooks = dataCollector.getAccountBooksByDate(
-                context.getUser(), context.getDateInfo(), accountBookType);
+        List<AccountBook> accountBooks = accountBookService.getAccountBookBetweenDates(
+                user,
+                dateInfo.getStartDate(),
+                dateInfo.getEndDate(),
+                accountBookType);
+
         List<CategoryChart> categoryCharts = chartService.getCategoryChart(accountBooks);
 
-        return responseFactory.createCategoryChartResponse(categoryCharts);
+        return CategoryChartResponse.builder()
+                .aggregatedData(categoryCharts.stream()
+                        .collect(Collectors.toMap(CategoryChart::getName, CategoryChart::getRate)))
+                .categoryColors(categoryCharts.stream()
+                        .collect(Collectors.toMap(CategoryChart::getName, CategoryChart::getColor)))
+                .categoryCharts(categoryCharts)
+                .build();
     }
 
     public AccountBookBarResponse getAccountBookBar(String username, String date, AccountBookType type) {
-        ChartDataContext context = dataCollector.collectContext(username, date);
-        List<DateInfo> dateInfos = DateInfoProvider.getPreviousAndCurrent(date);
+        User user = userService.findUserByUsername(username);
+        List<DateInfo> dateInfos = DateInfoProvider.getPreviousDateInfos(date);
 
-        Map<DateInfo, List<AccountBook>> accountBookGroupByDateInfo =
-                dataCollector.getAccountBooksGroupByDateInfo(context.getUser(), dateInfos, type);
+        List<List<AccountBook>> accountBooksGroupByDateInfo = dateInfos.stream()
+                .map(dateInfo -> accountBookService.getAccountBookBetweenDates(
+                        user,
+                        dateInfo.getStartDate(),
+                        dateInfo.getEndDate(),
+                        type))
+                .toList();
 
-        return chartService.getAccountBookBar(accountBookGroupByDateInfo);
-    }
-
-    public CategoryLineResponse getCategoryLine(String username, Long categoryId, String date) {
-        ChartDataContext context = dataCollector.collectCategoryContext(username, categoryId, date);
-        MonthInformation monthInfo = (MonthInformation) context.getDateInfo();
-
-        List<AccountBook> accountBooks = dataCollector.getAccountBooksByCategory(
-                context.getUser(), context.getCategory(), monthInfo);
-
-        Map<DateInfo, List<AccountBook>> weeklyAccountBooks =
-                dataCollector.getWeeklyAccountBooks(context.getUser(), context.getCategory(), monthInfo);
-
-        return chartService.getCategoryLine(monthInfo, accountBooks, weeklyAccountBooks);
-    }
-
-    public CategoryVerticalResponse getCategoryVertical(String username, Long categoryId, String date) {
-        if (date == null) {
-            date = Year.now().toString();
-        }
-
-        ChartDataContext context = dataCollector.collectCategoryContext(username, categoryId, date);
-        YearInformation yearInfo = (YearInformation) context.getDateInfo();
-
-        List<AccountBook> accountBooks = dataCollector.getAccountBooksByCategory(
-                context.getUser(), context.getCategory(), yearInfo);
-
-        Map<DateInfo, List<AccountBook>> monthlyAccountBooks =
-                dataCollector.getMonthlyAccountBooks(context.getUser(), context.getCategory(), yearInfo);
-
-        return chartService.getCategoryVertical(yearInfo, accountBooks, monthlyAccountBooks);
+        return chartService.getAccountBookBar(dateInfos, accountBooksGroupByDateInfo);
     }
 }

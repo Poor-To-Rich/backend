@@ -1,6 +1,5 @@
 package com.poortorich.chart.controller;
 
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -13,7 +12,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.poortorich.accountbook.enums.AccountBookType;
 import com.poortorich.chart.constants.ChartResponseMessage;
 import com.poortorich.chart.facade.ChartFacade;
 import com.poortorich.chart.response.TotalAmountAndSavingResponse;
@@ -51,7 +49,7 @@ public class ChartControllerTest extends BaseSecurityTest {
                 .totalSaving(10000L)
                 .build();
 
-        when(chartFacade.getTotalAccountBookAmountAndSaving(anyString(), anyString(), any(AccountBookType.class)))
+        when(chartFacade.getTotalExpenseAmountAndSaving(anyString(), anyString()))
                 .thenReturn(mockResponse);
 
         ResultActions actions = mockMvc.perform(get("/chart/expense/total")
@@ -70,7 +68,6 @@ public class ChartControllerTest extends BaseSecurityTest {
                 .andExpect(jsonPath("$.data.totalAmount").value(mockResponse.getTotalAmount()))
                 .andExpect(jsonPath("$.data.totalSaving").value(mockResponse.getTotalSaving()));
 
-        verify(chartFacade, times(1))
-                .getTotalAccountBookAmountAndSaving(anyString(), anyString(), any(AccountBookType.class));
+        verify(chartFacade, times(1)).getTotalExpenseAmountAndSaving(anyString(), anyString());
     }
 }
