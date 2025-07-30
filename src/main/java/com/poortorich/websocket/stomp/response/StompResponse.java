@@ -10,7 +10,9 @@ public enum StompResponse implements Response {
 
     SESSION_ATTRIBUTE_INVALID(HttpStatus.BAD_REQUEST, StompResponseMessage.SESSION_ATTRIBUTE_INVALID, "STOMP"),
     DESTINATION_NOT_FOUND(HttpStatus.NOT_FOUND, StompResponseMessage.DESTINATION_NOT_FOUND, "STOMP"),
-    DESTINATION_INVALID(HttpStatus.BAD_REQUEST, StompResponseMessage.DESTINATION_INVALID, "STOMP");
+    DESTINATION_INVALID(HttpStatus.BAD_REQUEST, StompResponseMessage.DESTINATION_INVALID, "STOMP"),
+    UNSUBSCRIBE_FORBIDDEN(HttpStatus.FORBIDDEN, StompResponseMessage.UNSUBSCRIBE_FORBIDDEN, "STOMP");
+
     private final HttpStatus httpStatus;
     private final String message;
     private final String field;
