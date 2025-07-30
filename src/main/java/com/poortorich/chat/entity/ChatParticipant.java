@@ -76,4 +76,9 @@ public class ChatParticipant {
         this.isParticipate = Boolean.TRUE;
         this.leaveTime = null;
     }
+
+    public void softDelete() {
+        this.isParticipate = Boolean.FALSE;
+        this.leaveTime = LocalDateTime.now();
+    }
 }
