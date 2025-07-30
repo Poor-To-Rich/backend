@@ -49,7 +49,7 @@ public class ChatroomValidator {
         Optional<ChatParticipant> chatParticipant = chatParticipantRepository.findByUserAndChatroom(user, chatroom);
 
         if (chatParticipant.isEmpty() || !chatParticipant.get().getIsParticipate()) {
-            throw new ForbiddenException(ChatResponse.CHATROOM_LEAVE_ALREADY);
+            throw new BadRequestException(ChatResponse.CHATROOM_LEAVE_ALREADY);
         }
     }
 }
