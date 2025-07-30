@@ -1,24 +1,25 @@
 package com.poortorich.chat.facade;
 
+import com.poortorich.chat.entity.ChatParticipant;
 import com.poortorich.chat.entity.Chatroom;
 import com.poortorich.chat.request.ChatroomCreateRequest;
 import com.poortorich.chat.request.ChatroomEnterRequest;
 import com.poortorich.chat.response.ChatroomCreateResponse;
+import com.poortorich.chat.response.ChatroomEnterResponse;
 import com.poortorich.chat.response.ChatroomInfoResponse;
+import com.poortorich.chat.response.ChatroomLeaveResponse;
 import com.poortorich.chat.service.ChatParticipantService;
 import com.poortorich.chat.service.ChatroomService;
 import com.poortorich.chat.util.ChatBuilder;
-import com.poortorich.chat.response.ChatroomEnterResponse;
 import com.poortorich.chat.validator.ChatroomValidator;
 import com.poortorich.s3.service.FileUploadService;
 import com.poortorich.tag.service.TagService;
 import com.poortorich.user.entity.User;
 import com.poortorich.user.service.UserService;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -53,7 +54,7 @@ public class ChatFacade {
 
         return ChatBuilder.buildChatroomInfoResponse(chatroom, hashtags);
     }
-  
+
     public ChatroomEnterResponse enterChatroom(
             String username,
             Long chatroomId,
@@ -67,5 +68,17 @@ public class ChatFacade {
 
         chatParticipantService.enterUser(user, chatroom);
         return ChatroomEnterResponse.builder().chatroomId(chatroomId).build();
+    }
+
+    @Transactional
+    public ChatroomLeaveResponse leaveChatroom(String username, Long chatroomId) {
+        User user = userService.findUserByUsername(username);
+        Chatroom chatroom = chatroomService.findById(chatroomId);
+
+        chatroomValidator.validateParticipate(user, chatroom);
+        ChatParticipant chatParticipant = chatParticipantService.findByUserAndChatroom(user, chatroom);
+        chatParticipant.softDelete();
+
+        return ChatroomLeaveResponse.builder().deleteChatroomId(chatroomId).build();
     }
 }
