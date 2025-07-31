@@ -44,4 +44,11 @@ public class ChatroomValidator {
             throw new ForbiddenException(ChatResponse.CHATROOM_ENTER_DENIED);
         }
     }
+
+    public void validateCanUpdateMaxMemberCount(Chatroom chatroom, Long maxMemberCount) {
+        int currentMemberCount = chatParticipantRepository.countByChatroomAndIsParticipateTrue(chatroom);
+        if (currentMemberCount > maxMemberCount) {
+            throw new BadRequestException(ChatResponse.CHATROOM_MAX_MEMBER_COUNT_EXCEED);
+        }
+    }
 }
