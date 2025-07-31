@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class SubscribeValidator {
 
-    public final StompValidator stompValidator;
+    private final StompValidator stompValidator;
 
     public void validateEndPoint(StompHeaderAccessor accessor) {
         stompValidator.validateDestination(accessor);

@@ -44,4 +44,12 @@ public class ChatroomValidator {
             throw new ForbiddenException(ChatResponse.CHATROOM_ENTER_DENIED);
         }
     }
+
+    public void validateParticipate(User user, Chatroom chatroom) {
+        Optional<ChatParticipant> chatParticipant = chatParticipantRepository.findByUserAndChatroom(user, chatroom);
+
+        if (chatParticipant.isEmpty() || !chatParticipant.get().getIsParticipate()) {
+            throw new BadRequestException(ChatResponse.CHATROOM_LEAVE_ALREADY);
+        }
+    }
 }

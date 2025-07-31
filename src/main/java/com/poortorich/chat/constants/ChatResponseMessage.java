@@ -25,6 +25,10 @@ public class ChatResponseMessage {
     public static final String CHATROOM_ENTER_SUCCESS = "채팅방 입장이 성공적으로 완료되었습니다.";
     public static final String CHATROOM_ENTER_DUPLICATED = "이미 참여중인 채팅방입니다.";
 
+    public static final String CHAT_PARTICIPANT_NOT_FOUND = "참여자를 찾을 수 없습니다.";
+    public static final String CHATROOM_LEAVE_ALREADY = "채팅방에 참여하고 있지 않습니다.";
+    public static final String CHATROOM_LEAVE_SUCCESS = "채팅방을 성공적으로 나갔습니다.";
+
     private ChatResponseMessage() {
     }
 }

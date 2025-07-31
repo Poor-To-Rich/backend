@@ -6,6 +6,7 @@ import com.poortorich.websocket.stomp.command.connect.handler.StompConnectHandle
 import com.poortorich.websocket.stomp.command.disconnect.handler.StompDisconnectHandler;
 import com.poortorich.websocket.stomp.command.publish.handler.StompSendHandler;
 import com.poortorich.websocket.stomp.command.subscribe.handler.StompSubscribeHandler;
+import com.poortorich.websocket.stomp.command.unsubscribe.handler.StompUnsubscribeHandler;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.Message;
@@ -23,6 +24,7 @@ public class StompInterceptor implements ChannelInterceptor {
     private final StompConnectHandler connectHandler;
     private final StompSubscribeHandler subscribeHandler;
     private final StompSendHandler sendHandler;
+    private final StompUnsubscribeHandler unsubscribeHandler;
     private final StompDisconnectHandler disconnectHandler;
 
     @Override
@@ -38,6 +40,8 @@ public class StompInterceptor implements ChannelInterceptor {
                 subscribeHandler.handle(accessor);
             } else if (StompCommand.SEND.equals(command)) {
                 sendHandler.handle(accessor);
+            } else if (StompCommand.UNSUBSCRIBE.equals(command)) {
+                unsubscribeHandler.handle(accessor);
             } else if (StompCommand.DISCONNECT.equals(command)) {
                 disconnectHandler.handle();
             }
