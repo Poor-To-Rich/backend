@@ -1,6 +1,7 @@
 package com.poortorich.chat.service;
 
 import com.poortorich.chat.entity.Chatroom;
+import com.poortorich.chat.entity.enums.ChatroomRole;
 import com.poortorich.chat.repository.ChatroomRepository;
 import com.poortorich.chat.request.ChatroomCreateRequest;
 import com.poortorich.chat.response.enums.ChatResponse;
@@ -90,7 +91,8 @@ class ChatroomServiceTest {
         Chatroom chatroom1 = Chatroom.builder().build();
         Chatroom chatroom2 = Chatroom.builder().build();
 
-        when(chatroomRepository.findHostedChatroomByUser(user)).thenReturn(List.of(chatroom1, chatroom2));
+        when(chatroomRepository.findChatroomByUserAndRole(user, ChatroomRole.HOST))
+                .thenReturn(List.of(chatroom1, chatroom2));
 
         List<Chatroom> result = chatroomService.getHostedChatrooms(user);
 

@@ -1,6 +1,7 @@
 package com.poortorich.chat.service;
 
 import com.poortorich.chat.entity.Chatroom;
+import com.poortorich.chat.entity.enums.ChatroomRole;
 import com.poortorich.chat.repository.ChatroomRepository;
 import com.poortorich.chat.request.ChatroomCreateRequest;
 import com.poortorich.chat.response.enums.ChatResponse;
@@ -29,6 +30,6 @@ public class ChatroomService {
     }
 
     public List<Chatroom> getHostedChatrooms(User user) {
-        return chatroomRepository.findHostedChatroomByUser(user);
+        return chatroomRepository.findChatroomByUserAndRole(user, ChatroomRole.HOST);
     }
 }
