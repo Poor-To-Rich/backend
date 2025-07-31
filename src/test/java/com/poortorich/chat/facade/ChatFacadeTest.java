@@ -4,6 +4,9 @@ import com.poortorich.chat.entity.Chatroom;
 import com.poortorich.chat.request.ChatroomCreateRequest;
 import com.poortorich.chat.response.ChatroomCreateResponse;
 import com.poortorich.chat.response.ChatroomInfoResponse;
+import com.poortorich.chat.response.ChatroomResponse;
+import com.poortorich.chat.response.ChatroomsResponse;
+import com.poortorich.chat.service.ChatMessageService;
 import com.poortorich.chat.service.ChatParticipantService;
 import com.poortorich.chat.service.ChatroomService;
 import com.poortorich.s3.service.FileUploadService;
@@ -39,6 +42,8 @@ class ChatFacadeTest {
     private FileUploadService fileUploadService;
     @Mock
     private TagService tagService;
+    @Mock
+    private ChatMessageService chatMessageService;
 
     @InjectMocks
     private ChatFacade chatFacade;
@@ -103,5 +108,28 @@ class ChatFacadeTest {
 
         assertThat(response.getHashtags().get(0)).isEqualTo(hashtags.get(0));
         assertThat(response.getHashtags().get(1)).isEqualTo(hashtags.get(1));
+    }
+
+    @Test
+    @DisplayName("내가 방장인 채팅방 조회 성공")
+    void getHostedChatroomSuccess() {
+        User user = User.builder().username("test").build();
+        Chatroom chatroom2 = Chatroom.builder().id(2L).build();
+        List<Chatroom> hostedChatrooms = List.of(chatroom, chatroom2);
+
+        when(userService.findUserByUsername("test")).thenReturn(user);
+        when(chatroomService.getHostedChatrooms(user)).thenReturn(hostedChatrooms);
+        when(tagService.getTagNames(chatroom)).thenReturn(hashtags);
+        when(tagService.getTagNames(chatroom2)).thenReturn(hashtags);
+        when(chatParticipantService.countByChatroom(chatroom)).thenReturn(1L);
+        when(chatParticipantService.countByChatroom(chatroom2)).thenReturn(2L);
+        when(chatMessageService.getLastMessageTime(chatroom)).thenReturn("2025-07-31T02:30");
+        when(chatMessageService.getLastMessageTime(chatroom2)).thenReturn("2025-07-31T03:00");
+
+        ChatroomsResponse response = chatFacade.getHostedChatrooms("test");
+
+        assertThat(response.getChatrooms()).hasSize(2);
+        assertThat(response.getChatrooms().get(0).getChatroomId()).isEqualTo(chatroom.getId());
+        assertThat(response.getChatrooms().get(1).getChatroomId()).isEqualTo(chatroom2.getId());
     }
 }
