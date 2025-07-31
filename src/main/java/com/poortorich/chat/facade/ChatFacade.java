@@ -1,5 +1,6 @@
 package com.poortorich.chat.facade;
 
+import com.poortorich.chat.entity.ChatParticipant;
 import com.poortorich.chat.entity.Chatroom;
 import com.poortorich.chat.request.ChatroomCreateRequest;
 import com.poortorich.chat.request.ChatroomEnterRequest;
@@ -7,6 +8,7 @@ import com.poortorich.chat.request.ChatroomUpdateRequest;
 import com.poortorich.chat.response.ChatroomCreateResponse;
 import com.poortorich.chat.response.ChatroomEnterResponse;
 import com.poortorich.chat.response.ChatroomInfoResponse;
+import com.poortorich.chat.response.ChatroomLeaveResponse;
 import com.poortorich.chat.response.ChatroomUpdateResponse;
 import com.poortorich.chat.service.ChatParticipantService;
 import com.poortorich.chat.service.ChatroomService;
@@ -89,5 +91,16 @@ public class ChatFacade {
         tagService.updateTag(chatroomUpdateRequest.getHashtags(), chatroom);
 
         return ChatroomUpdateResponse.builder().chatroomId(chatroomId).build();
+    }
+
+    public ChatroomLeaveResponse leaveChatroom(String username, Long chatroomId) {
+        User user = userService.findUserByUsername(username);
+        Chatroom chatroom = chatroomService.findById(chatroomId);
+
+        chatroomValidator.validateParticipate(user, chatroom);
+        ChatParticipant chatParticipant = chatParticipantService.findByUserAndChatroom(user, chatroom);
+        chatParticipant.softDelete();
+
+        return ChatroomLeaveResponse.builder().deleteChatroomId(chatroomId).build();
     }
 }

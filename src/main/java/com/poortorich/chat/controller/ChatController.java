@@ -7,6 +7,7 @@ import com.poortorich.chat.request.ChatroomCreateRequest;
 import com.poortorich.chat.request.ChatroomEnterRequest;
 import com.poortorich.chat.request.ChatroomUpdateRequest;
 import com.poortorich.chat.response.ChatroomEnterResponse;
+import com.poortorich.chat.response.ChatroomLeaveResponse;
 import com.poortorich.chat.response.enums.ChatResponse;
 import com.poortorich.global.response.BaseResponse;
 import com.poortorich.global.response.DataResponse;
@@ -18,6 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -84,5 +86,21 @@ public class ChatController {
         return DataResponse.toResponseEntity(
                 ChatResponse.CHATROOM_UPDATE_SUCCESS,
                 chatFacade.updateChatroom(userDetails.getUsername(), chatroomId, chatroomUpdateRequest));
+    }
+
+    @DeleteMapping("/{chatroomId}")
+    public ResponseEntity<BaseResponse> leaveChatroom(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @PathVariable("chatroomId") Long chatroomId
+    ) {
+        ChatroomLeaveResponse response = chatFacade.leaveChatroom(userDetails.getUsername(), chatroomId);
+        ResponsePayload payload = realTimeFacade.createUserLeaveSystemMessage(userDetails.getUsername(), chatroomId);
+
+        messagingTemplate.convertAndSend(SubscribeEndpoint.CHATROOM_SUBSCRIBE_PREFIX + chatroomId, payload);
+
+        return DataResponse.toResponseEntity(
+                ChatResponse.CHATROOM_LEAVE_SUCCESS,
+                response
+        );
     }
 }

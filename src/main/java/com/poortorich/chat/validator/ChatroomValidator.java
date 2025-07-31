@@ -51,4 +51,12 @@ public class ChatroomValidator {
             throw new BadRequestException(ChatResponse.CHATROOM_MAX_MEMBER_COUNT_EXCEED);
         }
     }
+
+    public void validateParticipate(User user, Chatroom chatroom) {
+        Optional<ChatParticipant> chatParticipant = chatParticipantRepository.findByUserAndChatroom(user, chatroom);
+
+        if (chatParticipant.isEmpty() || !chatParticipant.get().getIsParticipate()) {
+            throw new BadRequestException(ChatResponse.CHATROOM_LEAVE_ALREADY);
+        }
+    }
 }

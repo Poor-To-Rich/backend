@@ -27,7 +27,10 @@ public enum ChatResponse implements Response {
             HttpStatus.BAD_REQUEST,
             ChatResponseMessage.CHATROOM_MAX_MEMBER_COUNT_EXCEED,
             null
-    );
+    ),
+
+    CHATROOM_LEAVE_ALREADY(HttpStatus.BAD_REQUEST, ChatResponseMessage.CHATROOM_LEAVE_ALREADY, null),
+    CHATROOM_LEAVE_SUCCESS(HttpStatus.OK, ChatResponseMessage.CHATROOM_LEAVE_SUCCESS, null);
 
     private final HttpStatus httpStatus;
     private final String message;
