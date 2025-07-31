@@ -24,6 +24,11 @@ public class ChatResponseMessage {
     public static final String CHATROOM_NOT_FOUND = "채팅방을 찾을 수 없습니다.";
     public static final String CHATROOM_ENTER_SUCCESS = "채팅방 입장이 성공적으로 완료되었습니다.";
     public static final String CHATROOM_ENTER_DUPLICATED = "이미 참여중인 채팅방입니다.";
+    public static final String CHATROOM_UPDATE_SUCCESS = "채팅방을 성공적으로 편집했습니다.";
+    public static final String CHAT_PARTICIPANT_NOT_FOUND = "참여자를 찾을 수 없습니다.";
+    public static final String CHATROOM_NOT_PARTICIPATE = "채팅방에 참여하고 있지 않습니다.";
+    public static final String CHAT_PARTICIPANT_NOT_HOST = "채팅방 방장이 아닙니다.";
+    public static final String CHATROOM_MAX_MEMBER_COUNT_EXCEED = "최대 인원 수를 현재 인원보다 적게 설정할 수 없습니다.";
 
     private ChatResponseMessage() {
     }
