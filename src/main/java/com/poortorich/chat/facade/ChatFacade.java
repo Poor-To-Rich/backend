@@ -4,9 +4,11 @@ import com.poortorich.chat.entity.ChatParticipant;
 import com.poortorich.chat.entity.Chatroom;
 import com.poortorich.chat.request.ChatroomCreateRequest;
 import com.poortorich.chat.request.ChatroomEnterRequest;
+import com.poortorich.chat.request.ChatroomLeaveAllRequest;
 import com.poortorich.chat.response.ChatroomCreateResponse;
 import com.poortorich.chat.response.ChatroomEnterResponse;
 import com.poortorich.chat.response.ChatroomInfoResponse;
+import com.poortorich.chat.response.ChatroomLeaveAllResponse;
 import com.poortorich.chat.response.ChatroomLeaveResponse;
 import com.poortorich.chat.service.ChatParticipantService;
 import com.poortorich.chat.service.ChatroomService;
@@ -80,5 +82,20 @@ public class ChatFacade {
         chatParticipant.softDelete();
 
         return ChatroomLeaveResponse.builder().deleteChatroomId(chatroomId).build();
+    }
+
+    public ChatroomLeaveAllResponse leaveAllChatroom(String username, ChatroomLeaveAllRequest chatroomLeaveAllRequest) {
+        User user = userService.findUserByUsername(username);
+        for (Long chatroomId : chatroomLeaveAllRequest.getChatroomsToLeave()) {
+            Chatroom chatroom = chatroomService.findById(chatroomId);
+
+            chatroomValidator.validateParticipate(user, chatroom);
+            ChatParticipant chatParticipant = chatParticipantService.findByUserAndChatroom(user, chatroom);
+            chatParticipant.softDelete();
+        }
+
+        return ChatroomLeaveAllResponse.builder()
+                .deletedChatroomIds(chatroomLeaveAllRequest.getChatroomsToLeave())
+                .build();
     }
 }

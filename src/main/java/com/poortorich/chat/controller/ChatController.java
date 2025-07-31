@@ -5,7 +5,9 @@ import com.poortorich.chat.realtime.facade.ChatRealTimeFacade;
 import com.poortorich.chat.realtime.payload.ResponsePayload;
 import com.poortorich.chat.request.ChatroomCreateRequest;
 import com.poortorich.chat.request.ChatroomEnterRequest;
+import com.poortorich.chat.request.ChatroomLeaveAllRequest;
 import com.poortorich.chat.response.ChatroomEnterResponse;
+import com.poortorich.chat.response.ChatroomLeaveAllResponse;
 import com.poortorich.chat.response.ChatroomLeaveResponse;
 import com.poortorich.chat.response.enums.ChatResponse;
 import com.poortorich.global.response.BaseResponse;
@@ -84,6 +86,29 @@ public class ChatController {
         ResponsePayload payload = realTimeFacade.createUserLeaveSystemMessage(userDetails.getUsername(), chatroomId);
 
         messagingTemplate.convertAndSend(SubscribeEndpoint.CHATROOM_SUBSCRIBE_PREFIX + chatroomId, payload);
+
+        return DataResponse.toResponseEntity(
+                ChatResponse.CHATROOM_LEAVE_SUCCESS,
+                response
+        );
+    }
+
+    @DeleteMapping("/leave")
+    public ResponseEntity<BaseResponse> leaveAllChatroom(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @RequestBody ChatroomLeaveAllRequest chatroomLeaveAllRequest
+    ) {
+        ChatroomLeaveAllResponse response = chatFacade.leaveAllChatroom(
+                userDetails.getUsername(),
+                chatroomLeaveAllRequest);
+
+        for (Long chatroomId : chatroomLeaveAllRequest.getChatroomsToLeave()) {
+            ResponsePayload payload = realTimeFacade.createUserLeaveSystemMessage(
+                    userDetails.getUsername(),
+                    chatroomId);
+
+            messagingTemplate.convertAndSend(SubscribeEndpoint.CHATROOM_SUBSCRIBE_PREFIX + chatroomId, payload);
+        }
 
         return DataResponse.toResponseEntity(
                 ChatResponse.CHATROOM_LEAVE_SUCCESS,
