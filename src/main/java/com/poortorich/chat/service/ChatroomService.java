@@ -6,8 +6,11 @@ import com.poortorich.chat.request.ChatroomCreateRequest;
 import com.poortorich.chat.response.enums.ChatResponse;
 import com.poortorich.chat.util.ChatBuilder;
 import com.poortorich.global.exceptions.NotFoundException;
+import com.poortorich.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -23,5 +26,9 @@ public class ChatroomService {
     public Chatroom findById(Long chatroomId) {
         return chatroomRepository.findById(chatroomId)
                 .orElseThrow(() -> new NotFoundException(ChatResponse.CHATROOM_NOT_FOUND));
+    }
+
+    public List<Chatroom> getHostedChatrooms(User user) {
+        return chatroomRepository.findHostedChatroomByUser(user);
     }
 }

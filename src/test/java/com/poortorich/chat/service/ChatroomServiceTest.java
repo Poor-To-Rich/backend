@@ -5,6 +5,7 @@ import com.poortorich.chat.repository.ChatroomRepository;
 import com.poortorich.chat.request.ChatroomCreateRequest;
 import com.poortorich.chat.response.enums.ChatResponse;
 import com.poortorich.global.exceptions.NotFoundException;
+import com.poortorich.user.entity.User;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,6 +15,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -79,5 +81,21 @@ class ChatroomServiceTest {
         assertThatThrownBy(() -> chatroomService.findById(chatroomId))
                 .isInstanceOf(NotFoundException.class)
                 .hasMessageContaining(ChatResponse.CHATROOM_NOT_FOUND.getMessage());
+    }
+
+    @Test
+    @DisplayName("내가 방장인 채팅방 조회 성공")
+    void getHostedChatroomsSuccess() {
+        User user = User.builder().build();
+        Chatroom chatroom1 = Chatroom.builder().build();
+        Chatroom chatroom2 = Chatroom.builder().build();
+
+        when(chatroomRepository.findHostedChatroomByUser(user)).thenReturn(List.of(chatroom1, chatroom2));
+
+        List<Chatroom> result = chatroomService.getHostedChatrooms(user);
+
+        assertThat(result).hasSize(2);
+        assertThat(result.get(0)).isEqualTo(chatroom1);
+        assertThat(result.get(1)).isEqualTo(chatroom2);
     }
 }
