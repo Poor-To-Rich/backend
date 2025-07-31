@@ -11,4 +11,6 @@ import org.springframework.stereotype.Repository;
 public interface ChatParticipantRepository extends JpaRepository<ChatParticipant, Long> {
 
     Optional<ChatParticipant> findByUserAndChatroom(User user, Chatroom chatroom);
+
+    int countByChatroomAndIsParticipateTrue(Chatroom chatroom);
 }
