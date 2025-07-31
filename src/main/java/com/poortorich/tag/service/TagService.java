@@ -6,10 +6,9 @@ import com.poortorich.tag.constants.TagValidationConstraints;
 import com.poortorich.tag.entity.Tag;
 import com.poortorich.tag.repository.TagRepository;
 import com.poortorich.tag.response.enums.TagResponse;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -44,5 +43,10 @@ public class TagService {
         return tagRepository.findByChatroom(chatroom).stream()
                 .map(Tag::getName)
                 .toList();
+    }
+
+    public void updateTag(List<String> hashtags, Chatroom chatroom) {
+        tagRepository.deleteAllByChatroom(chatroom);
+        createTag(hashtags, chatroom);
     }
 }

@@ -4,13 +4,16 @@ import com.poortorich.chat.entity.ChatParticipant;
 import com.poortorich.chat.entity.Chatroom;
 import com.poortorich.chat.request.ChatroomCreateRequest;
 import com.poortorich.chat.request.ChatroomEnterRequest;
+import com.poortorich.chat.request.ChatroomUpdateRequest;
 import com.poortorich.chat.response.ChatroomCreateResponse;
 import com.poortorich.chat.response.ChatroomEnterResponse;
 import com.poortorich.chat.response.ChatroomInfoResponse;
 import com.poortorich.chat.response.ChatroomLeaveResponse;
+import com.poortorich.chat.response.ChatroomUpdateResponse;
 import com.poortorich.chat.service.ChatParticipantService;
 import com.poortorich.chat.service.ChatroomService;
 import com.poortorich.chat.util.ChatBuilder;
+import com.poortorich.chat.validator.ChatParticipantValidator;
 import com.poortorich.chat.validator.ChatroomValidator;
 import com.poortorich.s3.service.FileUploadService;
 import com.poortorich.tag.service.TagService;
@@ -32,6 +35,7 @@ public class ChatFacade {
     private final TagService tagService;
 
     private final ChatroomValidator chatroomValidator;
+    private final ChatParticipantValidator chatParticipantValidator;
 
     @Transactional
     public ChatroomCreateResponse createChatroom(
@@ -71,6 +75,24 @@ public class ChatFacade {
     }
 
     @Transactional
+    public ChatroomUpdateResponse updateChatroom(
+            String username,
+            Long chatroomId,
+            ChatroomUpdateRequest chatroomUpdateRequest
+    ) {
+        Chatroom chatroom = chatroomService.findById(chatroomId);
+        User user = userService.findUserByUsername(username);
+        String imageUrl = fileUploadService.uploadImage(chatroomUpdateRequest.getChatroomImage());
+
+        chatroomValidator.validateCanUpdateMaxMemberCount(chatroom, chatroomUpdateRequest.getMaxMemberCount());
+        chatParticipantValidator.validateIsHost(user, chatroom);
+
+        chatroom.updateChatroom(chatroomUpdateRequest, imageUrl);
+        tagService.updateTag(chatroomUpdateRequest.getHashtags(), chatroom);
+
+        return ChatroomUpdateResponse.builder().chatroomId(chatroomId).build();
+    }
+
     public ChatroomLeaveResponse leaveChatroom(String username, Long chatroomId) {
         User user = userService.findUserByUsername(username);
         Chatroom chatroom = chatroomService.findById(chatroomId);
