@@ -3,22 +3,24 @@ package com.poortorich.chat.facade;
 import com.poortorich.chat.entity.Chatroom;
 import com.poortorich.chat.request.ChatroomCreateRequest;
 import com.poortorich.chat.request.ChatroomEnterRequest;
+import com.poortorich.chat.request.ChatroomUpdateRequest;
 import com.poortorich.chat.response.ChatroomCreateResponse;
+import com.poortorich.chat.response.ChatroomEnterResponse;
 import com.poortorich.chat.response.ChatroomInfoResponse;
+import com.poortorich.chat.response.ChatroomUpdateResponse;
 import com.poortorich.chat.service.ChatParticipantService;
 import com.poortorich.chat.service.ChatroomService;
 import com.poortorich.chat.util.ChatBuilder;
-import com.poortorich.chat.response.ChatroomEnterResponse;
+import com.poortorich.chat.validator.ChatParticipantValidator;
 import com.poortorich.chat.validator.ChatroomValidator;
 import com.poortorich.s3.service.FileUploadService;
 import com.poortorich.tag.service.TagService;
 import com.poortorich.user.entity.User;
 import com.poortorich.user.service.UserService;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -31,6 +33,7 @@ public class ChatFacade {
     private final TagService tagService;
 
     private final ChatroomValidator chatroomValidator;
+    private final ChatParticipantValidator chatParticipantValidator;
 
     @Transactional
     public ChatroomCreateResponse createChatroom(
@@ -53,7 +56,7 @@ public class ChatFacade {
 
         return ChatBuilder.buildChatroomInfoResponse(chatroom, hashtags);
     }
-  
+
     public ChatroomEnterResponse enterChatroom(
             String username,
             Long chatroomId,
@@ -67,5 +70,24 @@ public class ChatFacade {
 
         chatParticipantService.enterUser(user, chatroom);
         return ChatroomEnterResponse.builder().chatroomId(chatroomId).build();
+    }
+
+    @Transactional
+    public ChatroomUpdateResponse updateChatroom(
+            String username,
+            Long chatroomId,
+            ChatroomUpdateRequest chatroomUpdateRequest
+    ) {
+        Chatroom chatroom = chatroomService.findById(chatroomId);
+        User user = userService.findUserByUsername(username);
+        String imageUrl = fileUploadService.uploadImage(chatroomUpdateRequest.getChatroomImage());
+
+        chatroomValidator.validateCanUpdateMaxMemberCount(chatroom, chatroomUpdateRequest.getMaxMemberCount());
+        chatParticipantValidator.validateIsHost(user, chatroom);
+
+        chatroom.updateChatroom(chatroomUpdateRequest, imageUrl);
+        tagService.updateTag(chatroomUpdateRequest.getHashtags(), chatroom);
+
+        return ChatroomUpdateResponse.builder().chatroomId(chatroomId).build();
     }
 }
