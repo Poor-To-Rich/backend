@@ -31,12 +31,15 @@ public class ChatParticipantValidator {
         }
     }
 
+    // TODO: 채팅방에서 역할이 멤버가 아니라면 예외를 발생
     public void validateIsMember(User user, Chatroom chatroom) {
     }
 
+    // TODO: 채탕방에서 사용자가 차단되었다면 예외를 발생
     public void validateIsBanned(User user, Chatroom chatroom) {
     }
 
+    // TODO: 채팅방에서 사용자가 퇴장한 상태이거나 없다면 예외를 발생
     public void validateHasLeft(User user, Chatroom chatroom) {
     }
 
