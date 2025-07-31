@@ -10,6 +10,8 @@ import com.poortorich.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+
 @Service
 @RequiredArgsConstructor
 public class ChatMessageService {
@@ -40,5 +42,11 @@ public class ChatMessageService {
                 .content(chatMessage.getContent())
                 .sendAt(chatMessage.getSentAt())
                 .build();
+    }
+
+    public String getLastMessageTime(Chatroom chatroom) {
+        return chatMessageRepository.findTopByChatroomOrderBySentAtDesc(chatroom)
+                .map(chatMessage -> chatMessage.getSentAt().toString())
+                .orElse(null);
     }
 }
