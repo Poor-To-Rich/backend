@@ -53,10 +53,7 @@ public class ChatController {
 
     @GetMapping("/{chatroomId}/edit")
     public ResponseEntity<BaseResponse> getChatroom(@PathVariable Long chatroomId) {
-        return DataResponse.toResponseEntity(
-                ChatResponse.GET_CHATROOM_SUCCESS,
-                chatFacade.getChatroom(chatroomId)
-        );
+        return DataResponse.toResponseEntity(ChatResponse.GET_CHATROOM_SUCCESS, chatFacade.getChatroom(chatroomId));
     }
 
     @PostMapping("/{chatroomId}/enter")
@@ -73,10 +70,7 @@ public class ChatController {
         ResponsePayload payload = realTimeFacade.createUserEnterSystemMessage(userDetails.getUsername(), chatroomId);
         messagingTemplate.convertAndSend(SubscribeEndpoint.CHATROOM_SUBSCRIBE_PREFIX + chatroomId, payload);
 
-        return DataResponse.toResponseEntity(
-                ChatResponse.CHATROOM_ENTER_SUCCESS,
-                response
-        );
+        return DataResponse.toResponseEntity(ChatResponse.CHATROOM_ENTER_SUCCESS, response);
     }
 
     @PutMapping(value = "/{chatroomId}/edit", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -100,10 +94,7 @@ public class ChatController {
 
         messagingTemplate.convertAndSend(SubscribeEndpoint.CHATROOM_SUBSCRIBE_PREFIX + chatroomId, payload);
 
-        return DataResponse.toResponseEntity(
-                ChatResponse.CHATROOM_LEAVE_SUCCESS,
-                response
-        );
+        return DataResponse.toResponseEntity(ChatResponse.CHATROOM_LEAVE_SUCCESS, response);
     }
 
     @DeleteMapping("/leave")
@@ -123,9 +114,6 @@ public class ChatController {
             messagingTemplate.convertAndSend(SubscribeEndpoint.CHATROOM_SUBSCRIBE_PREFIX + chatroomId, payload);
         }
 
-        return DataResponse.toResponseEntity(
-                ChatResponse.CHATROOM_LEAVE_SUCCESS,
-                response
-        );
+        return DataResponse.toResponseEntity(ChatResponse.CHATROOM_LEAVE_SUCCESS, response);
     }
 }
