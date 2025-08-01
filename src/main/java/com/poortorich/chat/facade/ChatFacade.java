@@ -105,12 +105,16 @@ public class ChatFacade {
     ) {
         Chatroom chatroom = chatroomService.findById(chatroomId);
         User user = userService.findUserByUsername(username);
-        String imageUrl = fileUploadService.uploadImage(chatroomUpdateRequest.getChatroomImage());
 
-        chatroomValidator.validateCanUpdateMaxMemberCount(chatroom, chatroomUpdateRequest.getMaxMemberCount());
         chatParticipantValidator.validateIsHost(user, chatroom);
+        chatroomValidator.validateCanUpdateMaxMemberCount(chatroom, chatroomUpdateRequest.getMaxMemberCount());
 
-        chatroom.updateChatroom(chatroomUpdateRequest, imageUrl);
+        String newChatroomImage = fileUploadService.updateImage(
+                chatroom.getImage(),
+                chatroomUpdateRequest.getChatroomImage(),
+                chatroomUpdateRequest.getIsDefaultImage());
+
+        chatroom.updateChatroom(chatroomUpdateRequest, newChatroomImage);
         tagService.updateTag(chatroomUpdateRequest.getHashtags(), chatroom);
 
         return ChatroomUpdateResponse.builder().chatroomId(chatroomId).build();

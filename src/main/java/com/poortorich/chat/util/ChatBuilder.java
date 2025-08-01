@@ -8,9 +8,8 @@ import com.poortorich.chat.entity.enums.RankingStatus;
 import com.poortorich.chat.request.ChatroomCreateRequest;
 import com.poortorich.chat.response.ChatroomInfoResponse;
 import com.poortorich.chat.response.ChatroomResponse;
+import com.poortorich.s3.constants.S3Constants;
 import com.poortorich.user.entity.User;
-
-import java.time.LocalDateTime;
 import java.util.List;
 
 public class ChatBuilder {
@@ -38,8 +37,16 @@ public class ChatBuilder {
     }
 
     public static ChatroomInfoResponse buildChatroomInfoResponse(Chatroom chatroom, List<String> hashtags) {
+        boolean isDefaultImage = S3Constants.DEFAULT_PROFILES.contains(chatroom.getImage());
+
+        String chatroomImage = null;
+        if (!isDefaultImage) {
+            chatroomImage = chatroom.getImage();
+        }
+
         return ChatroomInfoResponse.builder()
-                .chatroomImage(chatroom.getImage())
+                .chatroomImage(chatroomImage)
+                .isDefaultImage(isDefaultImage)
                 .chatroomTitle(chatroom.getTitle())
                 .description(chatroom.getDescription())
                 .maxMemberCount(chatroom.getMaxMemberCount())
