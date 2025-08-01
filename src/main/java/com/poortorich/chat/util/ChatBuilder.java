@@ -7,6 +7,7 @@ import com.poortorich.chat.entity.enums.NoticeStatus;
 import com.poortorich.chat.entity.enums.RankingStatus;
 import com.poortorich.chat.request.ChatroomCreateRequest;
 import com.poortorich.chat.response.ChatroomInfoResponse;
+import com.poortorich.chat.response.ChatroomResponse;
 import com.poortorich.s3.constants.S3Constants;
 import com.poortorich.user.entity.User;
 import java.util.List;
@@ -52,6 +53,24 @@ public class ChatBuilder {
                 .hashtags(hashtags)
                 .isRankingEnabled(chatroom.getIsRankingEnabled())
                 .chatroomPassword(chatroom.getPassword())
+                .build();
+    }
+
+    public static ChatroomResponse buildChatroomResponse(
+            Chatroom chatroom,
+            List<String> hashtags,
+            Long currentMemberCount,
+            String lastMessageTime
+    ) {
+        return ChatroomResponse.builder()
+                .chatroomId(chatroom.getId())
+                .chatroomTitle(chatroom.getTitle())
+                .chatroomImage(chatroom.getImage())
+                .description(chatroom.getDescription())
+                .hashtags(hashtags)
+                .currentMemberCount(currentMemberCount)
+                .maxMemberCount(chatroom.getMaxMemberCount())
+                .lastMessageTime(lastMessageTime)
                 .build();
     }
 }
