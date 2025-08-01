@@ -1,7 +1,12 @@
-package com.poortorich.websocket.interceptor;
+package com.poortorich.websocket.stomp.interceptor;
 
 import com.poortorich.global.exceptions.InternalServerErrorException;
 import com.poortorich.global.response.enums.GlobalResponse;
+import com.poortorich.websocket.stomp.command.connect.handler.StompConnectHandler;
+import com.poortorich.websocket.stomp.command.disconnect.handler.StompDisconnectHandler;
+import com.poortorich.websocket.stomp.command.publish.handler.StompSendHandler;
+import com.poortorich.websocket.stomp.command.subscribe.handler.StompSubscribeHandler;
+import com.poortorich.websocket.stomp.command.unsubscribe.handler.StompUnsubscribeHandler;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.Message;
@@ -16,6 +21,12 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class StompInterceptor implements ChannelInterceptor {
 
+    private final StompConnectHandler connectHandler;
+    private final StompSubscribeHandler subscribeHandler;
+    private final StompSendHandler sendHandler;
+    private final StompUnsubscribeHandler unsubscribeHandler;
+    private final StompDisconnectHandler disconnectHandler;
+
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
         StompCommand command = null;
@@ -24,16 +35,18 @@ public class StompInterceptor implements ChannelInterceptor {
             command = accessor.getCommand();
 
             if (StompCommand.CONNECT.equals(command)) {
-                log.info("[WebSocket]: 연결 시도");
+                connectHandler.handle(accessor);
             } else if (StompCommand.SUBSCRIBE.equals(command)) {
-                log.info("[WebSocket]: 구독 시도");
+                subscribeHandler.handle(accessor);
             } else if (StompCommand.SEND.equals(command)) {
-                log.info("[WebSocket]: 전송 시도");
+                sendHandler.handle(accessor);
+            } else if (StompCommand.UNSUBSCRIBE.equals(command)) {
+                unsubscribeHandler.handle(accessor);
             } else if (StompCommand.DISCONNECT.equals(command)) {
-                log.info("[WebSocket]: 연결 해제 시도");
+                disconnectHandler.handle();
             }
         } catch (Exception e) {
-            log.info("[WebSocket 연결 실패]");
+            log.info("[WebSocket 연결 실패] {}", e.getStackTrace()[0]);
             throw new InternalServerErrorException(GlobalResponse.INTERNAL_SERVER_EXCEPTION);
         }
 

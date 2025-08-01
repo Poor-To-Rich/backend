@@ -1,0 +1,46 @@
+package com.poortorich.chat.controller;
+
+import com.poortorich.chat.facade.ChatFacade;
+import com.poortorich.chat.response.ChatroomsResponse;
+import com.poortorich.chat.response.enums.ChatResponse;
+import com.poortorich.global.config.BaseSecurityTest;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.web.servlet.MockMvc;
+
+import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+@WebMvcTest(ChatParticipantController.class)
+@ExtendWith(MockitoExtension.class)
+class ChatParticipantControllerTest extends BaseSecurityTest {
+
+    @Autowired
+    private MockMvc mockMvc;
+
+    @MockitoBean
+    private ChatFacade chatFacade;
+
+    @Test
+    @WithMockUser(username = "test")
+    @DisplayName("내가 방장인 채팅방 조회 성공")
+    void getHostedChatroomsSuccess() throws Exception {
+        ChatroomsResponse response = ChatroomsResponse.builder().build();
+        when(chatFacade.getHostedChatrooms("test")).thenReturn(response);
+
+        mockMvc.perform(get("/users/hosted-chatrooms")
+                        .with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(("$.message"))
+                        .value(ChatResponse.GET_HOSTED_CHATROOMS_SUCCESS.getMessage()));
+    }
+}

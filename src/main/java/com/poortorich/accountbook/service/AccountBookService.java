@@ -244,7 +244,7 @@ public class AccountBookService {
                 dateInfo.getStartDate(),
                 dateInfo.getEndDate(),
                 type);
-        
+
         accountBooks = AccountBookExtractor.extractByCategory(accountBooks, category);
 
         return AccountBookCalculator.sum(accountBooks);

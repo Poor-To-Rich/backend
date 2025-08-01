@@ -31,7 +31,7 @@ import java.time.LocalDateTime;
 @DynamicUpdate
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-@Table(name = "iterationExpenses")
+@Table(name = "iteration_expenses")
 public class IterationExpenses implements Iteration {
 
     @Id
@@ -40,15 +40,15 @@ public class IterationExpenses implements Iteration {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "userId")
+    @JoinColumn(name = "user_id")
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "originalExpenseId")
+    @JoinColumn(name = "original_expense_id")
     private Expense originalExpense;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "generatedExpenseId")
+    @JoinColumn(name = "generated_expense_id")
     private Expense generatedExpense;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -56,11 +56,11 @@ public class IterationExpenses implements Iteration {
     private IterationInfo iterationInfo;
 
     @CreationTimestamp
-    @Column(name = "createdDate")
+    @Column(name = "created_date")
     private LocalDateTime createdDate;
 
     @UpdateTimestamp
-    @Column(name = "updatedDate")
+    @Column(name = "updated_date")
     private LocalDateTime updatedDate;
 
     @Override

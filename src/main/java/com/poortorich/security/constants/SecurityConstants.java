@@ -8,9 +8,9 @@ public class SecurityConstants {
             "https://localhost:5173",
             "https://localhost:4173",
             "https://poortorich.site",
-            "https://www.poortorich.site"
+            "https://www.poortorich.site",
             // STOMP 연결 테스트 사이트
-            //"https://jiangxy.github.io"
+            "https://jiangxy.github.io"
     );
     public static final List<String> ALLOWED_METHOD = List.of("GET", "POST", "PUT", "DELETE");
     public static final List<String> ALLOWED_HEADERS = List.of("authorization", "content-type", "x-auth-token");

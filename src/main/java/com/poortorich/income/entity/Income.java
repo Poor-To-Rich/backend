@@ -47,7 +47,7 @@ public class Income implements AccountBook {
     private Long id;
 
     @NotNull
-    @Column(name = "incomeDate", nullable = false)
+    @Column(name = "income_date", nullable = false)
     private LocalDate incomeDate;
 
     @Column(name = "title")
@@ -61,26 +61,26 @@ public class Income implements AccountBook {
 
     @NotNull
     @Enumerated(EnumType.STRING)
-    @Column(name = "iterationType", nullable = false)
+    @Column(name = "iteration_type", nullable = false)
     private IterationType iterationType;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "categoryId")
+    @JoinColumn(name = "category_id")
     private Category category;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "userId")
+    @JoinColumn(name = "user_id")
     private User user;
 
     @OneToOne(mappedBy = "generatedIncome")
     private IterationIncomes generatedIterationIncomes;
 
     @CreationTimestamp
-    @Column(name = "createdDate")
+    @Column(name = "created_date")
     private LocalDateTime createdDate;
 
     @UpdateTimestamp
-    @Column(name = "updatedDate")
+    @Column(name = "updated_date")
     private LocalDateTime updatedDate;
 
     @Override

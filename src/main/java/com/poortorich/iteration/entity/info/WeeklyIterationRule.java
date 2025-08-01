@@ -24,7 +24,7 @@ import java.util.List;
 @DiscriminatorValue("WEEKLY")
 public class WeeklyIterationRule extends IterationInfo {
 
-    @Column(name = "daysOfWeek")
+    @Column(name = "days_of_week")
     private String daysOfWeek;
 
     @Transient
