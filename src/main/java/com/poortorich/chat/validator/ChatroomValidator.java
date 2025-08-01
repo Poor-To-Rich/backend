@@ -29,6 +29,11 @@ public class ChatroomValidator {
                 throw new ConflictException(ChatResponse.CHATROOM_ENTER_DUPLICATED);
             }
         }
+
+        long currentMemberCount = chatParticipantRepository.countByChatroomAndIsParticipateTrue(chatroom);
+        if (currentMemberCount == chatroom.getMaxMemberCount()) {
+            throw new ForbiddenException(ChatResponse.CHATROOM_ENTER_DENIED);
+        }
     }
 
     public void validatePassword(Chatroom chatroom, String password) {
