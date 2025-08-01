@@ -3,7 +3,9 @@ package com.poortorich.chat.service;
 import com.poortorich.chat.entity.Chatroom;
 import com.poortorich.chat.entity.enums.ChatroomRole;
 import com.poortorich.chat.repository.ChatroomRepository;
+import com.poortorich.chat.repository.RedisChatRepository;
 import com.poortorich.chat.request.ChatroomCreateRequest;
+import com.poortorich.chat.request.enums.SortBy;
 import com.poortorich.chat.response.enums.ChatResponse;
 import com.poortorich.chat.util.ChatBuilder;
 import com.poortorich.global.exceptions.NotFoundException;
@@ -18,10 +20,49 @@ import java.util.List;
 public class ChatroomService {
 
     private final ChatroomRepository chatroomRepository;
+    private final RedisChatRepository redisChatRepository;
 
     public Chatroom createChatroom(String imageUrl, ChatroomCreateRequest request) {
         Chatroom chatroom = ChatBuilder.buildChatroom(imageUrl, request);
         return chatroomRepository.save(chatroom);
+    }
+
+    public List<Chatroom> getAllChatrooms(String sortBy, Long cursor) {
+        if (redisChatRepository.existsBySortBy(sortBy)) {
+            return findByIds(redisChatRepository.getChatroomIds(sortBy, cursor, 20));
+        }
+
+        List<Long> chatrooms = getBySortBy(sortBy).stream()
+                .map(Chatroom::getId)
+                .toList();
+        redisChatRepository.save(sortBy, chatrooms);
+        return findByIds(redisChatRepository.getChatroomIds(sortBy, cursor, 20));
+    }
+
+    private List<Chatroom> getBySortBy(String sortBy) {
+        if (sortBy.equals(SortBy.LIKE.toString())) {
+            return chatroomRepository.findChatroomsSortByLike();
+        }
+
+        if (sortBy.equals(SortBy.CREATED_AT.toString())) {
+            return chatroomRepository.findChatroomsSortByCreatedAt();
+        }
+
+        return chatroomRepository.findChatroomsSortByUpdatedAt();
+    }
+
+    private List<Chatroom> findByIds(List<Long> chatroomIds) {
+        return chatroomIds.stream()
+                .map(this::findById)
+                .toList();
+    }
+
+    public Boolean hasNext(String sortBy, Long lastChatroomId) {
+        return redisChatRepository.hasNext(sortBy, lastChatroomId);
+    }
+
+    public Long getNextCursor(String sortBy, Long lastChatroomId) {
+        return redisChatRepository.getNextCursor(sortBy, lastChatroomId);
     }
 
     public Chatroom findById(Long chatroomId) {

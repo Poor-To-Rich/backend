@@ -1,5 +1,7 @@
 package com.poortorich.chat.controller;
 
+import com.poortorich.chat.constants.ChatResponseMessage;
+import com.poortorich.chat.entity.ChatMessage;
 import com.poortorich.chat.facade.ChatFacade;
 import com.poortorich.chat.realtime.facade.ChatRealTimeFacade;
 import com.poortorich.chat.realtime.payload.ResponsePayload;
@@ -7,6 +9,7 @@ import com.poortorich.chat.request.ChatroomCreateRequest;
 import com.poortorich.chat.request.ChatroomEnterRequest;
 import com.poortorich.chat.request.ChatroomLeaveAllRequest;
 import com.poortorich.chat.request.ChatroomUpdateRequest;
+import com.poortorich.chat.request.enums.SortBy;
 import com.poortorich.chat.response.ChatroomEnterResponse;
 import com.poortorich.chat.response.ChatroomLeaveAllResponse;
 import com.poortorich.chat.response.ChatroomLeaveResponse;
@@ -16,6 +19,7 @@ import com.poortorich.global.response.DataResponse;
 import com.poortorich.websocket.stomp.command.subscribe.endpoint.SubscribeEndpoint;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -28,6 +32,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -49,6 +54,16 @@ public class ChatController {
                 ChatResponse.CREATE_CHATROOM_SUCCESS,
                 chatFacade.createChatroom(userDetails.getUsername(), request)
         );
+    }
+
+    @GetMapping
+    public ResponseEntity<BaseResponse> getAllChatrooms(
+            @RequestParam(defaultValue = "UPDATED_AT") String sortBy,
+            @RequestParam(defaultValue = "-1") Long cursor
+    ) {
+        String message = SortBy.valueOf(sortBy).getMessage() + ChatResponseMessage.GET_ALL_CHATROOMS_SUCCESS;
+
+        return DataResponse.toResponseEntity(HttpStatus.OK, message, chatFacade.getAllChatrooms(sortBy, cursor));
     }
 
     @GetMapping("/{chatroomId}/edit")

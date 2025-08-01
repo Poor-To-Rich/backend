@@ -22,4 +22,40 @@ public interface ChatroomRepository extends JpaRepository<Chatroom, Long> {
            AND cp.role = :role
     """)
     List<Chatroom> findChatroomByUserAndRole(@Param("user") User user, @Param("role") ChatroomRole role);
+
+    @Query("""
+        SELECT c
+          FROM Chatroom c
+          LEFT JOIN ChatMessage cm ON cm.chatroom = c
+          LEFT JOIN Like l ON l.chatroom = c AND l.likeStatus = true
+          LEFT JOIN ChatParticipant cp ON cp.chatroom = c AND cp.isParticipate = true
+        GROUP BY c.id
+        ORDER BY MAX(cm.sentAt) DESC,
+                 COUNT(DISTINCT l.id) DESC,
+                 COUNT(DISTINCT cp.id) DESC,
+                 c.createdDate DESC,
+                 c.id ASC
+    """)
+    List<Chatroom> findChatroomsSortByUpdatedAt();
+
+    @Query("""
+        SELECT c
+          FROM Chatroom c
+        ORDER BY c.createdDate DESC
+    """)
+    List<Chatroom> findChatroomsSortByCreatedAt();
+
+    @Query("""
+        SELECT c
+          FROM Chatroom c
+          LEFT JOIN ChatMessage cm ON cm.chatroom = c
+          LEFT JOIN Like l ON l.chatroom = c AND l.likeStatus = true
+          LEFT JOIN ChatParticipant cp ON cp.chatroom = c AND cp.isParticipate = true
+        GROUP BY c.id
+        ORDER BY COUNT(DISTINCT l.id) DESC,
+                 COUNT(DISTINCT cp.id) DESC,
+                 c.createdDate DESC,
+                 c.id ASC
+    """)
+    List<Chatroom> findChatroomsSortByLike();
 }

@@ -6,6 +6,7 @@ import com.poortorich.chat.request.ChatroomCreateRequest;
 import com.poortorich.chat.request.ChatroomEnterRequest;
 import com.poortorich.chat.request.ChatroomLeaveAllRequest;
 import com.poortorich.chat.request.ChatroomUpdateRequest;
+import com.poortorich.chat.response.AllChatroomsResponse;
 import com.poortorich.chat.response.ChatroomCreateResponse;
 import com.poortorich.chat.response.ChatroomEnterResponse;
 import com.poortorich.chat.response.ChatroomInfoResponse;
@@ -65,11 +66,27 @@ public class ChatFacade {
         return ChatBuilder.buildChatroomInfoResponse(chatroom, hashtags);
     }
 
+    public AllChatroomsResponse getAllChatrooms(String sortBy, Long cursor) {
+        List<Chatroom> chatrooms = chatroomService.getAllChatrooms(sortBy, cursor);
+
+        return AllChatroomsResponse.builder()
+                .hasNext(chatroomService.hasNext(sortBy, chatrooms.getLast().getId()))
+                .nextCursor(chatroomService.getNextCursor(sortBy, chatrooms.getLast().getId()))
+                .chatrooms(getChatroomResponses(chatrooms))
+                .build();
+    }
+
     public ChatroomsResponse getHostedChatrooms(String username) {
         User user = userService.findUserByUsername(username);
         List<Chatroom> hostedChatrooms = chatroomService.getHostedChatrooms(user);
 
-        List<ChatroomResponse> chatroomResponses = hostedChatrooms.stream()
+        return ChatroomsResponse.builder()
+                .chatrooms(getChatroomResponses(hostedChatrooms))
+                .build();
+    }
+
+    private List<ChatroomResponse> getChatroomResponses(List<Chatroom> chatrooms) {
+        return chatrooms.stream()
                 .map(chatroom ->
                         ChatBuilder.buildChatroomResponse(
                                 chatroom,
@@ -78,8 +95,6 @@ public class ChatFacade {
                                 chatMessageService.getLastMessageTime(chatroom)
                         ))
                 .toList();
-
-        return ChatroomsResponse.builder().chatrooms(chatroomResponses).build();
     }
 
     public ChatroomEnterResponse enterChatroom(

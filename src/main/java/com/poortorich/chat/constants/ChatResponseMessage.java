@@ -4,6 +4,7 @@ public class ChatResponseMessage {
 
     public static final String CREATE_CHATROOM_SUCCESS = "채팅방을 성공적으로 추가했습니다.";
     public static final String GET_CHATROOM_SUCCESS = "채팅방을 성공적으로 조회했습니다.";
+    public static final String GET_ALL_CHATROOMS_SUCCESS = "전체 채팅방 목록 조회가 완료되었습니다.";
     public static final String GET_HOSTED_CHATROOMS_SUCCESS = "나의 채팅방 목록 조회가 완료되었습니다.";
 
     public static final String CHATROOM_TITLE_REQUIRED = "채팅방 이름은 필수값입니다.";
@@ -31,7 +32,6 @@ public class ChatResponseMessage {
     public static final String CHAT_PARTICIPANT_NOT_HOST = "채팅방 방장이 아닙니다.";
     public static final String CHATROOM_MAX_MEMBER_COUNT_EXCEED = "최대 인원 수를 현재 인원보다 적게 설정할 수 없습니다.";
 
-    public static final String CHAT_PARTICIPANT_NOT_FOUND = "참여자를 찾을 수 없습니다.";
     public static final String CHATROOM_LEAVE_ALREADY = "채팅방에 참여하고 있지 않습니다.";
     public static final String CHATROOM_LEAVE_SUCCESS = "채팅방을 성공적으로 나갔습니다.";
 
