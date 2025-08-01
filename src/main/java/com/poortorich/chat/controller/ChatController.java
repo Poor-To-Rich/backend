@@ -48,10 +48,7 @@ public class ChatController {
     ) {
         ChatroomCreateResponse response = chatFacade.createChatroom(userDetails.getUsername(), request);
         realTimeFacade.createUserEnterSystemMessage(userDetails.getUsername(), response.getNewChatroomId());
-        return DataResponse.toResponseEntity(
-                ChatResponse.CREATE_CHATROOM_SUCCESS,
-                response
-        );
+        return DataResponse.toResponseEntity(ChatResponse.CREATE_CHATROOM_SUCCESS, response);
     }
 
     @GetMapping("/{chatroomId}/edit")
