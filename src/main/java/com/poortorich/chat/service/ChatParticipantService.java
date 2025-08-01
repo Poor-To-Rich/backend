@@ -35,4 +35,8 @@ public class ChatParticipantService {
         return chatParticipantRepository.findByUserAndChatroom(user, chatroom)
                 .orElseThrow(() -> new NotFoundException(ChatResponse.CHAT_PARTICIPANT_NOT_FOUND));
     }
+
+    public Long countByChatroom(Chatroom chatroom) {
+        return chatParticipantRepository.countByChatroomAndIsParticipateTrue(chatroom);
+    }
 }

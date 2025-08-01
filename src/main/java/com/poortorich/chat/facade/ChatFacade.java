@@ -12,6 +12,9 @@ import com.poortorich.chat.response.ChatroomInfoResponse;
 import com.poortorich.chat.response.ChatroomLeaveAllResponse;
 import com.poortorich.chat.response.ChatroomLeaveResponse;
 import com.poortorich.chat.response.ChatroomUpdateResponse;
+import com.poortorich.chat.response.ChatroomResponse;
+import com.poortorich.chat.response.ChatroomsResponse;
+import com.poortorich.chat.service.ChatMessageService;
 import com.poortorich.chat.service.ChatParticipantService;
 import com.poortorich.chat.service.ChatroomService;
 import com.poortorich.chat.util.ChatBuilder;
@@ -33,6 +36,7 @@ public class ChatFacade {
     private final UserService userService;
     private final ChatroomService chatroomService;
     private final ChatParticipantService chatParticipantService;
+    private final ChatMessageService chatMessageService;
     private final FileUploadService fileUploadService;
     private final TagService tagService;
 
@@ -59,6 +63,23 @@ public class ChatFacade {
         List<String> hashtags = tagService.getTagNames(chatroom);
 
         return ChatBuilder.buildChatroomInfoResponse(chatroom, hashtags);
+    }
+
+    public ChatroomsResponse getHostedChatrooms(String username) {
+        User user = userService.findUserByUsername(username);
+        List<Chatroom> hostedChatrooms = chatroomService.getHostedChatrooms(user);
+
+        List<ChatroomResponse> chatroomResponses = hostedChatrooms.stream()
+                .map(chatroom ->
+                        ChatBuilder.buildChatroomResponse(
+                                chatroom,
+                                tagService.getTagNames(chatroom),
+                                chatParticipantService.countByChatroom(chatroom),
+                                chatMessageService.getLastMessageTime(chatroom)
+                        ))
+                .toList();
+
+        return ChatroomsResponse.builder().chatrooms(chatroomResponses).build();
     }
 
     public ChatroomEnterResponse enterChatroom(

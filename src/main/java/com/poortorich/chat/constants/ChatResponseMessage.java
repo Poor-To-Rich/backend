@@ -4,6 +4,7 @@ public class ChatResponseMessage {
 
     public static final String CREATE_CHATROOM_SUCCESS = "채팅방을 성공적으로 추가했습니다.";
     public static final String GET_CHATROOM_SUCCESS = "채팅방을 성공적으로 조회했습니다.";
+    public static final String GET_HOSTED_CHATROOMS_SUCCESS = "나의 채팅방 목록 조회가 완료되었습니다.";
 
     public static final String CHATROOM_TITLE_REQUIRED = "채팅방 이름은 필수값입니다.";
     public static final String CHATROOM_TITLE_TOO_BIG

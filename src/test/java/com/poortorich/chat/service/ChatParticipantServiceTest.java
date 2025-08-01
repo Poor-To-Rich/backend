@@ -16,6 +16,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class ChatParticipantServiceTest {
@@ -48,5 +49,18 @@ class ChatParticipantServiceTest {
         assertThat(savedChatParticipant.getRole()).isEqualTo(chatParticipant.getRole());
         assertThat(savedChatParticipant.getUser()).isEqualTo(user);
         assertThat(savedChatParticipant.getChatroom()).isEqualTo(chatroom);
+    }
+
+    @Test
+    @DisplayName("채팅방 참여 인원 조회 성공")
+    void countByChatroomSuccess() {
+        Chatroom chatroom = Chatroom.builder().build();
+        Long currentMemberCount = 5L;
+
+        when(chatParticipantRepository.countByChatroomAndIsParticipateTrue(chatroom)).thenReturn(currentMemberCount);
+
+        Long result = chatParticipantService.countByChatroom(chatroom);
+
+        assertThat(result).isEqualTo(currentMemberCount);
     }
 }
