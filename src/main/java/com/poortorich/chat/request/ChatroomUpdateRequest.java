@@ -17,6 +17,8 @@ public class ChatroomUpdateRequest {
 
     private final MultipartFile chatroomImage;
 
+    private final Boolean isDefaultImage;
+    
     @NotNull(message = ChatResponseMessage.CHATROOM_TITLE_REQUIRED)
     @Size(max = ChatValidationConstraints.CHATROOM_TITLE_MAX,
             message = ChatResponseMessage.CHATROOM_TITLE_TOO_BIG)
