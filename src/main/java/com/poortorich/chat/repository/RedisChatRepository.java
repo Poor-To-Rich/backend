@@ -35,7 +35,7 @@ public class RedisChatRepository {
         }
 
         if (cursor == 0 || cursor == -1) {
-            return allIds.subList(0, size).stream()
+            return allIds.subList(0, Math.min(size, allIds.size())).stream()
                     .map(Long::parseLong)
                     .toList();
         }
