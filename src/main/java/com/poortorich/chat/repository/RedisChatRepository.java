@@ -1,5 +1,6 @@
 package com.poortorich.chat.repository;
 
+import com.poortorich.chat.request.enums.SortBy;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Repository;
@@ -16,8 +17,8 @@ public class RedisChatRepository {
 
     private final RedisTemplate<String, String> redisTemplate;
 
-    public void save(String sortBy, List<Long> chatroomIds) {
-        String key = getRedisKey(sortBy);
+    public void save(SortBy sortBy, List<Long> chatroomIds) {
+        String key = getRedisKey(sortBy.name());
         List<String> stringIds = chatroomIds.stream()
                 .map(String::valueOf)
                 .toList();
@@ -26,8 +27,8 @@ public class RedisChatRepository {
         redisTemplate.expire(key, Duration.ofMinutes(CHAT_KEY_EXPIRATION_TIME));
     }
 
-    public List<Long> getChatroomIds(String sortBy, Long cursor, int size) {
-        String key = getRedisKey(sortBy);
+    public List<Long> getChatroomIds(SortBy sortBy, Long cursor, int size) {
+        String key = getRedisKey(sortBy.name());
         List<String> allIds = redisTemplate.opsForList().range(key, 0, -1);
         if (allIds == null || allIds.isEmpty()) {
             return List.of();
@@ -46,12 +47,12 @@ public class RedisChatRepository {
                 .toList();
     }
 
-    public boolean existsBySortBy(String sortBy) {
-        String key = getRedisKey(sortBy);
+    public boolean existsBySortBy(SortBy sortBy) {
+        String key = getRedisKey(sortBy.name());
         return redisTemplate.hasKey(key);
     }
 
-    public Boolean hasNext(String sortBy, Long lastChatroomId) {
+    public Boolean hasNext(SortBy sortBy, Long lastChatroomId) {
         List<String> stringIds = getAllList(sortBy);
         if (stringIds == null || stringIds.isEmpty()) {
             return false;
@@ -61,7 +62,7 @@ public class RedisChatRepository {
         return hasNext(idx, stringIds.size());
     }
 
-    public Long getNextCursor(String sortBy, Long lastChatroomId) {
+    public Long getNextCursor(SortBy sortBy, Long lastChatroomId) {
         List<String> stringIds = getAllList(sortBy);
         if (stringIds == null || stringIds.isEmpty()) {
             return null;
@@ -75,8 +76,8 @@ public class RedisChatRepository {
         return null;
     }
 
-    private List<String> getAllList(String sortBy) {
-        String key = getRedisKey(sortBy);
+    private List<String> getAllList(SortBy sortBy) {
+        String key = getRedisKey(sortBy.name());
         return redisTemplate.opsForList().range(key, 0, -1);
     }
 

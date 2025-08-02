@@ -6,6 +6,7 @@ import com.poortorich.chat.request.ChatroomCreateRequest;
 import com.poortorich.chat.request.ChatroomEnterRequest;
 import com.poortorich.chat.request.ChatroomLeaveAllRequest;
 import com.poortorich.chat.request.ChatroomUpdateRequest;
+import com.poortorich.chat.request.enums.SortBy;
 import com.poortorich.chat.response.AllChatroomsResponse;
 import com.poortorich.chat.response.ChatroomCreateResponse;
 import com.poortorich.chat.response.ChatroomEnterResponse;
@@ -66,7 +67,7 @@ public class ChatFacade {
         return ChatBuilder.buildChatroomInfoResponse(chatroom, hashtags);
     }
 
-    public AllChatroomsResponse getAllChatrooms(String sortBy, Long cursor) {
+    public AllChatroomsResponse getAllChatrooms(SortBy sortBy, Long cursor) {
         List<Chatroom> chatrooms = chatroomService.getAllChatrooms(sortBy, cursor);
 
         return AllChatroomsResponse.builder()

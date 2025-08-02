@@ -2,6 +2,7 @@ package com.poortorich.chat.facade;
 
 import com.poortorich.chat.entity.Chatroom;
 import com.poortorich.chat.request.ChatroomCreateRequest;
+import com.poortorich.chat.request.enums.SortBy;
 import com.poortorich.chat.response.AllChatroomsResponse;
 import com.poortorich.chat.response.ChatroomCreateResponse;
 import com.poortorich.chat.response.ChatroomInfoResponse;
@@ -138,7 +139,7 @@ class ChatFacadeTest {
     @Test
     @DisplayName("전체 채팅방 목록 조회 성공")
     void getAllChatroomsSuccess() {
-        String sortBy = "UPDATED_AT";
+        SortBy sortBy = SortBy.UPDATED_AT;
         Long cursor = -1L;
 
         Chatroom chatroom1 = Chatroom.builder().id(1L).build();

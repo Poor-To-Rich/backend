@@ -58,10 +58,10 @@ public class ChatController {
 
     @GetMapping
     public ResponseEntity<BaseResponse> getAllChatrooms(
-            @RequestParam(defaultValue = "UPDATED_AT") String sortBy,
+            @RequestParam(defaultValue = "UPDATED_AT") SortBy sortBy,
             @RequestParam(defaultValue = "-1") Long cursor
     ) {
-        String message = SortBy.valueOf(sortBy).getMessage() + ChatResponseMessage.GET_ALL_CHATROOMS_SUCCESS;
+        String message = sortBy.getMessage() + ChatResponseMessage.GET_ALL_CHATROOMS_SUCCESS;
 
         return DataResponse.toResponseEntity(HttpStatus.OK, message, chatFacade.getAllChatrooms(sortBy, cursor));
     }

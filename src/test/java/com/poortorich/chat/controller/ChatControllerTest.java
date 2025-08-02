@@ -92,15 +92,15 @@ public class ChatControllerTest extends BaseSecurityTest {
     @WithMockUser(username = "test")
     @DisplayName("전체 채팅방 목록 조회 성공 - 최근대화순")
     void getAllChatroomsSortByUpdatedAtSuccess() throws Exception {
-        String sortBy = "UPDATED_AT";
+        SortBy sortBy = SortBy.UPDATED_AT;
         Long cursor = -1L;
 
         when(chatFacade.getAllChatrooms(eq(sortBy), eq(cursor)))
                 .thenReturn(AllChatroomsResponse.builder().build());
 
-        String message = SortBy.valueOf(sortBy).getMessage() + ChatResponseMessage.GET_ALL_CHATROOMS_SUCCESS;
+        String message = sortBy.getMessage() + ChatResponseMessage.GET_ALL_CHATROOMS_SUCCESS;
         mockMvc.perform(get("/chatrooms")
-                        .param("sortBy", sortBy)
+                        .param("sortBy", sortBy.name())
                         .param("cursor", cursor.toString())
                         .with(csrf()))
                 .andExpect(status().isOk())
@@ -111,15 +111,15 @@ public class ChatControllerTest extends BaseSecurityTest {
     @WithMockUser(username = "test")
     @DisplayName("전체 채팅방 목록 조회 성공 - 최근생성순")
     void getAllChatroomsSortByCreatedAtSuccess() throws Exception {
-        String sortBy = "CREATED_AT";
+        SortBy sortBy = SortBy.CREATED_AT;
         Long cursor = -1L;
 
         when(chatFacade.getAllChatrooms(eq(sortBy), eq(cursor)))
                 .thenReturn(AllChatroomsResponse.builder().build());
 
-        String message = SortBy.valueOf(sortBy).getMessage() + ChatResponseMessage.GET_ALL_CHATROOMS_SUCCESS;
+        String message = sortBy.getMessage() + ChatResponseMessage.GET_ALL_CHATROOMS_SUCCESS;
         mockMvc.perform(get("/chatrooms")
-                        .param("sortBy", sortBy)
+                        .param("sortBy", sortBy.name())
                         .param("cursor", cursor.toString())
                         .with(csrf()))
                 .andExpect(status().isOk())
@@ -130,15 +130,15 @@ public class ChatControllerTest extends BaseSecurityTest {
     @WithMockUser(username = "test")
     @DisplayName("전체 채팅방 목록 조회 성공 - 좋아요순")
     void getAllChatroomsSortByLikeSuccess() throws Exception {
-        String sortBy = "LIKE";
+        SortBy sortBy = SortBy.LIKE;
         Long cursor = -1L;
 
         when(chatFacade.getAllChatrooms(eq(sortBy), eq(cursor)))
                 .thenReturn(AllChatroomsResponse.builder().build());
 
-        String message = SortBy.valueOf(sortBy).getMessage() + ChatResponseMessage.GET_ALL_CHATROOMS_SUCCESS;
+        String message = sortBy.getMessage() + ChatResponseMessage.GET_ALL_CHATROOMS_SUCCESS;
         mockMvc.perform(get("/chatrooms")
-                        .param("sortBy", sortBy)
+                        .param("sortBy", sortBy.name())
                         .param("cursor", cursor.toString())
                         .with(csrf()))
                 .andExpect(status().isOk())
