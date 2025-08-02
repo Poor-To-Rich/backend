@@ -2,6 +2,8 @@ package com.poortorich.chat.facade;
 
 import com.poortorich.chat.entity.Chatroom;
 import com.poortorich.chat.request.ChatroomCreateRequest;
+import com.poortorich.chat.request.enums.SortBy;
+import com.poortorich.chat.response.AllChatroomsResponse;
 import com.poortorich.chat.response.ChatroomCreateResponse;
 import com.poortorich.chat.response.ChatroomInfoResponse;
 import com.poortorich.chat.response.ChatroomResponse;
@@ -26,6 +28,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -130,6 +133,31 @@ class ChatFacadeTest {
 
         assertThat(response.getChatrooms()).hasSize(2);
         assertThat(response.getChatrooms().get(0).getChatroomId()).isEqualTo(chatroom.getId());
+        assertThat(response.getChatrooms().get(1).getChatroomId()).isEqualTo(chatroom2.getId());
+    }
+
+    @Test
+    @DisplayName("전체 채팅방 목록 조회 성공")
+    void getAllChatroomsSuccess() {
+        SortBy sortBy = SortBy.UPDATED_AT;
+        Long cursor = -1L;
+
+        Chatroom chatroom1 = Chatroom.builder().id(1L).build();
+        Chatroom chatroom2 = Chatroom.builder().id(2L).build();
+
+        when(chatroomService.getAllChatrooms(sortBy, cursor)).thenReturn(List.of(chatroom1, chatroom2));
+        when(chatroomService.hasNext(sortBy, 2L)).thenReturn(true);
+        when(chatroomService.getNextCursor(sortBy, 2L)).thenReturn(3L);
+        when(tagService.getTagNames(any())).thenReturn(hashtags);
+        when(chatParticipantService.countByChatroom(any())).thenReturn(3L);
+        when(chatMessageService.getLastMessageTime(any())).thenReturn("2025-07-31T02:30");
+
+        AllChatroomsResponse response = chatFacade.getAllChatrooms(sortBy, cursor);
+
+        assertThat(response.getChatrooms()).hasSize(2);
+        assertThat(response.getHasNext()).isTrue();
+        assertThat(response.getNextCursor()).isEqualTo(3L);
+        assertThat(response.getChatrooms().get(0).getChatroomId()).isEqualTo(chatroom1.getId());
         assertThat(response.getChatrooms().get(1).getChatroomId()).isEqualTo(chatroom2.getId());
     }
 }
