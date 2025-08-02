@@ -10,6 +10,7 @@ import com.poortorich.chat.request.ChatroomEnterRequest;
 import com.poortorich.chat.request.ChatroomLeaveAllRequest;
 import com.poortorich.chat.request.ChatroomUpdateRequest;
 import com.poortorich.chat.request.enums.SortBy;
+import com.poortorich.chat.response.ChatroomCreateResponse;
 import com.poortorich.chat.response.ChatroomEnterResponse;
 import com.poortorich.chat.response.ChatroomLeaveAllResponse;
 import com.poortorich.chat.response.ChatroomLeaveResponse;
@@ -50,10 +51,9 @@ public class ChatController {
             @AuthenticationPrincipal UserDetails userDetails,
             @Valid ChatroomCreateRequest request
     ) {
-        return DataResponse.toResponseEntity(
-                ChatResponse.CREATE_CHATROOM_SUCCESS,
-                chatFacade.createChatroom(userDetails.getUsername(), request)
-        );
+        ChatroomCreateResponse response = chatFacade.createChatroom(userDetails.getUsername(), request);
+        realTimeFacade.createUserEnterSystemMessage(userDetails.getUsername(), response.getNewChatroomId());
+        return DataResponse.toResponseEntity(ChatResponse.CREATE_CHATROOM_SUCCESS, response);
     }
 
     @GetMapping
