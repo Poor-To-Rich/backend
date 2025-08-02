@@ -18,6 +18,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -118,9 +119,7 @@ class ChatroomServiceTest {
 
         when(redisChatRepository.existsBySortBy(sortBy)).thenReturn(true);
         when(redisChatRepository.getChatroomIds(sortBy, cursor, 20)).thenReturn(chatroomIds);
-        when(chatroomRepository.findById(1L)).thenReturn(Optional.of(chatroom1));
-        when(chatroomRepository.findById(2L)).thenReturn(Optional.of(chatroom2));
-        when(chatroomRepository.findById(3L)).thenReturn(Optional.of(chatroom3));
+        when(chatroomRepository.findAllById(chatroomIds)).thenReturn(Arrays.asList(chatroom1, chatroom2, chatroom3));
 
         List<Chatroom> result = chatroomService.getAllChatrooms(sortBy, cursor);
 
@@ -143,8 +142,7 @@ class ChatroomServiceTest {
         when(redisChatRepository.existsBySortBy(sortBy)).thenReturn(false);
         when(chatroomRepository.findChatroomsSortByLike()).thenReturn(List.of(chatroom1, chatroom2));
         when(redisChatRepository.getChatroomIds(sortBy, cursor, 20)).thenReturn(chatroomIds);
-        when(chatroomRepository.findById(1L)).thenReturn(Optional.of(chatroom1));
-        when(chatroomRepository.findById(2L)).thenReturn(Optional.of(chatroom2));
+        when(chatroomRepository.findAllById(chatroomIds)).thenReturn(Arrays.asList(chatroom1, chatroom2));
 
         List<Chatroom> result = chatroomService.getAllChatrooms(sortBy, cursor);
 
@@ -167,8 +165,7 @@ class ChatroomServiceTest {
         when(redisChatRepository.existsBySortBy(sortBy)).thenReturn(false);
         when(chatroomRepository.findChatroomsSortByUpdatedAt()).thenReturn(List.of(chatroom1, chatroom2));
         when(redisChatRepository.getChatroomIds(sortBy, cursor, 20)).thenReturn(chatroomIds);
-        when(chatroomRepository.findById(1L)).thenReturn(Optional.of(chatroom1));
-        when(chatroomRepository.findById(2L)).thenReturn(Optional.of(chatroom2));
+        when(chatroomRepository.findAllById(chatroomIds)).thenReturn(Arrays.asList(chatroom1, chatroom2));
 
         List<Chatroom> result = chatroomService.getAllChatrooms(sortBy, cursor);
 
@@ -191,8 +188,7 @@ class ChatroomServiceTest {
         when(redisChatRepository.existsBySortBy(sortBy)).thenReturn(false);
         when(chatroomRepository.findChatroomsSortByCreatedAt()).thenReturn(List.of(chatroom1, chatroom2));
         when(redisChatRepository.getChatroomIds(sortBy, cursor, 20)).thenReturn(chatroomIds);
-        when(chatroomRepository.findById(1L)).thenReturn(Optional.of(chatroom1));
-        when(chatroomRepository.findById(2L)).thenReturn(Optional.of(chatroom2));
+        when(chatroomRepository.findAllById(chatroomIds)).thenReturn(Arrays.asList(chatroom1, chatroom2));
 
         List<Chatroom> result = chatroomService.getAllChatrooms(sortBy, cursor);
 
@@ -201,7 +197,6 @@ class ChatroomServiceTest {
         assertThat(result.get(0)).isEqualTo(chatroom1);
         assertThat(result.get(1)).isEqualTo(chatroom2);
     }
-
 
     @Test
     @DisplayName("Redis 캐시에 다음 페이지가 존재하는 경우 - true 반환")

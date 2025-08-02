@@ -13,6 +13,7 @@ import com.poortorich.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -27,7 +28,7 @@ public class ChatroomService {
         return chatroomRepository.save(chatroom);
     }
 
-    public List<Chatroom> getAllChatrooms(String sortBy, Long cursor) {
+    public List<Chatroom> getAllChatrooms(SortBy sortBy, Long cursor) {
         if (redisChatRepository.existsBySortBy(sortBy)) {
             return findByIds(redisChatRepository.getChatroomIds(sortBy, cursor, 20));
         }
@@ -39,12 +40,12 @@ public class ChatroomService {
         return findByIds(redisChatRepository.getChatroomIds(sortBy, cursor, 20));
     }
 
-    private List<Chatroom> getBySortBy(String sortBy) {
-        if (sortBy.equals(SortBy.LIKE.toString())) {
+    private List<Chatroom> getBySortBy(SortBy sortBy) {
+        if (sortBy.equals(SortBy.LIKE)) {
             return chatroomRepository.findChatroomsSortByLike();
         }
 
-        if (sortBy.equals(SortBy.CREATED_AT.toString())) {
+        if (sortBy.equals(SortBy.CREATED_AT)) {
             return chatroomRepository.findChatroomsSortByCreatedAt();
         }
 
@@ -52,16 +53,16 @@ public class ChatroomService {
     }
 
     private List<Chatroom> findByIds(List<Long> chatroomIds) {
-        return chatroomIds.stream()
-                .map(this::findById)
-                .toList();
+        List<Chatroom> chatrooms = chatroomRepository.findAllById(chatroomIds);
+        chatrooms.sort(Comparator.comparingInt(c -> chatroomIds.indexOf(c.getId())));
+        return chatrooms;
     }
 
-    public Boolean hasNext(String sortBy, Long lastChatroomId) {
+    public Boolean hasNext(SortBy sortBy, Long lastChatroomId) {
         return redisChatRepository.hasNext(sortBy, lastChatroomId);
     }
 
-    public Long getNextCursor(String sortBy, Long lastChatroomId) {
+    public Long getNextCursor(SortBy sortBy, Long lastChatroomId) {
         return redisChatRepository.getNextCursor(sortBy, lastChatroomId);
     }
 
