@@ -9,6 +9,7 @@ import com.poortorich.tag.response.enums.TagResponse;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -48,5 +49,10 @@ public class TagService {
     public void updateTag(List<String> hashtags, Chatroom chatroom) {
         tagRepository.deleteAllByChatroom(chatroom);
         createTag(hashtags, chatroom);
+    }
+
+    @Transactional
+    public void deleteAllByChatroom(Chatroom chatroom) {
+        tagRepository.deleteAllByChatroom(chatroom);
     }
 }
