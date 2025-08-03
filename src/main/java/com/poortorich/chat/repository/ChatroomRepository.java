@@ -61,8 +61,8 @@ public interface ChatroomRepository extends JpaRepository<Chatroom, Long> {
     @Query("""
         SELECT DISTINCT c
           FROM Chatroom c
-          INNER JOIN Tag t ON t.chatroom = c
-          INNER JOIN ChatParticipant cp ON cp.chatroom = c AND cp.role = 'HOST'
+          LEFT JOIN Tag t ON t.chatroom = c
+         INNER JOIN ChatParticipant cp ON cp.chatroom = c AND cp.role = 'HOST'
         WHERE :keyword <> ''
           AND (
                  c.title LIKE CONCAT('%', :keyword, '%')
