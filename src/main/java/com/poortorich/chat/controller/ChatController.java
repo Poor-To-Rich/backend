@@ -66,6 +66,14 @@ public class ChatController {
         return DataResponse.toResponseEntity(HttpStatus.OK, message, chatFacade.getAllChatrooms(sortBy, cursor));
     }
 
+    @GetMapping("/search")
+    public ResponseEntity<BaseResponse> searchChatrooms(@RequestParam String keyword) {
+        return DataResponse.toResponseEntity(
+                ChatResponse.GET_SEARCH_CHATROOMS_SUCCESS,
+                chatFacade.searchChatrooms(keyword.trim())
+        );
+    }
+
     @GetMapping("/{chatroomId}/edit")
     public ResponseEntity<BaseResponse> getChatroom(@PathVariable Long chatroomId) {
         return DataResponse.toResponseEntity(ChatResponse.GET_CHATROOM_SUCCESS, chatFacade.getChatroom(chatroomId));
