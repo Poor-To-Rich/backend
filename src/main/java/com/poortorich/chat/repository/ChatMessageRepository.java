@@ -2,11 +2,15 @@ package com.poortorich.chat.repository;
 
 import com.poortorich.chat.entity.ChatMessage;
 import com.poortorich.chat.entity.Chatroom;
-import org.springframework.data.jpa.repository.JpaRepository;
-
+import java.util.List;
 import java.util.Optional;
+import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ChatMessageRepository extends JpaRepository<ChatMessage, Long> {
 
     Optional<ChatMessage> findTopByChatroomOrderBySentAtDesc(Chatroom chatroom);
+
+    List<ChatMessage> findAllByChatroom(Chatroom chatroom);
+
+    void deleteAllByChatroom(Chatroom chatroom);
 }
