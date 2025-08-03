@@ -6,7 +6,7 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class ResponsePayload {
+public class BasePayload {
 
     private ChatMessageType type;
     private Object payload;

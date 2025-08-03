@@ -1,13 +1,15 @@
 package com.poortorich.chat.realtime.payload;
 
+import com.poortorich.chat.entity.enums.ChatMessageType;
 import com.poortorich.chat.entity.enums.MessageType;
+import com.poortorich.chat.realtime.payload.interfaces.ResponsePayload;
 import java.time.LocalDateTime;
 import lombok.Builder;
 import lombok.Data;
 
 @Data
 @Builder
-public class UserLeaveResponsePayload {
+public class UserLeaveResponsePayload implements ResponsePayload {
 
     private Long userId;
     private Long messageId;
@@ -15,4 +17,12 @@ public class UserLeaveResponsePayload {
     private MessageType messageType;
     private String content;
     private LocalDateTime sendAt;
+
+    @Override
+    public BasePayload mapToBasePayload() {
+        return BasePayload.builder()
+                .type(ChatMessageType.SYSTEM_MESSAGE)
+                .payload(this)
+                .build();
+    }
 }
