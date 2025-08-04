@@ -1,4 +1,4 @@
-package com.poortorich.chat.manager;
+package com.poortorich.chat.util.manager;
 
 import com.poortorich.chat.entity.ChatParticipant;
 import com.poortorich.chat.entity.Chatroom;
