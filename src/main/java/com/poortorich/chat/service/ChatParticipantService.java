@@ -8,6 +8,7 @@ import com.poortorich.chat.response.enums.ChatResponse;
 import com.poortorich.chat.util.ChatBuilder;
 import com.poortorich.global.exceptions.NotFoundException;
 import com.poortorich.user.entity.User;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -38,5 +39,9 @@ public class ChatParticipantService {
 
     public Long countByChatroom(Chatroom chatroom) {
         return chatParticipantRepository.countByChatroomAndIsParticipateTrue(chatroom);
+    }
+
+    public List<ChatParticipant> findAllByChatroom(Chatroom chatroom) {
+        return chatParticipantRepository.findAllByChatroomAndIsParticipateTrue(chatroom);
     }
 }
