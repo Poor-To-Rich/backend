@@ -1,4 +1,4 @@
-package com.poortorich.chat.realtime.payload;
+package com.poortorich.chat.realtime.payload.response;
 
 import com.poortorich.chat.entity.enums.ChatMessageType;
 import lombok.Builder;
