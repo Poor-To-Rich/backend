@@ -9,6 +9,7 @@ import com.poortorich.chat.request.ChatroomEnterRequest;
 import com.poortorich.chat.request.ChatroomLeaveAllRequest;
 import com.poortorich.chat.request.ChatroomUpdateRequest;
 import com.poortorich.chat.request.enums.SortBy;
+import com.poortorich.chat.response.ChatMessagePageResponse;
 import com.poortorich.chat.response.ChatroomCreateResponse;
 import com.poortorich.chat.response.ChatroomEnterResponse;
 import com.poortorich.chat.response.ChatroomLeaveAllResponse;
@@ -17,6 +18,7 @@ import com.poortorich.chat.response.enums.ChatResponse;
 import com.poortorich.global.response.BaseResponse;
 import com.poortorich.global.response.DataResponse;
 import com.poortorich.websocket.stomp.command.subscribe.endpoint.SubscribeEndpoint;
+import jakarta.annotation.Nullable;
 import jakarta.validation.Valid;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
@@ -146,5 +148,21 @@ public class ChatController {
         }
 
         return DataResponse.toResponseEntity(ChatResponse.CHATROOM_LEAVE_SUCCESS, response);
+    }
+
+    @GetMapping("/{chatroomId}/messages")
+    public ResponseEntity<BaseResponse> getChatMessages(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @PathVariable("chatroomId") Long chatroomId,
+            @Nullable @RequestParam Long cursor,
+            @Nullable @RequestParam(defaultValue = "20") Long pageSize
+    ) {
+        ChatMessagePageResponse response = chatFacade.getChatMessages(
+                userDetails.getUsername(),
+                chatroomId,
+                cursor,
+                pageSize);
+
+        return DataResponse.toResponseEntity(ChatResponse.GET_CHAT_MESSAGE_SUCCESS, response);
     }
 }

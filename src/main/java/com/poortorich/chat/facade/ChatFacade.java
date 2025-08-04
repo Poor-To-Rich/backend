@@ -1,14 +1,19 @@
 package com.poortorich.chat.facade;
 
+import com.poortorich.chat.entity.ChatMessage;
 import com.poortorich.chat.entity.ChatParticipant;
 import com.poortorich.chat.entity.Chatroom;
 import com.poortorich.chat.entity.enums.ChatroomRole;
+import com.poortorich.chat.model.ChatMessageResponse;
+import com.poortorich.chat.model.ChatPaginationContext;
 import com.poortorich.chat.request.ChatroomCreateRequest;
 import com.poortorich.chat.request.ChatroomEnterRequest;
 import com.poortorich.chat.request.ChatroomLeaveAllRequest;
 import com.poortorich.chat.request.ChatroomUpdateRequest;
 import com.poortorich.chat.request.enums.SortBy;
 import com.poortorich.chat.response.AllChatroomsResponse;
+import com.poortorich.chat.response.ChatMessagePageResponse;
+import com.poortorich.chat.response.ChatParticipantProfile;
 import com.poortorich.chat.response.ChatroomCreateResponse;
 import com.poortorich.chat.response.ChatroomEnterResponse;
 import com.poortorich.chat.response.ChatroomInfoResponse;
@@ -21,6 +26,8 @@ import com.poortorich.chat.service.ChatMessageService;
 import com.poortorich.chat.service.ChatParticipantService;
 import com.poortorich.chat.service.ChatroomService;
 import com.poortorich.chat.util.ChatBuilder;
+import com.poortorich.chat.util.mapper.ChatMessageMapper;
+import com.poortorich.chat.util.provider.ChatPaginationProvider;
 import com.poortorich.chat.validator.ChatParticipantValidator;
 import com.poortorich.chat.validator.ChatroomValidator;
 import com.poortorich.s3.service.FileUploadService;
@@ -28,7 +35,9 @@ import com.poortorich.tag.service.TagService;
 import com.poortorich.user.entity.User;
 import com.poortorich.user.service.UserService;
 import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -43,6 +52,8 @@ public class ChatFacade {
     private final FileUploadService fileUploadService;
     private final TagService tagService;
 
+    private final ChatMessageMapper chatMessageMapper;
+    private final ChatPaginationProvider paginationProvider;
     private final ChatroomValidator chatroomValidator;
     private final ChatParticipantValidator chatParticipantValidator;
 
@@ -187,5 +198,30 @@ public class ChatFacade {
         tagService.deleteAllByChatroom(chatroom);
         chatMessageService.closeAllMessagesByChatroom(chatroom);
         chatroomService.closeChatroomById(chatroom.getId());
+    }
+
+    public ChatMessagePageResponse getChatMessages(String username, Long chatroomId, Long cursor, Long pageSize) {
+        User user = userService.findUserByUsername(username);
+        ChatPaginationContext context = paginationProvider.getContext(chatroomId, cursor, pageSize);
+        chatParticipantValidator.validateIsParticipate(user, context.chatroom());
+
+        Slice<ChatMessage> chatMessages = chatMessageService.getChatMessages(context);
+
+        Long nextCursor = paginationProvider.getNextCursor(chatMessages);
+        List<ChatMessageResponse> messages = chatMessages.getContent().stream()
+                .map(chatMessageMapper::mapToChatMessageResponse)
+                .toList();
+
+        return ChatMessagePageResponse.builder()
+                .nextCursor(nextCursor)
+                .hasNext(chatMessages.hasNext())
+                .messages(messages)
+                .users(chatParticipantService.getParticipantProfiles(context.chatroom())
+                        .stream()
+                        .collect(Collectors.toMap(
+                                ChatParticipantProfile::getUserId,
+                                profile -> profile
+                        )))
+                .build();
     }
 }
