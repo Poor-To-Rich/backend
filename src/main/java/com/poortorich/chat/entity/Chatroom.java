@@ -48,6 +48,13 @@ public class Chatroom {
     @Column(name = "is_ranking_enabled", nullable = false)
     private Boolean isRankingEnabled;
 
+    @Column(name = "is_delete", nullable = false)
+    @Builder.Default
+    private Boolean isDeleted = Boolean.FALSE;
+
+    @Column(name = "delete_at")
+    private LocalDateTime deleteAt;
+
     @CreationTimestamp
     @Column(name = "created_date")
     private LocalDateTime createdDate;
@@ -62,5 +69,10 @@ public class Chatroom {
         this.description = chatroomUpdateRequest.getDescription();
         this.password = chatroomUpdateRequest.getChatroomPassword();
         this.maxMemberCount = chatroomUpdateRequest.getMaxMemberCount();
+    }
+
+    public void closeChatroom() {
+        isDeleted = Boolean.TRUE;
+        deleteAt = LocalDateTime.now();
     }
 }

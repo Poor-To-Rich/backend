@@ -1,10 +1,9 @@
 package com.poortorich.chat.controller;
 
 import com.poortorich.chat.constants.ChatResponseMessage;
-import com.poortorich.chat.entity.ChatMessage;
 import com.poortorich.chat.facade.ChatFacade;
 import com.poortorich.chat.realtime.facade.ChatRealTimeFacade;
-import com.poortorich.chat.realtime.payload.ResponsePayload;
+import com.poortorich.chat.realtime.payload.BasePayload;
 import com.poortorich.chat.request.ChatroomCreateRequest;
 import com.poortorich.chat.request.ChatroomEnterRequest;
 import com.poortorich.chat.request.ChatroomLeaveAllRequest;
@@ -19,6 +18,7 @@ import com.poortorich.global.response.BaseResponse;
 import com.poortorich.global.response.DataResponse;
 import com.poortorich.websocket.stomp.command.subscribe.endpoint.SubscribeEndpoint;
 import jakarta.validation.Valid;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -90,8 +90,9 @@ public class ChatController {
                 chatroomId,
                 chatroomEnterRequest);
 
-        ResponsePayload payload = realTimeFacade.createUserEnterSystemMessage(userDetails.getUsername(), chatroomId);
-        messagingTemplate.convertAndSend(SubscribeEndpoint.CHATROOM_SUBSCRIBE_PREFIX + chatroomId, payload);
+        BasePayload basePayload = realTimeFacade.createUserEnterSystemMessage(userDetails.getUsername(),
+                chatroomId);
+        messagingTemplate.convertAndSend(SubscribeEndpoint.CHATROOM_SUBSCRIBE_PREFIX + chatroomId, basePayload);
 
         return DataResponse.toResponseEntity(ChatResponse.CHATROOM_ENTER_SUCCESS, response);
     }
@@ -113,10 +114,14 @@ public class ChatController {
             @PathVariable("chatroomId") Long chatroomId
     ) {
         ChatroomLeaveResponse response = chatFacade.leaveChatroom(userDetails.getUsername(), chatroomId);
-        ResponsePayload payload = realTimeFacade.createUserLeaveSystemMessage(userDetails.getUsername(), chatroomId);
 
-        messagingTemplate.convertAndSend(SubscribeEndpoint.CHATROOM_SUBSCRIBE_PREFIX + chatroomId, payload);
+        BasePayload basePayload = realTimeFacade.createUserLeaveSystemMessage(
+                userDetails.getUsername(),
+                chatroomId);
 
+        if (!Objects.isNull(basePayload)) {
+            messagingTemplate.convertAndSend(SubscribeEndpoint.CHATROOM_SUBSCRIBE_PREFIX + chatroomId, basePayload);
+        }
         return DataResponse.toResponseEntity(ChatResponse.CHATROOM_LEAVE_SUCCESS, response);
     }
 
@@ -130,11 +135,14 @@ public class ChatController {
                 chatroomLeaveAllRequest);
 
         for (Long chatroomId : chatroomLeaveAllRequest.getChatroomsToLeave()) {
-            ResponsePayload payload = realTimeFacade.createUserLeaveSystemMessage(
+            BasePayload basePayload = realTimeFacade.createUserLeaveSystemMessage(
                     userDetails.getUsername(),
                     chatroomId);
-
-            messagingTemplate.convertAndSend(SubscribeEndpoint.CHATROOM_SUBSCRIBE_PREFIX + chatroomId, payload);
+            if (!Objects.isNull(basePayload)) {
+                messagingTemplate.convertAndSend(
+                        SubscribeEndpoint.CHATROOM_SUBSCRIBE_PREFIX + chatroomId,
+                        basePayload);
+            }
         }
 
         return DataResponse.toResponseEntity(ChatResponse.CHATROOM_LEAVE_SUCCESS, response);

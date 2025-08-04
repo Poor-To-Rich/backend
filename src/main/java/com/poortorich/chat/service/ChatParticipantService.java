@@ -8,8 +8,10 @@ import com.poortorich.chat.response.enums.ChatResponse;
 import com.poortorich.chat.util.ChatBuilder;
 import com.poortorich.global.exceptions.NotFoundException;
 import com.poortorich.user.entity.User;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -38,5 +40,16 @@ public class ChatParticipantService {
 
     public Long countByChatroom(Chatroom chatroom) {
         return chatParticipantRepository.countByChatroomAndIsParticipateTrue(chatroom);
+    }
+
+    public boolean isAllParticipantLeft(Chatroom chatroom) {
+        List<ChatParticipant> participants = chatParticipantRepository.findAllByChatroom(chatroom);
+        return participants.stream()
+                .noneMatch(ChatParticipant::getIsParticipate);
+    }
+
+    @Transactional
+    public void deleteAllByChatroom(Chatroom chatroom) {
+        chatParticipantRepository.deleteAllByChatroom(chatroom);
     }
 }
