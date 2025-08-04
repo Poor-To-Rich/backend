@@ -1,9 +1,13 @@
 package com.poortorich.chat.facade;
 
+import com.poortorich.chat.entity.ChatParticipant;
 import com.poortorich.chat.entity.Chatroom;
+import com.poortorich.chat.entity.enums.ChatroomRole;
+import com.poortorich.chat.entity.enums.RankingStatus;
 import com.poortorich.chat.request.ChatroomCreateRequest;
 import com.poortorich.chat.request.enums.SortBy;
 import com.poortorich.chat.response.AllChatroomsResponse;
+import com.poortorich.chat.response.ChatroomCoverInfoResponse;
 import com.poortorich.chat.response.ChatroomCreateResponse;
 import com.poortorich.chat.response.ChatroomInfoResponse;
 import com.poortorich.chat.response.ChatroomResponse;
@@ -25,6 +29,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -71,6 +76,7 @@ class ChatFacadeTest {
                 .maxMemberCount(maxMemberCount)
                 .isRankingEnabled(isRankingEnabled)
                 .password(chatroomPassword)
+                .createdDate(LocalDateTime.of(2025, 8, 3, 15, 24, 51))
                 .build();
     }
 
@@ -179,5 +185,43 @@ class ChatFacadeTest {
         assertThat(response.getChatrooms()).hasSize(2);
         assertThat(response.getChatrooms().get(0).getChatroomTitle()).isEqualTo(chatroom1.getTitle());
         assertThat(response.getChatrooms().get(1).getChatroomTitle()).isEqualTo(chatroom2.getTitle());
+    }
+
+
+    @Test
+    @DisplayName("채팅방 커버 정보 조회 성공")
+    void getChatroomCoverInfoSuccess() {
+        String username = "testUser";
+        User user = User.builder()
+                .id(1L)
+                .username(username)
+                .nickname(username)
+                .build();
+        ChatParticipant hostParticipant = ChatParticipant.builder()
+                .user(user)
+                .role(ChatroomRole.HOST)
+                .rankingStatus(RankingStatus.NONE)
+                .build();
+
+        when(userService.findUserByUsername(username)).thenReturn(user);
+        when(chatroomService.findById(chatroomId)).thenReturn(chatroom);
+        when(tagService.getTagNames(chatroom)).thenReturn(hashtags);
+        when(chatParticipantService.countByChatroom(chatroom)).thenReturn(3L);
+        when(chatParticipantService.isJoined(user, chatroom)).thenReturn(true);
+        when(chatParticipantService.getChatroomHost(chatroom)).thenReturn(hostParticipant);
+
+        ChatroomCoverInfoResponse response = chatFacade.getChatroomCoverInfo(username, chatroomId);
+
+        assertThat(response.getChatroomId()).isEqualTo(chatroomId);
+        assertThat(response.getChatroomTitle()).isEqualTo(chatroomTitle);
+        assertThat(response.getChatroomImage()).isEqualTo(imageUrl);
+        assertThat(response.getDescription()).isEqualTo(chatroom.getDescription());
+        assertThat(response.getHashtags()).isEqualTo(hashtags);
+        assertThat(response.getCurrentMemberCount()).isEqualTo(3L);
+        assertThat(response.getMaxMemberCount()).isEqualTo(maxMemberCount);
+        assertThat(response.getIsJoined()).isTrue();
+        assertThat(response.getHasPassword()).isTrue();
+        assertThat(response.getHostProfile().getUserId()).isEqualTo(user.getId());
+        assertThat(response.getHostProfile().getIsHost()).isTrue();
     }
 }

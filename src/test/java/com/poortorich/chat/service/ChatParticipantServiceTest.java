@@ -14,6 +14,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.Optional;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -62,5 +64,74 @@ class ChatParticipantServiceTest {
         Long result = chatParticipantService.countByChatroom(chatroom);
 
         assertThat(result).isEqualTo(currentMemberCount);
+    }
+
+    @Test
+    @DisplayName("유저가 채팅방에 참여중인 경우 true 반환")
+    void isJoinedIsParticipatedTrue() {
+        User user = User.builder().build();
+        Chatroom chatroom = Chatroom.builder().build();
+        ChatParticipant participant = ChatParticipant.builder()
+                .user(user)
+                .chatroom(chatroom)
+                .isParticipated(true)
+                .build();
+
+        when(chatParticipantRepository.findByUserAndChatroom(user, chatroom)).thenReturn(Optional.of(participant));
+
+        Boolean result = chatParticipantService.isJoined(user, chatroom);
+
+        assertThat(result).isTrue();
+    }
+
+    @Test
+    @DisplayName("유저가 채팅방에 참여한 이력은 있지만 현재 참여 중이지 않은 경우 false 반환")
+    void isJoinedIsNotParticipatedFalse() {
+        User user = User.builder().build();
+        Chatroom chatroom = Chatroom.builder().build();
+        ChatParticipant participant = ChatParticipant.builder()
+                .user(user)
+                .chatroom(chatroom)
+                .isParticipated(false)
+                .build();
+
+        when(chatParticipantRepository.findByUserAndChatroom(user, chatroom)).thenReturn(Optional.of(participant));
+
+        Boolean result = chatParticipantService.isJoined(user, chatroom);
+
+        assertThat(result).isFalse();
+    }
+
+    @Test
+    @DisplayName("유저가 채팅방에 참여한 이력이 없는 경우 false 반환")
+    void isJoinedNoParticipationHistoryFalse() {
+        User user = User.builder().build();
+        Chatroom chatroom = Chatroom.builder().build();
+
+        when(chatParticipantRepository.findByUserAndChatroom(user, chatroom)).thenReturn(Optional.empty());
+
+        Boolean result = chatParticipantService.isJoined(user, chatroom);
+
+        assertThat(result).isFalse();
+    }
+
+    @Test
+    @DisplayName("채팅방 방장 조회 성공")
+    void getChatroomHostSuccess() {
+        Chatroom chatroom = Chatroom.builder().build();
+        User user = User.builder().build();
+        ChatParticipant hostParticipant = ChatParticipant.builder()
+                .user(user)
+                .chatroom(chatroom)
+                .role(ChatroomRole.HOST)
+                .build();
+
+        when(chatParticipantRepository.getChatroomHost(chatroom)).thenReturn(hostParticipant);
+
+        ChatParticipant result = chatParticipantService.getChatroomHost(chatroom);
+
+        assertThat(result).isEqualTo(hostParticipant);
+        assertThat(result.getRole()).isEqualTo(ChatroomRole.HOST);
+        assertThat(result.getChatroom()).isEqualTo(chatroom);
     }
 }
