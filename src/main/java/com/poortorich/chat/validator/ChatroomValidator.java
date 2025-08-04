@@ -37,7 +37,8 @@ public class ChatroomValidator {
     }
 
     public void validatePassword(Chatroom chatroom, String password) {
-        if (!password.equals(chatroom.getPassword())) {
+        String chatroomPassword = chatroom.getPassword();
+        if (chatroomPassword != null && !password.equals(chatroomPassword)) {
             throw new BadRequestException(ChatResponse.CHATROOM_PASSWORD_DO_NOT_MATCH);
         }
     }
