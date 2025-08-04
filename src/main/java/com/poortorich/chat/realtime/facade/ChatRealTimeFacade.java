@@ -29,7 +29,7 @@ public class ChatRealTimeFacade {
         User user = userService.findUserByUsername(username);
         Chatroom chatroom = chatroomService.findById(chatroomId);
 
-        if (chatroom.getIsDelete()) {
+        if (chatroom.getIsDeleted()) {
             return null;
         }
 

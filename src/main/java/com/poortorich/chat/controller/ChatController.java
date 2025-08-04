@@ -116,7 +116,7 @@ public class ChatController {
             BasePayload basePayload = realTimeFacade.createUserLeaveSystemMessage(
                     userDetails.getUsername(),
                     chatroomId);
-            if (basePayload != null) {
+            if (!Objects.isNull(basePayload)) {
                 messagingTemplate.convertAndSend(
                         SubscribeEndpoint.CHATROOM_SUBSCRIBE_PREFIX + chatroomId,
                         basePayload);

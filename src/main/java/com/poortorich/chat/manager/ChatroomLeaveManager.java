@@ -20,7 +20,7 @@ public class ChatroomLeaveManager {
     private final ChatMessageService chatMessageService;
 
     public BasePayload leaveChatroom(PayloadContext payloadContext) {
-        if (payloadContext.chatroom().getIsDelete()) {
+        if (payloadContext.chatroom().getIsDeleted()) {
             return getClosedMessageOrDeleteAll(payloadContext);
         }
 

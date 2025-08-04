@@ -53,7 +53,7 @@ public class ChatMessageService {
     @Transactional
     public void softDeleteAllByChatroom(Chatroom chatroom) {
         chatMessageRepository.findAllByChatroom(chatroom)
-                .forEach(ChatMessage::softDelete);
+                .forEach(ChatMessage::closeChatroom);
     }
 
     public ChatroomClosedResponsePayload saveChatroomClosedMessage(Chatroom chatroom) {
@@ -66,7 +66,6 @@ public class ChatMessageService {
                 .content(chatMessage.getContent())
                 .sendAt(chatMessage.getSentAt())
                 .build();
-
     }
 
     @Transactional

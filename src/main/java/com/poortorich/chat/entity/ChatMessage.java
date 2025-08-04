@@ -64,7 +64,7 @@ public class ChatMessage {
 
     @Column(name = "is_delete", nullable = false)
     @Builder.Default
-    private Boolean isDelete = Boolean.FALSE;
+    private Boolean isDeleted = Boolean.FALSE;
 
     @Column(name = "delete_at")
     private LocalDateTime deleteAt;
@@ -73,8 +73,8 @@ public class ChatMessage {
     @JoinColumn(name = "chatroom_id")
     private Chatroom chatroom;
 
-    public void softDelete() {
-        isDelete = Boolean.TRUE;
+    public void closeChatroom() {
+        isDeleted = Boolean.TRUE;
         deleteAt = LocalDateTime.now();
     }
 }

@@ -50,7 +50,7 @@ public class Chatroom {
 
     @Column(name = "is_delete", nullable = false)
     @Builder.Default
-    private Boolean isDelete = Boolean.FALSE;
+    private Boolean isDeleted = Boolean.FALSE;
 
     @Column(name = "delete_at")
     private LocalDateTime deleteAt;
@@ -71,8 +71,8 @@ public class Chatroom {
         this.maxMemberCount = chatroomUpdateRequest.getMaxMemberCount();
     }
 
-    public void softDelete() {
-        isDelete = Boolean.TRUE;
+    public void closeChatroom() {
+        isDeleted = Boolean.TRUE;
         deleteAt = LocalDateTime.now();
     }
 }
