@@ -13,6 +13,7 @@ public enum ChatResponse implements Response {
     CREATE_CHATROOM_SUCCESS(HttpStatus.CREATED, ChatResponseMessage.CREATE_CHATROOM_SUCCESS, null),
     GET_CHATROOM_SUCCESS(HttpStatus.OK, ChatResponseMessage.GET_CHATROOM_SUCCESS, null),
     GET_HOSTED_CHATROOMS_SUCCESS(HttpStatus.OK, ChatResponseMessage.GET_HOSTED_CHATROOMS_SUCCESS, null),
+    GET_SEARCH_CHATROOMS_SUCCESS(HttpStatus.OK, ChatResponseMessage.GET_SEARCH_CHATROOMS_SUCCESS, null),
 
     CHATROOM_ENTER_DENIED(HttpStatus.FORBIDDEN, ChatResponseMessage.CHATROOM_ENTER_DENIED, null),
     CHATROOM_PASSWORD_DO_NOT_MATCH(HttpStatus.BAD_REQUEST, ChatResponseMessage.CHATROOM_PASSWORD_DO_NOT_MATCH, null),
@@ -32,7 +33,7 @@ public enum ChatResponse implements Response {
 
     CHATROOM_LEAVE_ALREADY(HttpStatus.BAD_REQUEST, ChatResponseMessage.CHATROOM_LEAVE_ALREADY, null),
     CHATROOM_LEAVE_SUCCESS(HttpStatus.OK, ChatResponseMessage.CHATROOM_LEAVE_SUCCESS, null);
-    
+
     private final HttpStatus httpStatus;
     private final String message;
     private final String field;

@@ -1,10 +1,14 @@
 package com.poortorich.chat.controller;
 
+import com.poortorich.chat.constants.ChatResponseMessage;
 import com.poortorich.chat.facade.ChatFacade;
 import com.poortorich.chat.realtime.facade.ChatRealTimeFacade;
 import com.poortorich.chat.request.ChatroomCreateRequest;
+import com.poortorich.chat.request.enums.SortBy;
+import com.poortorich.chat.response.AllChatroomsResponse;
 import com.poortorich.chat.response.ChatroomCreateResponse;
 import com.poortorich.chat.response.ChatroomInfoResponse;
+import com.poortorich.chat.response.ChatroomsResponse;
 import com.poortorich.chat.response.enums.ChatResponse;
 import com.poortorich.global.config.BaseSecurityTest;
 import com.poortorich.s3.util.S3TestFileGenerator;
@@ -20,6 +24,8 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+
+import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -80,6 +86,80 @@ public class ChatControllerTest extends BaseSecurityTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message")
                         .value(ChatResponse.GET_CHATROOM_SUCCESS.getMessage())
+                );
+    }
+
+    @Test
+    @WithMockUser(username = "test")
+    @DisplayName("전체 채팅방 목록 조회 성공 - 최근대화순")
+    void getAllChatroomsSortByUpdatedAtSuccess() throws Exception {
+        SortBy sortBy = SortBy.UPDATED_AT;
+        Long cursor = -1L;
+
+        when(chatFacade.getAllChatrooms(eq(sortBy), eq(cursor)))
+                .thenReturn(AllChatroomsResponse.builder().build());
+
+        String message = sortBy.getMessage() + ChatResponseMessage.GET_ALL_CHATROOMS_SUCCESS;
+        mockMvc.perform(get("/chatrooms")
+                        .param("sortBy", sortBy.name())
+                        .param("cursor", cursor.toString())
+                        .with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value(message));
+    }
+
+    @Test
+    @WithMockUser(username = "test")
+    @DisplayName("전체 채팅방 목록 조회 성공 - 최근생성순")
+    void getAllChatroomsSortByCreatedAtSuccess() throws Exception {
+        SortBy sortBy = SortBy.CREATED_AT;
+        Long cursor = -1L;
+
+        when(chatFacade.getAllChatrooms(eq(sortBy), eq(cursor)))
+                .thenReturn(AllChatroomsResponse.builder().build());
+
+        String message = sortBy.getMessage() + ChatResponseMessage.GET_ALL_CHATROOMS_SUCCESS;
+        mockMvc.perform(get("/chatrooms")
+                        .param("sortBy", sortBy.name())
+                        .param("cursor", cursor.toString())
+                        .with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value(message));
+    }
+
+    @Test
+    @WithMockUser(username = "test")
+    @DisplayName("전체 채팅방 목록 조회 성공 - 좋아요순")
+    void getAllChatroomsSortByLikeSuccess() throws Exception {
+        SortBy sortBy = SortBy.LIKE;
+        Long cursor = -1L;
+
+        when(chatFacade.getAllChatrooms(eq(sortBy), eq(cursor)))
+                .thenReturn(AllChatroomsResponse.builder().build());
+
+        String message = sortBy.getMessage() + ChatResponseMessage.GET_ALL_CHATROOMS_SUCCESS;
+        mockMvc.perform(get("/chatrooms")
+                        .param("sortBy", sortBy.name())
+                        .param("cursor", cursor.toString())
+                        .with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value(message));
+    }
+
+    @Test
+    @WithMockUser(username = "test")
+    @DisplayName("채팅방 검색 목록 조회 성공")
+    void searchChatroomsSuccess() throws Exception {
+        String keyword = "부자";
+
+        when(chatFacade.searchChatrooms(eq(keyword))).thenReturn(ChatroomsResponse.builder().build());
+
+        mockMvc.perform(get("/chatrooms/search")
+                        .param("keyword", keyword)
+                        .with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message")
+                        .value(ChatResponse.GET_SEARCH_CHATROOMS_SUCCESS.getMessage())
                 );
     }
 }
