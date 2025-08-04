@@ -77,6 +77,14 @@ public class ChatFacade {
                 .build();
     }
 
+    public ChatroomsResponse searchChatrooms(String keyword) {
+        List<Chatroom> chatrooms = chatroomService.searchChatrooms(keyword);
+
+        return ChatroomsResponse.builder()
+                .chatrooms(getChatroomResponses(chatrooms))
+                .build();
+    }
+
     public ChatroomsResponse getHostedChatrooms(String username) {
         User user = userService.findUserByUsername(username);
         List<Chatroom> hostedChatrooms = chatroomService.getHostedChatrooms(user);

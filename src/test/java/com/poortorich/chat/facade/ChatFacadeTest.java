@@ -160,4 +160,24 @@ class ChatFacadeTest {
         assertThat(response.getChatrooms().get(0).getChatroomId()).isEqualTo(chatroom1.getId());
         assertThat(response.getChatrooms().get(1).getChatroomId()).isEqualTo(chatroom2.getId());
     }
+
+    @Test
+    @DisplayName("채팅방 검색 목록 조회 성공")
+    void searchChatroomsSuccess() {
+        String keyword = "부자";
+        Chatroom chatroom1 = Chatroom.builder().id(1L).title("부자되자").build();
+        Chatroom chatroom2 = Chatroom.builder().id(2L).title("부자될거야").build();
+        List<Chatroom> chatrooms = List.of(chatroom1, chatroom2);
+
+        when(chatroomService.searchChatrooms(keyword)).thenReturn(chatrooms);
+        when(tagService.getTagNames(any())).thenReturn(hashtags);
+        when(chatParticipantService.countByChatroom(any())).thenReturn(3L);
+        when(chatMessageService.getLastMessageTime(any())).thenReturn("2025-07-31T02:30");
+
+        ChatroomsResponse response = chatFacade.searchChatrooms(keyword);
+
+        assertThat(response.getChatrooms()).hasSize(2);
+        assertThat(response.getChatrooms().get(0).getChatroomTitle()).isEqualTo(chatroom1.getTitle());
+        assertThat(response.getChatrooms().get(1).getChatroomTitle()).isEqualTo(chatroom2.getTitle());
+    }
 }

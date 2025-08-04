@@ -71,6 +71,10 @@ public class ChatroomService {
                 .orElseThrow(() -> new NotFoundException(ChatResponse.CHATROOM_NOT_FOUND));
     }
 
+    public List<Chatroom> searchChatrooms(String keyword) {
+        return chatroomRepository.searchChatrooms(keyword);
+    }
+
     public List<Chatroom> getHostedChatrooms(User user) {
         return chatroomRepository.findChatroomByUserAndRole(user, ChatroomRole.HOST);
     }
