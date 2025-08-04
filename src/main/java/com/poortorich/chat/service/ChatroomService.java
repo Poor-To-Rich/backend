@@ -80,7 +80,7 @@ public class ChatroomService {
     }
 
     @Transactional
-    public void softDeleteById(Long chatroomId) {
+    public void closeChatroomById(Long chatroomId) {
         chatroomRepository.findById(chatroomId)
                 .orElseThrow(() -> new NotFoundException(ChatResponse.CHATROOM_NOT_FOUND))
                 .closeChatroom();

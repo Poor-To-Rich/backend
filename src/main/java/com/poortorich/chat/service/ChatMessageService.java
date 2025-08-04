@@ -51,7 +51,7 @@ public class ChatMessageService {
     }
 
     @Transactional
-    public void softDeleteAllByChatroom(Chatroom chatroom) {
+    public void closeAllMessagesByChatroom(Chatroom chatroom) {
         chatMessageRepository.findAllByChatroom(chatroom)
                 .forEach(ChatMessage::closeChatroom);
     }
