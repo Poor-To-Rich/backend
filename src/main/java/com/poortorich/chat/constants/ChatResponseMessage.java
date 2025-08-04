@@ -35,6 +35,8 @@ public class ChatResponseMessage {
 
     public static final String CHATROOM_LEAVE_ALREADY = "채팅방에 참여하고 있지 않습니다.";
     public static final String CHATROOM_LEAVE_SUCCESS = "채팅방을 성공적으로 나갔습니다.";
+    public static final String CHAT_MESSAGE_NOT_FOUND = "채팅 메시지를 찾을 수 없습니다.";
+    public static final String GET_CHAT_MESSAGE_SUCCESS = "이전 채팅 조회가 완료됐습니다.";
 
     private ChatResponseMessage() {
     }
