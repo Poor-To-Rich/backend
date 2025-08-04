@@ -1,8 +1,8 @@
 package com.poortorich.chat.realtime.controller;
 
 import com.poortorich.chat.realtime.facade.ChatRealTimeFacade;
-import com.poortorich.chat.realtime.payload.ResponsePayload;
 import com.poortorich.chat.realtime.payload.request.ChatMessageRequestPayload;
+import com.poortorich.chat.realtime.payload.response.BasePayload;
 import com.poortorich.websocket.stomp.command.subscribe.endpoint.SubscribeEndpoint;
 import com.poortorich.websocket.stomp.util.StompSessionManager;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +29,7 @@ public class ChatRealtimeController {
             @Payload ChatMessageRequestPayload chatMessagePayload
     ) {
         String username = sessionManager.getUsername(accessor);
-        ResponsePayload payload = chatRealTimeFacade.createUserChatMessage(username, chatMessagePayload);
+        BasePayload payload = chatRealTimeFacade.createUserChatMessage(username, chatMessagePayload);
 
         messagingTemplate.convertAndSend(
                 SubscribeEndpoint.CHATROOM_SUBSCRIBE_PREFIX + chatMessagePayload.getChatroomId(),

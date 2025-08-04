@@ -6,10 +6,10 @@ import com.poortorich.chat.entity.enums.ChatMessageType;
 import com.poortorich.chat.manager.ChatroomLeaveManager;
 import com.poortorich.chat.realtime.collect.ChatPayloadCollector;
 import com.poortorich.chat.realtime.model.PayloadContext;
-import com.poortorich.chat.realtime.payload.BasePayload;
-import com.poortorich.chat.realtime.payload.UserChatMessagePayload;
-import com.poortorich.chat.realtime.payload.UserEnterResponsePayload;
 import com.poortorich.chat.realtime.payload.request.ChatMessageRequestPayload;
+import com.poortorich.chat.realtime.payload.response.BasePayload;
+import com.poortorich.chat.realtime.payload.response.UserChatMessagePayload;
+import com.poortorich.chat.realtime.payload.response.UserEnterResponsePayload;
 import com.poortorich.chat.service.ChatMessageService;
 import com.poortorich.chat.service.ChatParticipantService;
 import com.poortorich.chat.service.ChatroomService;
@@ -56,20 +56,22 @@ public class ChatRealTimeFacade {
     }
 
     public BasePayload createUserChatMessage(String username, ChatMessageRequestPayload chatMessagePayload) {
-        User user = userService.findUserByUsername(username);
-        Chatroom chatroom = chatroomService.findById(chatMessagePayload.getChatroomId());
+        PayloadContext context = payloadCollector.getPayloadContext(
+                username,
+                chatMessagePayload.getChatroomId());
+
+        User user = context.user();
+        Chatroom chatroom = context.chatroom();
+
         ChatParticipant chatParticipant = chatParticipantService.findByUserAndChatroom(user, chatroom);
 
-        List<ChatParticipant> chatMembers = chatParticipantService.findAllByChatroom(chatroom).stream()
+        List<ChatParticipant> chatMembers = chatParticipantService.findAllByChatroom(context.chatroom()).stream()
                 .filter(participant -> !participant.getUser().getId().equals(chatParticipant.getUser().getId()))
                 .toList();
 
         UserChatMessagePayload chatMessage = chatMessageService
                 .saveUserChatMessage(chatParticipant, chatMembers, chatMessagePayload);
 
-        return BasePayload.builder()
-                .type(ChatMessageType.CHAT_MESSAGE)
-                .payload(chatMessage)
-                .build();
+        return chatMessage.mapToBasePayload();
     }
 }
