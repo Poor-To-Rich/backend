@@ -3,7 +3,7 @@ package com.poortorich.chat.controller;
 import com.poortorich.chat.constants.ChatResponseMessage;
 import com.poortorich.chat.facade.ChatFacade;
 import com.poortorich.chat.realtime.facade.ChatRealTimeFacade;
-import com.poortorich.chat.realtime.payload.BasePayload;
+import com.poortorich.chat.realtime.payload.response.BasePayload;
 import com.poortorich.chat.request.ChatroomCreateRequest;
 import com.poortorich.chat.request.ChatroomEnterRequest;
 import com.poortorich.chat.request.ChatroomLeaveAllRequest;
