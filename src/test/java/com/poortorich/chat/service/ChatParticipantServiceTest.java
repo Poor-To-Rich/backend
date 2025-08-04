@@ -57,7 +57,7 @@ class ChatParticipantServiceTest {
         Chatroom chatroom = Chatroom.builder().build();
         Long currentMemberCount = 5L;
 
-        when(chatParticipantRepository.countByChatroomAndIsParticipateTrue(chatroom)).thenReturn(currentMemberCount);
+        when(chatParticipantRepository.countByChatroomAndIsParticipatedTrue(chatroom)).thenReturn(currentMemberCount);
 
         Long result = chatParticipantService.countByChatroom(chatroom);
 

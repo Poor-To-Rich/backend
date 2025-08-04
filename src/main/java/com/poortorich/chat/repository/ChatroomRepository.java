@@ -28,7 +28,7 @@ public interface ChatroomRepository extends JpaRepository<Chatroom, Long> {
           FROM Chatroom c
           LEFT JOIN ChatMessage cm ON cm.chatroom = c
           LEFT JOIN Like l ON l.chatroom = c AND l.likeStatus = true
-          LEFT JOIN ChatParticipant cp ON cp.chatroom = c AND cp.isParticipate = true
+          LEFT JOIN ChatParticipant cp ON cp.chatroom = c AND cp.isParticipated = true
         GROUP BY c.id
         ORDER BY MAX(cm.sentAt) DESC,
                  COUNT(DISTINCT l.id) DESC,
@@ -49,7 +49,7 @@ public interface ChatroomRepository extends JpaRepository<Chatroom, Long> {
         SELECT c
           FROM Chatroom c
           LEFT JOIN Like l ON l.chatroom = c AND l.likeStatus = true
-          LEFT JOIN ChatParticipant cp ON cp.chatroom = c AND cp.isParticipate = true
+          LEFT JOIN ChatParticipant cp ON cp.chatroom = c AND cp.isParticipated = true
         GROUP BY c.id
         ORDER BY COUNT(DISTINCT l.id) DESC,
                  COUNT(DISTINCT cp.id) DESC,

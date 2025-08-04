@@ -37,6 +37,6 @@ public class ChatParticipantService {
     }
 
     public Long countByChatroom(Chatroom chatroom) {
-        return chatParticipantRepository.countByChatroomAndIsParticipateTrue(chatroom);
+        return chatParticipantRepository.countByChatroomAndIsParticipatedTrue(chatroom);
     }
 }
