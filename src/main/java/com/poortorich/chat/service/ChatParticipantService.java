@@ -11,6 +11,7 @@ import com.poortorich.user.entity.User;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -43,5 +44,16 @@ public class ChatParticipantService {
 
     public List<ChatParticipant> findAllByChatroom(Chatroom chatroom) {
         return chatParticipantRepository.findAllByChatroomAndIsParticipateTrue(chatroom);
+    }
+
+    public boolean isAllParticipantLeft(Chatroom chatroom) {
+        List<ChatParticipant> participants = chatParticipantRepository.findAllByChatroom(chatroom);
+        return participants.stream()
+                .noneMatch(ChatParticipant::getIsParticipate);
+    }
+
+    @Transactional
+    public void deleteAllByChatroom(Chatroom chatroom) {
+        chatParticipantRepository.deleteAllByChatroom(chatroom);
     }
 }

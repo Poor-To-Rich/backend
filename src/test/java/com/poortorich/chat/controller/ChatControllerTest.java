@@ -8,6 +8,7 @@ import com.poortorich.chat.request.enums.SortBy;
 import com.poortorich.chat.response.AllChatroomsResponse;
 import com.poortorich.chat.response.ChatroomCreateResponse;
 import com.poortorich.chat.response.ChatroomInfoResponse;
+import com.poortorich.chat.response.ChatroomsResponse;
 import com.poortorich.chat.response.enums.ChatResponse;
 import com.poortorich.global.config.BaseSecurityTest;
 import com.poortorich.s3.util.S3TestFileGenerator;
@@ -143,5 +144,22 @@ public class ChatControllerTest extends BaseSecurityTest {
                         .with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value(message));
+    }
+
+    @Test
+    @WithMockUser(username = "test")
+    @DisplayName("채팅방 검색 목록 조회 성공")
+    void searchChatroomsSuccess() throws Exception {
+        String keyword = "부자";
+
+        when(chatFacade.searchChatrooms(eq(keyword))).thenReturn(ChatroomsResponse.builder().build());
+
+        mockMvc.perform(get("/chatrooms/search")
+                        .param("keyword", keyword)
+                        .with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message")
+                        .value(ChatResponse.GET_SEARCH_CHATROOMS_SUCCESS.getMessage())
+                );
     }
 }

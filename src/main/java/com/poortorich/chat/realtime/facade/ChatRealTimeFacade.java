@@ -3,10 +3,12 @@ package com.poortorich.chat.realtime.facade;
 import com.poortorich.chat.entity.ChatParticipant;
 import com.poortorich.chat.entity.Chatroom;
 import com.poortorich.chat.entity.enums.ChatMessageType;
-import com.poortorich.chat.realtime.payload.ResponsePayload;
+import com.poortorich.chat.manager.ChatroomLeaveManager;
+import com.poortorich.chat.realtime.collect.ChatPayloadCollector;
+import com.poortorich.chat.realtime.model.PayloadContext;
+import com.poortorich.chat.realtime.payload.BasePayload;
 import com.poortorich.chat.realtime.payload.UserChatMessagePayload;
 import com.poortorich.chat.realtime.payload.UserEnterResponsePayload;
-import com.poortorich.chat.realtime.payload.UserLeaveResponsePayload;
 import com.poortorich.chat.realtime.payload.request.ChatMessageRequestPayload;
 import com.poortorich.chat.service.ChatMessageService;
 import com.poortorich.chat.service.ChatParticipantService;
@@ -28,31 +30,32 @@ public class ChatRealTimeFacade {
     private final ChatParticipantService chatParticipantService;
     private final UnreadChatMessageService unreadChatMessageService;
 
-    public ResponsePayload createUserEnterSystemMessage(String username, Long chatroomId) {
+    private final ChatPayloadCollector payloadCollector;
+    private final ChatroomLeaveManager chatroomLeaveManager;
+
+    public BasePayload createUserEnterSystemMessage(String username, Long chatroomId) {
         User user = userService.findUserByUsername(username);
         Chatroom chatroom = chatroomService.findById(chatroomId);
+
+        if (chatroom.getIsDeleted()) {
+            return null;
+        }
 
         UserEnterResponsePayload payload = chatMessageService.saveUserEnterMessage(user, chatroom);
 
-        return ResponsePayload.builder()
+        return BasePayload.builder()
                 .type(ChatMessageType.SYSTEM_MESSAGE)
                 .payload(payload)
                 .build();
     }
 
-    public ResponsePayload createUserLeaveSystemMessage(String username, Long chatroomId) {
-        User user = userService.findUserByUsername(username);
-        Chatroom chatroom = chatroomService.findById(chatroomId);
+    public BasePayload createUserLeaveSystemMessage(String username, Long chatroomId) {
+        PayloadContext context = payloadCollector.getPayloadContext(username, chatroomId);
 
-        UserLeaveResponsePayload payload = chatMessageService.saveUserLeaveMessage(user, chatroom);
-
-        return ResponsePayload.builder()
-                .type(ChatMessageType.SYSTEM_MESSAGE)
-                .payload(payload)
-                .build();
+        return chatroomLeaveManager.leaveChatroom(context);
     }
 
-    public ResponsePayload createUserChatMessage(String username, ChatMessageRequestPayload chatMessagePayload) {
+    public BasePayload createUserChatMessage(String username, ChatMessageRequestPayload chatMessagePayload) {
         User user = userService.findUserByUsername(username);
         Chatroom chatroom = chatroomService.findById(chatMessagePayload.getChatroomId());
         ChatParticipant chatParticipant = chatParticipantService.findByUserAndChatroom(user, chatroom);
@@ -64,7 +67,7 @@ public class ChatRealTimeFacade {
         UserChatMessagePayload chatMessage = chatMessageService
                 .saveUserChatMessage(chatParticipant, chatMembers, chatMessagePayload);
 
-        return ResponsePayload.builder()
+        return BasePayload.builder()
                 .type(ChatMessageType.CHAT_MESSAGE)
                 .payload(chatMessage)
                 .build();

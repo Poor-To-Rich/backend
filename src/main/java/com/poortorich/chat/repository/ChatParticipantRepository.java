@@ -16,4 +16,8 @@ public interface ChatParticipantRepository extends JpaRepository<ChatParticipant
     Long countByChatroomAndIsParticipateTrue(Chatroom chatroom);
 
     List<ChatParticipant> findAllByChatroomAndIsParticipateTrue(Chatroom chatroom);
+
+    void deleteAllByChatroom(Chatroom chatroom);
+
+    List<ChatParticipant> findAllByChatroom(Chatroom chatroom);
 }

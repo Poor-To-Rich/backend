@@ -5,6 +5,7 @@ import com.poortorich.chat.entity.ChatParticipant;
 import com.poortorich.chat.entity.Chatroom;
 import com.poortorich.chat.realtime.builder.SystemMessageBuilder;
 import com.poortorich.chat.realtime.builder.UserChatMessageBuilder;
+import com.poortorich.chat.realtime.payload.ChatroomClosedResponsePayload;
 import com.poortorich.chat.realtime.payload.UserChatMessagePayload;
 import com.poortorich.chat.realtime.payload.UserEnterResponsePayload;
 import com.poortorich.chat.realtime.payload.UserLeaveResponsePayload;
@@ -14,6 +15,7 @@ import com.poortorich.user.entity.User;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -73,5 +75,28 @@ public class ChatMessageService {
                 .sendAt(chatMessage.getSentAt())
                 .unreadBy(unreadBy)
                 .build();
+    }
+
+    @Transactional
+    public void closeAllMessagesByChatroom(Chatroom chatroom) {
+        chatMessageRepository.findAllByChatroom(chatroom)
+                .forEach(ChatMessage::closeChatroom);
+    }
+
+    public ChatroomClosedResponsePayload saveChatroomClosedMessage(Chatroom chatroom) {
+        ChatMessage chatMessage = chatMessageRepository.save(SystemMessageBuilder.buildChatroomClosedMessage(chatroom));
+
+        return ChatroomClosedResponsePayload.builder()
+                .messageId(chatMessage.getId())
+                .chatroomId(chatMessage.getChatroom().getId())
+                .messageType(chatMessage.getMessageType())
+                .content(chatMessage.getContent())
+                .sendAt(chatMessage.getSentAt())
+                .build();
+    }
+
+    @Transactional
+    public void deleteAllByChatroom(Chatroom chatroom) {
+        chatMessageRepository.deleteAllByChatroom(chatroom);
     }
 }

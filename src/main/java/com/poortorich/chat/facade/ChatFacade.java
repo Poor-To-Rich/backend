@@ -2,6 +2,7 @@ package com.poortorich.chat.facade;
 
 import com.poortorich.chat.entity.ChatParticipant;
 import com.poortorich.chat.entity.Chatroom;
+import com.poortorich.chat.entity.enums.ChatroomRole;
 import com.poortorich.chat.request.ChatroomCreateRequest;
 import com.poortorich.chat.request.ChatroomEnterRequest;
 import com.poortorich.chat.request.ChatroomLeaveAllRequest;
@@ -13,8 +14,8 @@ import com.poortorich.chat.response.ChatroomEnterResponse;
 import com.poortorich.chat.response.ChatroomInfoResponse;
 import com.poortorich.chat.response.ChatroomLeaveAllResponse;
 import com.poortorich.chat.response.ChatroomLeaveResponse;
-import com.poortorich.chat.response.ChatroomUpdateResponse;
 import com.poortorich.chat.response.ChatroomResponse;
+import com.poortorich.chat.response.ChatroomUpdateResponse;
 import com.poortorich.chat.response.ChatroomsResponse;
 import com.poortorich.chat.service.ChatMessageService;
 import com.poortorich.chat.service.ChatParticipantService;
@@ -73,6 +74,14 @@ public class ChatFacade {
         return AllChatroomsResponse.builder()
                 .hasNext(chatroomService.hasNext(sortBy, chatrooms.getLast().getId()))
                 .nextCursor(chatroomService.getNextCursor(sortBy, chatrooms.getLast().getId()))
+                .chatrooms(getChatroomResponses(chatrooms))
+                .build();
+    }
+
+    public ChatroomsResponse searchChatrooms(String keyword) {
+        List<Chatroom> chatrooms = chatroomService.searchChatrooms(keyword);
+
+        return ChatroomsResponse.builder()
                 .chatrooms(getChatroomResponses(chatrooms))
                 .build();
     }
@@ -142,11 +151,17 @@ public class ChatFacade {
 
         chatroomValidator.validateParticipate(user, chatroom);
         ChatParticipant chatParticipant = chatParticipantService.findByUserAndChatroom(user, chatroom);
-        chatParticipant.softDelete();
+        if (chatParticipant.getRole().equals(ChatroomRole.HOST)) {
+            chatParticipant.softDelete();
+            deleteChatroom(chatroom);
+        } else {
+            chatParticipant.softDelete();
+        }
 
         return ChatroomLeaveResponse.builder().deleteChatroomId(chatroomId).build();
     }
 
+    @Transactional
     public ChatroomLeaveAllResponse leaveAllChatroom(String username, ChatroomLeaveAllRequest chatroomLeaveAllRequest) {
         User user = userService.findUserByUsername(username);
         for (Long chatroomId : chatroomLeaveAllRequest.getChatroomsToLeave()) {
@@ -154,11 +169,23 @@ public class ChatFacade {
 
             chatroomValidator.validateParticipate(user, chatroom);
             ChatParticipant chatParticipant = chatParticipantService.findByUserAndChatroom(user, chatroom);
-            chatParticipant.softDelete();
+            if (chatParticipant.getRole().equals(ChatroomRole.HOST)) {
+                chatParticipant.softDelete();
+                deleteChatroom(chatroom);
+            } else {
+                chatParticipant.softDelete();
+            }
         }
 
         return ChatroomLeaveAllResponse.builder()
                 .deletedChatroomIds(chatroomLeaveAllRequest.getChatroomsToLeave())
                 .build();
+    }
+
+    @Transactional
+    private void deleteChatroom(Chatroom chatroom) {
+        tagService.deleteAllByChatroom(chatroom);
+        chatMessageService.closeAllMessagesByChatroom(chatroom);
+        chatroomService.closeChatroomById(chatroom.getId());
     }
 }

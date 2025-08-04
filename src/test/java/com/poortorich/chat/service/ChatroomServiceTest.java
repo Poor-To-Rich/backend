@@ -224,4 +224,21 @@ class ChatroomServiceTest {
 
         assertThat(result).isEqualTo(expectedNextCursor);
     }
+
+    @Test
+    @DisplayName("채팅방 검색 목록 조회 성공")
+    void searchChatroomsSuccess() {
+        String keyword = "부자";
+        Chatroom chatroom1 = Chatroom.builder().id(1L).title("부자되자").build();
+        Chatroom chatroom2 = Chatroom.builder().id(2L).title("부자될거야").build();
+        List<Chatroom> expected = List.of(chatroom1, chatroom2);
+
+        when(chatroomRepository.searchChatrooms(keyword)).thenReturn(expected);
+
+        List<Chatroom> result = chatroomService.searchChatrooms(keyword);
+
+        assertThat(result).hasSize(2);
+        assertThat(result.get(0)).isEqualTo(chatroom1);
+        assertThat(result.get(1)).isEqualTo(chatroom2);
+    }
 }

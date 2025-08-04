@@ -57,4 +57,20 @@ public interface ChatroomRepository extends JpaRepository<Chatroom, Long> {
                  c.id ASC
     """)
     List<Chatroom> findChatroomsSortByLike();
+
+    @Query("""
+        SELECT DISTINCT c
+          FROM Chatroom c
+          LEFT JOIN Tag t ON t.chatroom = c
+         INNER JOIN ChatParticipant cp ON cp.chatroom = c AND cp.role = 'HOST'
+        WHERE :keyword <> ''
+          AND (
+                 c.title LIKE CONCAT('%', :keyword, '%')
+              OR c.description LIKE CONCAT('%', :keyword, '%')
+              OR cp.user.nickname LIKE CONCAT('%', :keyword, '%')
+              OR (t.name IS NOT NULL AND t.name LIKE CONCAT('%', :keyword, '%'))
+          )
+        GROUP BY c.id
+    """)
+    List<Chatroom> searchChatrooms(String keyword);
 }

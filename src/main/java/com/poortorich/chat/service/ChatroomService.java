@@ -10,11 +10,11 @@ import com.poortorich.chat.response.enums.ChatResponse;
 import com.poortorich.chat.util.ChatBuilder;
 import com.poortorich.global.exceptions.NotFoundException;
 import com.poortorich.user.entity.User;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-
 import java.util.Comparator;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -71,7 +71,23 @@ public class ChatroomService {
                 .orElseThrow(() -> new NotFoundException(ChatResponse.CHATROOM_NOT_FOUND));
     }
 
+    public List<Chatroom> searchChatrooms(String keyword) {
+        return chatroomRepository.searchChatrooms(keyword);
+    }
+
     public List<Chatroom> getHostedChatrooms(User user) {
         return chatroomRepository.findChatroomByUserAndRole(user, ChatroomRole.HOST);
+    }
+
+    @Transactional
+    public void closeChatroomById(Long chatroomId) {
+        chatroomRepository.findById(chatroomId)
+                .orElseThrow(() -> new NotFoundException(ChatResponse.CHATROOM_NOT_FOUND))
+                .closeChatroom();
+    }
+
+    @Transactional
+    public void deleteById(Long chatroomId) {
+        chatroomRepository.deleteById(chatroomId);
     }
 }
