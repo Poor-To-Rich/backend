@@ -7,7 +7,6 @@ import com.poortorich.chat.response.AllChatroomsResponse;
 import com.poortorich.chat.response.ChatroomCreateResponse;
 import com.poortorich.chat.response.ChatroomDetailsResponse;
 import com.poortorich.chat.response.ChatroomInfoResponse;
-import com.poortorich.chat.response.ChatroomResponse;
 import com.poortorich.chat.response.ChatroomsResponse;
 import com.poortorich.chat.service.ChatMessageService;
 import com.poortorich.chat.service.ChatParticipantService;
@@ -72,6 +71,7 @@ class ChatFacadeTest {
                 .maxMemberCount(maxMemberCount)
                 .isRankingEnabled(isRankingEnabled)
                 .password(chatroomPassword)
+                .isDeleted(false)
                 .build();
     }
 
@@ -194,6 +194,6 @@ class ChatFacadeTest {
         assertThat(response.getChatroomImage()).isEqualTo(chatroom.getImage());
         assertThat(response.getCurrentMemberCount()).isEqualTo(5L);
         assertThat(response.getIsRankingEnabled()).isFalse();
+        assertThat(response.getIsClosed()).isFalse();
     }
-
 }
