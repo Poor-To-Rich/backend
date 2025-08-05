@@ -3,6 +3,7 @@ package com.poortorich.chat.repository;
 import com.poortorich.chat.entity.ChatParticipant;
 import com.poortorich.chat.entity.Chatroom;
 import com.poortorich.user.entity.User;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -23,4 +24,10 @@ public interface ChatParticipantRepository extends JpaRepository<ChatParticipant
            AND cp.role = 'HOST'
     """)
     ChatParticipant getChatroomHost(@Param("chatroom") Chatroom chatroom);
+
+    Long countByChatroomAndIsParticipateTrue(Chatroom chatroom);
+
+    void deleteAllByChatroom(Chatroom chatroom);
+
+    List<ChatParticipant> findAllByChatroom(Chatroom chatroom);
 }

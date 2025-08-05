@@ -9,9 +9,8 @@ import lombok.Data;
 
 @Data
 @Builder
-public class UserLeaveResponsePayload implements ResponsePayload {
+public class ChatroomClosedResponsePayload implements ResponsePayload {
 
-    private Long userId;
     private Long messageId;
     private Long chatroomId;
     private MessageType messageType;
