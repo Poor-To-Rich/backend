@@ -16,6 +16,7 @@ import com.poortorich.chat.response.ChatroomEnterResponse;
 import com.poortorich.chat.response.ChatroomInfoResponse;
 import com.poortorich.chat.response.ChatroomLeaveAllResponse;
 import com.poortorich.chat.response.ChatroomLeaveResponse;
+import com.poortorich.chat.response.ChatroomLikeStatusResponse;
 import com.poortorich.chat.response.ChatroomResponse;
 import com.poortorich.chat.response.ChatroomUpdateResponse;
 import com.poortorich.chat.response.ChatroomsResponse;
@@ -25,6 +26,7 @@ import com.poortorich.chat.service.ChatroomService;
 import com.poortorich.chat.util.ChatBuilder;
 import com.poortorich.chat.validator.ChatParticipantValidator;
 import com.poortorich.chat.validator.ChatroomValidator;
+import com.poortorich.like.service.LikeService;
 import com.poortorich.s3.service.FileUploadService;
 import com.poortorich.tag.service.TagService;
 import com.poortorich.user.entity.User;
@@ -44,6 +46,7 @@ public class ChatFacade {
     private final ChatMessageService chatMessageService;
     private final FileUploadService fileUploadService;
     private final TagService tagService;
+    private final LikeService likeService;
 
     private final ChatroomValidator chatroomValidator;
     private final ChatParticipantValidator chatParticipantValidator;
@@ -125,6 +128,20 @@ public class ChatFacade {
                 chatParticipantService.isJoined(user, chatroom),
                 chatParticipantService.getChatroomHost(chatroom)
         );
+    }
+
+    public ChatroomLikeStatusResponse getChatroomLike(String username, Long chatroomId) {
+        User user = userService.findUserByUsername(username);
+        Chatroom chatroom = chatroomService.findById(chatroomId);
+
+        return buildChatroomLikeStatusResponse(user, chatroom);
+    }
+
+    private ChatroomLikeStatusResponse buildChatroomLikeStatusResponse(User user, Chatroom chatroom) {
+        return ChatroomLikeStatusResponse.builder()
+                .isLiked(likeService.getLikeStatus(user, chatroom))
+                .likeCount(likeService.getLikeCount(chatroom))
+                .build();
     }
 
     public ChatroomEnterResponse enterChatroom(

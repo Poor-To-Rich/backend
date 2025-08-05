@@ -10,6 +10,8 @@ public class ChatResponseMessage {
     public static final String GET_CHATROOM_DETAILS_SUCCESS = "채팅방 상세정보 조회를 완료했습니다.";
     public static final String GET_CHATROOM_COVER_INFO_SUCCESS = "채팅방 커버 정보 조회를 완료했습니다.";
 
+    public static final String GET_CHATROOM_LIKE_STATUS_SUCCESS = "채팅방 좋아요 상태 조회를 완료했습니다.";
+
     public static final String CHATROOM_TITLE_REQUIRED = "채팅방 이름은 필수값입니다.";
     public static final String CHATROOM_TITLE_TOO_BIG
             = "채팅방 이름은 " + ChatValidationConstraints.CHATROOM_TITLE_MAX + "자 이하여야 합니다.";

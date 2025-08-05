@@ -11,10 +11,12 @@ import com.poortorich.chat.response.ChatroomCoverInfoResponse;
 import com.poortorich.chat.response.ChatroomCreateResponse;
 import com.poortorich.chat.response.ChatroomDetailsResponse;
 import com.poortorich.chat.response.ChatroomInfoResponse;
+import com.poortorich.chat.response.ChatroomLikeStatusResponse;
 import com.poortorich.chat.response.ChatroomsResponse;
 import com.poortorich.chat.service.ChatMessageService;
 import com.poortorich.chat.service.ChatParticipantService;
 import com.poortorich.chat.service.ChatroomService;
+import com.poortorich.like.service.LikeService;
 import com.poortorich.s3.service.FileUploadService;
 import com.poortorich.tag.service.TagService;
 import com.poortorich.user.entity.User;
@@ -52,6 +54,8 @@ class ChatFacadeTest {
     private TagService tagService;
     @Mock
     private ChatMessageService chatMessageService;
+    @Mock
+    private LikeService likeService;
 
     @InjectMocks
     private ChatFacade chatFacade;
@@ -238,5 +242,23 @@ class ChatFacadeTest {
         assertThat(response.getHasPassword()).isTrue();
         assertThat(response.getHostProfile().getUserId()).isEqualTo(user.getId());
         assertThat(response.getHostProfile().getIsHost()).isTrue();
+    }
+
+    @Test
+    @DisplayName("채팅방 좋아요 상태 조회 성공")
+    void getChatroomLikeSuccess() {
+        String username = "testUser";
+        User user = User.builder().username(username).build();
+
+        when(userService.findUserByUsername(username)).thenReturn(user);
+        when(chatroomService.findById(chatroomId)).thenReturn(chatroom);
+        when(likeService.getLikeStatus(user, chatroom)).thenReturn(true);
+        when(likeService.getLikeCount(chatroom)).thenReturn(3L);
+
+        ChatroomLikeStatusResponse result = chatFacade.getChatroomLike(username, chatroomId);
+
+        assertThat(result).isNotNull();
+        assertThat(result.getIsLiked()).isTrue();
+        assertThat(result.getLikeCount()).isEqualTo(3L);
     }
 }

@@ -10,6 +10,7 @@ import com.poortorich.chat.response.ChatroomCoverInfoResponse;
 import com.poortorich.chat.response.ChatroomCreateResponse;
 import com.poortorich.chat.response.ChatroomDetailsResponse;
 import com.poortorich.chat.response.ChatroomInfoResponse;
+import com.poortorich.chat.response.ChatroomLikeStatusResponse;
 import com.poortorich.chat.response.ChatroomsResponse;
 import com.poortorich.chat.response.enums.ChatResponse;
 import com.poortorich.global.config.BaseSecurityTest;
@@ -193,6 +194,23 @@ public class ChatControllerTest extends BaseSecurityTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message")
                         .value(ChatResponse.GET_CHATROOM_COVER_INFO_SUCCESS.getMessage())
+                );
+    }
+
+    @Test
+    @WithMockUser(username = "test")
+    @DisplayName("채팅방 좋아요 상태 조회 성공")
+    void getChatroomLikeSuccess() throws Exception {
+        Long chatroomId = 1L;
+
+        when(chatFacade.getChatroomLike(eq("test"), eq(chatroomId)))
+                .thenReturn(ChatroomLikeStatusResponse.builder().build());
+
+        mockMvc.perform(get("/chatrooms/" + chatroomId + "/like")
+                        .with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message")
+                        .value(ChatResponse.GET_CHATROOM_LIKE_STATUS_SUCCESS.getMessage())
                 );
     }
 }
