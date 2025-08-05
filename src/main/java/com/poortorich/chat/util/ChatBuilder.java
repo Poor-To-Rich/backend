@@ -7,8 +7,10 @@ import com.poortorich.chat.entity.enums.NoticeStatus;
 import com.poortorich.chat.entity.enums.RankingStatus;
 import com.poortorich.chat.request.ChatroomCreateRequest;
 import com.poortorich.chat.response.ChatroomDetailsResponse;
+import com.poortorich.chat.response.ChatroomCoverInfoResponse;
 import com.poortorich.chat.response.ChatroomInfoResponse;
 import com.poortorich.chat.response.ChatroomResponse;
+import com.poortorich.chat.response.ProfileResponse;
 import com.poortorich.s3.constants.S3Constants;
 import com.poortorich.user.entity.User;
 import java.util.List;
@@ -29,7 +31,7 @@ public class ChatBuilder {
     public static ChatParticipant buildChatParticipant(User user, ChatroomRole role, Chatroom chatroom) {
         return ChatParticipant.builder()
                 .role(role)
-                .isParticipate(true)
+                .isParticipated(true)
                 .rankingStatus(RankingStatus.NONE)
                 .noticeStatus(NoticeStatus.DEFAULT)
                 .user(user)
@@ -82,6 +84,38 @@ public class ChatBuilder {
                 .currentMemberCount(currentMemberCount)
                 .isRankingEnabled(chatroom.getIsRankingEnabled())
                 .isClosed(chatroom.getIsDeleted())
+                .build();
+    }
+
+    public static ChatroomCoverInfoResponse buildChatroomCoverInfoResponse(
+            Chatroom chatroom,
+            List<String> hashtags,
+            Long currentMemberCount,
+            Boolean isJoined,
+            ChatParticipant hostInfo
+    ) {
+        return ChatroomCoverInfoResponse.builder()
+                .chatroomId(chatroom.getId())
+                .chatroomTitle(chatroom.getTitle())
+                .chatroomImage(chatroom.getImage())
+                .description(chatroom.getDescription())
+                .hashtags(hashtags)
+                .currentMemberCount(currentMemberCount)
+                .maxMemberCount(chatroom.getMaxMemberCount())
+                .createdAt(chatroom.getCreatedDate().toString())
+                .isJoined(isJoined)
+                .hasPassword(chatroom.getPassword() != null)
+                .hostProfile(buildProfileResponse(hostInfo))
+                .build();
+    }
+
+    private static ProfileResponse buildProfileResponse(ChatParticipant participantInfo) {
+        return ProfileResponse.builder()
+                .userId(participantInfo.getUser().getId())
+                .profileImage(participantInfo.getUser().getProfileImage())
+                .nickname(participantInfo.getUser().getNickname())
+                .isHost(participantInfo.getRole().equals(ChatroomRole.HOST))
+                .rankingType(participantInfo.getRankingStatus().toString())
                 .build();
     }
 }

@@ -39,7 +39,17 @@ public class ChatParticipantService {
     }
 
     public Long countByChatroom(Chatroom chatroom) {
-        return chatParticipantRepository.countByChatroomAndIsParticipateTrue(chatroom);
+        return chatParticipantRepository.countByChatroomAndIsParticipatedTrue(chatroom);
+    }
+
+    public Boolean isJoined(User user, Chatroom chatroom) {
+        return chatParticipantRepository.findByUserAndChatroom(user, chatroom)
+                .map(ChatParticipant::getIsParticipated)
+                .orElse(false);
+    }
+
+    public ChatParticipant getChatroomHost(Chatroom chatroom) {
+        return chatParticipantRepository.getChatroomHost(chatroom);
     }
 
     public boolean isAllParticipantLeft(Chatroom chatroom) {
