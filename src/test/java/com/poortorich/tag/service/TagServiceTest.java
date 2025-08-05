@@ -66,17 +66,6 @@ class TagServiceTest {
     }
 
     @Test
-    @DisplayName("태그 최대 개수보다 많은 경우 예외 발생")
-    void createTagNameTooLong() {
-        List<String> tagNames = List.of("1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11");
-        Chatroom chatroom = Chatroom.builder().build();
-
-        assertThatThrownBy(() -> tagService.createTag(tagNames, chatroom))
-                .isInstanceOf(BadRequestException.class)
-                .hasMessageContaining(TagResponse.TAG_TOO_MANY.getMessage());
-    }
-
-    @Test
     @DisplayName("태그 이름 리스트 조회 성공")
     void getTagNamesSuccess() {
         when(tagRepository.findByChatroom(chatroom)).thenReturn(tags);

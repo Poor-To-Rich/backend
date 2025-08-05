@@ -18,7 +18,6 @@ public class TagService {
     private final TagRepository tagRepository;
 
     public void createTag(List<String> hashtags, Chatroom chatroom) {
-        validateTagCount(hashtags);
         List<Tag> tag = hashtags.stream()
                 .map(tagName -> buildTag(tagName, chatroom))
                 .toList();
@@ -31,12 +30,6 @@ public class TagService {
                 .name(tagName)
                 .chatroom(chatroom)
                 .build();
-    }
-
-    private void validateTagCount(List<String> hashtags) {
-        if (hashtags.size() > TagValidationConstraints.TAG_COUNT_MAX) {
-            throw new BadRequestException(TagResponse.TAG_TOO_MANY);
-        }
     }
 
     public List<String> getTagNames(Chatroom chatroom) {
