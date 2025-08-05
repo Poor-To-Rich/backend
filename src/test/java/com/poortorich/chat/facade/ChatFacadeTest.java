@@ -188,7 +188,6 @@ class ChatFacadeTest {
         assertThat(response.getChatrooms().get(1).getChatroomTitle()).isEqualTo(chatroom2.getTitle());
     }
 
-
     @Test
     @DisplayName("채팅방 상세 정보 조회 성공")
     void getChatroomDetailsSuccess() {
