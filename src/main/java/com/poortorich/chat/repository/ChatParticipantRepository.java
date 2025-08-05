@@ -25,8 +25,6 @@ public interface ChatParticipantRepository extends JpaRepository<ChatParticipant
     """)
     ChatParticipant getChatroomHost(@Param("chatroom") Chatroom chatroom);
 
-    Long countByChatroomAndIsParticipateTrue(Chatroom chatroom);
-
     void deleteAllByChatroom(Chatroom chatroom);
 
     List<ChatParticipant> findAllByChatroom(Chatroom chatroom);
