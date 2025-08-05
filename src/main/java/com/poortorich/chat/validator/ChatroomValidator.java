@@ -25,19 +25,20 @@ public class ChatroomValidator {
             if (chatParticipant.get().getRole().equals(ChatroomRole.BANNED)) {
                 throw new ForbiddenException(ChatResponse.CHATROOM_ENTER_DENIED);
             }
-            if (chatParticipant.get().getIsParticipate()) {
+            if (chatParticipant.get().getIsParticipated()) {
                 throw new ConflictException(ChatResponse.CHATROOM_ENTER_DUPLICATED);
             }
         }
 
-        long currentMemberCount = chatParticipantRepository.countByChatroomAndIsParticipateTrue(chatroom);
+        long currentMemberCount = chatParticipantRepository.countByChatroomAndIsParticipatedTrue(chatroom);
         if (currentMemberCount == chatroom.getMaxMemberCount()) {
             throw new ForbiddenException(ChatResponse.CHATROOM_ENTER_DENIED);
         }
     }
 
     public void validatePassword(Chatroom chatroom, String password) {
-        if (!password.equals(chatroom.getPassword())) {
+        String chatroomPassword = chatroom.getPassword();
+        if (chatroomPassword != null && !password.equals(chatroomPassword)) {
             throw new BadRequestException(ChatResponse.CHATROOM_PASSWORD_DO_NOT_MATCH);
         }
     }
@@ -51,7 +52,7 @@ public class ChatroomValidator {
     }
 
     public void validateCanUpdateMaxMemberCount(Chatroom chatroom, Long maxMemberCount) {
-        Long currentMemberCount = chatParticipantRepository.countByChatroomAndIsParticipateTrue(chatroom);
+        Long currentMemberCount = chatParticipantRepository.countByChatroomAndIsParticipatedTrue(chatroom);
         if (currentMemberCount > maxMemberCount) {
             throw new BadRequestException(ChatResponse.CHATROOM_MAX_MEMBER_COUNT_EXCEED);
         }
@@ -60,7 +61,7 @@ public class ChatroomValidator {
     public void validateParticipate(User user, Chatroom chatroom) {
         Optional<ChatParticipant> chatParticipant = chatParticipantRepository.findByUserAndChatroom(user, chatroom);
 
-        if (chatParticipant.isEmpty() || !chatParticipant.get().getIsParticipate()) {
+        if (chatParticipant.isEmpty() || !chatParticipant.get().getIsParticipated()) {
             throw new BadRequestException(ChatResponse.CHATROOM_LEAVE_ALREADY);
         }
     }

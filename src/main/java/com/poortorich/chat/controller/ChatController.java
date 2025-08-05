@@ -74,9 +74,28 @@ public class ChatController {
         );
     }
 
+    @GetMapping("/{chatroomId}")
+    public ResponseEntity<BaseResponse> getChatroomCoverInfo(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @PathVariable Long chatroomId
+    ) {
+        return DataResponse.toResponseEntity(
+                ChatResponse.GET_CHATROOM_COVER_INFO_SUCCESS,
+                chatFacade.getChatroomCoverInfo(userDetails.getUsername(), chatroomId)
+        );
+    }
+
     @GetMapping("/{chatroomId}/edit")
     public ResponseEntity<BaseResponse> getChatroom(@PathVariable Long chatroomId) {
         return DataResponse.toResponseEntity(ChatResponse.GET_CHATROOM_SUCCESS, chatFacade.getChatroom(chatroomId));
+    }
+
+    @GetMapping("/{chatroomId}/details")
+    public ResponseEntity<BaseResponse> getChatroomDetails(@PathVariable Long chatroomId) {
+        return DataResponse.toResponseEntity(
+                ChatResponse.GET_CHATROOM_DETAILS_SUCCESS,
+                chatFacade.getChatroomDetails(chatroomId)
+        );
     }
 
     @PostMapping("/{chatroomId}/enter")
