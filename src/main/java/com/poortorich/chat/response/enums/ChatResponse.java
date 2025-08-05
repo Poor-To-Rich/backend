@@ -14,6 +14,7 @@ public enum ChatResponse implements Response {
     GET_CHATROOM_SUCCESS(HttpStatus.OK, ChatResponseMessage.GET_CHATROOM_SUCCESS, null),
     GET_HOSTED_CHATROOMS_SUCCESS(HttpStatus.OK, ChatResponseMessage.GET_HOSTED_CHATROOMS_SUCCESS, null),
     GET_SEARCH_CHATROOMS_SUCCESS(HttpStatus.OK, ChatResponseMessage.GET_SEARCH_CHATROOMS_SUCCESS, null),
+    GET_CHATROOM_DETAILS_SUCCESS(HttpStatus.OK, ChatResponseMessage.GET_CHATROOM_DETAILS_SUCCESS, null),
     GET_CHATROOM_COVER_INFO_SUCCESS(HttpStatus.OK, ChatResponseMessage.GET_CHATROOM_COVER_INFO_SUCCESS, null),
 
     CHATROOM_ENTER_DENIED(HttpStatus.FORBIDDEN, ChatResponseMessage.CHATROOM_ENTER_DENIED, null),

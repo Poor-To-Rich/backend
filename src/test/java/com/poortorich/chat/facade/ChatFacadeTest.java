@@ -9,8 +9,8 @@ import com.poortorich.chat.request.enums.SortBy;
 import com.poortorich.chat.response.AllChatroomsResponse;
 import com.poortorich.chat.response.ChatroomCoverInfoResponse;
 import com.poortorich.chat.response.ChatroomCreateResponse;
+import com.poortorich.chat.response.ChatroomDetailsResponse;
 import com.poortorich.chat.response.ChatroomInfoResponse;
-import com.poortorich.chat.response.ChatroomResponse;
 import com.poortorich.chat.response.ChatroomsResponse;
 import com.poortorich.chat.service.ChatMessageService;
 import com.poortorich.chat.service.ChatParticipantService;
@@ -76,6 +76,7 @@ class ChatFacadeTest {
                 .maxMemberCount(maxMemberCount)
                 .isRankingEnabled(isRankingEnabled)
                 .password(chatroomPassword)
+                .isDeleted(false)
                 .createdDate(LocalDateTime.of(2025, 8, 3, 15, 24, 51))
                 .build();
     }
@@ -187,6 +188,20 @@ class ChatFacadeTest {
         assertThat(response.getChatrooms().get(1).getChatroomTitle()).isEqualTo(chatroom2.getTitle());
     }
 
+    @Test
+    @DisplayName("채팅방 상세 정보 조회 성공")
+    void getChatroomDetailsSuccess() {
+        when(chatroomService.findById(chatroomId)).thenReturn(chatroom);
+        when(chatParticipantService.countByChatroom(chatroom)).thenReturn(5L);
+
+        ChatroomDetailsResponse response = chatFacade.getChatroomDetails(chatroomId);
+
+        assertThat(response.getChatroomTitle()).isEqualTo(chatroom.getTitle());
+        assertThat(response.getChatroomImage()).isEqualTo(chatroom.getImage());
+        assertThat(response.getCurrentMemberCount()).isEqualTo(5L);
+        assertThat(response.getIsRankingEnabled()).isFalse();
+        assertThat(response.getIsClosed()).isFalse();
+    }
 
     @Test
     @DisplayName("채팅방 커버 정보 조회 성공")

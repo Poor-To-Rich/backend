@@ -48,7 +48,7 @@ public class Chatroom {
     @Column(name = "is_ranking_enabled", nullable = false)
     private Boolean isRankingEnabled;
 
-    @Column(name = "is_delete", nullable = false)
+    @Column(name = "is_deleted", nullable = false)
     @Builder.Default
     private Boolean isDeleted = Boolean.FALSE;
 
