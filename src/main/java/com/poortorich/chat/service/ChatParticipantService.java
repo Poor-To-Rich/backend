@@ -59,7 +59,7 @@ public class ChatParticipantService {
     }
 
     public List<ChatParticipantProfile> getParticipantProfiles(Chatroom chatroom) {
-        List<ChatParticipant> participants = chatParticipantRepository.findAllByChatroom(chatroom);
+        List<ChatParticipant> participants = chatParticipantRepository.findAllByChatroomAndIsParticipateTrue(chatroom);
 
         return participants.stream()
                 .map(participant -> {

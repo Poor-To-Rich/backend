@@ -61,6 +61,7 @@ public class ChatMessageService {
                 .orElse(null);
     }
 
+    @Transactional
     public UserChatMessagePayload saveUserChatMessage(
             ChatParticipant chatParticipant,
             List<ChatParticipant> chatMembers,
