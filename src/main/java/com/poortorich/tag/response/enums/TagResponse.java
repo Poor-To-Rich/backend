@@ -10,7 +10,7 @@ import org.springframework.http.HttpStatus;
 @RequiredArgsConstructor
 public enum TagResponse implements Response {
 
-    TAG_NAME_TOO_LONG(HttpStatus.BAD_REQUEST, TagResponseMessage.TAG_NAME_TOO_LONG, "hashtags");
+    TAG_TOO_MANY(HttpStatus.BAD_REQUEST, TagResponseMessage.TAG_TOO_MANY, "hashtags");
 
     private final HttpStatus httpStatus;
     private final String message;

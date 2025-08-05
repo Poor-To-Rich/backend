@@ -2,7 +2,6 @@ package com.poortorich.tag.service;
 
 import com.poortorich.chat.entity.Chatroom;
 import com.poortorich.global.exceptions.BadRequestException;
-import com.poortorich.tag.constants.TagValidationConstraints;
 import com.poortorich.tag.entity.Tag;
 import com.poortorich.tag.repository.TagRepository;
 import com.poortorich.tag.response.enums.TagResponse;
@@ -67,15 +66,14 @@ class TagServiceTest {
     }
 
     @Test
-    @DisplayName("태그 이름이 최대 길이가 넘어가는 경우 예외 발생")
+    @DisplayName("태그 최대 개수보다 많은 경우 예외 발생")
     void createTagNameTooLong() {
-        String tooLongName = "A".repeat(TagValidationConstraints.TAG_NAME_MAX + 1);
-        List<String> tagNames = List.of(tooLongName);
+        List<String> tagNames = List.of("1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11");
         Chatroom chatroom = Chatroom.builder().build();
 
         assertThatThrownBy(() -> tagService.createTag(tagNames, chatroom))
                 .isInstanceOf(BadRequestException.class)
-                .hasMessageContaining(TagResponse.TAG_NAME_TOO_LONG.getMessage());
+                .hasMessageContaining(TagResponse.TAG_TOO_MANY.getMessage());
     }
 
     @Test
