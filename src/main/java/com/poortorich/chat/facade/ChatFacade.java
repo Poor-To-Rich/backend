@@ -9,6 +9,7 @@ import com.poortorich.chat.request.ChatroomLeaveAllRequest;
 import com.poortorich.chat.request.ChatroomUpdateRequest;
 import com.poortorich.chat.request.enums.SortBy;
 import com.poortorich.chat.response.AllChatroomsResponse;
+import com.poortorich.chat.response.ChatroomCoverInfoResponse;
 import com.poortorich.chat.response.ChatroomCreateResponse;
 import com.poortorich.chat.response.ChatroomEnterResponse;
 import com.poortorich.chat.response.ChatroomInfoResponse;
@@ -105,6 +106,19 @@ public class ChatFacade {
                                 chatMessageService.getLastMessageTime(chatroom)
                         ))
                 .toList();
+    }
+
+    public ChatroomCoverInfoResponse getChatroomCoverInfo(String username, Long chatroomId) {
+        User user = userService.findUserByUsername(username);
+        Chatroom chatroom = chatroomService.findById(chatroomId);
+
+        return ChatBuilder.buildChatroomCoverInfoResponse(
+                chatroom,
+                tagService.getTagNames(chatroom),
+                chatParticipantService.countByChatroom(chatroom),
+                chatParticipantService.isJoined(user, chatroom),
+                chatParticipantService.getChatroomHost(chatroom)
+        );
     }
 
     public ChatroomEnterResponse enterChatroom(
