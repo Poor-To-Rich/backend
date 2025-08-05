@@ -53,7 +53,7 @@ public class ChatParticipantService {
     }
 
     public List<ChatParticipant> findAllByChatroom(Chatroom chatroom) {
-        return chatParticipantRepository.findAllByChatroomAndIsParticipateTrue(chatroom);
+        return chatParticipantRepository.findAllByChatroomAndIsParticipatedTrue(chatroom);
     }
 
     public boolean isAllParticipantLeft(Chatroom chatroom) {
@@ -68,6 +68,6 @@ public class ChatParticipantService {
     }
 
     public List<ChatParticipant> findAllByChatroomExcludingUser(Chatroom chatroom, User excludedUser) {
-        return chatParticipantRepository.findAllByChatroomAndIsParticipateTrueAndUserNot(chatroom, excludedUser);
+        return chatParticipantRepository.findAllByChatroomAndIsParticipatedTrueAndUserNot(chatroom, excludedUser);
     }
 }
