@@ -1,10 +1,8 @@
 package com.poortorich.tag.service;
 
 import com.poortorich.chat.entity.Chatroom;
-import com.poortorich.global.exceptions.BadRequestException;
 import com.poortorich.tag.entity.Tag;
 import com.poortorich.tag.repository.TagRepository;
-import com.poortorich.tag.response.enums.TagResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -18,7 +16,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
