@@ -55,7 +55,7 @@ public class ChatParticipantService {
     public boolean isAllParticipantLeft(Chatroom chatroom) {
         List<ChatParticipant> participants = chatParticipantRepository.findAllByChatroom(chatroom);
         return participants.stream()
-                .noneMatch(ChatParticipant::getIsParticipate);
+                .noneMatch(ChatParticipant::getIsParticipated);
     }
 
     @Transactional

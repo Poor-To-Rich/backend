@@ -24,6 +24,8 @@ public class ChatResponseMessage {
     public static final String CHATROOM_DESCRIPTION_TOO_BIG
             = "채팅방 소개는 " + ChatValidationConstraints.CHATROOM_DESCRIPTION_MAX + "자 이하여야 합니다.";
 
+    public static final String TAG_TOO_MANY = "태그는 " + ChatValidationConstraints.TAG_COUNT_MAX + "개 이하여야 합니다.";
+
     public static final String CHATROOM_ENTER_DENIED = "이 채팅방에 입장할 수 없습니다.";
     public static final String CHATROOM_PASSWORD_DO_NOT_MATCH = "채팅방 비밀번호가 맞지 않습니다.";
     public static final String CHATROOM_NOT_FOUND = "채팅방을 찾을 수 없습니다.";

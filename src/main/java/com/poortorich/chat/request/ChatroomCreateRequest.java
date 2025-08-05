@@ -37,6 +37,8 @@ public class ChatroomCreateRequest {
             message = ChatResponseMessage.CHATROOM_DESCRIPTION_TOO_BIG)
     private String description;
 
+    @Size(max = ChatValidationConstraints.TAG_COUNT_MAX,
+            message = ChatResponseMessage.TAG_TOO_MANY)
     private List<String> hashtags;
     private Boolean isRankingEnabled;
     private String chatroomPassword;
