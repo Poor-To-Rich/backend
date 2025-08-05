@@ -15,4 +15,5 @@ public class ChatroomDetailsResponse {
     private String chatroomTitle;
     private Long currentMemberCount;
     private Boolean isRankingEnabled;
+    private Boolean isClosed;
 }
