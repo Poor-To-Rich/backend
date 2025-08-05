@@ -2,8 +2,6 @@ package com.poortorich.chat.request;
 
 import com.poortorich.chat.constants.ChatResponseMessage;
 import com.poortorich.chat.constants.ChatValidationConstraints;
-import com.poortorich.tag.constants.TagResponseMessage;
-import com.poortorich.tag.constants.TagValidationConstraints;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
@@ -39,8 +37,8 @@ public class ChatroomCreateRequest {
             message = ChatResponseMessage.CHATROOM_DESCRIPTION_TOO_BIG)
     private String description;
 
-    @Size(max = TagValidationConstraints.TAG_COUNT_MAX,
-            message = TagResponseMessage.TAG_TOO_MANY)
+    @Size(max = ChatValidationConstraints.TAG_COUNT_MAX,
+            message = ChatResponseMessage.TAG_TOO_MANY)
     private List<String> hashtags;
     private Boolean isRankingEnabled;
     private String chatroomPassword;
