@@ -65,9 +65,7 @@ public class ChatRealTimeFacade {
 
         ChatParticipant chatParticipant = chatParticipantService.findByUserAndChatroom(user, chatroom);
 
-        List<ChatParticipant> chatMembers = chatParticipantService.findAllByChatroom(context.chatroom()).stream()
-                .filter(participant -> !participant.getUser().getId().equals(chatParticipant.getUser().getId()))
-                .toList();
+        List<ChatParticipant> chatMembers = chatParticipantService.findAllByChatroomExcludingUser(chatroom, user);
 
         UserChatMessagePayload chatMessage = chatMessageService
                 .saveUserChatMessage(chatParticipant, chatMembers, chatMessagePayload);

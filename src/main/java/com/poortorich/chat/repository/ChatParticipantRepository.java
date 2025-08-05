@@ -20,4 +20,6 @@ public interface ChatParticipantRepository extends JpaRepository<ChatParticipant
     void deleteAllByChatroom(Chatroom chatroom);
 
     List<ChatParticipant> findAllByChatroom(Chatroom chatroom);
+
+    List<ChatParticipant> findAllByChatroomAndIsParticipateTrueAndUserNot(Chatroom chatroom, User excludedUser);
 }

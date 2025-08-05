@@ -56,4 +56,8 @@ public class ChatParticipantService {
     public void deleteAllByChatroom(Chatroom chatroom) {
         chatParticipantRepository.deleteAllByChatroom(chatroom);
     }
+
+    public List<ChatParticipant> findAllByChatroomExcludingUser(Chatroom chatroom, User excludedUser) {
+        return chatParticipantRepository.findAllByChatroomAndIsParticipateTrueAndUserNot(chatroom, excludedUser);
+    }
 }
