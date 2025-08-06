@@ -62,7 +62,7 @@ class LikeServiceTest {
         Long likeCount = 10L;
         Chatroom chatroom = Chatroom.builder().build();
 
-        when(likeRepository.countByChatroom(chatroom)).thenReturn(likeCount);
+        when(likeRepository.countByChatroomAndLikeStatusTrue(chatroom)).thenReturn(likeCount);
 
         Long result = likeService.getLikeCount(chatroom);
 

@@ -20,6 +20,6 @@ public class LikeService {
     }
 
     public Long getLikeCount(Chatroom chatroom) {
-        return likeRepository.countByChatroom(chatroom);
+        return likeRepository.countByChatroomAndLikeStatusTrue(chatroom);
     }
 }
