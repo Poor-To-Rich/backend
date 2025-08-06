@@ -32,7 +32,7 @@ public class SystemMessageBuilder {
 
     public static ChatMessage buildChatroomClosedMessage(Chatroom chatroom) {
         return ChatMessage.builder()
-                .messageType(MessageType.SYSTEM)
+                .messageType(MessageType.CLOSE)
                 .type(ChatMessageType.SYSTEM_MESSAGE)
                 .content(CHATROOM_CLOSED_BY_HOST)
                 .chatroom(chatroom)

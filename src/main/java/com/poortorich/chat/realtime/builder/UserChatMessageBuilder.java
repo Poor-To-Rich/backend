@@ -7,6 +7,9 @@ import com.poortorich.chat.realtime.payload.request.ChatMessageRequestPayload;
 
 public class UserChatMessageBuilder {
 
+    private UserChatMessageBuilder() {
+    }
+
     public static ChatMessage buildChatMessage(
             ChatParticipant chatParticipant,
             ChatMessageRequestPayload chatMessageRequestPayload

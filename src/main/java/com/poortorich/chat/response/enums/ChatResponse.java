@@ -36,7 +36,9 @@ public enum ChatResponse implements Response {
     ),
 
     CHATROOM_LEAVE_ALREADY(HttpStatus.BAD_REQUEST, ChatResponseMessage.CHATROOM_LEAVE_ALREADY, null),
-    CHATROOM_LEAVE_SUCCESS(HttpStatus.OK, ChatResponseMessage.CHATROOM_LEAVE_SUCCESS, null);
+    CHATROOM_LEAVE_SUCCESS(HttpStatus.OK, ChatResponseMessage.CHATROOM_LEAVE_SUCCESS, null),
+    CHAT_MESSAGE_NOT_FOUND(HttpStatus.NOT_FOUND, ChatResponseMessage.CHAT_MESSAGE_NOT_FOUND, null),
+    GET_CHAT_MESSAGE_SUCCESS(HttpStatus.OK, ChatResponseMessage.GET_CHAT_MESSAGE_SUCCESS, null);
 
     private final HttpStatus httpStatus;
     private final String message;

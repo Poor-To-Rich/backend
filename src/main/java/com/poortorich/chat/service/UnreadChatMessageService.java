@@ -30,4 +30,10 @@ public class UnreadChatMessageService {
                 .map(chatParticipant -> chatParticipant.getUser().getId())
                 .toList();
     }
+
+    public List<Long> getUserIdsByChatMessage(ChatMessage chatMessage) {
+        return unreadChatMessageRepository.findAllByChatMessage(chatMessage).stream()
+                .map(unreadChatMessage -> unreadChatMessage.getUser().getId())
+                .toList();
+    }
 }
