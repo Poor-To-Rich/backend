@@ -8,11 +8,11 @@ import lombok.Data;
 
 @Data
 @Builder
-public class RankingStatusMessage implements ResponsePayload {
+public class RankingStatusMessagePayload implements ResponsePayload {
 
     private Long messageId;
     private Long chatroomId;
-    private Boolean isChatEnabled;
+    private Boolean isRankingEnabled;
     private LocalDateTime sendAt;
 
     @Override
