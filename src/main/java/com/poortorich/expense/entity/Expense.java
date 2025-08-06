@@ -24,6 +24,8 @@ import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Objects;
+
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -36,8 +38,8 @@ import org.hibernate.annotations.UpdateTimestamp;
 @Getter
 @Builder
 @DynamicUpdate
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "expense")
 public class Expense implements AccountBook {
 

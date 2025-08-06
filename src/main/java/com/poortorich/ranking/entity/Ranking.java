@@ -1,6 +1,6 @@
-package com.poortorich.chat.entity;
+package com.poortorich.ranking.entity;
 
-import com.poortorich.user.entity.User;
+import com.poortorich.chat.entity.Chatroom;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -27,25 +27,31 @@ import java.time.LocalDateTime;
 @DynamicUpdate
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "unread_chat_message")
-public class UnreadChatMessage {
+@Table(name = "ranking")
+public class Ranking {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
+    @Column(name = "saver_first")
+    private Long saverFirst;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "chatroom_id")
-    private Chatroom chatroom;
+    @Column(name = "saver_second")
+    private Long saverSecond;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "chat_message_id")
-    private ChatMessage chatMessage;
+    @Column(name = "saver_third")
+    private Long saverThird;
+
+    @Column(name = "flexer_first")
+    private Long flexerFirst;
+
+    @Column(name = "flexer_second")
+    private Long flexerSecond;
+
+    @Column(name = "flexer_third")
+    private Long flexerThird;
 
     @CreationTimestamp
     @Column(name = "created_date")
@@ -54,4 +60,8 @@ public class UnreadChatMessage {
     @UpdateTimestamp
     @Column(name = "updated_date")
     private LocalDateTime updatedDate;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "chatroom_id", nullable = false)
+    private Chatroom chatroom;
 }
