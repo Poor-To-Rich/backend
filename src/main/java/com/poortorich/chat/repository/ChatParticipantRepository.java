@@ -18,14 +18,18 @@ public interface ChatParticipantRepository extends JpaRepository<ChatParticipant
     Long countByChatroomAndIsParticipatedTrue(Chatroom chatroom);
 
     @Query("""
-        SELECT cp
-          FROM ChatParticipant cp
-         WHERE cp.chatroom = :chatroom
-           AND cp.role = 'HOST'
-    """)
+            SELECT cp
+            FROM ChatParticipant cp
+            WHERE cp.chatroom = :chatroom
+            AND cp.role = 'HOST'
+            """)
     ChatParticipant getChatroomHost(@Param("chatroom") Chatroom chatroom);
+
+    List<ChatParticipant> findAllByChatroomAndIsParticipatedTrue(Chatroom chatroom);
 
     void deleteAllByChatroom(Chatroom chatroom);
 
     List<ChatParticipant> findAllByChatroom(Chatroom chatroom);
+
+    List<ChatParticipant> findAllByChatroomAndIsParticipatedTrueAndUserNot(Chatroom chatroom, User excludedUser);
 }

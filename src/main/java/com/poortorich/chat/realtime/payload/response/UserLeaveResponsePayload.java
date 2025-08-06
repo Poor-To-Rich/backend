@@ -1,4 +1,4 @@
-package com.poortorich.chat.realtime.payload;
+package com.poortorich.chat.realtime.payload.response;
 
 import com.poortorich.chat.entity.enums.ChatMessageType;
 import com.poortorich.chat.entity.enums.MessageType;
@@ -9,8 +9,9 @@ import lombok.Data;
 
 @Data
 @Builder
-public class ChatroomClosedResponsePayload implements ResponsePayload {
+public class UserLeaveResponsePayload implements ResponsePayload {
 
+    private Long userId;
     private Long messageId;
     private Long chatroomId;
     private MessageType messageType;

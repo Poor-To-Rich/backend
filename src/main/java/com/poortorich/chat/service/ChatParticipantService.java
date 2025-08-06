@@ -52,6 +52,10 @@ public class ChatParticipantService {
         return chatParticipantRepository.getChatroomHost(chatroom);
     }
 
+    public List<ChatParticipant> findAllByChatroom(Chatroom chatroom) {
+        return chatParticipantRepository.findAllByChatroomAndIsParticipatedTrue(chatroom);
+    }
+
     public boolean isAllParticipantLeft(Chatroom chatroom) {
         List<ChatParticipant> participants = chatParticipantRepository.findAllByChatroom(chatroom);
         return participants.stream()
@@ -61,5 +65,9 @@ public class ChatParticipantService {
     @Transactional
     public void deleteAllByChatroom(Chatroom chatroom) {
         chatParticipantRepository.deleteAllByChatroom(chatroom);
+    }
+
+    public List<ChatParticipant> findAllByChatroomExcludingUser(Chatroom chatroom, User excludedUser) {
+        return chatParticipantRepository.findAllByChatroomAndIsParticipatedTrueAndUserNot(chatroom, excludedUser);
     }
 }
