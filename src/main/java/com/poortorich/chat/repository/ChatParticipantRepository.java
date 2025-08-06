@@ -15,6 +15,17 @@ public interface ChatParticipantRepository extends JpaRepository<ChatParticipant
 
     Optional<ChatParticipant> findByUserAndChatroom(User user, Chatroom chatroom);
 
+    @Query("""
+        SELECT cp
+          FROM ChatParticipant cp
+         WHERE cp.user.username = :username
+           AND cp.chatroom = :chatroom
+    """)
+    Optional<ChatParticipant> findByUsernameAndChatroom(
+            @Param("username") String username,
+            @Param("chatroom") Chatroom chatroom
+    );
+
     Long countByChatroomAndIsParticipatedTrue(Chatroom chatroom);
 
     @Query("""

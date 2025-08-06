@@ -4,6 +4,8 @@ import com.poortorich.chat.entity.ChatParticipant;
 import com.poortorich.chat.entity.Chatroom;
 import com.poortorich.chat.entity.enums.ChatroomRole;
 import com.poortorich.chat.repository.ChatParticipantRepository;
+import com.poortorich.chat.response.enums.ChatResponse;
+import com.poortorich.global.exceptions.NotFoundException;
 import com.poortorich.user.entity.User;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -17,6 +19,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -133,5 +136,42 @@ class ChatParticipantServiceTest {
         assertThat(result).isEqualTo(hostParticipant);
         assertThat(result.getRole()).isEqualTo(ChatroomRole.HOST);
         assertThat(result.getChatroom()).isEqualTo(chatroom);
+    }
+
+    @Test
+    @DisplayName("username과 채팅방 정보로 채팅방 참여자 조회 성공")
+    void findByUsernameAndChatroomIdSuccess() {
+        String username = "test";
+        Long chatroomId = 1L;
+        User user = User.builder().username(username).build();
+        Chatroom chatroom = Chatroom.builder().id(chatroomId).build();
+        ChatParticipant chatParticipant = ChatParticipant.builder()
+                .user(user)
+                .chatroom(chatroom)
+                .build();
+
+        when(chatParticipantRepository.findByUsernameAndChatroom(username, chatroom))
+                .thenReturn(Optional.of(chatParticipant));
+
+        ChatParticipant result = chatParticipantService.findByUsernameAndChatroom(username, chatroom);
+
+        assertThat(result).isEqualTo(chatParticipant);
+        assertThat(result.getUser().getUsername()).isEqualTo(username);
+        assertThat(result.getChatroom().getId()).isEqualTo(chatroomId);
+    }
+
+    @Test
+    @DisplayName("username과 채팅방 정보에 해당하는 참여자가 없는 경우 예외 발생")
+    void findByUsernameAndChatroomIdNotFound() {
+        String username = "test";
+        Long chatroomId = 1L;
+        Chatroom chatroom = Chatroom.builder().id(chatroomId).build();
+
+        when(chatParticipantRepository.findByUsernameAndChatroom(username, chatroom))
+                .thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> chatParticipantService.findByUsernameAndChatroom(username, chatroom))
+                .isInstanceOf(NotFoundException.class)
+                .hasMessageContaining(ChatResponse.CHAT_PARTICIPANT_NOT_FOUND.getMessage());
     }
 }
