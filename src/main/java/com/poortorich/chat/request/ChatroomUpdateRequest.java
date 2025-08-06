@@ -18,7 +18,7 @@ public class ChatroomUpdateRequest {
     private final MultipartFile chatroomImage;
 
     private final Boolean isDefaultImage;
-    
+
     @NotNull(message = ChatResponseMessage.CHATROOM_TITLE_REQUIRED)
     @Size(max = ChatValidationConstraints.CHATROOM_TITLE_MAX,
             message = ChatResponseMessage.CHATROOM_TITLE_TOO_BIG)
@@ -36,7 +36,10 @@ public class ChatroomUpdateRequest {
             message = ChatResponseMessage.CHATROOM_DESCRIPTION_TOO_BIG)
     private final String description;
 
+    @Size(max = ChatValidationConstraints.TAG_COUNT_MAX,
+            message = ChatResponseMessage.TAG_TOO_MANY)
     private final List<String> hashtags;
+
     private final Boolean isRankingEnabled;
     private final String chatroomPassword;
 }
