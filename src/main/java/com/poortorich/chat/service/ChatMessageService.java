@@ -136,7 +136,7 @@ public class ChatMessageService {
         return RankingStatusMessagePayload.builder()
                 .messageId(savedRankingStatusChatMessage.getId())
                 .chatroomId(context.chatroom().getId())
-                .isChatEnabled(savedRankingStatusChatMessage.getIsRankingEnabled())
+                .isRankingEnabled(savedRankingStatusChatMessage.getIsRankingEnabled())
                 .sendAt(savedRankingStatusChatMessage.getSentAt())
                 .build();
     }
