@@ -13,7 +13,7 @@ public class ChatMessageRequestPayload {
     @NotNull(message = ChatResponseMessage.CHATROOM_ID_REQUIRED)
     private Long chatroomId;
 
-    @NotNull(message = ChatResponseMessage.MESSAGE_TPYE_REQUIRED)
+    @NotNull(message = ChatResponseMessage.MESSAGE_TYPE_REQUIRED)
     private MessageType messageType;
 
     private String content;
