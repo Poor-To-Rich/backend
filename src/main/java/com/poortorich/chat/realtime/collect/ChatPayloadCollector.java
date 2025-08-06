@@ -29,4 +29,9 @@ public class ChatPayloadCollector {
                 .chatParticipant(chatParticipant)
                 .build();
     }
+
+    public PayloadContext getPayloadContext(Long chatroomId) {
+        Chatroom chatroom = chatroomService.findById(chatroomId);
+        return PayloadContext.builder().chatroom(chatroom).build();
+    }
 }
