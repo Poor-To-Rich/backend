@@ -18,6 +18,7 @@ import com.poortorich.chat.response.ChatroomLeaveAllResponse;
 import com.poortorich.chat.response.ChatroomLeaveResponse;
 import com.poortorich.chat.response.ChatroomLikeStatusResponse;
 import com.poortorich.chat.response.ChatroomResponse;
+import com.poortorich.chat.response.ChatroomRoleResponse;
 import com.poortorich.chat.response.ChatroomUpdateResponse;
 import com.poortorich.chat.response.ChatroomsResponse;
 import com.poortorich.chat.service.ChatMessageService;
@@ -141,6 +142,16 @@ public class ChatFacade {
         return ChatroomLikeStatusResponse.builder()
                 .isLiked(likeService.getLikeStatus(user, chatroom))
                 .likeCount(likeService.getLikeCount(chatroom))
+                .build();
+    }
+
+    public ChatroomRoleResponse getChatroomRole(String username, Long chatroomId) {
+        Chatroom chatroom = chatroomService.findById(chatroomId);
+        ChatParticipant chatParticipant = chatParticipantService.findByUsernameAndChatroom(username, chatroom);
+
+        return ChatroomRoleResponse.builder()
+                .userId(chatParticipant.getUser().getId())
+                .chatroomRole(chatParticipant.getRole().toString())
                 .build();
     }
 

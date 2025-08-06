@@ -12,6 +12,7 @@ import com.poortorich.chat.response.ChatroomCreateResponse;
 import com.poortorich.chat.response.ChatroomDetailsResponse;
 import com.poortorich.chat.response.ChatroomInfoResponse;
 import com.poortorich.chat.response.ChatroomLikeStatusResponse;
+import com.poortorich.chat.response.ChatroomRoleResponse;
 import com.poortorich.chat.response.ChatroomsResponse;
 import com.poortorich.chat.service.ChatMessageService;
 import com.poortorich.chat.service.ChatParticipantService;
@@ -260,5 +261,29 @@ class ChatFacadeTest {
         assertThat(result).isNotNull();
         assertThat(result.getIsLiked()).isTrue();
         assertThat(result.getLikeCount()).isEqualTo(3L);
+    }
+
+    @Test
+    @DisplayName("채팅방 내 사용자 역할 조회 성공")
+    void getChatroomRoleSuccess() {
+        String username = "testUser";
+        Long chatroomId = 1L;
+        User user = User.builder()
+                .id(1L)
+                .username(username)
+                .build();
+        ChatParticipant chatParticipant = ChatParticipant.builder()
+                .user(user)
+                .role(ChatroomRole.HOST)
+                .build();
+
+        when(chatroomService.findById(chatroomId)).thenReturn(chatroom);
+        when(chatParticipantService.findByUsernameAndChatroom(username, chatroom)).thenReturn(chatParticipant);
+
+        ChatroomRoleResponse result = chatFacade.getChatroomRole(username, chatroomId);
+
+        assertThat(result).isNotNull();
+        assertThat(result.getChatroomRole()).isEqualTo(ChatroomRole.HOST.toString());
+        assertThat(result.getUserId()).isEqualTo(user.getId());
     }
 }
