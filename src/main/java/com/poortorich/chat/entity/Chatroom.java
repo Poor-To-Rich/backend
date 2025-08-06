@@ -42,13 +42,13 @@ public class Chatroom {
     @Column(name = "max_member_count", nullable = false)
     private Long maxMemberCount;
 
-    @Column(name = "password", nullable = false)
+    @Column(name = "password")
     private String password;
 
     @Column(name = "is_ranking_enabled", nullable = false)
     private Boolean isRankingEnabled;
 
-    @Column(name = "is_delete", nullable = false)
+    @Column(name = "is_deleted", nullable = false)
     @Builder.Default
     private Boolean isDeleted = Boolean.FALSE;
 

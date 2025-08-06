@@ -27,17 +27,9 @@ public class TagService {
 
     private Tag buildTag(String tagName, Chatroom chatroom) {
         return Tag.builder()
-                .name(validateTagName(tagName))
+                .name(tagName)
                 .chatroom(chatroom)
                 .build();
-    }
-
-    private String validateTagName(String tagName) {
-        if (tagName.length() > TagValidationConstraints.TAG_NAME_MAX) {
-            throw new BadRequestException(TagResponse.TAG_NAME_TOO_LONG);
-        }
-
-        return tagName;
     }
 
     public List<String> getTagNames(Chatroom chatroom) {

@@ -40,17 +40,27 @@ public class ChatParticipantService {
     }
 
     public Long countByChatroom(Chatroom chatroom) {
-        return chatParticipantRepository.countByChatroomAndIsParticipateTrue(chatroom);
+        return chatParticipantRepository.countByChatroomAndIsParticipatedTrue(chatroom);
+    }
+
+    public Boolean isJoined(User user, Chatroom chatroom) {
+        return chatParticipantRepository.findByUserAndChatroom(user, chatroom)
+                .map(ChatParticipant::getIsParticipated)
+                .orElse(false);
+    }
+
+    public ChatParticipant getChatroomHost(Chatroom chatroom) {
+        return chatParticipantRepository.getChatroomHost(chatroom);
     }
 
     public List<ChatParticipant> findAllByChatroom(Chatroom chatroom) {
-        return chatParticipantRepository.findAllByChatroomAndIsParticipateTrue(chatroom);
+        return chatParticipantRepository.findAllByChatroomAndIsParticipatedTrue(chatroom);
     }
 
     public boolean isAllParticipantLeft(Chatroom chatroom) {
         List<ChatParticipant> participants = chatParticipantRepository.findAllByChatroom(chatroom);
         return participants.stream()
-                .noneMatch(ChatParticipant::getIsParticipate);
+                .noneMatch(ChatParticipant::getIsParticipated);
     }
 
     @Transactional
@@ -59,7 +69,7 @@ public class ChatParticipantService {
     }
 
     public List<ChatParticipantProfile> getParticipantProfiles(Chatroom chatroom) {
-        List<ChatParticipant> participants = chatParticipantRepository.findAllByChatroomAndIsParticipateTrue(chatroom);
+        List<ChatParticipant> participants = chatParticipantRepository.findAllByChatroomAndIsParticipatedTrue(chatroom);
 
         return participants.stream()
                 .map(participant -> {
@@ -73,5 +83,9 @@ public class ChatParticipantService {
                             .build();
                 })
                 .toList();
+    }
+
+    public List<ChatParticipant> findAllByChatroomExcludingUser(Chatroom chatroom, User excludedUser) {
+        return chatParticipantRepository.findAllByChatroomAndIsParticipatedTrueAndUserNot(chatroom, excludedUser);
     }
 }

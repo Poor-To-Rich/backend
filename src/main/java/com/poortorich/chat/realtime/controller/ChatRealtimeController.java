@@ -5,6 +5,7 @@ import com.poortorich.chat.realtime.payload.request.ChatMessageRequestPayload;
 import com.poortorich.chat.realtime.payload.response.BasePayload;
 import com.poortorich.websocket.stomp.command.subscribe.endpoint.SubscribeEndpoint;
 import com.poortorich.websocket.stomp.util.StompSessionManager;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -26,7 +27,7 @@ public class ChatRealtimeController {
     @MessageMapping("/chat/messages")
     public void sendChatMessage(
             StompHeaderAccessor accessor,
-            @Payload ChatMessageRequestPayload chatMessagePayload
+            @Payload @Valid ChatMessageRequestPayload chatMessagePayload
     ) {
         String username = sessionManager.getUsername(accessor);
         BasePayload payload = chatRealTimeFacade.createUserChatMessage(username, chatMessagePayload);

@@ -15,18 +15,19 @@ public class UnreadChatMessageService {
     private final UnreadChatMessageRepository unreadChatMessageRepository;
 
     public List<Long> saveUnreadMember(ChatMessage chatMessage, List<ChatParticipant> chatMembers) {
+
+        List<UnreadChatMessage> unreadChatMessages = chatMembers.stream()
+                .map(chatParticipant -> UnreadChatMessage.builder()
+                        .user(chatParticipant.getUser())
+                        .chatroom(chatParticipant.getChatroom())
+                        .chatMessage(chatMessage)
+                        .build())
+                .toList();
+
+        unreadChatMessageRepository.saveAll(unreadChatMessages);
+
         return chatMembers.stream()
-                .map(chatParticipant -> {
-                    UnreadChatMessage unreadChatMessage = UnreadChatMessage.builder()
-                            .user(chatParticipant.getUser())
-                            .chatroom(chatParticipant.getChatroom())
-                            .chatMessage(chatMessage)
-                            .build();
-
-                    unreadChatMessageRepository.save(unreadChatMessage);
-
-                    return chatParticipant.getUser().getId();
-                })
+                .map(chatParticipant -> chatParticipant.getUser().getId())
                 .toList();
     }
 

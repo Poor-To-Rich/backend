@@ -5,15 +5,15 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Getter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class AllChatroomsResponse {
+public class ProfileResponse {
 
-    private Boolean hasNext;
-    private Long nextCursor;
-    private List<ChatroomResponse> chatrooms;
+    private Long userId;
+    private String profileImage;
+    private String nickname;
+    private Boolean isHost;
+    private String rankingType;
 }

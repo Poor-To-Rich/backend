@@ -18,7 +18,7 @@ public class ChatParticipantValidator {
     private final ChatParticipantRepository chatParticipantRepository;
 
     public void validateIsParticipate(User user, Chatroom chatroom) {
-        if (!chatParticipant(user, chatroom).getIsParticipate()) {
+        if (!chatParticipant(user, chatroom).getIsParticipated()) {
             throw new BadRequestException(ChatResponse.CHATROOM_NOT_PARTICIPATE);
         }
     }
@@ -49,7 +49,7 @@ public class ChatParticipantValidator {
     }
 
     private void validateIsParticipate(ChatParticipant chatParticipant) {
-        if (!chatParticipant.getIsParticipate()) {
+        if (!chatParticipant.getIsParticipated()) {
             throw new BadRequestException(ChatResponse.CHATROOM_NOT_PARTICIPATE);
         }
     }

@@ -14,7 +14,9 @@ import com.poortorich.chat.request.enums.SortBy;
 import com.poortorich.chat.response.AllChatroomsResponse;
 import com.poortorich.chat.response.ChatMessagePageResponse;
 import com.poortorich.chat.response.ChatParticipantProfile;
+import com.poortorich.chat.response.ChatroomCoverInfoResponse;
 import com.poortorich.chat.response.ChatroomCreateResponse;
+import com.poortorich.chat.response.ChatroomDetailsResponse;
 import com.poortorich.chat.response.ChatroomEnterResponse;
 import com.poortorich.chat.response.ChatroomInfoResponse;
 import com.poortorich.chat.response.ChatroomLeaveAllResponse;
@@ -116,6 +118,24 @@ public class ChatFacade {
                                 chatMessageService.getLastMessageTime(chatroom)
                         ))
                 .toList();
+    }
+
+    public ChatroomDetailsResponse getChatroomDetails(Long chatroomId) {
+        Chatroom chatroom = chatroomService.findById(chatroomId);
+        return ChatBuilder.buildChatroomDetailsResponse(chatroom, chatParticipantService.countByChatroom(chatroom));
+    }
+
+    public ChatroomCoverInfoResponse getChatroomCoverInfo(String username, Long chatroomId) {
+        User user = userService.findUserByUsername(username);
+        Chatroom chatroom = chatroomService.findById(chatroomId);
+
+        return ChatBuilder.buildChatroomCoverInfoResponse(
+                chatroom,
+                tagService.getTagNames(chatroom),
+                chatParticipantService.countByChatroom(chatroom),
+                chatParticipantService.isJoined(user, chatroom),
+                chatParticipantService.getChatroomHost(chatroom)
+        );
     }
 
     public ChatroomEnterResponse enterChatroom(

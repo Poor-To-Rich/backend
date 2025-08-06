@@ -42,8 +42,8 @@ public class ChatParticipant {
     @Column(name = "role", nullable = false)
     private ChatroomRole role;
 
-    @Column(name = "is_participate", nullable = false)
-    private Boolean isParticipate;
+    @Column(name = "is_participated", nullable = false)
+    private Boolean isParticipated;
 
     @Column(name = "leave_time")
     private LocalDateTime leaveTime;
@@ -73,12 +73,12 @@ public class ChatParticipant {
     private Chatroom chatroom;
 
     public void restoreParticipation() {
-        this.isParticipate = Boolean.TRUE;
+        this.isParticipated = Boolean.TRUE;
         this.leaveTime = null;
     }
 
     public void softDelete() {
-        this.isParticipate = Boolean.FALSE;
+        this.isParticipated = Boolean.FALSE;
         this.leaveTime = LocalDateTime.now();
     }
 }
