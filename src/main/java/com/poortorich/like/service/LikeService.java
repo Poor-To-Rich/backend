@@ -31,12 +31,11 @@ public class LikeService {
 
     private Like findOrCreateLike(User user, Chatroom chatroom, Boolean isLiked) {
         return likeRepository.findByUserAndChatroom(user, chatroom)
-                .orElseGet(() -> likeRepository.save(
-                        Like.builder()
-                                .user(user)
-                                .chatroom(chatroom)
-                                .likeStatus(isLiked)
-                                .build()
-                ));
+                .orElseGet(() -> Like.builder()
+                        .user(user)
+                        .chatroom(chatroom)
+                        .likeStatus(isLiked)
+                        .build()
+                );
     }
 }

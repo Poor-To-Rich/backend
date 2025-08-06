@@ -96,14 +96,12 @@ class LikeServiceTest {
         likeService.updateLikeStatus(user, chatroom, isLiked);
 
         verify(likeRepository).findByUserAndChatroom(user, chatroom);
-        verify(likeRepository, times(2)).save(likeCaptor.capture());
-        List<Like> savedLikes = likeCaptor.getAllValues();
+        verify(likeRepository).save(likeCaptor.capture());
+        Like savedLikes = likeCaptor.getValue();
 
-        Like secondSavedLike = savedLikes.get(1);
-
-        assertThat(secondSavedLike.getUser()).isEqualTo(user);
-        assertThat(secondSavedLike.getChatroom()).isEqualTo(chatroom);
-        assertThat(secondSavedLike.getLikeStatus()).isEqualTo(isLiked);
+        assertThat(savedLikes.getUser()).isEqualTo(user);
+        assertThat(savedLikes.getChatroom()).isEqualTo(chatroom);
+        assertThat(savedLikes.getLikeStatus()).isEqualTo(isLiked);
     }
 
     @Test
