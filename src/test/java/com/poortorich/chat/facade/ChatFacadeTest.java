@@ -5,6 +5,7 @@ import com.poortorich.chat.entity.Chatroom;
 import com.poortorich.chat.entity.enums.ChatroomRole;
 import com.poortorich.chat.entity.enums.RankingStatus;
 import com.poortorich.chat.request.ChatroomCreateRequest;
+import com.poortorich.chat.request.ChatroomLikeUpdateRequest;
 import com.poortorich.chat.request.enums.SortBy;
 import com.poortorich.chat.response.AllChatroomsResponse;
 import com.poortorich.chat.response.ChatroomCoverInfoResponse;
@@ -257,6 +258,28 @@ class ChatFacadeTest {
 
         ChatroomLikeStatusResponse result = chatFacade.getChatroomLike(username, chatroomId);
 
+        assertThat(result).isNotNull();
+        assertThat(result.getIsLiked()).isTrue();
+        assertThat(result.getLikeCount()).isEqualTo(3L);
+    }
+
+    @Test
+    @DisplayName("좋아요 상태 변경 성공")
+    void updateChatroomLikeSuccess() {
+        String username = "testUser";
+        Long chatroomId = 1L;
+        User user = User.builder().username(username).build();
+        Chatroom chatroom = Chatroom.builder().id(chatroomId).build();
+        ChatroomLikeUpdateRequest request = new ChatroomLikeUpdateRequest(true);
+
+        when(userService.findUserByUsername(username)).thenReturn(user);
+        when(chatroomService.findById(chatroomId)).thenReturn(chatroom);
+        when(likeService.getLikeStatus(user, chatroom)).thenReturn(true);
+        when(likeService.getLikeCount(chatroom)).thenReturn(3L);
+
+        ChatroomLikeStatusResponse result = chatFacade.updateChatroomLike(username, chatroomId, request);
+
+        verify(likeService).updateLikeStatus(user, chatroom, request.getIsLiked());
         assertThat(result).isNotNull();
         assertThat(result.getIsLiked()).isTrue();
         assertThat(result.getLikeCount()).isEqualTo(3L);

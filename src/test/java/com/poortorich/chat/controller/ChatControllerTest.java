@@ -1,9 +1,13 @@
 package com.poortorich.chat.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.poortorich.chat.constants.ChatResponseMessage;
 import com.poortorich.chat.facade.ChatFacade;
 import com.poortorich.chat.realtime.facade.ChatRealTimeFacade;
 import com.poortorich.chat.request.ChatroomCreateRequest;
+import com.poortorich.chat.request.ChatroomLikeUpdateRequest;
 import com.poortorich.chat.request.enums.SortBy;
 import com.poortorich.chat.response.AllChatroomsResponse;
 import com.poortorich.chat.response.ChatroomCoverInfoResponse;
@@ -15,6 +19,7 @@ import com.poortorich.chat.response.ChatroomsResponse;
 import com.poortorich.chat.response.enums.ChatResponse;
 import com.poortorich.global.config.BaseSecurityTest;
 import com.poortorich.s3.util.S3TestFileGenerator;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -34,6 +39,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -50,6 +56,15 @@ public class ChatControllerTest extends BaseSecurityTest {
     private SimpMessagingTemplate simpMessagingTemplate;
     @MockitoBean
     private ChatRealTimeFacade chatRealTimeFacade;
+
+    private ObjectMapper objectMapper;
+
+    @BeforeEach
+    void setUp() {
+        objectMapper = new ObjectMapper()
+                .registerModule(new JavaTimeModule())
+                .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+    }
 
     @Test
     @WithMockUser(username = "test")
@@ -211,6 +226,26 @@ public class ChatControllerTest extends BaseSecurityTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message")
                         .value(ChatResponse.GET_CHATROOM_LIKE_STATUS_SUCCESS.getMessage())
+                );
+    }
+
+    @Test
+    @WithMockUser(username = "test")
+    @DisplayName("채팅방 좋아요 상태 변경 성공")
+    void updateChatroomLikeSuccess() throws Exception {
+        Long chatroomId = 1L;
+        ChatroomLikeUpdateRequest request = new ChatroomLikeUpdateRequest(true);
+
+        when(chatFacade.updateChatroomLike(eq("test"), eq(chatroomId), eq(request)))
+                .thenReturn(ChatroomLikeStatusResponse.builder().build());
+
+        mockMvc.perform(patch("/chatrooms/" + chatroomId + "/like")
+                        .content(objectMapper.writeValueAsString(request))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message")
+                        .value(ChatResponse.UPDATE_CHATROOM_LIKE_SUCCESS.getMessage())
                 );
     }
 }

@@ -9,6 +9,7 @@ import com.poortorich.chat.model.ChatPaginationContext;
 import com.poortorich.chat.request.ChatroomCreateRequest;
 import com.poortorich.chat.request.ChatroomEnterRequest;
 import com.poortorich.chat.request.ChatroomLeaveAllRequest;
+import com.poortorich.chat.request.ChatroomLikeUpdateRequest;
 import com.poortorich.chat.request.ChatroomUpdateRequest;
 import com.poortorich.chat.request.enums.SortBy;
 import com.poortorich.chat.response.AllChatroomsResponse;
@@ -144,6 +145,18 @@ public class ChatFacade {
     public ChatroomLikeStatusResponse getChatroomLike(String username, Long chatroomId) {
         User user = userService.findUserByUsername(username);
         Chatroom chatroom = chatroomService.findById(chatroomId);
+
+        return buildChatroomLikeStatusResponse(user, chatroom);
+    }
+
+    public ChatroomLikeStatusResponse updateChatroomLike(
+            String username,
+            Long chatroomId,
+            ChatroomLikeUpdateRequest request
+    ) {
+        User user = userService.findUserByUsername(username);
+        Chatroom chatroom = chatroomService.findById(chatroomId);
+        likeService.updateLikeStatus(user, chatroom, request.getIsLiked());
 
         return buildChatroomLikeStatusResponse(user, chatroom);
     }
