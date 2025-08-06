@@ -1,6 +1,7 @@
 package com.poortorich.chatnotice.entity;
 
 import com.poortorich.chat.entity.Chatroom;
+import com.poortorich.user.entity.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -35,9 +36,6 @@ public class ChatNotice {
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "author_id", nullable = false)
-    private Long authorId;
-
     @Column(name = "content", nullable = false)
     private String content;
 
@@ -48,6 +46,10 @@ public class ChatNotice {
     @UpdateTimestamp
     @Column(name = "updated_date")
     private LocalDateTime updatedDate;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "author_id", nullable = false)
+    private User author;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "chatroom_id")
