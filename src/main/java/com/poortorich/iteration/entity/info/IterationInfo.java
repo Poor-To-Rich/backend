@@ -29,8 +29,8 @@ import java.time.LocalDateTime;
 @Getter
 @SuperBuilder
 @DynamicUpdate
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "iteration_type", discriminatorType = DiscriminatorType.STRING)
 @Table(name = "iteration_info")
