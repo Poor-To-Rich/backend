@@ -38,7 +38,7 @@ public class Ranking {
     @Column(name = "saver_first")
     private Long saverFirst;
 
-    @Column(name = "saver_seconed")
+    @Column(name = "saver_second")
     private Long saverSecond;
 
     @Column(name = "saver_third")
