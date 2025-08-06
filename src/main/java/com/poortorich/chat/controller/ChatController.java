@@ -98,6 +98,17 @@ public class ChatController {
         );
     }
 
+    @GetMapping("/{chatroomId}/like")
+    public ResponseEntity<BaseResponse> getChatroomLike(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @PathVariable Long chatroomId
+    ) {
+        return DataResponse.toResponseEntity(
+                ChatResponse.GET_CHATROOM_LIKE_STATUS_SUCCESS,
+                chatFacade.getChatroomLike(userDetails.getUsername(), chatroomId)
+        );
+    }
+
     @PostMapping("/{chatroomId}/enter")
     public ResponseEntity<BaseResponse> enterChatroom(
             @AuthenticationPrincipal UserDetails userDetails,
