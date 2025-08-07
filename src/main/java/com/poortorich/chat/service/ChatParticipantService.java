@@ -34,6 +34,11 @@ public class ChatParticipantService {
         chatParticipantRepository.save(chatParticipant);
     }
 
+    public ChatParticipant findByUsernameAndChatroom(String username, Chatroom chatroom) {
+        return chatParticipantRepository.findByUsernameAndChatroom(username, chatroom)
+                .orElseThrow(() -> new NotFoundException(ChatResponse.CHAT_PARTICIPANT_NOT_FOUND));
+    }
+
     public ChatParticipant findByUserAndChatroom(User user, Chatroom chatroom) {
         return chatParticipantRepository.findByUserAndChatroom(user, chatroom)
                 .orElseThrow(() -> new NotFoundException(ChatResponse.CHAT_PARTICIPANT_NOT_FOUND));

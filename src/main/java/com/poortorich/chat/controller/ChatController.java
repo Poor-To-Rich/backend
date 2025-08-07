@@ -111,6 +111,17 @@ public class ChatController {
         );
     }
 
+    @GetMapping("/{chatroomId}/role")
+    public ResponseEntity<BaseResponse> getChatroomRole(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @PathVariable Long chatroomId
+    ) {
+        return DataResponse.toResponseEntity(
+                ChatResponse.GET_CHATROOM_ROLE_SUCCESS,
+                chatFacade.getChatroomRole(userDetails.getUsername(), chatroomId)
+        );
+    }
+
     @PostMapping("/{chatroomId}/enter")
     public ResponseEntity<BaseResponse> enterChatroom(
             @AuthenticationPrincipal UserDetails userDetails,
