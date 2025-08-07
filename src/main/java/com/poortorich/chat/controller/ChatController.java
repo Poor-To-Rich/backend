@@ -150,9 +150,7 @@ public class ChatController {
             messagingTemplate.convertAndSend(SubscribeEndpoint.CHATROOM_SUBSCRIBE_PREFIX + chatroomId, payload);
         }
 
-        return DataResponse.toResponseEntity(
-                ChatResponse.CHATROOM_UPDATE_SUCCESS,
-                chatFacade.updateChatroom(userDetails.getUsername(), chatroomId, chatroomUpdateRequest));
+        return DataResponse.toResponseEntity(ChatResponse.CHATROOM_UPDATE_SUCCESS, response);
     }
 
     @DeleteMapping("/{chatroomId}")
