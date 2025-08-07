@@ -1,0 +1,12 @@
+package com.poortorich.chatnotice.constants;
+
+public class ChatNoticeResponseMessage {
+
+    public static final String UPDATE_CHAT_NOTICE_STATUS_SUCCESS = "공지 상태 변경이 완료되었습니다.";
+
+    public static final String NOTICE_STATUS_REQUIRED = "공지 상태는 필수값입니다.";
+    public static final String NOTICE_STATUS_INVALID = "공지 상태가 적절하지 않습니다.";
+
+    private ChatNoticeResponseMessage() {
+    }
+}

@@ -3,10 +3,13 @@ package com.poortorich.chat.service;
 import com.poortorich.chat.entity.ChatParticipant;
 import com.poortorich.chat.entity.Chatroom;
 import com.poortorich.chat.entity.enums.ChatroomRole;
+import com.poortorich.chat.entity.enums.NoticeStatus;
 import com.poortorich.chat.repository.ChatParticipantRepository;
 import com.poortorich.chat.response.ChatParticipantProfile;
 import com.poortorich.chat.response.enums.ChatResponse;
 import com.poortorich.chat.util.ChatBuilder;
+import com.poortorich.chatnotice.request.ChatNoticeUpdateRequest;
+import com.poortorich.global.exceptions.BadRequestException;
 import com.poortorich.global.exceptions.NotFoundException;
 import com.poortorich.user.entity.User;
 import java.util.List;
@@ -23,6 +26,19 @@ public class ChatParticipantService {
     public void createChatroomHost(User user, Chatroom chatroom) {
         ChatParticipant chatParticipant = ChatBuilder.buildChatParticipant(user, ChatroomRole.HOST, chatroom);
         chatParticipantRepository.save(chatParticipant);
+    }
+
+    public void updateNoticeStatus(String username, Chatroom chatroom, ChatNoticeUpdateRequest request) {
+        ChatParticipant chatParticipant = findByUsernameAndChatroom(username, chatroom);
+        validateNoticeStatus(chatParticipant.getNoticeStatus());
+        chatParticipant.updateNoticeStatus(request.parseStatus());
+        chatParticipantRepository.save(chatParticipant);
+    }
+
+    private void validateNoticeStatus(NoticeStatus noticeStatus) {
+        if (noticeStatus.equals(NoticeStatus.PERMANENT_HIDDEN)) {
+            throw new BadRequestException(ChatResponse.CHAT_NOTICE_STATUS_IMMUTABLE);
+        }
     }
 
     public void enterUser(User user, Chatroom chatroom) {

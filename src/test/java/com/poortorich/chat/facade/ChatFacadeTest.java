@@ -18,6 +18,7 @@ import com.poortorich.chat.response.ChatroomsResponse;
 import com.poortorich.chat.service.ChatMessageService;
 import com.poortorich.chat.service.ChatParticipantService;
 import com.poortorich.chat.service.ChatroomService;
+import com.poortorich.chatnotice.request.ChatNoticeUpdateRequest;
 import com.poortorich.like.service.LikeService;
 import com.poortorich.s3.service.FileUploadService;
 import com.poortorich.tag.service.TagService;
@@ -308,5 +309,19 @@ class ChatFacadeTest {
         assertThat(result).isNotNull();
         assertThat(result.getChatroomRole()).isEqualTo(ChatroomRole.HOST.toString());
         assertThat(result.getUserId()).isEqualTo(user.getId());
+    }
+
+    @Test
+    @DisplayName("공지 상태 변경 성공")
+    void updateNoticeStatusSuccess() {
+        String username = "testUser";
+        Long chatroomId = 1L;
+        ChatNoticeUpdateRequest request = new ChatNoticeUpdateRequest("DEFAULT");
+
+        when(chatroomService.findById(chatroomId)).thenReturn(chatroom);
+
+        chatFacade.updateNoticeStatus(username, chatroomId, request);
+
+        verify(chatParticipantService).updateNoticeStatus(username, chatroom, request);
     }
 }

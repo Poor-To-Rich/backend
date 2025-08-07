@@ -30,6 +30,8 @@ public class ChatResponseMessage {
 
     public static final String TAG_TOO_MANY = "태그는 " + ChatValidationConstraints.TAG_COUNT_MAX + "개 이하여야 합니다.";
 
+    public static final String CHAT_NOTICE_STATUS_IMMUTABLE = "이 공지사항은 더 이상 상태를 변경할 수 없습니다.";
+
     public static final String IS_LIKED_REQUIRED = "좋아요 상태는 필수값입니다.";
 
     public static final String CHATROOM_ENTER_DENIED = "이 채팅방에 입장할 수 없습니다.";
