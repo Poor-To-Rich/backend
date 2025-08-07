@@ -79,10 +79,7 @@ public class ChatFacade {
         chatParticipantService.createChatroomHost(user, chatroom);
         tagService.createTag(request.getHashtags(), chatroom);
 
-        return ChatroomCreateResponse.builder()
-                .newChatroomId(chatroom.getId())
-                .savedRankingStatus(request.getIsRankingEnabled())
-                .build();
+        return ChatroomCreateResponse.builder().newChatroomId(chatroom.getId()).build();
     }
 
     public ChatroomInfoResponse getChatroom(Long chatroomId) {
