@@ -107,6 +107,7 @@ class ChatNoticeFacadeTest {
         assertThat(result.getNoticeId()).isEqualTo(chatNotice.getId());
         assertThat(result.getStatus()).isEqualTo(chatParticipant.getNoticeStatus().toString());
         assertThat(result.getPreview()).isEqualTo(preview);
+        assertThat(result.getPreview()).hasSize(30);
         assertThat(result.getAuthorNickname()).isEqualTo(user.getNickname());
         assertThat(result.getCreatedAt()).isEqualTo(chatNotice.getCreatedDate().toString());
     }
