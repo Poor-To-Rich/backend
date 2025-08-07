@@ -8,9 +8,11 @@ import org.springframework.http.HttpStatus;
 @RequiredArgsConstructor
 public enum ChatNoticeResponse implements Response {
 
-    UPDATE_CHAT_NOTICE_STATUS_SUCCESS(HttpStatus.OK, ChatNoticeResponseMessage.UPDATE_CHAT_NOTICE_STATUS_SUCCESS, null),
+    GET_LATEST_NOTICE_SUCCESS(HttpStatus.OK, ChatNoticeResponseMessage.GET_LATEST_NOTICE_SUCCESS, null),
+    UPDATE_NOTICE_STATUS_SUCCESS(HttpStatus.OK, ChatNoticeResponseMessage.UPDATE_NOTICE_STATUS_SUCCESS, null),
 
-    NOTICE_STATUS_INVALID(HttpStatus.BAD_REQUEST, ChatNoticeResponseMessage.NOTICE_STATUS_INVALID, "status");
+    NOTICE_STATUS_INVALID(HttpStatus.BAD_REQUEST, ChatNoticeResponseMessage.NOTICE_STATUS_INVALID, "status"),
+    NOTICE_NOT_FOUND(HttpStatus.NOT_FOUND, ChatNoticeResponseMessage.NOTICE_NOT_FOUND , null);
 
     private final HttpStatus httpStatus;
     private final String message;

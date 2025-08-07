@@ -5,7 +5,9 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.poortorich.chat.facade.ChatFacade;
 import com.poortorich.chatnotice.constants.ChatNoticeResponseMessage;
+import com.poortorich.chatnotice.facade.ChatNoticeFacade;
 import com.poortorich.chatnotice.request.ChatNoticeUpdateRequest;
+import com.poortorich.chatnotice.response.LatestNoticeResponse;
 import com.poortorich.chatnotice.response.enums.ChatNoticeResponse;
 import com.poortorich.global.config.BaseSecurityTest;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,9 +22,9 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -36,6 +38,8 @@ class ChatNoticeControllerTest extends BaseSecurityTest {
 
     @MockitoBean
     private ChatFacade chatFacade;
+    @MockitoBean
+    private ChatNoticeFacade chatNoticeFacade;
 
     private ObjectMapper objectMapper;
 
@@ -44,6 +48,23 @@ class ChatNoticeControllerTest extends BaseSecurityTest {
         objectMapper = new ObjectMapper()
                 .registerModule(new JavaTimeModule())
                 .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+    }
+
+    @Test
+    @WithMockUser(username = "test")
+    @DisplayName("최신 공지 조회 성공")
+    void getLatestNoticeSuccess() throws Exception {
+        String username = "test";
+        Long chatroomId = 1L;
+
+        when(chatNoticeFacade.getLatestNotice(username, chatroomId)).thenReturn(LatestNoticeResponse.builder().build());
+
+        mockMvc.perform(get("/chatrooms/" + chatroomId + "/notices")
+                        .with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message")
+                        .value(ChatNoticeResponse.GET_LATEST_NOTICE_SUCCESS.getMessage())
+                );
     }
 
     @Test
@@ -59,7 +80,7 @@ class ChatNoticeControllerTest extends BaseSecurityTest {
                         .with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message")
-                        .value(ChatNoticeResponse.UPDATE_CHAT_NOTICE_STATUS_SUCCESS.getMessage())
+                        .value(ChatNoticeResponse.UPDATE_NOTICE_STATUS_SUCCESS.getMessage())
                 );
     }
 
