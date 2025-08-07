@@ -49,7 +49,7 @@ public class ChatResponseMessage {
     public static final String GET_CHAT_MESSAGE_SUCCESS = "이전 채팅 조회가 완료됐습니다.";
 
     public static final String CHATROOM_ID_REQUIRED = "채팅방 아이디는 필수값입니다.";
-    public static final String MESSAGE_TPYE_REQUIRED = "메시지 타입은 필수값입니다.";
+    public static final String MESSAGE_TYPE_REQUIRED = "메시지 타입은 필수값입니다.";
 
     private ChatResponseMessage() {
     }
