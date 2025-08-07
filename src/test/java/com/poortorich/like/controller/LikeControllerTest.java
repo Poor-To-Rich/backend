@@ -43,9 +43,7 @@ class LikeControllerTest extends BaseSecurityTest {
 
     @BeforeEach
     void setUp() {
-        objectMapper = new ObjectMapper()
-                .registerModule(new JavaTimeModule())
-                .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+        objectMapper = new ObjectMapper();
     }
 
     @Test
@@ -89,11 +87,8 @@ class LikeControllerTest extends BaseSecurityTest {
     @WithMockUser(username = "test")
     @DisplayName("채팅방 좋아요 상태 입력값이 null인 경우 예외 발생")
     void updateChatroomLikeRequestNull() throws Exception {
-        Long chatroomId = 1L;
+        long chatroomId = 1L;
         LikeUpdateRequest request = new LikeUpdateRequest(null);
-
-        when(likeFacade.updateChatroomLike(eq("test"), eq(chatroomId), eq(request)))
-                .thenReturn(LikeStatusResponse.builder().build());
 
         mockMvc.perform(patch("/chatrooms/" + chatroomId + "/like")
                         .content(objectMapper.writeValueAsString(request))
