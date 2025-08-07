@@ -56,7 +56,7 @@ public class ChatController {
     ) {
         ChatroomCreateResponse response = chatFacade.createChatroom(userDetails.getUsername(), request);
         realTimeFacade.createUserEnterSystemMessage(userDetails.getUsername(), response.getNewChatroomId());
-        realTimeFacade.createRankingStatusMessage(response.getNewChatroomId(), response.getSavedRankingStatus());
+        realTimeFacade.createRankingStatusMessage(response.getNewChatroomId(), request.getIsRankingEnabled());
         return DataResponse.toResponseEntity(ChatResponse.CREATE_CHATROOM_SUCCESS, response);
     }
 
