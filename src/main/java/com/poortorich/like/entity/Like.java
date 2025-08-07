@@ -54,4 +54,8 @@ public class Like {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "chatroom_id")
     private Chatroom chatroom;
+
+    public void updateStatus(Boolean isLiked) {
+        this.likeStatus = isLiked;
+    }
 }
