@@ -7,7 +7,6 @@ import com.poortorich.chat.realtime.payload.response.BasePayload;
 import com.poortorich.chat.request.ChatroomCreateRequest;
 import com.poortorich.chat.request.ChatroomEnterRequest;
 import com.poortorich.chat.request.ChatroomLeaveAllRequest;
-import com.poortorich.chat.request.ChatroomLikeUpdateRequest;
 import com.poortorich.chat.request.ChatroomUpdateRequest;
 import com.poortorich.chat.request.enums.SortBy;
 import com.poortorich.chat.response.ChatMessagePageResponse;
@@ -31,7 +30,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -99,29 +97,6 @@ public class ChatController {
         return DataResponse.toResponseEntity(
                 ChatResponse.GET_CHATROOM_DETAILS_SUCCESS,
                 chatFacade.getChatroomDetails(chatroomId)
-        );
-    }
-
-    @GetMapping("/{chatroomId}/like")
-    public ResponseEntity<BaseResponse> getChatroomLike(
-            @AuthenticationPrincipal UserDetails userDetails,
-            @PathVariable Long chatroomId
-    ) {
-        return DataResponse.toResponseEntity(
-                ChatResponse.GET_CHATROOM_LIKE_STATUS_SUCCESS,
-                chatFacade.getChatroomLike(userDetails.getUsername(), chatroomId)
-        );
-    }
-
-    @PatchMapping("/{chatroomId}/like")
-    public ResponseEntity<BaseResponse> updateChatroomLike(
-            @AuthenticationPrincipal UserDetails userDetails,
-            @PathVariable Long chatroomId,
-            @RequestBody ChatroomLikeUpdateRequest request
-    ) {
-        return DataResponse.toResponseEntity(
-                ChatResponse.UPDATE_CHATROOM_LIKE_SUCCESS,
-                chatFacade.updateChatroomLike(userDetails.getUsername(), chatroomId, request)
         );
     }
 
