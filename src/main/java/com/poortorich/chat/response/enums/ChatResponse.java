@@ -30,6 +30,7 @@ public enum ChatResponse implements Response {
     CHAT_PARTICIPANT_NOT_FOUND(HttpStatus.NOT_FOUND, ChatResponseMessage.CHAT_PARTICIPANT_NOT_FOUND, null),
     CHATROOM_NOT_PARTICIPATE(HttpStatus.BAD_REQUEST, ChatResponseMessage.CHATROOM_NOT_PARTICIPATE, null),
     CHAT_PARTICIPANT_NOT_HOST(HttpStatus.BAD_REQUEST, ChatResponseMessage.CHAT_PARTICIPANT_NOT_HOST, null),
+    CHAT_NOTICE_STATUS_IMMUTABLE(HttpStatus.BAD_REQUEST, ChatResponseMessage.CHAT_NOTICE_STATUS_IMMUTABLE, null),
 
     CHATROOM_MAX_MEMBER_COUNT_EXCEED(
             HttpStatus.BAD_REQUEST,

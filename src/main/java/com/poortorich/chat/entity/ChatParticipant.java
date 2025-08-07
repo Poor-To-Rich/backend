@@ -83,4 +83,8 @@ public class ChatParticipant {
         this.isParticipated = Boolean.FALSE;
         this.leaveTime = LocalDateTime.now();
     }
+
+    public void updateNoticeStatus(NoticeStatus status) {
+        this.noticeStatus = status;
+    }
 }

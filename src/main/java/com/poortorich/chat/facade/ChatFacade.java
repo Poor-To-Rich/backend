@@ -36,6 +36,7 @@ import com.poortorich.chat.util.mapper.ChatMessageMapper;
 import com.poortorich.chat.util.provider.ChatPaginationProvider;
 import com.poortorich.chat.validator.ChatParticipantValidator;
 import com.poortorich.chat.validator.ChatroomValidator;
+import com.poortorich.chatnotice.request.ChatNoticeUpdateRequest;
 import com.poortorich.like.service.LikeService;
 import com.poortorich.s3.service.FileUploadService;
 import com.poortorich.tag.service.TagService;
@@ -182,6 +183,11 @@ public class ChatFacade {
                 .userId(chatParticipant.getUser().getId())
                 .chatroomRole(chatParticipant.getRole().toString())
                 .build();
+    }
+
+    public void updateNoticeStatus(String username, Long chatroomId, ChatNoticeUpdateRequest request) {
+        Chatroom chatroom = chatroomService.findById(chatroomId);
+        chatParticipantService.updateNoticeStatus(username, chatroom, request);
     }
 
     public ChatroomEnterResponse enterChatroom(
