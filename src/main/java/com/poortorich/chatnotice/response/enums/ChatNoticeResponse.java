@@ -12,7 +12,7 @@ public enum ChatNoticeResponse implements Response {
     UPDATE_NOTICE_STATUS_SUCCESS(HttpStatus.OK, ChatNoticeResponseMessage.UPDATE_NOTICE_STATUS_SUCCESS, null),
 
     NOTICE_STATUS_INVALID(HttpStatus.BAD_REQUEST, ChatNoticeResponseMessage.NOTICE_STATUS_INVALID, "status"),
-    NOTICE_NOT_FOUND(HttpStatus.NOT_FOUND, ChatNoticeResponseMessage.NOTICE_NOT_FOUND , null);
+    NOTICE_NOT_FOUND(HttpStatus.NOT_FOUND, ChatNoticeResponseMessage.NOTICE_NOT_FOUND, null);
 
     private final HttpStatus httpStatus;
     private final String message;
