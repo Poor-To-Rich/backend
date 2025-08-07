@@ -15,6 +15,8 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class ChatNoticeFacade {
 
+    private static final int PREVIEW_MAX_LENGTH = 30;
+
     private final ChatroomService chatroomService;
     private final ChatParticipantService chatParticipantService;
     private final ChatNoticeService chatNoticeService;
@@ -38,8 +40,8 @@ public class ChatNoticeFacade {
     }
 
     private String truncateContent(String content) {
-        if (content.length() > 30) {
-            return content.substring(0, 30);
+        if (content.length() > PREVIEW_MAX_LENGTH) {
+            return content.substring(0, PREVIEW_MAX_LENGTH);
         }
 
         return content;
