@@ -4,6 +4,7 @@ import com.poortorich.chat.facade.ChatFacade;
 import com.poortorich.chatnotice.request.ChatNoticeUpdateRequest;
 import com.poortorich.chatnotice.response.enums.ChatNoticeResponse;
 import com.poortorich.global.response.BaseResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -25,7 +26,7 @@ public class ChatNoticeController {
     public ResponseEntity<BaseResponse> updateNoticeStatus(
             @AuthenticationPrincipal UserDetails userDetails,
             @PathVariable Long chatroomId,
-            @RequestBody ChatNoticeUpdateRequest request
+            @RequestBody @Valid ChatNoticeUpdateRequest request
     ) {
         chatFacade.updateNoticeStatus(userDetails.getUsername(), chatroomId, request);
         return BaseResponse.toResponseEntity(ChatNoticeResponse.UPDATE_CHAT_NOTICE_STATUS_SUCCESS);

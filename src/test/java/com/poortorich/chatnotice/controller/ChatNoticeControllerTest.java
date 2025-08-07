@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.poortorich.chat.facade.ChatFacade;
+import com.poortorich.chatnotice.constants.ChatNoticeResponseMessage;
 import com.poortorich.chatnotice.request.ChatNoticeUpdateRequest;
 import com.poortorich.chatnotice.response.enums.ChatNoticeResponse;
 import com.poortorich.global.config.BaseSecurityTest;
@@ -48,7 +49,7 @@ class ChatNoticeControllerTest extends BaseSecurityTest {
     @Test
     @WithMockUser(username = "test")
     @DisplayName("공지 상태 변경 성공")
-    void updateNoticeStatus() throws Exception {
+    void updateNoticeStatusSuccess() throws Exception {
         long chatroomId = 1L;
         ChatNoticeUpdateRequest request = new ChatNoticeUpdateRequest("TEMP_HIDDEN");
 
@@ -59,6 +60,23 @@ class ChatNoticeControllerTest extends BaseSecurityTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message")
                         .value(ChatNoticeResponse.UPDATE_CHAT_NOTICE_STATUS_SUCCESS.getMessage())
+                );
+    }
+
+    @Test
+    @WithMockUser(username = "test")
+    @DisplayName("공지 상태 변경 입력값이 없는 경우 예외 발생")
+    void updateNoticeStatusRequestNull() throws Exception {
+        long chatroomId = 1L;
+        ChatNoticeUpdateRequest request = new ChatNoticeUpdateRequest(null);
+
+        mockMvc.perform(patch("/chatrooms/" + chatroomId + "/notices")
+                        .content(objectMapper.writeValueAsString(request))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .with(csrf()))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message")
+                        .value(ChatNoticeResponseMessage.NOTICE_STATUS_REQUIRED)
                 );
     }
 }
