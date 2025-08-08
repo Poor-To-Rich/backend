@@ -29,6 +29,7 @@ import com.poortorich.chat.service.ChatMessageService;
 import com.poortorich.chat.service.ChatParticipantService;
 import com.poortorich.chat.service.ChatroomService;
 import com.poortorich.chat.util.ChatBuilder;
+import com.poortorich.chat.util.detector.RankingStatusChangeDetector;
 import com.poortorich.chat.util.mapper.ChatMessageMapper;
 import com.poortorich.chat.util.provider.ChatPaginationProvider;
 import com.poortorich.chat.validator.ChatParticipantValidator;
@@ -59,6 +60,7 @@ public class ChatFacade {
     private final ChatPaginationProvider paginationProvider;
     private final ChatroomValidator chatroomValidator;
     private final ChatParticipantValidator chatParticipantValidator;
+    private final RankingStatusChangeDetector rankingStatusChangeDetector;
 
     @Transactional
     public ChatroomCreateResponse createChatroom(
@@ -72,7 +74,10 @@ public class ChatFacade {
         chatParticipantService.createChatroomHost(user, chatroom);
         tagService.createTag(request.getHashtags(), chatroom);
 
-        return ChatroomCreateResponse.builder().newChatroomId(chatroom.getId()).build();
+        return ChatroomCreateResponse.builder()
+                .newChatroomId(chatroom.getId())
+                .savedRankingStatus(request.getIsRankingEnabled())
+                .build();
     }
 
     public ChatroomInfoResponse getChatroom(Long chatroomId) {
@@ -149,6 +154,11 @@ public class ChatFacade {
                 .build();
     }
 
+    public void updateNoticeStatus(String username, Long chatroomId, ChatNoticeUpdateRequest request) {
+        Chatroom chatroom = chatroomService.findById(chatroomId);
+        chatParticipantService.updateNoticeStatus(username, chatroom, request);
+    }
+
     public ChatroomEnterResponse enterChatroom(
             String username,
             Long chatroomId,
@@ -181,10 +191,17 @@ public class ChatFacade {
                 chatroomUpdateRequest.getChatroomImage(),
                 chatroomUpdateRequest.getIsDefaultImage());
 
+        Boolean isChangedRankingStatus = rankingStatusChangeDetector.detectRankingChange(
+                chatroom.getIsRankingEnabled(),
+                chatroomUpdateRequest.getIsRankingEnabled());
+
         chatroom.updateChatroom(chatroomUpdateRequest, newChatroomImage);
         tagService.updateTag(chatroomUpdateRequest.getHashtags(), chatroom);
 
-        return ChatroomUpdateResponse.builder().chatroomId(chatroomId).build();
+        return ChatroomUpdateResponse.builder()
+                .chatroomId(chatroomId)
+                .isChangedRankingStatus(isChangedRankingStatus)
+                .build();
     }
 
     public ChatroomLeaveResponse leaveChatroom(String username, Long chatroomId) {

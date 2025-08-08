@@ -14,6 +14,7 @@ import com.poortorich.chat.response.ChatroomCreateResponse;
 import com.poortorich.chat.response.ChatroomEnterResponse;
 import com.poortorich.chat.response.ChatroomLeaveAllResponse;
 import com.poortorich.chat.response.ChatroomLeaveResponse;
+import com.poortorich.chat.response.ChatroomUpdateResponse;
 import com.poortorich.chat.response.enums.ChatResponse;
 import com.poortorich.global.response.BaseResponse;
 import com.poortorich.global.response.DataResponse;
@@ -55,6 +56,7 @@ public class ChatController {
     ) {
         ChatroomCreateResponse response = chatFacade.createChatroom(userDetails.getUsername(), request);
         realTimeFacade.createUserEnterSystemMessage(userDetails.getUsername(), response.getNewChatroomId());
+        realTimeFacade.createRankingStatusMessage(response.getNewChatroomId(), request.getIsRankingEnabled());
         return DataResponse.toResponseEntity(ChatResponse.CREATE_CHATROOM_SUCCESS, response);
     }
 
@@ -135,9 +137,20 @@ public class ChatController {
             @PathVariable("chatroomId") Long chatroomId,
             @Valid ChatroomUpdateRequest chatroomUpdateRequest
     ) {
-        return DataResponse.toResponseEntity(
-                ChatResponse.CHATROOM_UPDATE_SUCCESS,
-                chatFacade.updateChatroom(userDetails.getUsername(), chatroomId, chatroomUpdateRequest));
+        ChatroomUpdateResponse response = chatFacade.updateChatroom(
+                userDetails.getUsername(),
+                chatroomId,
+                chatroomUpdateRequest);
+
+        BasePayload payload = realTimeFacade.createRankingStatusMessage(
+                chatroomId,
+                response.getIsChangedRankingStatus());
+
+        if (!Objects.isNull(payload)) {
+            messagingTemplate.convertAndSend(SubscribeEndpoint.CHATROOM_SUBSCRIBE_PREFIX + chatroomId, payload);
+        }
+
+        return DataResponse.toResponseEntity(ChatResponse.CHATROOM_UPDATE_SUCCESS, response);
     }
 
     @DeleteMapping("/{chatroomId}")

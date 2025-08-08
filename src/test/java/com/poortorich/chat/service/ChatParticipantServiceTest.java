@@ -3,8 +3,12 @@ package com.poortorich.chat.service;
 import com.poortorich.chat.entity.ChatParticipant;
 import com.poortorich.chat.entity.Chatroom;
 import com.poortorich.chat.entity.enums.ChatroomRole;
+import com.poortorich.chat.entity.enums.NoticeStatus;
 import com.poortorich.chat.repository.ChatParticipantRepository;
 import com.poortorich.chat.response.enums.ChatResponse;
+import com.poortorich.chatnotice.request.ChatNoticeUpdateRequest;
+import com.poortorich.chatnotice.response.enums.ChatNoticeResponse;
+import com.poortorich.global.exceptions.BadRequestException;
 import com.poortorich.global.exceptions.NotFoundException;
 import com.poortorich.user.entity.User;
 import org.junit.jupiter.api.DisplayName;
@@ -173,5 +177,74 @@ class ChatParticipantServiceTest {
         assertThatThrownBy(() -> chatParticipantService.findByUsernameAndChatroom(username, chatroom))
                 .isInstanceOf(NotFoundException.class)
                 .hasMessageContaining(ChatResponse.CHAT_PARTICIPANT_NOT_FOUND.getMessage());
+    }
+
+    @Test
+    @DisplayName("공지 상태 변경 성공")
+    void updateNoticeStatusSuccess() {
+        String username = "test";
+        Long chatroomId = 1L;
+        ChatNoticeUpdateRequest request = new ChatNoticeUpdateRequest("TEMP_HIDDEN");
+        Chatroom chatroom = Chatroom.builder()
+                .id(chatroomId)
+                .build();
+        ChatParticipant chatParticipant = ChatParticipant.builder()
+                .chatroom(chatroom)
+                .noticeStatus(NoticeStatus.DEFAULT)
+                .build();
+
+        when(chatParticipantRepository.findByUsernameAndChatroom(username, chatroom))
+                .thenReturn(Optional.of(chatParticipant));
+
+        chatParticipantService.updateNoticeStatus(username, chatroom, request);
+
+        verify(chatParticipantRepository).save(chatParticipantCaptor.capture());
+        ChatParticipant savedChatParticipant = chatParticipantCaptor.getValue();
+
+        assertThat(savedChatParticipant.getNoticeStatus()).isEqualTo(NoticeStatus.TEMP_HIDDEN);
+    }
+
+    @Test
+    @DisplayName("현 상태가 더 이상 보지 않음인 경우 공지 상태 변경 실패")
+    void updateNoticeStatusCurrentStatusPermanentHidden() {
+        String username = "test";
+        Long chatroomId = 1L;
+        ChatNoticeUpdateRequest request = new ChatNoticeUpdateRequest("TEMP_HIDDEN");
+        Chatroom chatroom = Chatroom.builder()
+                .id(chatroomId)
+                .build();
+        ChatParticipant chatParticipant = ChatParticipant.builder()
+                .chatroom(chatroom)
+                .noticeStatus(NoticeStatus.PERMANENT_HIDDEN)
+                .build();
+
+        when(chatParticipantRepository.findByUsernameAndChatroom(username, chatroom))
+                .thenReturn(Optional.of(chatParticipant));
+
+        assertThatThrownBy(() -> chatParticipantService.updateNoticeStatus(username, chatroom, request))
+                .isInstanceOf(BadRequestException.class)
+                .hasMessageContaining(ChatResponse.CHAT_NOTICE_STATUS_IMMUTABLE.getMessage());
+    }
+
+    @Test
+    @DisplayName("입력값이 유효하지 않은 경우 공지 상태 변경 실패")
+    void updateNoticeStatusInvalidRequest() {
+        String username = "test";
+        Long chatroomId = 1L;
+        ChatNoticeUpdateRequest request = new ChatNoticeUpdateRequest("INVALID_REQUEST");
+        Chatroom chatroom = Chatroom.builder()
+                .id(chatroomId)
+                .build();
+        ChatParticipant chatParticipant = ChatParticipant.builder()
+                .chatroom(chatroom)
+                .noticeStatus(NoticeStatus.DEFAULT)
+                .build();
+
+        when(chatParticipantRepository.findByUsernameAndChatroom(username, chatroom))
+                .thenReturn(Optional.of(chatParticipant));
+
+        assertThatThrownBy(() -> chatParticipantService.updateNoticeStatus(username, chatroom, request))
+                .isInstanceOf(BadRequestException.class)
+                .hasMessageContaining(ChatNoticeResponse.NOTICE_STATUS_INVALID.getMessage());
     }
 }

@@ -264,4 +264,18 @@ class ChatFacadeTest {
         assertThat(result.getChatroomRole()).isEqualTo(ChatroomRole.HOST.toString());
         assertThat(result.getUserId()).isEqualTo(user.getId());
     }
+
+    @Test
+    @DisplayName("공지 상태 변경 성공")
+    void updateNoticeStatusSuccess() {
+        String username = "testUser";
+        Long chatroomId = 1L;
+        ChatNoticeUpdateRequest request = new ChatNoticeUpdateRequest("DEFAULT");
+
+        when(chatroomService.findById(chatroomId)).thenReturn(chatroom);
+
+        chatFacade.updateNoticeStatus(username, chatroomId, request);
+
+        verify(chatParticipantService).updateNoticeStatus(username, chatroom, request);
+    }
 }

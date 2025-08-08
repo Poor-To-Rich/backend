@@ -7,12 +7,14 @@ import com.poortorich.chat.realtime.collect.ChatPayloadCollector;
 import com.poortorich.chat.realtime.model.PayloadContext;
 import com.poortorich.chat.realtime.payload.request.ChatMessageRequestPayload;
 import com.poortorich.chat.realtime.payload.response.BasePayload;
+import com.poortorich.chat.realtime.payload.response.RankingStatusMessagePayload;
 import com.poortorich.chat.realtime.payload.response.UserChatMessagePayload;
 import com.poortorich.chat.realtime.payload.response.UserEnterResponsePayload;
 import com.poortorich.chat.service.ChatMessageService;
 import com.poortorich.chat.service.ChatParticipantService;
 import com.poortorich.chat.service.ChatroomService;
 import com.poortorich.chat.service.UnreadChatMessageService;
+import com.poortorich.chat.util.detector.RankingStatusChangeDetector;
 import com.poortorich.chat.util.manager.ChatroomLeaveManager;
 import com.poortorich.user.entity.User;
 import com.poortorich.user.service.UserService;
@@ -32,6 +34,7 @@ public class ChatRealTimeFacade {
 
     private final ChatPayloadCollector payloadCollector;
     private final ChatroomLeaveManager chatroomLeaveManager;
+    private final RankingStatusChangeDetector rankingStatusChangeDetector;
 
     public BasePayload createUserEnterSystemMessage(String username, Long chatroomId) {
         User user = userService.findUserByUsername(username);
@@ -71,5 +74,14 @@ public class ChatRealTimeFacade {
                 .saveUserChatMessage(chatParticipant, chatMembers, chatMessagePayload);
 
         return chatMessage.mapToBasePayload();
+    }
+
+    public BasePayload createRankingStatusMessage(Long chatroomId, Boolean isChangedRankingStatus) {
+        if (isChangedRankingStatus) {
+            PayloadContext context = payloadCollector.getPayloadContext(chatroomId);
+            RankingStatusMessagePayload payload = chatMessageService.saveRankingStatusMessage(context);
+            return payload.mapToBasePayload();
+        }
+        return null;
     }
 }

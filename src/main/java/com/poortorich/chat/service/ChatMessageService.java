@@ -4,10 +4,13 @@ import com.poortorich.chat.entity.ChatMessage;
 import com.poortorich.chat.entity.ChatParticipant;
 import com.poortorich.chat.entity.Chatroom;
 import com.poortorich.chat.model.ChatPaginationContext;
+import com.poortorich.chat.realtime.builder.RankingStatusChatMessageBuilder;
 import com.poortorich.chat.realtime.builder.SystemMessageBuilder;
 import com.poortorich.chat.realtime.builder.UserChatMessageBuilder;
+import com.poortorich.chat.realtime.model.PayloadContext;
 import com.poortorich.chat.realtime.payload.request.ChatMessageRequestPayload;
 import com.poortorich.chat.realtime.payload.response.ChatroomClosedResponsePayload;
+import com.poortorich.chat.realtime.payload.response.RankingStatusMessagePayload;
 import com.poortorich.chat.realtime.payload.response.UserChatMessagePayload;
 import com.poortorich.chat.realtime.payload.response.UserEnterResponsePayload;
 import com.poortorich.chat.realtime.payload.response.UserLeaveResponsePayload;
@@ -122,5 +125,19 @@ public class ChatMessageService {
                 context.chatroom(),
                 context.cursor(),
                 context.pageRequest());
+    }
+
+    public RankingStatusMessagePayload saveRankingStatusMessage(PayloadContext context) {
+        ChatMessage rankingStatusChatMessage = RankingStatusChatMessageBuilder.buildRankingStatusMessage(
+                context.chatroom());
+
+        ChatMessage savedRankingStatusChatMessage = chatMessageRepository.save(rankingStatusChatMessage);
+
+        return RankingStatusMessagePayload.builder()
+                .messageId(savedRankingStatusChatMessage.getId())
+                .chatroomId(context.chatroom().getId())
+                .isRankingEnabled(savedRankingStatusChatMessage.getIsRankingEnabled())
+                .sendAt(savedRankingStatusChatMessage.getSentAt())
+                .build();
     }
 }
