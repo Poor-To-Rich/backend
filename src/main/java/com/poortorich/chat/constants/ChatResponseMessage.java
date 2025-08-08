@@ -11,9 +11,6 @@ public class ChatResponseMessage {
     public static final String GET_CHATROOM_COVER_INFO_SUCCESS = "채팅방 커버 정보 조회를 완료했습니다.";
     public static final String GET_CHATROOM_ROLE_SUCCESS = "현재 채팅방의 유저 역할 조회를 완료했습니다.";
 
-    public static final String GET_CHATROOM_LIKE_STATUS_SUCCESS = "채팅방 좋아요 상태 조회를 완료했습니다.";
-    public static final String UPDATE_CHATROOM_LIKE_SUCCESS = "채팅방 좋아요 상태 변경이 완료되었습니다.";
-
     public static final String CHATROOM_TITLE_REQUIRED = "채팅방 이름은 필수값입니다.";
     public static final String CHATROOM_TITLE_TOO_BIG
             = "채팅방 이름은 " + ChatValidationConstraints.CHATROOM_TITLE_MAX + "자 이하여야 합니다.";
@@ -29,10 +26,6 @@ public class ChatResponseMessage {
             = "채팅방 소개는 " + ChatValidationConstraints.CHATROOM_DESCRIPTION_MAX + "자 이하여야 합니다.";
 
     public static final String TAG_TOO_MANY = "태그는 " + ChatValidationConstraints.TAG_COUNT_MAX + "개 이하여야 합니다.";
-
-    public static final String CHAT_NOTICE_STATUS_IMMUTABLE = "이 공지사항은 더 이상 상태를 변경할 수 없습니다.";
-
-    public static final String IS_LIKED_REQUIRED = "좋아요 상태는 필수값입니다.";
 
     public static final String CHATROOM_ENTER_DENIED = "이 채팅방에 입장할 수 없습니다.";
     public static final String CHATROOM_PASSWORD_DO_NOT_MATCH = "채팅방 비밀번호가 맞지 않습니다.";

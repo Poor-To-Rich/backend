@@ -1,11 +1,10 @@
-package com.poortorich.chatnotice.controller;
+package com.poortorich.like.controller;
 
-import com.poortorich.chat.facade.ChatFacade;
-import com.poortorich.chatnotice.facade.ChatNoticeFacade;
-import com.poortorich.chatnotice.request.ChatNoticeUpdateRequest;
-import com.poortorich.chatnotice.response.enums.ChatNoticeResponse;
 import com.poortorich.global.response.BaseResponse;
 import com.poortorich.global.response.DataResponse;
+import com.poortorich.like.facade.LikeFacade;
+import com.poortorich.like.request.LikeUpdateRequest;
+import com.poortorich.like.response.enums.LikeResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -19,31 +18,32 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/chatrooms/{chatroomId}/notices")
+@RequestMapping("/chatrooms/{chatroomId}/like")
 @RequiredArgsConstructor
-public class ChatNoticeController {
+public class LikeController {
 
-    private final ChatFacade chatFacade;
-    private final ChatNoticeFacade chatNoticeFacade;
+    private final LikeFacade likeFacade;
 
     @GetMapping
-    public ResponseEntity<BaseResponse> getLatestNotice(
+    public ResponseEntity<BaseResponse> getChatroomLike(
             @AuthenticationPrincipal UserDetails userDetails,
             @PathVariable Long chatroomId
     ) {
         return DataResponse.toResponseEntity(
-                ChatNoticeResponse.GET_LATEST_NOTICE_SUCCESS,
-                chatNoticeFacade.getLatestNotice(userDetails.getUsername(), chatroomId)
+                LikeResponse.GET_LIKE_STATUS_SUCCESS,
+                likeFacade.getChatroomLike(userDetails.getUsername(), chatroomId)
         );
     }
 
     @PatchMapping
-    public ResponseEntity<BaseResponse> updateNoticeStatus(
+    public ResponseEntity<BaseResponse> updateChatroomLike(
             @AuthenticationPrincipal UserDetails userDetails,
             @PathVariable Long chatroomId,
-            @RequestBody @Valid ChatNoticeUpdateRequest request
+            @RequestBody @Valid LikeUpdateRequest request
     ) {
-        chatFacade.updateNoticeStatus(userDetails.getUsername(), chatroomId, request);
-        return BaseResponse.toResponseEntity(ChatNoticeResponse.UPDATE_NOTICE_STATUS_SUCCESS);
+        return DataResponse.toResponseEntity(
+                LikeResponse.UPDATE_LIKE_STATUS_SUCCESS,
+                likeFacade.updateChatroomLike(userDetails.getUsername(), chatroomId, request)
+        );
     }
 }

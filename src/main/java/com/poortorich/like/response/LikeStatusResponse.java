@@ -1,4 +1,4 @@
-package com.poortorich.chat.response;
+package com.poortorich.like.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ChatroomLikeStatusResponse {
+public class LikeStatusResponse {
 
     private Boolean isLiked;
     private Long likeCount;

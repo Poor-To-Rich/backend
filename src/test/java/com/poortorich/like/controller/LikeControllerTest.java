@@ -1,15 +1,14 @@
-package com.poortorich.chatnotice.controller;
+package com.poortorich.like.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.poortorich.chat.facade.ChatFacade;
-import com.poortorich.chatnotice.constants.ChatNoticeResponseMessage;
-import com.poortorich.chatnotice.facade.ChatNoticeFacade;
-import com.poortorich.chatnotice.request.ChatNoticeUpdateRequest;
-import com.poortorich.chatnotice.response.LatestNoticeResponse;
-import com.poortorich.chatnotice.response.enums.ChatNoticeResponse;
 import com.poortorich.global.config.BaseSecurityTest;
+import com.poortorich.like.constants.LikeResponseMessage;
+import com.poortorich.like.facade.LikeFacade;
+import com.poortorich.like.request.LikeUpdateRequest;
+import com.poortorich.like.response.enums.LikeResponse;
+import com.poortorich.like.response.LikeStatusResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -22,6 +21,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -29,75 +29,74 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(ChatNoticeController.class)
+@WebMvcTest(LikeController.class)
 @ExtendWith(MockitoExtension.class)
-class ChatNoticeControllerTest extends BaseSecurityTest {
+class LikeControllerTest extends BaseSecurityTest {
 
     @Autowired
     private MockMvc mockMvc;
 
     @MockitoBean
-    private ChatFacade chatFacade;
-    @MockitoBean
-    private ChatNoticeFacade chatNoticeFacade;
+    private LikeFacade likeFacade;
 
     private ObjectMapper objectMapper;
 
     @BeforeEach
     void setUp() {
-        objectMapper = new ObjectMapper()
-                .registerModule(new JavaTimeModule())
-                .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+        objectMapper = new ObjectMapper();
     }
 
     @Test
     @WithMockUser(username = "test")
-    @DisplayName("최신 공지 조회 성공")
-    void getLatestNoticeSuccess() throws Exception {
-        String username = "test";
+    @DisplayName("채팅방 좋아요 상태 조회 성공")
+    void getChatroomLikeSuccess() throws Exception {
         Long chatroomId = 1L;
 
-        when(chatNoticeFacade.getLatestNotice(username, chatroomId)).thenReturn(LatestNoticeResponse.builder().build());
+        when(likeFacade.getChatroomLike(eq("test"), eq(chatroomId)))
+                .thenReturn(LikeStatusResponse.builder().build());
 
-        mockMvc.perform(get("/chatrooms/" + chatroomId + "/notices")
+        mockMvc.perform(get("/chatrooms/" + chatroomId + "/like")
                         .with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message")
-                        .value(ChatNoticeResponse.GET_LATEST_NOTICE_SUCCESS.getMessage())
+                        .value(LikeResponse.GET_LIKE_STATUS_SUCCESS.getMessage())
                 );
     }
 
     @Test
     @WithMockUser(username = "test")
-    @DisplayName("공지 상태 변경 성공")
-    void updateNoticeStatusSuccess() throws Exception {
-        long chatroomId = 1L;
-        ChatNoticeUpdateRequest request = new ChatNoticeUpdateRequest("TEMP_HIDDEN");
+    @DisplayName("채팅방 좋아요 상태 변경 성공")
+    void updateChatroomLikeSuccess() throws Exception {
+        Long chatroomId = 1L;
+        LikeUpdateRequest request = new LikeUpdateRequest(true);
 
-        mockMvc.perform(patch("/chatrooms/" + chatroomId + "/notices")
+        when(likeFacade.updateChatroomLike(eq("test"), eq(chatroomId), eq(request)))
+                .thenReturn(LikeStatusResponse.builder().build());
+
+        mockMvc.perform(patch("/chatrooms/" + chatroomId + "/like")
                         .content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON)
                         .with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message")
-                        .value(ChatNoticeResponse.UPDATE_NOTICE_STATUS_SUCCESS.getMessage())
+                        .value(LikeResponse.UPDATE_LIKE_STATUS_SUCCESS.getMessage())
                 );
     }
 
     @Test
     @WithMockUser(username = "test")
-    @DisplayName("공지 상태 변경 입력값이 없는 경우 예외 발생")
-    void updateNoticeStatusRequestNull() throws Exception {
+    @DisplayName("채팅방 좋아요 상태 입력값이 null인 경우 예외 발생")
+    void updateChatroomLikeRequestNull() throws Exception {
         long chatroomId = 1L;
-        ChatNoticeUpdateRequest request = new ChatNoticeUpdateRequest(null);
+        LikeUpdateRequest request = new LikeUpdateRequest(null);
 
-        mockMvc.perform(patch("/chatrooms/" + chatroomId + "/notices")
+        mockMvc.perform(patch("/chatrooms/" + chatroomId + "/like")
                         .content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON)
                         .with(csrf()))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message")
-                        .value(ChatNoticeResponseMessage.NOTICE_STATUS_REQUIRED)
+                        .value(LikeResponseMessage.IS_LIKED_REQUIRED)
                 );
     }
 }
