@@ -121,7 +121,7 @@ public class ChatMessageService {
             return new SliceImpl<>(Collections.emptyList(), context.pageRequest(), false);
         }
 
-        return chatMessageRepository.findByChatroomAndIdLessThanOrderByIdDesc(
+        return chatMessageRepository.findByChatroomAndIdLessThanEqualOrderByIdDesc(
                 context.chatroom(),
                 context.cursor(),
                 context.pageRequest());
