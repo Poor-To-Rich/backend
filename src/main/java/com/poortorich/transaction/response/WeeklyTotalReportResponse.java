@@ -1,4 +1,4 @@
-package com.poortorich.report.response;
+package com.poortorich.transaction.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

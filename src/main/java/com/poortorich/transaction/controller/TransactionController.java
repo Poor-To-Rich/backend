@@ -1,10 +1,9 @@
-package com.poortorich.report.controller;
+package com.poortorich.transaction.controller;
 
-import com.poortorich.global.date.response.enums.DateResponse;
 import com.poortorich.global.response.BaseResponse;
 import com.poortorich.global.response.DataResponse;
-import com.poortorich.report.facade.ReportFacade;
-import com.poortorich.report.response.enums.ReportResponse;
+import com.poortorich.transaction.facade.TransactionFacade;
+import com.poortorich.transaction.response.enums.TransactionResponse;
 import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -16,11 +15,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/report")
+@RequestMapping("/transactions")
 @RequiredArgsConstructor
-public class ReportController {
+public class TransactionController {
 
-    private final ReportFacade reportFacade;
+    private final TransactionFacade transactionFacade;
 
     @GetMapping("/daily/details")
     public ResponseEntity<BaseResponse> getDailyDetailsReport(
@@ -28,8 +27,8 @@ public class ReportController {
             @RequestParam("date") @Nullable String date
     ) {
         return DataResponse.toResponseEntity(
-                ReportResponse.GET_DAILY_DETAILS_SUCCESS,
-                reportFacade.getDailyDetailsReport(userDetails.getUsername(), date)
+                TransactionResponse.GET_DAILY_DETAILS_SUCCESS,
+                transactionFacade.getDailyDetailsReport(userDetails.getUsername(), date)
         );
     }
 
@@ -41,8 +40,8 @@ public class ReportController {
             @RequestParam("cursor") @Nullable String cursor
     ) {
         return DataResponse.toResponseEntity(
-                ReportResponse.GET_WEEKLY_DETAILS_SUCCESS,
-                reportFacade.getWeeklyDetailsReport(userDetails.getUsername(), date, week, cursor)
+                TransactionResponse.GET_WEEKLY_DETAILS_SUCCESS,
+                transactionFacade.getWeeklyDetailsReport(userDetails.getUsername(), date, week, cursor)
         );
     }
 
@@ -52,8 +51,8 @@ public class ReportController {
             @RequestParam("date") @Nullable String date
     ) {
         return DataResponse.toResponseEntity(
-                ReportResponse.GET_MONTHLY_TOTAL_SUCCESS,
-                reportFacade.getMonthlyTotal(userDetails.getUsername(), date)
+                TransactionResponse.GET_MONTHLY_TOTAL_SUCCESS,
+                transactionFacade.getMonthlyTotal(userDetails.getUsername(), date)
         );
     }
 
@@ -63,8 +62,8 @@ public class ReportController {
             @RequestParam("date") @Nullable String date
     ) {
         return DataResponse.toResponseEntity(
-                ReportResponse.GET_MONTHLY_TOTAL_REPORT_SUCCESS,
-                reportFacade.getMonthlyTotalReport(userDetails.getUsername(), date)
+                TransactionResponse.GET_MONTHLY_TOTAL_REPORT_SUCCESS,
+                transactionFacade.getMonthlyTotalReport(userDetails.getUsername(), date)
         );
     }
 
@@ -74,8 +73,8 @@ public class ReportController {
             @RequestParam("date") @Nullable String date
     ) {
         return DataResponse.toResponseEntity(
-                ReportResponse.GET_WEEKLY_TOTAL_REPORT_SUCCESS,
-                reportFacade.getWeeklyTotalReport(userDetails.getUsername(), date)
+                TransactionResponse.GET_WEEKLY_TOTAL_REPORT_SUCCESS,
+                transactionFacade.getWeeklyTotalReport(userDetails.getUsername(), date)
         );
     }
 }

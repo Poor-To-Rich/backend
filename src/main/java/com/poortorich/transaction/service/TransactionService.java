@@ -1,4 +1,4 @@
-package com.poortorich.report.service;
+package com.poortorich.transaction.service;
 
 import com.poortorich.accountbook.entity.AccountBook;
 import com.poortorich.accountbook.enums.AccountBookType;
@@ -8,11 +8,11 @@ import com.poortorich.accountbook.util.AccountBookCalculator;
 import com.poortorich.accountbook.util.AccountBookExtractor;
 import com.poortorich.accountbook.util.AccountBookGrouper;
 import com.poortorich.chart.util.PeriodFormatter;
-import com.poortorich.report.response.DailyDetailsResponse;
-import com.poortorich.report.response.DailyFinance;
-import com.poortorich.report.response.DailyTransaction;
-import com.poortorich.report.response.Logs;
-import com.poortorich.report.response.WeeklyDetailsResponse;
+import com.poortorich.transaction.response.DailyDetailsResponse;
+import com.poortorich.transaction.response.DailyFinance;
+import com.poortorich.transaction.response.DailyTransaction;
+import com.poortorich.transaction.response.Logs;
+import com.poortorich.transaction.response.WeeklyDetailsResponse;
 import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
@@ -20,7 +20,7 @@ import java.util.stream.Stream;
 import org.springframework.stereotype.Service;
 
 @Service
-public class ReportService {
+public class TransactionService {
 
     public DailyDetailsResponse getDailyDetailsReport(List<AccountBook> dailyIncomes, List<AccountBook> dailyExpenses) {
         Long totalIncome = AccountBookCalculator.sum(dailyIncomes);
