@@ -8,6 +8,8 @@ public class ChatValidationConstraints {
     public static final int CHATROOM_MAX_MEMBER_COUNT_MAX = 100;
 
     public static final int CHATROOM_DESCRIPTION_MAX = 100;
+
+    public static final int TAG_COUNT_MAX = 10;
     
     private ChatValidationConstraints() {
     }

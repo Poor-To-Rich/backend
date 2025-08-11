@@ -1,5 +1,6 @@
 package com.poortorich.chat.response;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Builder;
 import lombok.Data;
 
@@ -8,4 +9,7 @@ import lombok.Data;
 public class ChatroomUpdateResponse {
 
     private final Long chatroomId;
+
+    @JsonIgnore
+    private final Boolean isChangedRankingStatus;
 }

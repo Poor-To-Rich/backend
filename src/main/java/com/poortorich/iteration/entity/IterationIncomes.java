@@ -29,8 +29,8 @@ import java.time.LocalDateTime;
 @Getter
 @Builder
 @DynamicUpdate
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "iteration_incomes")
 public class IterationIncomes implements Iteration{
 

@@ -8,6 +8,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
+
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -20,8 +22,8 @@ import org.hibernate.annotations.UpdateTimestamp;
 @Getter
 @Builder
 @DynamicUpdate
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "chatroom")
 public class Chatroom {
 
@@ -42,11 +44,18 @@ public class Chatroom {
     @Column(name = "max_member_count", nullable = false)
     private Long maxMemberCount;
 
-    @Column(name = "password", nullable = false)
+    @Column(name = "password")
     private String password;
 
     @Column(name = "is_ranking_enabled", nullable = false)
     private Boolean isRankingEnabled;
+
+    @Column(name = "is_deleted", nullable = false)
+    @Builder.Default
+    private Boolean isDeleted = Boolean.FALSE;
+
+    @Column(name = "delete_at")
+    private LocalDateTime deleteAt;
 
     @CreationTimestamp
     @Column(name = "created_date")
@@ -62,5 +71,10 @@ public class Chatroom {
         this.description = chatroomUpdateRequest.getDescription();
         this.password = chatroomUpdateRequest.getChatroomPassword();
         this.maxMemberCount = chatroomUpdateRequest.getMaxMemberCount();
+    }
+
+    public void closeChatroom() {
+        isDeleted = Boolean.TRUE;
+        deleteAt = LocalDateTime.now();
     }
 }

@@ -14,7 +14,9 @@ public class StompSendHandler {
     private final StompPublishValidator stompPublishValidator;
 
     public void handle(StompHeaderAccessor accessor) {
+        stompValidator.validateSessionAttribute(accessor);
+        stompPublishValidator.validateSession(accessor);
         stompValidator.validateDestination(accessor);
-        stompPublishValidator.validate(accessor);
+        stompPublishValidator.validateDestination(accessor);
     }
 }

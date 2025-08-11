@@ -19,8 +19,8 @@ import java.util.List;
 @Getter
 @SuperBuilder
 @DynamicUpdate
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @DiscriminatorValue("WEEKLY")
 public class WeeklyIterationRule extends IterationInfo {
 

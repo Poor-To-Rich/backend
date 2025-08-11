@@ -1,10 +1,17 @@
 package com.poortorich.chat.facade;
 
+import com.poortorich.chat.entity.ChatParticipant;
 import com.poortorich.chat.entity.Chatroom;
+import com.poortorich.chat.entity.enums.ChatroomRole;
+import com.poortorich.chat.entity.enums.RankingStatus;
 import com.poortorich.chat.request.ChatroomCreateRequest;
+import com.poortorich.chat.request.enums.SortBy;
+import com.poortorich.chat.response.AllChatroomsResponse;
+import com.poortorich.chat.response.ChatroomCoverInfoResponse;
 import com.poortorich.chat.response.ChatroomCreateResponse;
+import com.poortorich.chat.response.ChatroomDetailsResponse;
 import com.poortorich.chat.response.ChatroomInfoResponse;
-import com.poortorich.chat.response.ChatroomResponse;
+import com.poortorich.chat.response.ChatroomRoleResponse;
 import com.poortorich.chat.response.ChatroomsResponse;
 import com.poortorich.chat.service.ChatMessageService;
 import com.poortorich.chat.service.ChatParticipantService;
@@ -23,9 +30,11 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -68,6 +77,8 @@ class ChatFacadeTest {
                 .maxMemberCount(maxMemberCount)
                 .isRankingEnabled(isRankingEnabled)
                 .password(chatroomPassword)
+                .isDeleted(false)
+                .createdDate(LocalDateTime.of(2025, 8, 3, 15, 24, 51))
                 .build();
     }
 
@@ -131,5 +142,140 @@ class ChatFacadeTest {
         assertThat(response.getChatrooms()).hasSize(2);
         assertThat(response.getChatrooms().get(0).getChatroomId()).isEqualTo(chatroom.getId());
         assertThat(response.getChatrooms().get(1).getChatroomId()).isEqualTo(chatroom2.getId());
+    }
+
+    @Test
+    @DisplayName("전체 채팅방 목록 조회 성공")
+    void getAllChatroomsSuccess() {
+        SortBy sortBy = SortBy.UPDATED_AT;
+        Long cursor = -1L;
+
+        Chatroom chatroom1 = Chatroom.builder().id(1L).build();
+        Chatroom chatroom2 = Chatroom.builder().id(2L).build();
+
+        when(chatroomService.getAllChatrooms(sortBy, cursor)).thenReturn(List.of(chatroom1, chatroom2));
+        when(chatroomService.hasNext(sortBy, 2L)).thenReturn(true);
+        when(chatroomService.getNextCursor(sortBy, 2L)).thenReturn(3L);
+        when(tagService.getTagNames(any())).thenReturn(hashtags);
+        when(chatParticipantService.countByChatroom(any())).thenReturn(3L);
+        when(chatMessageService.getLastMessageTime(any())).thenReturn("2025-07-31T02:30");
+
+        AllChatroomsResponse response = chatFacade.getAllChatrooms(sortBy, cursor);
+
+        assertThat(response.getChatrooms()).hasSize(2);
+        assertThat(response.getHasNext()).isTrue();
+        assertThat(response.getNextCursor()).isEqualTo(3L);
+        assertThat(response.getChatrooms().get(0).getChatroomId()).isEqualTo(chatroom1.getId());
+        assertThat(response.getChatrooms().get(1).getChatroomId()).isEqualTo(chatroom2.getId());
+    }
+
+    @Test
+    @DisplayName("채팅방 검색 목록 조회 성공")
+    void searchChatroomsSuccess() {
+        String keyword = "부자";
+        Chatroom chatroom1 = Chatroom.builder().id(1L).title("부자되자").build();
+        Chatroom chatroom2 = Chatroom.builder().id(2L).title("부자될거야").build();
+        List<Chatroom> chatrooms = List.of(chatroom1, chatroom2);
+
+        when(chatroomService.searchChatrooms(keyword)).thenReturn(chatrooms);
+        when(tagService.getTagNames(any())).thenReturn(hashtags);
+        when(chatParticipantService.countByChatroom(any())).thenReturn(3L);
+        when(chatMessageService.getLastMessageTime(any())).thenReturn("2025-07-31T02:30");
+
+        ChatroomsResponse response = chatFacade.searchChatrooms(keyword);
+
+        assertThat(response.getChatrooms()).hasSize(2);
+        assertThat(response.getChatrooms().get(0).getChatroomTitle()).isEqualTo(chatroom1.getTitle());
+        assertThat(response.getChatrooms().get(1).getChatroomTitle()).isEqualTo(chatroom2.getTitle());
+    }
+
+    @Test
+    @DisplayName("채팅방 상세 정보 조회 성공")
+    void getChatroomDetailsSuccess() {
+        when(chatroomService.findById(chatroomId)).thenReturn(chatroom);
+        when(chatParticipantService.countByChatroom(chatroom)).thenReturn(5L);
+
+        ChatroomDetailsResponse response = chatFacade.getChatroomDetails(chatroomId);
+
+        assertThat(response.getChatroomTitle()).isEqualTo(chatroom.getTitle());
+        assertThat(response.getChatroomImage()).isEqualTo(chatroom.getImage());
+        assertThat(response.getCurrentMemberCount()).isEqualTo(5L);
+        assertThat(response.getIsRankingEnabled()).isFalse();
+        assertThat(response.getIsClosed()).isFalse();
+    }
+
+    @Test
+    @DisplayName("채팅방 커버 정보 조회 성공")
+    void getChatroomCoverInfoSuccess() {
+        String username = "testUser";
+        User user = User.builder()
+                .id(1L)
+                .username(username)
+                .nickname(username)
+                .build();
+        ChatParticipant hostParticipant = ChatParticipant.builder()
+                .user(user)
+                .role(ChatroomRole.HOST)
+                .rankingStatus(RankingStatus.NONE)
+                .build();
+
+        when(userService.findUserByUsername(username)).thenReturn(user);
+        when(chatroomService.findById(chatroomId)).thenReturn(chatroom);
+        when(tagService.getTagNames(chatroom)).thenReturn(hashtags);
+        when(chatParticipantService.countByChatroom(chatroom)).thenReturn(3L);
+        when(chatParticipantService.isJoined(user, chatroom)).thenReturn(true);
+        when(chatParticipantService.getChatroomHost(chatroom)).thenReturn(hostParticipant);
+
+        ChatroomCoverInfoResponse response = chatFacade.getChatroomCoverInfo(username, chatroomId);
+
+        assertThat(response.getChatroomId()).isEqualTo(chatroomId);
+        assertThat(response.getChatroomTitle()).isEqualTo(chatroomTitle);
+        assertThat(response.getChatroomImage()).isEqualTo(imageUrl);
+        assertThat(response.getDescription()).isEqualTo(chatroom.getDescription());
+        assertThat(response.getHashtags()).isEqualTo(hashtags);
+        assertThat(response.getCurrentMemberCount()).isEqualTo(3L);
+        assertThat(response.getMaxMemberCount()).isEqualTo(maxMemberCount);
+        assertThat(response.getIsJoined()).isTrue();
+        assertThat(response.getHasPassword()).isTrue();
+        assertThat(response.getHostProfile().getUserId()).isEqualTo(user.getId());
+        assertThat(response.getHostProfile().getIsHost()).isTrue();
+    }
+
+    @Test
+    @DisplayName("채팅방 내 사용자 역할 조회 성공")
+    void getChatroomRoleSuccess() {
+        String username = "testUser";
+        Long chatroomId = 1L;
+        User user = User.builder()
+                .id(1L)
+                .username(username)
+                .build();
+        ChatParticipant chatParticipant = ChatParticipant.builder()
+                .user(user)
+                .role(ChatroomRole.HOST)
+                .build();
+
+        when(chatroomService.findById(chatroomId)).thenReturn(chatroom);
+        when(chatParticipantService.findByUsernameAndChatroom(username, chatroom)).thenReturn(chatParticipant);
+
+        ChatroomRoleResponse result = chatFacade.getChatroomRole(username, chatroomId);
+
+        assertThat(result).isNotNull();
+        assertThat(result.getChatroomRole()).isEqualTo(ChatroomRole.HOST.toString());
+        assertThat(result.getUserId()).isEqualTo(user.getId());
+    }
+
+    @Test
+    @DisplayName("공지 상태 변경 성공")
+    void updateNoticeStatusSuccess() {
+        String username = "testUser";
+        Long chatroomId = 1L;
+        ChatNoticeUpdateRequest request = new ChatNoticeUpdateRequest("DEFAULT");
+
+        when(chatroomService.findById(chatroomId)).thenReturn(chatroom);
+
+        chatFacade.updateNoticeStatus(username, chatroomId, request);
+
+        verify(chatParticipantService).updateNoticeStatus(username, chatroom, request);
     }
 }

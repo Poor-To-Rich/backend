@@ -1,16 +1,17 @@
-package com.poortorich.tag.response.enums;
+package com.poortorich.like.response.enums;
 
 import com.poortorich.global.response.Response;
-import com.poortorich.tag.constants.TagResponseMessage;
+import com.poortorich.like.constants.LikeResponseMessage;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 
 @Getter
 @RequiredArgsConstructor
-public enum TagResponse implements Response {
+public enum LikeResponse implements Response {
 
-    TAG_NAME_TOO_LONG(HttpStatus.BAD_REQUEST, TagResponseMessage.TAG_NAME_TOO_LONG, "hashtags");
+    GET_LIKE_STATUS_SUCCESS(HttpStatus.OK, LikeResponseMessage.GET_LIKE_STATUS_SUCCESS, null),
+    UPDATE_LIKE_STATUS_SUCCESS(HttpStatus.OK, LikeResponseMessage.UPDATE_LIKE_STATUS_SUCCESS, null);
 
     private final HttpStatus httpStatus;
     private final String message;
