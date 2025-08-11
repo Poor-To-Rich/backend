@@ -34,6 +34,7 @@ import com.poortorich.chat.util.mapper.ChatMessageMapper;
 import com.poortorich.chat.util.provider.ChatPaginationProvider;
 import com.poortorich.chat.validator.ChatParticipantValidator;
 import com.poortorich.chat.validator.ChatroomValidator;
+import com.poortorich.chatnotice.request.ChatNoticeUpdateRequest;
 import com.poortorich.s3.service.FileUploadService;
 import com.poortorich.tag.service.TagService;
 import com.poortorich.user.entity.User;
