@@ -45,6 +45,8 @@ public class ChatResponseMessage {
 
     public static final String CHATROOM_ID_REQUIRED = "채팅방 아이디는 필수값입니다.";
     public static final String MESSAGE_TYPE_REQUIRED = "메시지 타입은 필수값입니다.";
+    public static final String LAST_READ_MESSAGE_ID_REQUIRED = "마지막으로 읽은 메시지 아이디는 필수값입니다.";
+    public static final String CHAT_NOTICE_STATUS_IMMUTABLE = "컴파일이 안됩니다. 수정 부탁드립니다.";
 
     private ChatResponseMessage() {
     }
