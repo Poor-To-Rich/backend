@@ -6,7 +6,9 @@ import com.poortorich.chat.entity.enums.ChatMessageType;
 import com.poortorich.chat.realtime.collect.ChatPayloadCollector;
 import com.poortorich.chat.realtime.model.PayloadContext;
 import com.poortorich.chat.realtime.payload.request.ChatMessageRequestPayload;
+import com.poortorich.chat.realtime.payload.request.MarkMessagesAsReadRequestPayload;
 import com.poortorich.chat.realtime.payload.response.BasePayload;
+import com.poortorich.chat.realtime.payload.response.MessageReadPayload;
 import com.poortorich.chat.realtime.payload.response.RankingStatusMessagePayload;
 import com.poortorich.chat.realtime.payload.response.UserChatMessagePayload;
 import com.poortorich.chat.realtime.payload.response.UserEnterResponsePayload;
@@ -18,9 +20,11 @@ import com.poortorich.chat.util.detector.RankingStatusChangeDetector;
 import com.poortorich.chat.util.manager.ChatroomLeaveManager;
 import com.poortorich.user.entity.User;
 import com.poortorich.user.service.UserService;
+import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -83,5 +87,14 @@ public class ChatRealTimeFacade {
             return payload.mapToBasePayload();
         }
         return null;
+    }
+
+    @Transactional
+    public BasePayload markMessagesAsRead(String username, @Valid MarkMessagesAsReadRequestPayload requestPayload) {
+        PayloadContext context = payloadCollector.getPayloadContext(username, requestPayload.getChatroomId());
+
+        MessageReadPayload payload = unreadChatMessageService.markMessageAsRead(context.chatParticipant());
+
+        return payload.mapToBasePayload();
     }
 }
