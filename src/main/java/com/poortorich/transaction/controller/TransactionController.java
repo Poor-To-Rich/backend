@@ -1,10 +1,9 @@
-package com.poortorich.report.controller;
+package com.poortorich.transaction.controller;
 
-import com.poortorich.global.date.response.enums.DateResponse;
 import com.poortorich.global.response.BaseResponse;
 import com.poortorich.global.response.DataResponse;
-import com.poortorich.report.facade.ReportFacade;
-import com.poortorich.report.response.enums.ReportResponse;
+import com.poortorich.transaction.facade.TransactionFacade;
+import com.poortorich.transaction.response.enums.TransactionResponse;
 import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -16,33 +15,33 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/report")
+@RequestMapping("/transactions")
 @RequiredArgsConstructor
-public class ReportController {
+public class TransactionController {
 
-    private final ReportFacade reportFacade;
+    private final TransactionFacade transactionFacade;
 
     @GetMapping("/daily/details")
-    public ResponseEntity<BaseResponse> getDailyDetailsReport(
+    public ResponseEntity<BaseResponse> getDailyDetails(
             @AuthenticationPrincipal UserDetails userDetails,
             @RequestParam("date") @Nullable String date
     ) {
         return DataResponse.toResponseEntity(
-                ReportResponse.GET_DAILY_DETAILS_SUCCESS,
-                reportFacade.getDailyDetailsReport(userDetails.getUsername(), date)
+                TransactionResponse.GET_DAILY_DETAILS_SUCCESS,
+                transactionFacade.getDailyDetails(userDetails.getUsername(), date)
         );
     }
 
     @GetMapping("/weekly/details")
-    public ResponseEntity<BaseResponse> getWeeklyDetailsReport(
+    public ResponseEntity<BaseResponse> getWeeklyDetails(
             @AuthenticationPrincipal UserDetails userDetails,
             @RequestParam("date") @Nullable String date,
             @RequestParam("week") Long week,
             @RequestParam("cursor") @Nullable String cursor
     ) {
         return DataResponse.toResponseEntity(
-                ReportResponse.GET_WEEKLY_DETAILS_SUCCESS,
-                reportFacade.getWeeklyDetailsReport(userDetails.getUsername(), date, week, cursor)
+                TransactionResponse.GET_WEEKLY_DETAILS_SUCCESS,
+                transactionFacade.getWeeklyDetails(userDetails.getUsername(), date, week, cursor)
         );
     }
 
@@ -52,30 +51,30 @@ public class ReportController {
             @RequestParam("date") @Nullable String date
     ) {
         return DataResponse.toResponseEntity(
-                ReportResponse.GET_MONTHLY_TOTAL_SUCCESS,
-                reportFacade.getMonthlyTotal(userDetails.getUsername(), date)
+                TransactionResponse.GET_MONTHLY_TOTAL_SUCCESS,
+                transactionFacade.getMonthlyTotal(userDetails.getUsername(), date)
         );
     }
 
     @GetMapping("/yearly/total")
-    public ResponseEntity<BaseResponse> getMonthlyTotalReport(
+    public ResponseEntity<BaseResponse> getYearlyTotal(
             @AuthenticationPrincipal UserDetails userDetails,
             @RequestParam("date") @Nullable String date
     ) {
         return DataResponse.toResponseEntity(
-                ReportResponse.GET_MONTHLY_TOTAL_REPORT_SUCCESS,
-                reportFacade.getMonthlyTotalReport(userDetails.getUsername(), date)
+                TransactionResponse.GET_YEARLY_TOTAL_SUCCESS,
+                transactionFacade.getYearlyTotal(userDetails.getUsername(), date)
         );
     }
 
     @GetMapping("/weekly/total")
-    public ResponseEntity<BaseResponse> getWeeklyTotalReport(
+    public ResponseEntity<BaseResponse> getWeeklyTotal(
             @AuthenticationPrincipal UserDetails userDetails,
             @RequestParam("date") @Nullable String date
     ) {
         return DataResponse.toResponseEntity(
-                ReportResponse.GET_WEEKLY_TOTAL_REPORT_SUCCESS,
-                reportFacade.getWeeklyTotalReport(userDetails.getUsername(), date)
+                TransactionResponse.GET_WEEKLY_TOTAL_SUCCESS,
+                transactionFacade.getWeeklyTotal(userDetails.getUsername(), date)
         );
     }
 }

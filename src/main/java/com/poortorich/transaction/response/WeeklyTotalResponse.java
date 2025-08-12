@@ -1,4 +1,4 @@
-package com.poortorich.report.response;
+package com.poortorich.transaction.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,7 +11,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class WeeklyTotalReportResponse {
+public class WeeklyTotalResponse {
 
     private List<Logs> weeklyLogs;
 }
