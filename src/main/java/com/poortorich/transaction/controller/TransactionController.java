@@ -22,18 +22,18 @@ public class TransactionController {
     private final TransactionFacade transactionFacade;
 
     @GetMapping("/daily/details")
-    public ResponseEntity<BaseResponse> getDailyDetailsReport(
+    public ResponseEntity<BaseResponse> getDailyDetails(
             @AuthenticationPrincipal UserDetails userDetails,
             @RequestParam("date") @Nullable String date
     ) {
         return DataResponse.toResponseEntity(
                 TransactionResponse.GET_DAILY_DETAILS_SUCCESS,
-                transactionFacade.getDailyDetailsReport(userDetails.getUsername(), date)
+                transactionFacade.getDailyDetails(userDetails.getUsername(), date)
         );
     }
 
     @GetMapping("/weekly/details")
-    public ResponseEntity<BaseResponse> getWeeklyDetailsReport(
+    public ResponseEntity<BaseResponse> getWeeklyDetails(
             @AuthenticationPrincipal UserDetails userDetails,
             @RequestParam("date") @Nullable String date,
             @RequestParam("week") Long week,
@@ -41,7 +41,7 @@ public class TransactionController {
     ) {
         return DataResponse.toResponseEntity(
                 TransactionResponse.GET_WEEKLY_DETAILS_SUCCESS,
-                transactionFacade.getWeeklyDetailsReport(userDetails.getUsername(), date, week, cursor)
+                transactionFacade.getWeeklyDetails(userDetails.getUsername(), date, week, cursor)
         );
     }
 
@@ -57,24 +57,24 @@ public class TransactionController {
     }
 
     @GetMapping("/yearly/total")
-    public ResponseEntity<BaseResponse> getMonthlyTotalReport(
+    public ResponseEntity<BaseResponse> getYearlyTotal(
             @AuthenticationPrincipal UserDetails userDetails,
             @RequestParam("date") @Nullable String date
     ) {
         return DataResponse.toResponseEntity(
-                TransactionResponse.GET_MONTHLY_TOTAL_REPORT_SUCCESS,
-                transactionFacade.getMonthlyTotalReport(userDetails.getUsername(), date)
+                TransactionResponse.GET_YEARLY_TOTAL_SUCCESS,
+                transactionFacade.getYearlyTotal(userDetails.getUsername(), date)
         );
     }
 
     @GetMapping("/weekly/total")
-    public ResponseEntity<BaseResponse> getWeeklyTotalReport(
+    public ResponseEntity<BaseResponse> getWeeklyTotal(
             @AuthenticationPrincipal UserDetails userDetails,
             @RequestParam("date") @Nullable String date
     ) {
         return DataResponse.toResponseEntity(
-                TransactionResponse.GET_WEEKLY_TOTAL_REPORT_SUCCESS,
-                transactionFacade.getWeeklyTotalReport(userDetails.getUsername(), date)
+                TransactionResponse.GET_WEEKLY_TOTAL_SUCCESS,
+                transactionFacade.getWeeklyTotal(userDetails.getUsername(), date)
         );
     }
 }

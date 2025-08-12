@@ -15,10 +15,10 @@ import com.poortorich.global.date.util.DateParser;
 import com.poortorich.global.exceptions.BadRequestException;
 import com.poortorich.transaction.response.DailyDetailsResponse;
 import com.poortorich.transaction.response.Logs;
-import com.poortorich.transaction.response.MonthlyTotalReportResponse;
+import com.poortorich.transaction.response.YearlyTotalResponse;
 import com.poortorich.transaction.response.MonthlyTotalResponse;
 import com.poortorich.transaction.response.WeeklyDetailsResponse;
-import com.poortorich.transaction.response.WeeklyTotalReportResponse;
+import com.poortorich.transaction.response.WeeklyTotalResponse;
 import com.poortorich.transaction.response.enums.TransactionResponse;
 import com.poortorich.transaction.service.TransactionService;
 import com.poortorich.user.entity.User;
@@ -43,7 +43,7 @@ public class TransactionFacade {
     private final TransactionService transactionService;
     private final AccountBookService accountBookService;
 
-    public DailyDetailsResponse getDailyDetailsReport(String username, String inputDate) {
+    public DailyDetailsResponse getDailyDetails(String username, String inputDate) {
         User user = userService.findUserByUsername(username);
         LocalDate date = DateParser.parseDate(inputDate);
 
@@ -52,10 +52,10 @@ public class TransactionFacade {
         List<AccountBook> dailyExpenses
                 = accountBookService.getAccountBookBetweenDates(user, date, date, AccountBookType.EXPENSE);
 
-        return transactionService.getDailyDetailsReport(dailyIncomes, dailyExpenses);
+        return transactionService.getDailyDetails(dailyIncomes, dailyExpenses);
     }
 
-    public WeeklyDetailsResponse getWeeklyDetailsReport(String username, String date, Long week, String cursor) {
+    public WeeklyDetailsResponse getWeeklyDetails(String username, String date, Long week, String cursor) {
         User user = userService.findUserByUsername(username);
         MonthInformation monthInfo = (MonthInformation) DateInfoProvider.get(date);
         if (monthInfo.getWeeks().size() < week) {
@@ -92,7 +92,7 @@ public class TransactionFacade {
         Boolean hasNext = accountBookService.hasNextPage(user, nextCursor, endDate);
         Long countOfLogs = accountBookService.countByUserAndBetweenDates(user, startDate, endDate);
 
-        return transactionService.getWeeklyDetailsReport(
+        return transactionService.getWeeklyDetails(
                 weeklyAccountBooks, PeriodFormatter.formatWeeklyReportRange(startDate, endDate), countOfLogs,
                 nextCursor, hasNext
         );
@@ -151,7 +151,7 @@ public class TransactionFacade {
                 .build();
     }
 
-    public MonthlyTotalReportResponse getMonthlyTotalReport(String username, String date) {
+    public YearlyTotalResponse getYearlyTotal(String username, String date) {
         User user = userService.findUserByUsername(username);
         YearInformation yearInfo;
         if (date == null) {
@@ -174,7 +174,7 @@ public class TransactionFacade {
         Long totalIncome = AccountBookCalculator.sum(yearlyIncomes);
         Long totalExpense = AccountBookCalculator.sum(yearlyExpenses);
 
-        return MonthlyTotalReportResponse.builder()
+        return YearlyTotalResponse.builder()
                 .yearTotalIncome(totalIncome)
                 .yearTotalExpense(totalExpense)
                 .yearTotalAmount(totalIncome - totalExpense)
@@ -203,11 +203,11 @@ public class TransactionFacade {
         return logs;
     }
 
-    public WeeklyTotalReportResponse getWeeklyTotalReport(String username, String date) {
+    public WeeklyTotalResponse getWeeklyTotal(String username, String date) {
         User user = userService.findUserByUsername(username);
         MonthInformation monthInfo = (MonthInformation) DateInfoProvider.get(date);
 
-        return WeeklyTotalReportResponse.builder()
+        return WeeklyTotalResponse.builder()
                 .weeklyLogs(getWeeklyLogs(user, monthInfo))
                 .build();
     }

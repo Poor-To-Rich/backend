@@ -22,7 +22,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class TransactionService {
 
-    public DailyDetailsResponse getDailyDetailsReport(List<AccountBook> dailyIncomes, List<AccountBook> dailyExpenses) {
+    public DailyDetailsResponse getDailyDetails(List<AccountBook> dailyIncomes, List<AccountBook> dailyExpenses) {
         Long totalIncome = AccountBookCalculator.sum(dailyIncomes);
         Long totalExpense = AccountBookCalculator.sum(dailyExpenses);
 
@@ -69,7 +69,7 @@ public class TransactionService {
                 .toList();
     }
 
-    public WeeklyDetailsResponse getWeeklyDetailsReport(
+    public WeeklyDetailsResponse getWeeklyDetails(
             List<AccountBook> weeklyAccountBooks, String period, Long countOfLogs, LocalDate nextCursor, Boolean hasNext
     ) {
         List<DailyTransaction> dailyTransactions = getDailyTransactions(weeklyAccountBooks);

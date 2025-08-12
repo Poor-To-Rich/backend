@@ -11,10 +11,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class MonthlyTotalReportResponse {
+public class WeeklyTotalResponse {
 
-    private Long yearTotalIncome;
-    private Long yearTotalExpense;
-    private Long yearTotalAmount;
-    private List<Logs> monthlyLogs;
+    private List<Logs> weeklyLogs;
 }

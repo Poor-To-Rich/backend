@@ -11,8 +11,8 @@ public enum TransactionResponse implements Response {
     GET_DAILY_DETAILS_SUCCESS(HttpStatus.OK, TransactionResponseMessages.GET_DAILY_DETAILS_SUCCESS, null),
     GET_WEEKLY_DETAILS_SUCCESS(HttpStatus.OK, TransactionResponseMessages.GET_WEEKLY_DETAILS_SUCCESS, null),
     GET_MONTHLY_TOTAL_SUCCESS(HttpStatus.OK, TransactionResponseMessages.GET_MONTHLY_TOTAL_SUCCESS, null),
-    GET_MONTHLY_TOTAL_REPORT_SUCCESS(HttpStatus.OK, TransactionResponseMessages.GET_MONTHLY_TOTAL_REPORT_SUCCESS, null),
-    GET_WEEKLY_TOTAL_REPORT_SUCCESS(HttpStatus.OK, TransactionResponseMessages.GET_WEEKLY_TOTAL_REPORT_SUCCESS, null),
+    GET_YEARLY_TOTAL_SUCCESS(HttpStatus.OK, TransactionResponseMessages.GET_YEARLY_TOTAL_SUCCESS, null),
+    GET_WEEKLY_TOTAL_SUCCESS(HttpStatus.OK, TransactionResponseMessages.GET_WEEKLY_TOTAL_SUCCESS, null),
 
     WEEK_INVALID(HttpStatus.BAD_REQUEST, TransactionResponseMessages.WEEK_INVALID, "week"),
     CURSOR_INVALID(HttpStatus.BAD_REQUEST, TransactionResponseMessages.CURSOR_INVALID, "cursor");
