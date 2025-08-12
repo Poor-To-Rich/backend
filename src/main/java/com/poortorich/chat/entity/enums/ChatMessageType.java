@@ -10,5 +10,6 @@ public enum ChatMessageType {
     CHAT_MESSAGE,
     SYSTEM_MESSAGE,
     RANKING_STATUS,
+    MESSAGE_READ,
     RANKING_MESSAGE
 }

@@ -2,6 +2,7 @@ package com.poortorich.chat.realtime.controller;
 
 import com.poortorich.chat.realtime.facade.ChatRealTimeFacade;
 import com.poortorich.chat.realtime.payload.request.ChatMessageRequestPayload;
+import com.poortorich.chat.realtime.payload.request.MarkMessagesAsReadRequestPayload;
 import com.poortorich.chat.realtime.payload.response.BasePayload;
 import com.poortorich.websocket.stomp.command.subscribe.endpoint.SubscribeEndpoint;
 import com.poortorich.websocket.stomp.util.StompSessionManager;
@@ -35,5 +36,19 @@ public class ChatRealtimeController {
         messagingTemplate.convertAndSend(
                 SubscribeEndpoint.CHATROOM_SUBSCRIBE_PREFIX + chatMessagePayload.getChatroomId(),
                 payload);
+    }
+
+    @MessageMapping("/chat/read")
+    public void markMessagesAsRead(
+            StompHeaderAccessor accessor,
+            @Payload @Valid MarkMessagesAsReadRequestPayload requestPayload
+    ) {
+        String username = sessionManager.getUsername(accessor);
+        BasePayload responsePayload = chatRealTimeFacade.markMessagesAsRead(username, requestPayload);
+
+        messagingTemplate.convertAndSend(
+                SubscribeEndpoint.CHATROOM_SUBSCRIBE_PREFIX + requestPayload.getChatroomId(),
+                responsePayload
+        );
     }
 }

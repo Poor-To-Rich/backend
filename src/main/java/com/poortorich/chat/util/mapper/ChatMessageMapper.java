@@ -3,6 +3,7 @@ package com.poortorich.chat.util.mapper;
 import com.poortorich.chat.entity.ChatMessage;
 import com.poortorich.chat.model.ChatMessageResponse;
 import com.poortorich.chat.realtime.payload.response.ChatroomClosedResponsePayload;
+import com.poortorich.chat.realtime.payload.response.RankingStatusMessagePayload;
 import com.poortorich.chat.realtime.payload.response.UserChatMessagePayload;
 import com.poortorich.chat.realtime.payload.response.UserEnterResponsePayload;
 import com.poortorich.chat.realtime.payload.response.UserLeaveResponsePayload;
@@ -20,11 +21,21 @@ public class ChatMessageMapper {
         return switch (chatMessage.getMessageType()) {
             // TODO: 랭킹 기능 구현 후 추가 예정
             case RANKING -> null;
+            case RANKING_STATUS -> rankingStatusMessage(chatMessage);
             case ENTER -> userEnterMessage(chatMessage);
             case LEAVE -> userLeaveMessage(chatMessage);
             case CLOSE -> chatroomClosedMessage(chatMessage);
             case TEXT, PHOTO -> userChatMessage(chatMessage);
         };
+    }
+
+    private ChatMessageResponse rankingStatusMessage(ChatMessage chatMessage) {
+        return RankingStatusMessagePayload.builder()
+                .messageId(chatMessage.getId())
+                .chatroomId(chatMessage.getChatroom().getId())
+                .isRankingEnabled(chatMessage.getIsRankingEnabled())
+                .sendAt(chatMessage.getSentAt())
+                .build();
     }
 
     private ChatMessageResponse userEnterMessage(ChatMessage chatMessage) {
