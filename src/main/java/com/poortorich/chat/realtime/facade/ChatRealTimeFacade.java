@@ -20,7 +20,6 @@ import com.poortorich.chat.util.detector.RankingStatusChangeDetector;
 import com.poortorich.chat.util.manager.ChatroomLeaveManager;
 import com.poortorich.user.entity.User;
 import com.poortorich.user.service.UserService;
-import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -90,7 +89,7 @@ public class ChatRealTimeFacade {
     }
 
     @Transactional
-    public BasePayload markMessagesAsRead(String username, @Valid MarkMessagesAsReadRequestPayload requestPayload) {
+    public BasePayload markMessagesAsRead(String username, MarkMessagesAsReadRequestPayload requestPayload) {
         PayloadContext context = payloadCollector.getPayloadContext(username, requestPayload.getChatroomId());
 
         MessageReadPayload payload = unreadChatMessageService.markMessageAsRead(context.chatParticipant());
