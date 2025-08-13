@@ -34,7 +34,7 @@ public class ReportFacade {
         validReporterAndReported(reporterMember, reportedMember);
         reportService.reportMember(reporterMember, reportedMember, chatroom, request);
 
-        return ReportBuilder.buildReceiptReportResponse(reportedId, chatroomId, request.getReportType());
+        return ReportBuilder.buildReceiptReportResponse(reportedId, chatroomId, request.parseReportReason().name());
     }
 
     private void validReporterAndReported(ChatParticipant reporterMember, ChatParticipant reportedMember) {

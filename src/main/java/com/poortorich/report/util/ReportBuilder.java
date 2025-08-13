@@ -27,12 +27,12 @@ public class ReportBuilder {
     public static ReceiptReportResponse buildReceiptReportResponse(
             Long reportedUserId,
             Long chatroomId,
-            String reportType
+            String reportReason
     ) {
         return ReceiptReportResponse.builder()
                 .reportedUserId(reportedUserId)
                 .chatroomId(chatroomId)
-                .reportType(reportType)
+                .reportReason(reportReason)
                 .build();
     }
 }

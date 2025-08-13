@@ -13,5 +13,5 @@ public class ReceiptReportResponse {
 
     private Long reportedUserId;
     private Long chatroomId;
-    private String reportType;
+    private String reportReason;
 }

@@ -23,7 +23,6 @@ public class ReportService {
             Chatroom chatroom,
             ReceiptReportRequest request
     ) {
-        // TODO : 같은 조합으로도 신고가 가능하게 할 지, 아니면 신고에 개수 제한을 둘 지
         if (reportRepository.existsByReporterAndReportedAndChatroom(reporterMember, reportedMember, chatroom)) {
             throw new ConflictException(ReportResponse.REPORT_DUPLICATE);
         }
@@ -33,7 +32,7 @@ public class ReportService {
                         reporterMember,
                         reportedMember,
                         chatroom,
-                        ReportReason.valueOf(request.getReportType()),
+                        request.parseReportReason(),
                         request.getCustomReason())
         );
     }
