@@ -1,6 +1,5 @@
 package com.poortorich.auth.service;
 
-import com.poortorich.auth.jwt.constants.JwtConstants;
 import com.poortorich.auth.jwt.util.JwtTokenExtractor;
 import com.poortorich.auth.jwt.util.JwtTokenGenerator;
 import com.poortorich.auth.jwt.util.JwtTokenManager;
@@ -17,7 +16,6 @@ import com.poortorich.user.entity.User;
 import com.poortorich.user.repository.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
@@ -25,6 +23,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -88,7 +88,7 @@ public class AuthService {
             tokenManager.setRefreshTokens(response, newRefreshToken);
 
             return AccessTokenResponse.builder()
-                    .accessToken(JwtConstants.TOKEN_PREFIX + accessToken)
+                    .accessToken(accessToken)
                     .build();
 
         } catch (DataAccessException e) {
