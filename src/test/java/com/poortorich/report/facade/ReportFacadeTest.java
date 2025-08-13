@@ -63,7 +63,7 @@ class ReportFacadeTest {
 
         verify(reportService).reportMember(reporterMember, reportedMember, chatroom, request);
 
-        assertThat(result.getReportType()).isEqualTo(request.getReportType());
+        assertThat(result.getReportReason()).isEqualTo(request.parseReportReason().toString());
         assertThat(result.getReportedUserId()).isEqualTo(reportedId);
     }
 

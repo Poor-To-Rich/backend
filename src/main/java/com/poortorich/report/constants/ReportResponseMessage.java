@@ -10,6 +10,7 @@ public class ReportResponseMessage {
 
     public static final String REPORT_DUPLICATE = "현재 채팅방에서 이미 이 참여자를 신고했습니다.";
     public static final String SELF_REPORT_NOT_ALLOWED = "자기 자신을 신고할 수 없습니다.";
+    public static final String REPORT_REASON_INVALID = "신고 사유가 적절하지 않습니다.";
 
     private ReportResponseMessage() {
     }

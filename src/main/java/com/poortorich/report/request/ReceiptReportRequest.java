@@ -20,4 +20,12 @@ public class ReceiptReportRequest {
     @Size(max = ReportValidationConstraints.CUSTOM_REASON_MAX,
             message = ReportResponseMessage.CUSTOM_REASON_TOO_BIG)
     private String customReason;
+
+    public ReportReason parseReportReason() {
+        try {
+            return ReportReason.valueOf(reportReason);
+        } catch (Exception e) {
+            throw new BadRequestException(ReportResponse.REPORT_REASON_INVALID);
+        }
+    }
 }

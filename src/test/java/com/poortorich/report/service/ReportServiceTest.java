@@ -54,7 +54,7 @@ class ReportServiceTest {
         assertThat(report.getReporter()).isEqualTo(reporterMember);
         assertThat(report.getReported()).isEqualTo(reportedMember);
         assertThat(report.getChatroom()).isEqualTo(chatroom);
-        assertThat(report.getReason()).isEqualTo(ReportReason.valueOf(request.getReportType()));
+        assertThat(report.getReason()).isEqualTo(request.parseReportReason());
     }
 
     @Test
