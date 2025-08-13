@@ -216,7 +216,7 @@ public class ChatController {
     public ResponseEntity<BaseResponse> markAllChatroomAsRead(@AuthenticationPrincipal UserDetails userDetails) {
         MarkAllChatroomAsReadResult result = realTimeFacade.markAllChatroomAsRead(userDetails.getUsername());
 
-        result.getBroadcastPayloads().stream()
+        result.getBroadcastPayloads()
                 .forEach(basePayload -> {
                     MessageReadPayload payload = (MessageReadPayload) basePayload.getPayload();
                     messagingTemplate.convertAndSend(
