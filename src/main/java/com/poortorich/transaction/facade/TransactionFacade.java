@@ -1,4 +1,4 @@
-package com.poortorich.report.facade;
+package com.poortorich.transaction.facade;
 
 import com.poortorich.accountbook.entity.AccountBook;
 import com.poortorich.accountbook.enums.AccountBookType;
@@ -13,14 +13,14 @@ import com.poortorich.global.date.domain.YearInformation;
 import com.poortorich.global.date.util.DateInfoProvider;
 import com.poortorich.global.date.util.DateParser;
 import com.poortorich.global.exceptions.BadRequestException;
-import com.poortorich.report.response.DailyDetailsResponse;
-import com.poortorich.report.response.Logs;
-import com.poortorich.report.response.MonthlyTotalReportResponse;
-import com.poortorich.report.response.MonthlyTotalResponse;
-import com.poortorich.report.response.WeeklyDetailsResponse;
-import com.poortorich.report.response.WeeklyTotalReportResponse;
-import com.poortorich.report.response.enums.ReportResponse;
-import com.poortorich.report.service.ReportService;
+import com.poortorich.transaction.response.DailyDetailsResponse;
+import com.poortorich.transaction.response.Logs;
+import com.poortorich.transaction.response.YearlyTotalResponse;
+import com.poortorich.transaction.response.MonthlyTotalResponse;
+import com.poortorich.transaction.response.WeeklyDetailsResponse;
+import com.poortorich.transaction.response.WeeklyTotalResponse;
+import com.poortorich.transaction.response.enums.TransactionResponse;
+import com.poortorich.transaction.service.TransactionService;
 import com.poortorich.user.entity.User;
 import com.poortorich.user.service.UserService;
 import java.time.LocalDate;
@@ -37,13 +37,13 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class ReportFacade {
+public class TransactionFacade {
 
     private final UserService userService;
-    private final ReportService reportService;
+    private final TransactionService transactionService;
     private final AccountBookService accountBookService;
 
-    public DailyDetailsResponse getDailyDetailsReport(String username, String inputDate) {
+    public DailyDetailsResponse getDailyDetails(String username, String inputDate) {
         User user = userService.findUserByUsername(username);
         LocalDate date = DateParser.parseDate(inputDate);
 
@@ -52,14 +52,14 @@ public class ReportFacade {
         List<AccountBook> dailyExpenses
                 = accountBookService.getAccountBookBetweenDates(user, date, date, AccountBookType.EXPENSE);
 
-        return reportService.getDailyDetailsReport(dailyIncomes, dailyExpenses);
+        return transactionService.getDailyDetails(dailyIncomes, dailyExpenses);
     }
 
-    public WeeklyDetailsResponse getWeeklyDetailsReport(String username, String date, Long week, String cursor) {
+    public WeeklyDetailsResponse getWeeklyDetails(String username, String date, Long week, String cursor) {
         User user = userService.findUserByUsername(username);
         MonthInformation monthInfo = (MonthInformation) DateInfoProvider.get(date);
         if (monthInfo.getWeeks().size() < week) {
-            throw new BadRequestException(ReportResponse.WEEK_INVALID);
+            throw new BadRequestException(TransactionResponse.WEEK_INVALID);
         }
 
         LocalDate startDate = monthInfo.getWeeks().get((int) (week - 1)).getStartDate();
@@ -81,18 +81,18 @@ public class ReportFacade {
         );
 
         List<AccountBook> mergeSliceAccountBooks
-                = reportService.mergeAccountBookLimit(weeklyIncomes.getContent(), weeklyExpenses.getContent(), 20);
+                = transactionService.mergeAccountBookLimit(weeklyIncomes.getContent(), weeklyExpenses.getContent(), 20);
         List<AccountBook> accountBooksByLastDate
                 = getAccountBooksByLastDate(user, mergeSliceAccountBooks, weeklyExpenses, weeklyIncomes);
 
         List<AccountBook> weeklyAccountBooks
-                = reportService.mergeAccountBookDistinct(mergeSliceAccountBooks, accountBooksByLastDate);
+                = transactionService.mergeAccountBookDistinct(mergeSliceAccountBooks, accountBooksByLastDate);
 
         LocalDate nextCursor = getNextCursor(accountBooksByLastDate, endDate);
         Boolean hasNext = accountBookService.hasNextPage(user, nextCursor, endDate);
         Long countOfLogs = accountBookService.countByUserAndBetweenDates(user, startDate, endDate);
 
-        return reportService.getWeeklyDetailsReport(
+        return transactionService.getWeeklyDetails(
                 weeklyAccountBooks, PeriodFormatter.formatWeeklyReportRange(startDate, endDate), countOfLogs,
                 nextCursor, hasNext
         );
@@ -117,7 +117,7 @@ public class ReportFacade {
             );
         }
 
-        return reportService.mergeAccountBook(incomesByLastDate, expensesByLastDate);
+        return transactionService.mergeAccountBook(incomesByLastDate, expensesByLastDate);
     }
 
     private LocalDate getNextCursor(List<AccountBook> accountBooksByLastDate, LocalDate endDate) {
@@ -147,11 +147,11 @@ public class ReportFacade {
                 .totalAmount(totalIncome - totalExpense)
                 .totalIncome(totalIncome)
                 .totalExpense(totalExpense)
-                .transactions(reportService.getDailyFinance(monthlyIncomes, monthlyExpenses))
+                .transactions(transactionService.getDailyFinance(monthlyIncomes, monthlyExpenses))
                 .build();
     }
 
-    public MonthlyTotalReportResponse getMonthlyTotalReport(String username, String date) {
+    public YearlyTotalResponse getYearlyTotal(String username, String date) {
         User user = userService.findUserByUsername(username);
         YearInformation yearInfo;
         if (date == null) {
@@ -174,7 +174,7 @@ public class ReportFacade {
         Long totalIncome = AccountBookCalculator.sum(yearlyIncomes);
         Long totalExpense = AccountBookCalculator.sum(yearlyExpenses);
 
-        return MonthlyTotalReportResponse.builder()
+        return YearlyTotalResponse.builder()
                 .yearTotalIncome(totalIncome)
                 .yearTotalExpense(totalExpense)
                 .yearTotalAmount(totalIncome - totalExpense)
@@ -195,7 +195,7 @@ public class ReportFacade {
                     user, monthInfo.getStartDate(), monthInfo.getEndDate(), AccountBookType.EXPENSE
             );
 
-            logs.add(reportService.getLogs(
+            logs.add(transactionService.getLogs(
                     monthInfo.getStartDate(), monthInfo.getEndDate(), monthlyIncomes, monthlyExpenses
             ));
         }
@@ -203,11 +203,11 @@ public class ReportFacade {
         return logs;
     }
 
-    public WeeklyTotalReportResponse getWeeklyTotalReport(String username, String date) {
+    public WeeklyTotalResponse getWeeklyTotal(String username, String date) {
         User user = userService.findUserByUsername(username);
         MonthInformation monthInfo = (MonthInformation) DateInfoProvider.get(date);
 
-        return WeeklyTotalReportResponse.builder()
+        return WeeklyTotalResponse.builder()
                 .weeklyLogs(getWeeklyLogs(user, monthInfo))
                 .build();
     }
@@ -223,7 +223,7 @@ public class ReportFacade {
                     user, weekInfo.getStartDate(), weekInfo.getEndDate(), AccountBookType.EXPENSE
             );
 
-            weeklyLogs.add(reportService.getLogs(
+            weeklyLogs.add(transactionService.getLogs(
                     weekInfo.getStartDate(), weekInfo.getEndDate(), weeklyIncomes, weeklyExpenses
             ));
         }

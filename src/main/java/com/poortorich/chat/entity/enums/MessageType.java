@@ -12,5 +12,6 @@ public enum MessageType {
     RANKING,
     ENTER,
     LEAVE,
+    RANKING_STATUS,
     CLOSE
 }
