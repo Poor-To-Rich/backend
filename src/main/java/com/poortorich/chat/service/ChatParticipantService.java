@@ -109,4 +109,12 @@ public class ChatParticipantService {
     public List<ChatParticipant> findAllByChatroomExcludingUser(Chatroom chatroom, User excludedUser) {
         return chatParticipantRepository.findAllByChatroomAndIsParticipatedTrueAndUserNot(chatroom, excludedUser);
     }
+
+    public List<ChatParticipant> findAllByUser(User user) {
+        return chatParticipantRepository.findAllByUserAndIsParticipatedTrue(user);
+    }
+
+    public List<ChatParticipant> findAllByUsernameWithChatroomAndUser(String username) {
+        return chatParticipantRepository.findAllByUsernameWithChatroomAndUser(username);
+    }
 }

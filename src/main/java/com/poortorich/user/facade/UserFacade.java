@@ -25,6 +25,7 @@ import com.poortorich.user.service.RedisUserReservationService;
 import com.poortorich.user.service.UserResetService;
 import com.poortorich.user.service.UserService;
 import com.poortorich.user.service.UserValidationService;
+import com.poortorich.user.util.UserProfileUpdateEventDetector;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -42,6 +43,7 @@ public class UserFacade {
     private final CategoryService categoryService;
     private final KakaoService kakaoService;
     private final JwtTokenManager tokenManager;
+    private final UserProfileUpdateEventDetector userProfileUpdateEventDetector;
 
     @Transactional
     public void registerNewUser(UserRegistrationRequest userRegistrationRequest) {
@@ -79,6 +81,7 @@ public class UserFacade {
                 userProfile.getProfileImage(),
                 userProfile.getIsDefaultProfile());
 
+        userProfileUpdateEventDetector.detectEvent(username, userProfile, newProfileImage);
         userService.update(username, userProfile, newProfileImage);
         return UserResponse.USER_PROFILE_UPDATE_SUCCESS;
     }
