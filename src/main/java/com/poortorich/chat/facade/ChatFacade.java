@@ -73,7 +73,9 @@ public class ChatFacade {
 
         Chatroom chatroom = chatroomService.createChatroom(imageUrl, request);
         chatParticipantService.createChatroomHost(user, chatroom);
-        tagService.createTag(request.getHashtags(), chatroom);
+        if (request.getHashtags() != null) {
+            tagService.createTag(request.getHashtags(), chatroom);
+        }
 
         return ChatroomCreateResponse.builder().newChatroomId(chatroom.getId()).build();
     }
