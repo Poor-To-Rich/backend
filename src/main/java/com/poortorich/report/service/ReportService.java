@@ -9,6 +9,7 @@ import com.poortorich.report.request.ReceiptReportRequest;
 import com.poortorich.report.response.enums.ReportResponse;
 import com.poortorich.report.util.ReportBuilder;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -23,17 +24,35 @@ public class ReportService {
             Chatroom chatroom,
             ReceiptReportRequest request
     ) {
-        if (reportRepository.existsByReporterAndReportedAndChatroom(reporterMember, reportedMember, chatroom)) {
+        validateReport(reporterMember, reportedMember, chatroom, request.parseReportReason());
+
+        try {
+            reportRepository.save(
+                    ReportBuilder.buildReport(
+                            reporterMember,
+                            reportedMember,
+                            chatroom,
+                            request.parseReportReason(),
+                            request.getCustomReason())
+            );
+        } catch (DataIntegrityViolationException e) {
             throw new ConflictException(ReportResponse.REPORT_DUPLICATE);
         }
+    }
 
-        reportRepository.save(
-                ReportBuilder.buildReport(
-                        reporterMember,
-                        reportedMember,
-                        chatroom,
-                        request.parseReportReason(),
-                        request.getCustomReason())
-        );
+    private void validateReport(
+            ChatParticipant reporterMember,
+            ChatParticipant reportedMember,
+            Chatroom chatroom,
+            ReportReason reason
+    ) {
+        if (reportRepository.existsByReporterAndReportedAndChatroomAndReason(
+                reporterMember,
+                reportedMember,
+                chatroom,
+                reason)
+        ) {
+            throw new ConflictException(ReportResponse.REPORT_DUPLICATE);
+        }
     }
 }

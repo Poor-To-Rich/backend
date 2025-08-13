@@ -8,7 +8,7 @@ public class ReportResponseMessage {
     public static final String CUSTOM_REASON_TOO_BIG
             = "기타 사유는 " + ReportValidationConstraints.CUSTOM_REASON_MAX + "자 이하여야 합니다.";
 
-    public static final String REPORT_DUPLICATE = "현재 채팅방에서 이미 이 참여자를 신고했습니다.";
+    public static final String REPORT_DUPLICATE = "현재 채팅방에서 이미 동일 사유로 이 참여자의 신고가 접수되었습니다.";
     public static final String SELF_REPORT_NOT_ALLOWED = "자기 자신을 신고할 수 없습니다.";
     public static final String REPORT_REASON_INVALID = "신고 사유가 적절하지 않습니다.";
 

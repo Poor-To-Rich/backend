@@ -12,7 +12,11 @@ public enum ReportResponse implements Response {
 
     MEMBER_REPORT_SUCCESS(HttpStatus.CREATED, ReportResponseMessage.MEMBER_REPORT_SUCCESS, null),
 
-    REPORT_DUPLICATE(HttpStatus.CONFLICT, ReportResponseMessage.REPORT_DUPLICATE, "userId, chatroomId"),
+    REPORT_DUPLICATE(
+            HttpStatus.CONFLICT,
+            ReportResponseMessage.REPORT_DUPLICATE,
+            "userId, chatroomId, reportReason"
+    ),
     SELF_REPORT_NOT_ALLOWED(HttpStatus.BAD_REQUEST, ReportResponseMessage.SELF_REPORT_NOT_ALLOWED, "userId"),
     REPORT_REASON_INVALID(HttpStatus.BAD_REQUEST, ReportResponseMessage.REPORT_REASON_INVALID, "reportReason");
 
