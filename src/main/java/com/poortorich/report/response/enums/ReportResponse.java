@@ -10,7 +10,7 @@ import org.springframework.http.HttpStatus;
 @RequiredArgsConstructor
 public enum ReportResponse implements Response {
 
-    MEMBER_REPORT_SUCCESS(HttpStatus.OK, ReportResponseMessage.MEMBER_REPORT_SUCCESS, null),
+    MEMBER_REPORT_SUCCESS(HttpStatus.CREATED, ReportResponseMessage.MEMBER_REPORT_SUCCESS, null),
 
     REPORT_DUPLICATE(HttpStatus.CONFLICT, ReportResponseMessage.REPORT_DUPLICATE, "userId, chatroomId");
 

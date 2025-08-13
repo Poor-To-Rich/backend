@@ -30,17 +30,13 @@ class ReportControllerTest extends BaseSecurityTest {
 
     @Autowired
     private MockMvc mockMvc;
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @MockitoBean
     private ReportFacade reportFacade;
 
     private final String username = "test";
-    private ObjectMapper objectMapper;
-
-    @BeforeEach
-    void setUp() {
-        objectMapper = new ObjectMapper();
-    }
 
     @Test
     @WithMockUser(username = username)
@@ -57,7 +53,7 @@ class ReportControllerTest extends BaseSecurityTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request))
                         .with(csrf()))
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andExpect(jsonPath(("$.message")).value(ReportResponse.MEMBER_REPORT_SUCCESS.getMessage()));
     }
 }
