@@ -16,6 +16,7 @@ import com.poortorich.chat.response.ChatroomsResponse;
 import com.poortorich.chat.service.ChatMessageService;
 import com.poortorich.chat.service.ChatParticipantService;
 import com.poortorich.chat.service.ChatroomService;
+import com.poortorich.chatnotice.request.ChatNoticeUpdateRequest;
 import com.poortorich.s3.service.FileUploadService;
 import com.poortorich.tag.service.TagService;
 import com.poortorich.user.entity.User;
@@ -41,6 +42,14 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class ChatFacadeTest {
 
+    private final Long chatroomId = 1L;
+    private final MultipartFile image = Mockito.mock(MultipartFile.class);
+    private final String imageUrl = "https://image.com";
+    private final String chatroomTitle = "채팅방";
+    private final Long maxMemberCount = 10L;
+    private final List<String> hashtags = List.of("부자", "거지");
+    private final Boolean isRankingEnabled = false;
+    private final String chatroomPassword = "부자12";
     @Mock
     private UserService userService;
     @Mock
@@ -53,19 +62,8 @@ class ChatFacadeTest {
     private TagService tagService;
     @Mock
     private ChatMessageService chatMessageService;
-
     @InjectMocks
     private ChatFacade chatFacade;
-
-    private final Long chatroomId = 1L;
-    private final MultipartFile image = Mockito.mock(MultipartFile.class);
-    private final String imageUrl = "https://image.com";
-    private final String chatroomTitle = "채팅방";
-    private final Long maxMemberCount = 10L;
-    private final List<String> hashtags = List.of("부자", "거지");
-    private final Boolean isRankingEnabled = false;
-    private final String chatroomPassword = "부자12";
-
     private Chatroom chatroom;
 
     @BeforeEach
