@@ -42,14 +42,14 @@ class ChatNoticeServiceTest {
     }
 
     @Test
-    @DisplayName("공지가 없는 경우 예외 발생")
-    void getLatestNoticeNotFound() {
+    @DisplayName("공지가 없는 경우 null 반환")
+    void getLatestNoticeNotFoundNull() {
         Chatroom chatroom = Chatroom.builder().build();
 
         when(chatNoticeRepository.findTop1ByChatroomOrderByCreatedDateDesc(chatroom)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> chatNoticeService.getLatestNotice(chatroom))
-                .isInstanceOf(NotFoundException.class)
-                .hasMessageContaining(ChatNoticeResponse.NOTICE_NOT_FOUND.getMessage());
+        ChatNotice latestNotice = chatNoticeService.getLatestNotice(chatroom);
+
+        assertThat(latestNotice).isNull();
     }
 }
