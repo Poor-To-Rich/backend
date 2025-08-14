@@ -24,7 +24,8 @@ public class ReportService {
             Chatroom chatroom,
             ReceiptReportRequest request
     ) {
-        validateReport(reporterMember, reportedMember, chatroom, request.parseReportReason());
+        ReportReason reason = request.parseReportReason();
+        validateReport(reporterMember, reportedMember, chatroom, reason);
 
         try {
             reportRepository.save(
@@ -32,7 +33,7 @@ public class ReportService {
                             reporterMember,
                             reportedMember,
                             chatroom,
-                            request.parseReportReason(),
+                            reason,
                             request.getCustomReason())
             );
         } catch (DataIntegrityViolationException e) {
