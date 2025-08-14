@@ -6,6 +6,8 @@ import com.poortorich.chat.entity.enums.ChatMessageType;
 import com.poortorich.chat.entity.enums.MessageType;
 import com.poortorich.user.entity.User;
 
+import java.time.LocalDate;
+
 public class SystemMessageBuilder {
 
     private static final String ENTER_CONTENT_SUFFIX = "님이 입장했습니다.";
@@ -35,6 +37,15 @@ public class SystemMessageBuilder {
                 .messageType(MessageType.CLOSE)
                 .type(ChatMessageType.SYSTEM_MESSAGE)
                 .content(CHATROOM_CLOSED_BY_HOST)
+                .chatroom(chatroom)
+                .build();
+    }
+
+    public static ChatMessage buildChatDateMessage(Chatroom chatroom) {
+        return ChatMessage.builder()
+                .messageType(MessageType.DATE)
+                .type(ChatMessageType.SYSTEM_MESSAGE)
+                .content(LocalDate.now().toString())
                 .chatroom(chatroom)
                 .build();
     }
