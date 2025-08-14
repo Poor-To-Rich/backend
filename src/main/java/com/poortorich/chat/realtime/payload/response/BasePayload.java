@@ -1,6 +1,6 @@
 package com.poortorich.chat.realtime.payload.response;
 
-import com.poortorich.chat.entity.enums.ChatMessageType;
+import com.poortorich.websocket.payload.interfaces.EventType;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -8,6 +8,6 @@ import lombok.Getter;
 @Builder
 public class BasePayload {
 
-    private ChatMessageType type;
+    private EventType type;
     private Object payload;
 }
