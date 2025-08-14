@@ -38,7 +38,7 @@ public class ReportFacade {
     }
 
     private void validReporterAndReported(ChatParticipant reporterMember, ChatParticipant reportedMember) {
-        if (reporterMember.equals(reportedMember)) {
+        if (reporterMember.getId().equals(reportedMember.getId())) {
             throw new BadRequestException(ReportResponse.SELF_REPORT_NOT_ALLOWED);
         }
     }
