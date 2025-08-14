@@ -2,6 +2,7 @@ package com.poortorich.report.service;
 
 import com.poortorich.chat.entity.ChatParticipant;
 import com.poortorich.chat.entity.Chatroom;
+import com.poortorich.global.exceptions.BadRequestException;
 import com.poortorich.global.exceptions.ConflictException;
 import com.poortorich.report.entity.Report;
 import com.poortorich.report.entity.enums.ReportReason;
@@ -105,5 +106,18 @@ class ReportServiceTest {
         assertThatThrownBy(() -> reportService.reportMember(reporter, reported, chatroom, request))
                 .isInstanceOf(ConflictException.class)
                 .hasMessageContaining(ReportResponse.REPORT_DUPLICATE.getMessage());
+    }
+
+    @Test
+    @DisplayName("신고 사유가 적절하지 않은 경우 예외 발생")
+    void reportMemberBadRequestReason() {
+        Chatroom chatroom = Chatroom.builder().build();
+        ChatParticipant reporter = ChatParticipant.builder().chatroom(chatroom).build();
+        ChatParticipant reported = ChatParticipant.builder().chatroom(chatroom).build();
+        ReceiptReportRequest request = new ReceiptReportRequest("INVALID", null);
+
+        assertThatThrownBy(() -> reportService.reportMember(reporter, reported, chatroom, request))
+                .isInstanceOf(BadRequestException.class)
+                .hasMessageContaining(ReportResponse.REPORT_REASON_INVALID.getMessage());
     }
 }
