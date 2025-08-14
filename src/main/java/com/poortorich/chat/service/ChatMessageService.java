@@ -84,6 +84,7 @@ public class ChatMessageService {
                 .content(chatMessage.getContent())
                 .sentAt(chatMessage.getSentAt())
                 .unreadBy(unreadBy)
+                .type(chatMessage.getType())
                 .build();
     }
 
