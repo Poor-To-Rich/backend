@@ -12,6 +12,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -51,5 +52,24 @@ class ChatNoticeServiceTest {
         ChatNotice latestNotice = chatNoticeService.getLatestNotice(chatroom);
 
         assertThat(latestNotice).isNull();
+    }
+
+    @Test
+    @DisplayName("최근 공지 목록 조회 성공")
+    void getPreviewNoticesSuccess() {
+        Chatroom chatroom = Chatroom.builder().build();
+        ChatNotice chatNotice1 = ChatNotice.builder().chatroom(chatroom).build();
+        ChatNotice chatNotice2 = ChatNotice.builder().chatroom(chatroom).build();
+        ChatNotice chatNotice3 = ChatNotice.builder().chatroom(chatroom).build();
+
+        when(chatNoticeRepository.findTop3ByChatroomOrderByCreatedDateDesc(chatroom))
+                .thenReturn(List.of(chatNotice1, chatNotice2, chatNotice3));
+
+        List<ChatNotice> previewNotice = chatNoticeService.getPreviewNotices(chatroom);
+
+        assertThat(previewNotice).hasSize(3);
+        assertThat(previewNotice.get(0)).isEqualTo(chatNotice1);
+        assertThat(previewNotice.get(1)).isEqualTo(chatNotice2);
+        assertThat(previewNotice.get(2)).isEqualTo(chatNotice3);
     }
 }

@@ -10,6 +10,7 @@ public enum ChatNoticeResponse implements Response {
 
     GET_LATEST_NOTICE_SUCCESS(HttpStatus.OK, ChatNoticeResponseMessage.GET_LATEST_NOTICE_SUCCESS, null),
     UPDATE_NOTICE_STATUS_SUCCESS(HttpStatus.OK, ChatNoticeResponseMessage.UPDATE_NOTICE_STATUS_SUCCESS, null),
+    GET_PREVIEW_NOTICE_SUCCESS(HttpStatus.OK, ChatNoticeResponseMessage.GET_PREVIEW_NOTICE_SUCCESS, null),
 
     NOTICE_STATUS_INVALID(HttpStatus.BAD_REQUEST, ChatNoticeResponseMessage.NOTICE_STATUS_INVALID, "status"),
     NOTICE_NOT_FOUND(HttpStatus.NOT_FOUND, ChatNoticeResponseMessage.NOTICE_NOT_FOUND, null);
