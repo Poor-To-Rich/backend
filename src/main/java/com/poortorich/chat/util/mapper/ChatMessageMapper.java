@@ -82,6 +82,7 @@ public class ChatMessageMapper {
                 .content(chatMessage.getContent())
                 .sendAt(chatMessage.getSentAt())
                 .unreadBy(unreadChatMessageService.getUserIdsByChatMessage(chatMessage))
+                .type(chatMessage.getType())
                 .build();
     }
 }
