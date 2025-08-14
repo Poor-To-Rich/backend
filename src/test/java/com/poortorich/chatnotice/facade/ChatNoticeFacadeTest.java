@@ -118,7 +118,7 @@ class ChatNoticeFacadeTest {
     @DisplayName("최근 공지 목록 조회 성공")
     void getPreviewNoticesSuccess() {
         ChatNotice chatNotice2 = ChatNotice.builder()
-                .id(1L)
+                .id(2L)
                 .chatroom(chatroom)
                 .author(user)
                 .content("공지 내용")
@@ -143,7 +143,7 @@ class ChatNoticeFacadeTest {
     void getPreviewNoticesPreviewTest() {
         String preview = "코딩하다가 정신 차려보니 새벽 3시가 되었다. 피곤하지";
         ChatNotice chatNotice2 = ChatNotice.builder()
-                .id(1L)
+                .id(2L)
                 .chatroom(chatroom)
                 .author(user)
                 .content("코딩하다가 정신 차려보니 새벽 3시가 되었다. 피곤하지만 너무 재밌어서 멈출수가 없다.")
