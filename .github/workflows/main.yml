@@ -24,12 +24,14 @@ jobs:
         run: ./gradlew build
       # DockerHub 로그인
       - name: Login to DockerHub
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
         uses: docker/login-action@v1
         with:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
       # DockerHub Push
       - name: Build and Push Docker Image
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
         run: |
           docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/poor-to-rich .
           docker push ${{ secrets.DOCKER_HUB_USERNAME }}/poor-to-rich
@@ -37,6 +39,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     needs: build
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
 
     steps:
       # AWS 배포
@@ -50,5 +53,6 @@ jobs:
             cd poor-to-rich-server
             sudo docker-compose stop
             sudo docker-compose rm -f
-            sudo docker rmi sjh9708/poor-to-rich:lastest
+            sudo docker rmi ${{ secrets.DOCKER_HUB_USERNAME }}/poor-to-rich:lastest
+            sudo docker-compose pull
             sudo docker-compose up -d
