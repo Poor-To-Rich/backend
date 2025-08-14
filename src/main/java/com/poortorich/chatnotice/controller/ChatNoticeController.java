@@ -46,4 +46,12 @@ public class ChatNoticeController {
         chatFacade.updateNoticeStatus(userDetails.getUsername(), chatroomId, request);
         return BaseResponse.toResponseEntity(ChatNoticeResponse.UPDATE_NOTICE_STATUS_SUCCESS);
     }
+
+    @GetMapping("/preview")
+    public ResponseEntity<BaseResponse> getPreviewNotices(@PathVariable Long chatroomId) {
+        return DataResponse.toResponseEntity(
+                ChatNoticeResponse.GET_PREVIEW_NOTICE_SUCCESS,
+                chatNoticeFacade.getPreviewNotices(chatroomId)
+        );
+    }
 }
