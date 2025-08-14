@@ -3,6 +3,7 @@ package com.poortorich.chat.repository;
 import com.poortorich.chat.entity.ChatParticipant;
 import com.poortorich.chat.entity.Chatroom;
 import com.poortorich.user.entity.User;
+
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -23,6 +24,17 @@ public interface ChatParticipantRepository extends JpaRepository<ChatParticipant
     """)
     Optional<ChatParticipant> findByUsernameAndChatroom(
             @Param("username") String username,
+            @Param("chatroom") Chatroom chatroom
+    );
+
+    @Query("""
+        SELECT cp
+          FROM ChatParticipant cp
+         WHERE cp.user.id = :userId
+           AND cp.chatroom = :chatroom
+    """)
+    Optional<ChatParticipant> findByUserIdAndChatroom(
+            @Param("userId") Long userId,
             @Param("chatroom") Chatroom chatroom
     );
 
