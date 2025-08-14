@@ -2,11 +2,13 @@ package com.poortorich.chat.repository;
 
 import com.poortorich.chat.entity.ChatMessage;
 import com.poortorich.chat.entity.Chatroom;
-import java.util.List;
-import java.util.Optional;
+import com.poortorich.chat.entity.enums.MessageType;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.List;
+import java.util.Optional;
 
 public interface ChatMessageRepository extends JpaRepository<ChatMessage, Long> {
 
@@ -17,4 +19,6 @@ public interface ChatMessageRepository extends JpaRepository<ChatMessage, Long> 
     void deleteAllByChatroom(Chatroom chatroom);
 
     Slice<ChatMessage> findByChatroomAndIdLessThanEqualOrderByIdDesc(Chatroom chatroom, Long cursor, Pageable pageable);
+
+    boolean existsByContentAndMessageTypeAndChatroom(String content, MessageType messageType, Chatroom chatroom);
 }

@@ -8,6 +8,7 @@ import com.poortorich.chat.realtime.model.PayloadContext;
 import com.poortorich.chat.realtime.payload.request.ChatMessageRequestPayload;
 import com.poortorich.chat.realtime.payload.request.MarkMessagesAsReadRequestPayload;
 import com.poortorich.chat.realtime.payload.response.BasePayload;
+import com.poortorich.chat.realtime.payload.response.DateChangeMessagePayload;
 import com.poortorich.chat.realtime.payload.response.MessageReadPayload;
 import com.poortorich.chat.realtime.payload.response.RankingStatusMessagePayload;
 import com.poortorich.chat.realtime.payload.response.UserChatMessagePayload;
@@ -20,10 +21,11 @@ import com.poortorich.chat.util.detector.RankingStatusChangeDetector;
 import com.poortorich.chat.util.manager.ChatroomLeaveManager;
 import com.poortorich.user.entity.User;
 import com.poortorich.user.service.UserService;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -93,6 +95,14 @@ public class ChatRealTimeFacade {
         PayloadContext context = payloadCollector.getPayloadContext(username, requestPayload.getChatroomId());
 
         MessageReadPayload payload = unreadChatMessageService.markMessageAsRead(context.chatParticipant());
+
+        return payload.mapToBasePayload();
+    }
+
+    public BasePayload createDateChangeSystemMessage(Long newChatroomId) {
+        PayloadContext context = payloadCollector.getPayloadContext(newChatroomId);
+
+        DateChangeMessagePayload payload = chatMessageService.saveDateChangeMessage(context.chatroom());
 
         return payload.mapToBasePayload();
     }

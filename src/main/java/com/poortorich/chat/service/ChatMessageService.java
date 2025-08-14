@@ -7,23 +7,26 @@ import com.poortorich.chat.model.ChatPaginationContext;
 import com.poortorich.chat.realtime.builder.RankingStatusChatMessageBuilder;
 import com.poortorich.chat.realtime.builder.SystemMessageBuilder;
 import com.poortorich.chat.realtime.builder.UserChatMessageBuilder;
+import com.poortorich.chat.realtime.event.datechange.detector.DateChangeDetector;
 import com.poortorich.chat.realtime.model.PayloadContext;
 import com.poortorich.chat.realtime.payload.request.ChatMessageRequestPayload;
 import com.poortorich.chat.realtime.payload.response.ChatroomClosedResponsePayload;
+import com.poortorich.chat.realtime.payload.response.DateChangeMessagePayload;
 import com.poortorich.chat.realtime.payload.response.RankingStatusMessagePayload;
 import com.poortorich.chat.realtime.payload.response.UserChatMessagePayload;
 import com.poortorich.chat.realtime.payload.response.UserEnterResponsePayload;
 import com.poortorich.chat.realtime.payload.response.UserLeaveResponsePayload;
 import com.poortorich.chat.repository.ChatMessageRepository;
 import com.poortorich.user.entity.User;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -32,7 +35,11 @@ public class ChatMessageService {
     private final ChatMessageRepository chatMessageRepository;
     private final UnreadChatMessageService unreadChatMessageService;
 
+    private final DateChangeDetector dateChangeDetector;
+
+    @Transactional
     public UserEnterResponsePayload saveUserEnterMessage(User user, Chatroom chatroom) {
+        dateChangeDetector.detect(chatroom);
         ChatMessage chatMessage = chatMessageRepository.save(SystemMessageBuilder.buildEnterMessage(user, chatroom));
 
         return UserEnterResponsePayload.builder()
@@ -45,7 +52,9 @@ public class ChatMessageService {
                 .build();
     }
 
+    @Transactional
     public UserLeaveResponsePayload saveUserLeaveMessage(User user, Chatroom chatroom) {
+        dateChangeDetector.detect(chatroom);
         ChatMessage chatMessage = chatMessageRepository.save(SystemMessageBuilder.buildLeaveMessage(user, chatroom));
 
         return UserLeaveResponsePayload.builder()
@@ -70,6 +79,7 @@ public class ChatMessageService {
             List<ChatParticipant> chatMembers,
             ChatMessageRequestPayload chatMessageRequestPayload
     ) {
+        dateChangeDetector.detect(chatParticipant.getChatroom());
         ChatMessage chatMessage = chatMessageRepository.save(
                 UserChatMessageBuilder.buildChatMessage(chatParticipant, chatMessageRequestPayload));
 
@@ -87,12 +97,36 @@ public class ChatMessageService {
     }
 
     @Transactional
+    public DateChangeMessagePayload saveDateChangeMessage(Chatroom chatroom) {
+        ChatMessage dateChangeMessage = SystemMessageBuilder.buildDateChangeMessage(chatroom);
+
+        if (chatMessageRepository.existsByContentAndMessageTypeAndChatroom(
+                dateChangeMessage.getContent(),
+                dateChangeMessage.getMessageType(),
+                chatroom)
+        ) {
+            return null;
+        }
+
+        dateChangeMessage = chatMessageRepository.save(dateChangeMessage);
+        return DateChangeMessagePayload.builder()
+                .messageId(dateChangeMessage.getId())
+                .chatroomId(dateChangeMessage.getChatroom().getId())
+                .messageType(dateChangeMessage.getMessageType())
+                .content(dateChangeMessage.getContent())
+                .sendAt(dateChangeMessage.getSentAt())
+                .build();
+    }
+
+    @Transactional
     public void closeAllMessagesByChatroom(Chatroom chatroom) {
         chatMessageRepository.findAllByChatroom(chatroom)
                 .forEach(ChatMessage::closeChatroom);
     }
 
+    @Transactional
     public ChatroomClosedResponsePayload saveChatroomClosedMessage(Chatroom chatroom) {
+        dateChangeDetector.detect(chatroom);
         ChatMessage chatMessage = chatMessageRepository.save(SystemMessageBuilder.buildChatroomClosedMessage(chatroom));
 
         return ChatroomClosedResponsePayload.builder()
@@ -127,10 +161,12 @@ public class ChatMessageService {
                 context.pageRequest());
     }
 
+    @Transactional
     public RankingStatusMessagePayload saveRankingStatusMessage(PayloadContext context) {
         ChatMessage rankingStatusChatMessage = RankingStatusChatMessageBuilder.buildRankingStatusMessage(
                 context.chatroom());
 
+        dateChangeDetector.detect(context.chatroom());
         ChatMessage savedRankingStatusChatMessage = chatMessageRepository.save(rankingStatusChatMessage);
 
         return RankingStatusMessagePayload.builder()

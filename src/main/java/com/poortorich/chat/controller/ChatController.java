@@ -21,7 +21,6 @@ import com.poortorich.global.response.DataResponse;
 import com.poortorich.websocket.stomp.command.subscribe.endpoint.SubscribeEndpoint;
 import jakarta.annotation.Nullable;
 import jakarta.validation.Valid;
-import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -39,6 +38,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Objects;
+
 @RestController
 @RequestMapping("/chatrooms")
 @RequiredArgsConstructor
@@ -55,6 +56,7 @@ public class ChatController {
             @Valid ChatroomCreateRequest request
     ) {
         ChatroomCreateResponse response = chatFacade.createChatroom(userDetails.getUsername(), request);
+        realTimeFacade.createDateChangeSystemMessage(response.getNewChatroomId());
         realTimeFacade.createUserEnterSystemMessage(userDetails.getUsername(), response.getNewChatroomId());
         realTimeFacade.createRankingStatusMessage(response.getNewChatroomId(), request.getIsRankingEnabled());
         return DataResponse.toResponseEntity(ChatResponse.CREATE_CHATROOM_SUCCESS, response);
