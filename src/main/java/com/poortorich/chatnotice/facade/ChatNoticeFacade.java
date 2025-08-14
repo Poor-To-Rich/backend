@@ -30,6 +30,10 @@ public class ChatNoticeFacade {
     }
 
     private LatestNoticeResponse buildLatestNoticeResponse(NoticeStatus status, ChatNotice notice) {
+        if (notice == null) {
+            return null;
+        }
+
         return LatestNoticeResponse.builder()
                 .status(status.toString())
                 .noticeId(notice.getId())

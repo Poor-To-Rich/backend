@@ -16,6 +16,6 @@ public class ChatNoticeService {
 
     public ChatNotice getLatestNotice(Chatroom chatroom) {
         return chatNoticeRepository.findTop1ByChatroomOrderByCreatedDateDesc(chatroom)
-                .orElseThrow(() -> new NotFoundException(ChatNoticeResponse.NOTICE_NOT_FOUND));
+                .orElse(null);
     }
 }
