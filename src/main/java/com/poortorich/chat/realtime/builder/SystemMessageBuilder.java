@@ -41,7 +41,7 @@ public class SystemMessageBuilder {
                 .build();
     }
 
-    public static ChatMessage buildChatDateMessage(Chatroom chatroom) {
+    public static ChatMessage buildDateChangeMessage(Chatroom chatroom) {
         return ChatMessage.builder()
                 .messageType(MessageType.DATE)
                 .type(ChatMessageType.SYSTEM_MESSAGE)
