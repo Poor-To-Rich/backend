@@ -33,6 +33,26 @@ public class ChatNoticeFacade {
     public PreviewNoticesResponse getPreviewNotices(Long chatroomId) {
         Chatroom chatroom = chatroomService.findById(chatroomId);
         List<ChatNotice> previewNotice = chatNoticeService.getPreviewNotices(chatroom);
+    }
+ 
+    private LatestNoticeResponse buildLatestNoticeResponse(NoticeStatus status, ChatNotice notice) {
+        if (notice == null) {
+            return null;
+        }
+
+        return LatestNoticeResponse.builder()
+                .status(status.toString())
+                .noticeId(notice.getId())
+                .preview(truncateContent(notice.getContent()))
+                .createdAt(notice.getCreatedDate().toString())
+                .authorNickname(notice.getAuthor().getNickname())
+                .build();
+    }
+
+    private String truncateContent(String content) {
+        if (content.length() > PREVIEW_MAX_LENGTH) {
+            return content.substring(0, PREVIEW_MAX_LENGTH);
+        }
 
         return PreviewNoticesResponse.builder()
                 .notices(ChatNoticeBuilder.buildPreviewNoticeResponse(previewNotice))

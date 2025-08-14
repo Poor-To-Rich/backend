@@ -174,4 +174,16 @@ class ChatNoticeFacadeTest {
         assertThat(result).isNotNull();
         assertThat(result.getNotices()).isEmpty();
     }
+
+    @Test
+    @DisplayName("최근 공지가 null인 경우 null response 반환")
+    void getLatestNoticeNull() {
+        when(chatroomService.findById(chatroomId)).thenReturn(chatroom);
+        when(chatParticipantService.findByUsernameAndChatroom(username, chatroom)).thenReturn(chatParticipant);
+        when(chatNoticeService.getLatestNotice(chatroom)).thenReturn(null);
+
+        LatestNoticeResponse result = chatNoticeFacade.getLatestNotice(username, chatroomId);
+
+        assertThat(result).isNull();
+    }
 }

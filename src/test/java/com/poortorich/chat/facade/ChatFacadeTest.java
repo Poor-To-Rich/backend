@@ -102,6 +102,26 @@ class ChatFacadeTest {
     }
 
     @Test
+    @DisplayName("해시태그가 없는 채팅방 추가 성공")
+    void createChatroomTagNullSuccess() {
+        String username = "test";
+        ChatroomCreateRequest request = new ChatroomCreateRequest(
+                image, chatroomTitle, maxMemberCount, null, null, isRankingEnabled, chatroomPassword
+        );
+        User user = User.builder().username(username).build();
+
+        when(userService.findUserByUsername(username)).thenReturn(user);
+        when(fileUploadService.uploadImage(image)).thenReturn(imageUrl);
+        when(chatroomService.createChatroom(imageUrl, request)).thenReturn(chatroom);
+
+        ChatroomCreateResponse response = chatFacade.createChatroom(username, request);
+
+        verify(chatParticipantService).createChatroomHost(user, chatroom);
+
+        assertThat(response.getNewChatroomId()).isEqualTo(chatroom.getId());
+    }
+
+    @Test
     @DisplayName("채팅방 정보 조회 성공")
     void getChatroomSuccess() {
         when(chatroomService.findById(chatroomId)).thenReturn(chatroom);
