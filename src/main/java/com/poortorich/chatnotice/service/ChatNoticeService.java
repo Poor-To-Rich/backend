@@ -8,6 +8,8 @@ import com.poortorich.global.exceptions.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class ChatNoticeService {
@@ -16,6 +18,10 @@ public class ChatNoticeService {
 
     public ChatNotice getLatestNotice(Chatroom chatroom) {
         return chatNoticeRepository.findTop1ByChatroomOrderByCreatedDateDesc(chatroom)
-                .orElseThrow(() -> new NotFoundException(ChatNoticeResponse.NOTICE_NOT_FOUND));
+                .orElse(null);
+    }
+
+    public List<ChatNotice> getPreviewNotices(Chatroom chatroom) {
+        return chatNoticeRepository.findTop3ByChatroomOrderByCreatedDateDesc(chatroom);
     }
 }

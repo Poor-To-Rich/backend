@@ -1,16 +1,14 @@
 package com.poortorich.chatnotice.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.poortorich.chat.facade.ChatFacade;
 import com.poortorich.chatnotice.constants.ChatNoticeResponseMessage;
 import com.poortorich.chatnotice.facade.ChatNoticeFacade;
 import com.poortorich.chatnotice.request.ChatNoticeUpdateRequest;
 import com.poortorich.chatnotice.response.LatestNoticeResponse;
+import com.poortorich.chatnotice.response.PreviewNoticesResponse;
 import com.poortorich.chatnotice.response.enums.ChatNoticeResponse;
 import com.poortorich.global.config.BaseSecurityTest;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -35,26 +33,20 @@ class ChatNoticeControllerTest extends BaseSecurityTest {
 
     @Autowired
     private MockMvc mockMvc;
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @MockitoBean
     private ChatFacade chatFacade;
     @MockitoBean
     private ChatNoticeFacade chatNoticeFacade;
 
-    private ObjectMapper objectMapper;
-
-    @BeforeEach
-    void setUp() {
-        objectMapper = new ObjectMapper()
-                .registerModule(new JavaTimeModule())
-                .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
-    }
+    private final String username = "test";
 
     @Test
-    @WithMockUser(username = "test")
+    @WithMockUser(username = username)
     @DisplayName("최신 공지 조회 성공")
     void getLatestNoticeSuccess() throws Exception {
-        String username = "test";
         Long chatroomId = 1L;
 
         when(chatNoticeFacade.getLatestNotice(username, chatroomId)).thenReturn(LatestNoticeResponse.builder().build());
@@ -68,7 +60,7 @@ class ChatNoticeControllerTest extends BaseSecurityTest {
     }
 
     @Test
-    @WithMockUser(username = "test")
+    @WithMockUser(username = username)
     @DisplayName("공지 상태 변경 성공")
     void updateNoticeStatusSuccess() throws Exception {
         long chatroomId = 1L;
@@ -85,7 +77,7 @@ class ChatNoticeControllerTest extends BaseSecurityTest {
     }
 
     @Test
-    @WithMockUser(username = "test")
+    @WithMockUser(username = username)
     @DisplayName("공지 상태 변경 입력값이 없는 경우 예외 발생")
     void updateNoticeStatusRequestNull() throws Exception {
         long chatroomId = 1L;
@@ -99,5 +91,20 @@ class ChatNoticeControllerTest extends BaseSecurityTest {
                 .andExpect(jsonPath("$.message")
                         .value(ChatNoticeResponseMessage.NOTICE_STATUS_REQUIRED)
                 );
+    }
+
+    @Test
+    @WithMockUser(username = username)
+    @DisplayName("최근 공지 목록 조회 성공")
+    void getPreviewNoticesSuccess() throws Exception {
+        Long chatroomId = 1L;
+
+        when(chatNoticeFacade.getPreviewNotices(chatroomId)).thenReturn(PreviewNoticesResponse.builder().build());
+
+        mockMvc.perform(get("/chatrooms/" + chatroomId + "/notices/preview")
+                        .with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message")
+                        .value(ChatNoticeResponse.GET_PREVIEW_NOTICE_SUCCESS.getMessage()));
     }
 }

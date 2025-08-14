@@ -16,14 +16,15 @@ import com.poortorich.chat.realtime.payload.response.UserEnterResponsePayload;
 import com.poortorich.chat.realtime.payload.response.UserLeaveResponsePayload;
 import com.poortorich.chat.repository.ChatMessageRepository;
 import com.poortorich.user.entity.User;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -41,7 +42,7 @@ public class ChatMessageService {
                 .chatroomId(chatMessage.getChatroom().getId())
                 .messageType(chatMessage.getMessageType())
                 .content(chatMessage.getContent())
-                .sendAt(chatMessage.getSentAt())
+                .sentAt(chatMessage.getSentAt())
                 .build();
     }
 
@@ -54,7 +55,7 @@ public class ChatMessageService {
                 .chatroomId(chatMessage.getChatroom().getId())
                 .messageType(chatMessage.getMessageType())
                 .content(chatMessage.getContent())
-                .sendAt(chatMessage.getSentAt())
+                .sentAt(chatMessage.getSentAt())
                 .build();
     }
 
@@ -81,8 +82,9 @@ public class ChatMessageService {
                 .senderId(chatMessage.getUserId())
                 .messageType(chatMessage.getMessageType())
                 .content(chatMessage.getContent())
-                .sendAt(chatMessage.getSentAt())
+                .sentAt(chatMessage.getSentAt())
                 .unreadBy(unreadBy)
+                .type(chatMessage.getType())
                 .build();
     }
 
@@ -100,7 +102,7 @@ public class ChatMessageService {
                 .chatroomId(chatMessage.getChatroom().getId())
                 .messageType(chatMessage.getMessageType())
                 .content(chatMessage.getContent())
-                .sendAt(chatMessage.getSentAt())
+                .sentAt(chatMessage.getSentAt())
                 .build();
     }
 
@@ -137,7 +139,7 @@ public class ChatMessageService {
                 .messageId(savedRankingStatusChatMessage.getId())
                 .chatroomId(context.chatroom().getId())
                 .isRankingEnabled(savedRankingStatusChatMessage.getIsRankingEnabled())
-                .sendAt(savedRankingStatusChatMessage.getSentAt())
+                .sentAt(savedRankingStatusChatMessage.getSentAt())
                 .build();
     }
 }
