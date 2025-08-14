@@ -34,7 +34,7 @@ public class ChatMessageMapper {
                 .messageId(chatMessage.getId())
                 .chatroomId(chatMessage.getChatroom().getId())
                 .isRankingEnabled(chatMessage.getIsRankingEnabled())
-                .sendAt(chatMessage.getSentAt())
+                .sentAt(chatMessage.getSentAt())
                 .build();
     }
 
@@ -45,7 +45,7 @@ public class ChatMessageMapper {
                 .chatroomId(chatMessage.getChatroom().getId())
                 .messageType(chatMessage.getMessageType())
                 .content(chatMessage.getContent())
-                .sendAt(chatMessage.getSentAt())
+                .sentAt(chatMessage.getSentAt())
                 .type(chatMessage.getType())
                 .build();
     }
@@ -57,7 +57,7 @@ public class ChatMessageMapper {
                 .chatroomId(chatMessage.getChatroom().getId())
                 .messageType(chatMessage.getMessageType())
                 .content(chatMessage.getContent())
-                .sendAt(chatMessage.getSentAt())
+                .sentAt(chatMessage.getSentAt())
                 .type(chatMessage.getType())
                 .build();
     }
@@ -68,7 +68,7 @@ public class ChatMessageMapper {
                 .chatroomId(chatMessage.getChatroom().getId())
                 .messageType(chatMessage.getMessageType())
                 .content(chatMessage.getContent())
-                .sendAt(chatMessage.getSentAt())
+                .sentAt(chatMessage.getSentAt())
                 .type(chatMessage.getType())
                 .build();
     }
@@ -80,7 +80,7 @@ public class ChatMessageMapper {
                 .senderId(chatMessage.getUserId())
                 .messageType(chatMessage.getMessageType())
                 .content(chatMessage.getContent())
-                .sendAt(chatMessage.getSentAt())
+                .sentAt(chatMessage.getSentAt())
                 .unreadBy(unreadChatMessageService.getUserIdsByChatMessage(chatMessage))
                 .type(chatMessage.getType())
                 .build();
