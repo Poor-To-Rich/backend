@@ -4,10 +4,11 @@ import com.poortorich.chat.entity.enums.ChatMessageType;
 import com.poortorich.chat.entity.enums.MessageType;
 import com.poortorich.chat.model.ChatMessageResponse;
 import com.poortorich.chat.realtime.payload.interfaces.ResponsePayload;
-import java.time.LocalDateTime;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+
+import java.time.LocalDateTime;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -18,9 +19,9 @@ public class ChatroomClosedResponsePayload extends ChatMessageResponse implement
     private Long chatroomId;
     private MessageType messageType;
     private String content;
-    private LocalDateTime sendAt;
+    private LocalDateTime sentAt;
     private ChatMessageType type;
-    
+
     @Override
     public BasePayload mapToBasePayload() {
         return BasePayload.builder()
