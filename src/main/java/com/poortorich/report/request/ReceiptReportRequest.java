@@ -24,7 +24,7 @@ public class ReceiptReportRequest {
     public ReportReason parseReportReason() {
         try {
             return ReportReason.valueOf(reportReason);
-        } catch (Exception e) {
+        } catch (IllegalArgumentException | NullPointerException e) {
             throw new BadRequestException(ReportResponse.REPORT_REASON_INVALID);
         }
     }
