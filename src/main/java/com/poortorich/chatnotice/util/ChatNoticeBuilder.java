@@ -14,7 +14,7 @@ public class ChatNoticeBuilder {
 
     public static LatestNoticeResponse buildLatestNoticeResponse(NoticeStatus status, ChatNotice notice) {
         return LatestNoticeResponse.builder()
-                .status(status.toString())
+                .status(status.name())
                 .noticeId(notice.getId())
                 .preview(truncateContent(notice.getContent()))
                 .createdAt(notice.getCreatedDate().toString())
@@ -22,8 +22,8 @@ public class ChatNoticeBuilder {
                 .build();
     }
 
-    public static List<PreviewNoticeResponse> buildPreviewNoticeResponse(List<ChatNotice> previewNotice) {
-        return previewNotice.stream()
+    public static List<PreviewNoticeResponse> buildPreviewNoticeResponse(List<ChatNotice> previewNotices) {
+        return previewNotices.stream()
                 .filter(Objects::nonNull)
                 .map(notice -> PreviewNoticeResponse.builder()
                         .noticeId(notice.getId())
