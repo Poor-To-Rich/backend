@@ -162,4 +162,16 @@ class ChatNoticeFacadeTest {
         assertThat(result.getNotices().get(1).getNoticeId()).isEqualTo(chatNotice2.getId());
         assertThat(result.getNotices().get(1).getPreview()).isEqualTo(preview);
     }
+
+    @Test
+    @DisplayName("최근 공지가 없는 경우 빈 목록 반환")
+    void getPreviewNoticesEmpty() {
+        when(chatroomService.findById(chatroomId)).thenReturn(chatroom);
+        when(chatNoticeService.getPreviewNotices(chatroom)).thenReturn(List.of());
+
+        PreviewNoticesResponse result = chatNoticeFacade.getPreviewNotices(chatroomId);
+
+        assertThat(result).isNotNull();
+        assertThat(result.getNotices()).isEmpty();
+    }
 }
