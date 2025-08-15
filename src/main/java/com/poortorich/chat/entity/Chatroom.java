@@ -71,6 +71,7 @@ public class Chatroom {
         this.description = chatroomUpdateRequest.getDescription();
         this.password = chatroomUpdateRequest.getChatroomPassword();
         this.maxMemberCount = chatroomUpdateRequest.getMaxMemberCount();
+        this.isRankingEnabled = chatroomUpdateRequest.getIsRankingEnabled();
     }
 
     public void closeChatroom() {

@@ -39,12 +39,13 @@ import com.poortorich.s3.service.FileUploadService;
 import com.poortorich.tag.service.TagService;
 import com.poortorich.user.entity.User;
 import com.poortorich.user.service.UserService;
-import java.util.List;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -189,7 +190,7 @@ public class ChatFacade {
         String newChatroomImage = fileUploadService.updateImage(
                 chatroom.getImage(),
                 chatroomUpdateRequest.getChatroomImage(),
-                chatroomUpdateRequest.getIsDefaultImage());
+                chatroomUpdateRequest.getIsDefaultProfile());
 
         Boolean isChangedRankingStatus = rankingStatusChangeDetector.detectRankingChange(
                 chatroom.getIsRankingEnabled(),

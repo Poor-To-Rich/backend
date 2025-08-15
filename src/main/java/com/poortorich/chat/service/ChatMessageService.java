@@ -48,7 +48,7 @@ public class ChatMessageService {
                 .chatroomId(chatMessage.getChatroom().getId())
                 .messageType(chatMessage.getMessageType())
                 .content(chatMessage.getContent())
-                .sendAt(chatMessage.getSentAt())
+                .sentAt(chatMessage.getSentAt())
                 .build();
     }
 
@@ -63,7 +63,7 @@ public class ChatMessageService {
                 .chatroomId(chatMessage.getChatroom().getId())
                 .messageType(chatMessage.getMessageType())
                 .content(chatMessage.getContent())
-                .sendAt(chatMessage.getSentAt())
+                .sentAt(chatMessage.getSentAt())
                 .build();
     }
 
@@ -91,8 +91,9 @@ public class ChatMessageService {
                 .senderId(chatMessage.getUserId())
                 .messageType(chatMessage.getMessageType())
                 .content(chatMessage.getContent())
-                .sendAt(chatMessage.getSentAt())
+                .sentAt(chatMessage.getSentAt())
                 .unreadBy(unreadBy)
+                .type(chatMessage.getType())
                 .build();
     }
 
@@ -134,7 +135,7 @@ public class ChatMessageService {
                 .chatroomId(chatMessage.getChatroom().getId())
                 .messageType(chatMessage.getMessageType())
                 .content(chatMessage.getContent())
-                .sendAt(chatMessage.getSentAt())
+                .sentAt(chatMessage.getSentAt())
                 .build();
     }
 
@@ -173,7 +174,7 @@ public class ChatMessageService {
                 .messageId(savedRankingStatusChatMessage.getId())
                 .chatroomId(context.chatroom().getId())
                 .isRankingEnabled(savedRankingStatusChatMessage.getIsRankingEnabled())
-                .sendAt(savedRankingStatusChatMessage.getSentAt())
+                .sentAt(savedRankingStatusChatMessage.getSentAt())
                 .build();
     }
 }
