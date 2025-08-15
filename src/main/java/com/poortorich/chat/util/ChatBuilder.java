@@ -6,13 +6,14 @@ import com.poortorich.chat.entity.enums.ChatroomRole;
 import com.poortorich.chat.entity.enums.NoticeStatus;
 import com.poortorich.chat.entity.enums.RankingStatus;
 import com.poortorich.chat.request.ChatroomCreateRequest;
-import com.poortorich.chat.response.ChatroomDetailsResponse;
 import com.poortorich.chat.response.ChatroomCoverInfoResponse;
+import com.poortorich.chat.response.ChatroomDetailsResponse;
 import com.poortorich.chat.response.ChatroomInfoResponse;
 import com.poortorich.chat.response.ChatroomResponse;
 import com.poortorich.chat.response.ProfileResponse;
 import com.poortorich.s3.constants.S3Constants;
 import com.poortorich.user.entity.User;
+
 import java.util.List;
 
 public class ChatBuilder {
@@ -49,7 +50,7 @@ public class ChatBuilder {
 
         return ChatroomInfoResponse.builder()
                 .chatroomImage(chatroomImage)
-                .isDefaultImage(isDefaultImage)
+                .isDefaultProfile(isDefaultImage)
                 .chatroomTitle(chatroom.getTitle())
                 .description(chatroom.getDescription())
                 .maxMemberCount(chatroom.getMaxMemberCount())
