@@ -17,11 +17,11 @@ public interface ChatParticipantRepository extends JpaRepository<ChatParticipant
     Optional<ChatParticipant> findByUserAndChatroom(User user, Chatroom chatroom);
 
     @Query("""
-        SELECT cp
-          FROM ChatParticipant cp
-         WHERE cp.user.username = :username
-           AND cp.chatroom = :chatroom
-    """)
+                SELECT cp
+                  FROM ChatParticipant cp
+                 WHERE cp.user.username = :username
+                   AND cp.chatroom = :chatroom
+            """)
     Optional<ChatParticipant> findByUsernameAndChatroom(
             @Param("username") String username,
             @Param("chatroom") Chatroom chatroom
@@ -55,4 +55,14 @@ public interface ChatParticipantRepository extends JpaRepository<ChatParticipant
     List<ChatParticipant> findAllByChatroom(Chatroom chatroom);
 
     List<ChatParticipant> findAllByChatroomAndIsParticipatedTrueAndUserNot(Chatroom chatroom, User excludedUser);
+
+    List<ChatParticipant> findAllByUserAndIsParticipatedTrue(User user);
+
+    @Query("""
+            SELECT cp FROM ChatParticipant cp
+            JOIN FETCH cp.chatroom cr
+            JOIN FETCH cp.user u
+            WHERE u.username = :username
+            """)
+    List<ChatParticipant> findAllByUsernameWithChatroomAndUser(String username);
 }
