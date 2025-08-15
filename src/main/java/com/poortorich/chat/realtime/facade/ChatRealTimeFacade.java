@@ -22,10 +22,11 @@ import com.poortorich.chat.util.detector.RankingStatusChangeDetector;
 import com.poortorich.chat.util.manager.ChatroomLeaveManager;
 import com.poortorich.user.entity.User;
 import com.poortorich.user.service.UserService;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -103,11 +104,8 @@ public class ChatRealTimeFacade {
         List<PayloadContext> contexts = payloadCollector.getAllPayloadContext(username);
 
         List<Long> chatroomIds = contexts.stream().map(PayloadContext::chatroom).map(Chatroom::getId).toList();
-        
-        List<BasePayload> broadcastPayloads = contexts.stream()
-                .map(context -> unreadChatMessageService.markMessageAsRead(context.chatParticipant())
-                        .mapToBasePayload())
-                .toList();
+
+        List<BasePayload> broadcastPayloads = unreadChatMessageService.markAllMessageAsRead(contexts);
 
         return MarkAllChatroomAsReadResult.builder()
                 .apiResponse(MarkAllChatroomAsReadResponse.builder().chatroomIds(chatroomIds).build())
