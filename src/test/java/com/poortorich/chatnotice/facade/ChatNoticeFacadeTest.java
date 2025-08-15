@@ -7,6 +7,7 @@ import com.poortorich.chat.service.ChatParticipantService;
 import com.poortorich.chat.service.ChatroomService;
 import com.poortorich.chatnotice.entity.ChatNotice;
 import com.poortorich.chatnotice.response.LatestNoticeResponse;
+import com.poortorich.chatnotice.response.PreviewNoticesResponse;
 import com.poortorich.chatnotice.service.ChatNoticeService;
 import com.poortorich.user.entity.User;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,6 +19,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
@@ -110,5 +112,78 @@ class ChatNoticeFacadeTest {
         assertThat(result.getPreview()).hasSize(30);
         assertThat(result.getAuthorNickname()).isEqualTo(user.getNickname());
         assertThat(result.getCreatedAt()).isEqualTo(chatNotice.getCreatedDate().toString());
+    }
+
+    @Test
+    @DisplayName("최근 공지 목록 조회 성공")
+    void getPreviewNoticesSuccess() {
+        ChatNotice chatNotice2 = ChatNotice.builder()
+                .id(2L)
+                .chatroom(chatroom)
+                .author(user)
+                .content("공지 내용")
+                .createdDate(LocalDateTime.of(2025, 8, 8, 0, 0))
+                .build();
+
+        when(chatroomService.findById(chatroomId)).thenReturn(chatroom);
+        when(chatNoticeService.getPreviewNotices(chatroom)).thenReturn(List.of(chatNotice, chatNotice2));
+
+        PreviewNoticesResponse result = chatNoticeFacade.getPreviewNotices(chatroomId);
+
+        assertThat(result).isNotNull();
+        assertThat(result.getNotices()).hasSize(2);
+        assertThat(result.getNotices().get(0).getNoticeId()).isEqualTo(chatNotice.getId());
+        assertThat(result.getNotices().get(0).getPreview()).isEqualTo(chatNotice.getContent());
+        assertThat(result.getNotices().get(1).getNoticeId()).isEqualTo(chatNotice2.getId());
+        assertThat(result.getNotices().get(1).getPreview()).isEqualTo(chatNotice2.getContent());
+    }
+
+    @Test
+    @DisplayName("최근 공지 중 공지 내용이 30자 초과인 경우 30자만 표출")
+    void getPreviewNoticesPreviewTest() {
+        String preview = "코딩하다가 정신 차려보니 새벽 3시가 되었다. 피곤하지";
+        ChatNotice chatNotice2 = ChatNotice.builder()
+                .id(2L)
+                .chatroom(chatroom)
+                .author(user)
+                .content("코딩하다가 정신 차려보니 새벽 3시가 되었다. 피곤하지만 너무 재밌어서 멈출수가 없다.")
+                .createdDate(LocalDateTime.of(2025, 8, 8, 0, 0))
+                .build();
+
+        when(chatroomService.findById(chatroomId)).thenReturn(chatroom);
+        when(chatNoticeService.getPreviewNotices(chatroom)).thenReturn(List.of(chatNotice, chatNotice2));
+
+        PreviewNoticesResponse result = chatNoticeFacade.getPreviewNotices(chatroomId);
+
+        assertThat(result).isNotNull();
+        assertThat(result.getNotices()).hasSize(2);
+        assertThat(result.getNotices().get(0).getNoticeId()).isEqualTo(chatNotice.getId());
+        assertThat(result.getNotices().get(0).getPreview()).isEqualTo(chatNotice.getContent());
+        assertThat(result.getNotices().get(1).getNoticeId()).isEqualTo(chatNotice2.getId());
+        assertThat(result.getNotices().get(1).getPreview()).isEqualTo(preview);
+    }
+
+    @Test
+    @DisplayName("최근 공지가 없는 경우 빈 목록 반환")
+    void getPreviewNoticesEmpty() {
+        when(chatroomService.findById(chatroomId)).thenReturn(chatroom);
+        when(chatNoticeService.getPreviewNotices(chatroom)).thenReturn(List.of());
+
+        PreviewNoticesResponse result = chatNoticeFacade.getPreviewNotices(chatroomId);
+
+        assertThat(result).isNotNull();
+        assertThat(result.getNotices()).isEmpty();
+    }
+
+    @Test
+    @DisplayName("최근 공지가 null인 경우 null response 반환")
+    void getLatestNoticeNull() {
+        when(chatroomService.findById(chatroomId)).thenReturn(chatroom);
+        when(chatParticipantService.findByUsernameAndChatroom(username, chatroom)).thenReturn(chatParticipant);
+        when(chatNoticeService.getLatestNotice(chatroom)).thenReturn(null);
+
+        LatestNoticeResponse result = chatNoticeFacade.getLatestNotice(username, chatroomId);
+
+        assertThat(result).isNull();
     }
 }

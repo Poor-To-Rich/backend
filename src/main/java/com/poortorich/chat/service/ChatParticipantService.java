@@ -60,6 +60,11 @@ public class ChatParticipantService {
                 .orElseThrow(() -> new NotFoundException(ChatResponse.CHAT_PARTICIPANT_NOT_FOUND));
     }
 
+    public ChatParticipant findByUserIdAndChatroom(Long userId, Chatroom chatroom) {
+        return chatParticipantRepository.findByUserIdAndChatroom(userId, chatroom)
+                .orElseThrow(() -> new NotFoundException(ChatResponse.CHAT_PARTICIPANT_NOT_FOUND));
+    }
+
     public Long countByChatroom(Chatroom chatroom) {
         return chatParticipantRepository.countByChatroomAndIsParticipatedTrue(chatroom);
     }

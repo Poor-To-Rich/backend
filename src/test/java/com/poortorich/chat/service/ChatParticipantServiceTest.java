@@ -247,4 +247,38 @@ class ChatParticipantServiceTest {
                 .isInstanceOf(BadRequestException.class)
                 .hasMessageContaining(ChatNoticeResponse.NOTICE_STATUS_INVALID.getMessage());
     }
+
+    @Test
+    @DisplayName("회원 아이디와 채팅방으로 채팅방 참여자 조회 성공")
+    void findByUserIdAndChatroomSuccess() {
+        Long userId = 1L;
+        User user = User.builder().id(userId).build();
+        Chatroom chatroom = Chatroom.builder().build();
+        ChatParticipant chatParticipant = ChatParticipant.builder()
+                .user(user)
+                .chatroom(chatroom)
+                .build();
+
+        when(chatParticipantRepository.findByUserIdAndChatroom(userId, chatroom))
+                .thenReturn(Optional.of(chatParticipant));
+
+        ChatParticipant result = chatParticipantService.findByUserIdAndChatroom(userId, chatroom);
+
+        assertThat(result).isEqualTo(chatParticipant);
+        assertThat(result.getUser().getId()).isEqualTo(user.getId());
+        assertThat(result.getChatroom()).isEqualTo(chatroom);
+    }
+
+    @Test
+    @DisplayName("회원 아이디와 채팅방으로 채팅방 참여자 조회 실패")
+    void findByUserIdAndChatroomNotFound() {
+        Long userId = 1L;
+        Chatroom chatroom = Chatroom.builder().build();
+
+        when(chatParticipantRepository.findByUserIdAndChatroom(userId, chatroom)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> chatParticipantService.findByUserIdAndChatroom(userId, chatroom))
+                .isInstanceOf(NotFoundException.class)
+                .hasMessageContaining(ChatResponse.CHAT_PARTICIPANT_NOT_FOUND.getMessage());
+    }
 }
