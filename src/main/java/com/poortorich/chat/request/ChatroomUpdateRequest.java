@@ -6,10 +6,11 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @Getter
 @AllArgsConstructor
@@ -17,7 +18,7 @@ public class ChatroomUpdateRequest {
 
     private final MultipartFile chatroomImage;
 
-    private final Boolean isDefaultImage;
+    private final Boolean isDefaultProfile;
 
     @NotNull(message = ChatResponseMessage.CHATROOM_TITLE_REQUIRED)
     @Size(max = ChatValidationConstraints.CHATROOM_TITLE_MAX,
