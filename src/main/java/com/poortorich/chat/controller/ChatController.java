@@ -128,8 +128,9 @@ public class ChatController {
 
         BasePayload basePayload = realTimeFacade.createUserEnterSystemMessage(userDetails.getUsername(),
                 chatroomId);
-        messagingTemplate.convertAndSend(SubscribeEndpoint.CHATROOM_SUBSCRIBE_PREFIX + chatroomId, basePayload);
-
+        if (!Objects.isNull(basePayload)) {
+            messagingTemplate.convertAndSend(SubscribeEndpoint.CHATROOM_SUBSCRIBE_PREFIX + chatroomId, basePayload);
+        }
         return DataResponse.toResponseEntity(ChatResponse.CHATROOM_ENTER_SUCCESS, response);
     }
 

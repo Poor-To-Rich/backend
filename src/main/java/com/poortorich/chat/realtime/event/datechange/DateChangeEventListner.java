@@ -4,10 +4,9 @@ import com.poortorich.chat.realtime.payload.response.DateChangeMessagePayload;
 import com.poortorich.chat.service.ChatMessageService;
 import com.poortorich.websocket.stomp.command.subscribe.endpoint.SubscribeEndpoint;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.event.EventListener;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.event.TransactionPhase;
-import org.springframework.transaction.event.TransactionalEventListener;
 
 import java.util.Objects;
 
@@ -18,7 +17,7 @@ public class DateChangeEventListner {
     private final SimpMessagingTemplate messagingTemplate;
     private final ChatMessageService chatMessageService;
 
-    @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
+    @EventListener
     public void onDateChanged(DateChangeEvent event) {
         DateChangeMessagePayload payload = chatMessageService.saveDateChangeMessage(event.getChatroom());
 
