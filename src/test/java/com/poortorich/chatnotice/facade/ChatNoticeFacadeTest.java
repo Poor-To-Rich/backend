@@ -2,11 +2,14 @@ package com.poortorich.chatnotice.facade;
 
 import com.poortorich.chat.entity.ChatParticipant;
 import com.poortorich.chat.entity.Chatroom;
+import com.poortorich.chat.entity.enums.ChatroomRole;
 import com.poortorich.chat.entity.enums.NoticeStatus;
+import com.poortorich.chat.entity.enums.RankingStatus;
 import com.poortorich.chat.service.ChatParticipantService;
 import com.poortorich.chat.service.ChatroomService;
 import com.poortorich.chatnotice.entity.ChatNotice;
 import com.poortorich.chatnotice.response.LatestNoticeResponse;
+import com.poortorich.chatnotice.response.NoticeDetailsResponse;
 import com.poortorich.chatnotice.response.PreviewNoticesResponse;
 import com.poortorich.chatnotice.service.ChatNoticeService;
 import com.poortorich.user.entity.User;
@@ -59,6 +62,8 @@ class ChatNoticeFacadeTest {
                 .user(user)
                 .chatroom(chatroom)
                 .noticeStatus(NoticeStatus.DEFAULT)
+                .role(ChatroomRole.HOST)
+                .rankingStatus(RankingStatus.NONE)
                 .build();
 
         chatNotice = ChatNotice.builder()
@@ -185,5 +190,23 @@ class ChatNoticeFacadeTest {
         LatestNoticeResponse result = chatNoticeFacade.getLatestNotice(username, chatroomId);
 
         assertThat(result).isNull();
+    }
+
+    @Test
+    @DisplayName("공지 상세 조회 성공")
+    void getNoticeDetailsSuccess() {
+        Long noticeId = 1L;
+
+        when(chatroomService.findById(chatroomId)).thenReturn(chatroom);
+        when(chatNoticeService.findNotice(chatroom, noticeId)).thenReturn(chatNotice);
+
+        NoticeDetailsResponse result = chatNoticeFacade.getNoticeDetails(chatroomId, noticeId);
+
+        assertThat(result).isNotNull();
+        assertThat(result.getNoticeId()).isEqualTo(noticeId);
+        assertThat(result.getContent()).isEqualTo(chatNotice.getContent());
+        assertThat(result.getCreatedAt()).isEqualTo(chatNotice.getCreatedDate().toString());
+        assertThat(result.getAuthor().getUserId()).isEqualTo(user.getId());
+        assertThat(result.getAuthor().getNickname()).isEqualTo(user.getNickname());
     }
 }

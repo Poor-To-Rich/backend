@@ -72,4 +72,35 @@ class ChatNoticeServiceTest {
         assertThat(previewNotice.get(1)).isEqualTo(chatNotice2);
         assertThat(previewNotice.get(2)).isEqualTo(chatNotice3);
     }
+
+    @Test
+    @DisplayName("채팅방과 아이디로 공지 조회 성공")
+    void findNoticeSuccess() {
+        Long noticeId = 1L;
+        Chatroom chatroom = Chatroom.builder().build();
+        ChatNotice chatNotice = ChatNotice.builder()
+                .id(noticeId)
+                .chatroom(chatroom)
+                .build();
+
+        when(chatNoticeRepository.findByChatroomAndId(chatroom, noticeId)).thenReturn(Optional.of(chatNotice));
+
+        ChatNotice result = chatNoticeService.findNotice(chatroom, noticeId);
+
+        assertThat(result.getId()).isEqualTo(noticeId);
+        assertThat(result.getChatroom()).isEqualTo(chatroom);
+    }
+
+    @Test
+    @DisplayName("공지가 없는 경우 예외 발생")
+    void findNoticeNotFound() {
+        Long noticeId = 1L;
+        Chatroom chatroom = Chatroom.builder().build();
+
+        when(chatNoticeRepository.findByChatroomAndId(chatroom, noticeId)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> chatNoticeService.findNotice(chatroom, noticeId))
+                .isInstanceOf(NotFoundException.class)
+                .hasMessageContaining(ChatNoticeResponse.NOTICE_NOT_FOUND.getMessage());
+    }
 }

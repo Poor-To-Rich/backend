@@ -14,4 +14,6 @@ public interface ChatNoticeRepository extends JpaRepository<ChatNotice, Long> {
     Optional<ChatNotice> findTop1ByChatroomOrderByCreatedDateDesc(Chatroom chatroom);
 
     List<ChatNotice> findTop3ByChatroomOrderByCreatedDateDesc(Chatroom chatroom);
+
+    Optional<ChatNotice> findByChatroomAndId(Chatroom chatroom, Long noticeId);
 }

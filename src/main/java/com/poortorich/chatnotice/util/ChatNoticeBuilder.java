@@ -1,8 +1,10 @@
 package com.poortorich.chatnotice.util;
 
 import com.poortorich.chat.entity.enums.NoticeStatus;
+import com.poortorich.chat.util.ChatBuilder;
 import com.poortorich.chatnotice.entity.ChatNotice;
 import com.poortorich.chatnotice.response.LatestNoticeResponse;
+import com.poortorich.chatnotice.response.NoticeDetailsResponse;
 import com.poortorich.chatnotice.response.PreviewNoticeResponse;
 
 import java.util.List;
@@ -18,7 +20,7 @@ public class ChatNoticeBuilder {
                 .noticeId(notice.getId())
                 .preview(truncateContent(notice.getContent()))
                 .createdAt(notice.getCreatedDate().toString())
-                .authorNickname(notice.getAuthor().getNickname())
+                .authorNickname(notice.getAuthor().getUser().getNickname())
                 .build();
     }
 
@@ -38,5 +40,14 @@ public class ChatNoticeBuilder {
         }
 
         return content;
+    }
+
+    public static NoticeDetailsResponse buildNoticeDetailsResponse(ChatNotice notice) {
+        return NoticeDetailsResponse.builder()
+                .noticeId(notice.getId())
+                .content(notice.getContent())
+                .createdAt(notice.getCreatedDate().toString())
+                .author(ChatBuilder.buildProfileResponse(notice.getAuthor()))
+                .build();
     }
 }

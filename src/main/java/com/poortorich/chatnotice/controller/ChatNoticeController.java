@@ -37,6 +37,14 @@ public class ChatNoticeController {
         );
     }
 
+    @GetMapping("/{noticeId}")
+    public ResponseEntity<BaseResponse> getNoticeDetails(@PathVariable Long chatroomId, @PathVariable Long noticeId) {
+        return DataResponse.toResponseEntity(
+                ChatNoticeResponse.GET_NOTICE_DETAILS_SUCCESS,
+                chatNoticeFacade.getNoticeDetails(chatroomId, noticeId)
+        );
+    }
+
     @PatchMapping
     public ResponseEntity<BaseResponse> updateNoticeStatus(
             @AuthenticationPrincipal UserDetails userDetails,
