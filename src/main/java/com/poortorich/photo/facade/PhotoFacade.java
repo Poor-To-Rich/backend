@@ -12,6 +12,7 @@ import com.poortorich.user.entity.User;
 import com.poortorich.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
@@ -23,6 +24,7 @@ public class PhotoFacade {
     private final FileUploadService fileUploadService;
     private final PhotoService photoService;
 
+    @Transactional
     public PhotoUploadResponse uploadPhoto(String username, Long chatroomId, PhotoUploadRequest request) {
         User user = userService.findUserByUsername(username);
         Chatroom chatroom = chatroomService.findById(chatroomId);

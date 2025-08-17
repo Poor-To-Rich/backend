@@ -1,10 +1,12 @@
 package com.poortorich.photo.request;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.web.multipart.MultipartFile;
 
-@Getter
+@Data
+@NoArgsConstructor
 @AllArgsConstructor
 public class PhotoUploadRequest {
 

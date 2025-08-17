@@ -5,7 +5,6 @@ import com.poortorich.global.response.DataResponse;
 import com.poortorich.photo.facade.PhotoFacade;
 import com.poortorich.photo.request.PhotoUploadRequest;
 import com.poortorich.photo.response.enums.PhotoResponse;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -27,7 +26,7 @@ public class PhotoController {
     public ResponseEntity<BaseResponse> uploadPhoto(
             @AuthenticationPrincipal UserDetails userDetails,
             @PathVariable Long chatroomId,
-            @Valid PhotoUploadRequest request
+            PhotoUploadRequest request
     ) {
         return DataResponse.toResponseEntity(
                 PhotoResponse.UPLOAD_PHOTO_SUCCESS,
