@@ -5,11 +5,12 @@ import com.poortorich.chat.entity.ChatParticipant;
 import com.poortorich.chat.entity.UnreadChatMessage;
 import com.poortorich.chat.realtime.payload.response.MessageReadPayload;
 import com.poortorich.chat.repository.UnreadChatMessageRepository;
-import java.time.LocalDateTime;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -18,7 +19,6 @@ public class UnreadChatMessageService {
     private final UnreadChatMessageRepository unreadChatMessageRepository;
 
     public List<Long> saveUnreadMember(ChatMessage chatMessage, List<ChatParticipant> chatMembers) {
-
         List<UnreadChatMessage> unreadChatMessages = chatMembers.stream()
                 .map(chatParticipant -> UnreadChatMessage.builder()
                         .user(chatParticipant.getUser())

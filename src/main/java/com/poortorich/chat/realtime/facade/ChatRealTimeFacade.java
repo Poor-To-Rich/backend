@@ -20,10 +20,11 @@ import com.poortorich.chat.util.detector.RankingStatusChangeDetector;
 import com.poortorich.chat.util.manager.ChatroomLeaveManager;
 import com.poortorich.user.entity.User;
 import com.poortorich.user.service.UserService;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -71,7 +72,7 @@ public class ChatRealTimeFacade {
 
         ChatParticipant chatParticipant = chatParticipantService.findByUserAndChatroom(user, chatroom);
 
-        List<ChatParticipant> chatMembers = chatParticipantService.findAllByChatroomExcludingUser(chatroom, user);
+        List<ChatParticipant> chatMembers = chatParticipantService.findUnreadMembers(chatroom, user);
 
         UserChatMessagePayload chatMessage = chatMessageService
                 .saveUserChatMessage(chatParticipant, chatMembers, chatMessagePayload);
