@@ -64,12 +64,7 @@ class PhotoFacadeTest {
     void uploadPhotoNull() {
         String username = "test";
         Long chatroomId = 1L;
-        User user = User.builder().username(username).build();
-        Chatroom chatroom = Chatroom.builder().id(chatroomId).build();
         PhotoUploadRequest request = new PhotoUploadRequest(null);
-
-        when(userService.findUserByUsername(username)).thenReturn(user);
-        when(chatroomService.findById(chatroomId)).thenReturn(chatroom);
 
         assertThatThrownBy(() -> photoFacade.uploadPhoto(username, chatroomId, request))
                 .isInstanceOf(BadRequestException.class)
@@ -81,15 +76,10 @@ class PhotoFacadeTest {
     void uploadPhotoEmpty() {
         String username = "test";
         Long chatroomId = 1L;
-        User user = User.builder().username(username).build();
-        Chatroom chatroom = Chatroom.builder().id(chatroomId).build();
 
         MultipartFile emptyFile = Mockito.mock(MultipartFile.class);
         when(emptyFile.isEmpty()).thenReturn(true);
         PhotoUploadRequest request = new PhotoUploadRequest(emptyFile);
-
-        when(userService.findUserByUsername(username)).thenReturn(user);
-        when(chatroomService.findById(chatroomId)).thenReturn(chatroom);
 
         assertThatThrownBy(() -> photoFacade.uploadPhoto(username, chatroomId, request))
                 .isInstanceOf(BadRequestException.class)

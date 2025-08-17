@@ -26,9 +26,10 @@ public class PhotoFacade {
 
     @Transactional
     public PhotoUploadResponse uploadPhoto(String username, Long chatroomId, PhotoUploadRequest request) {
+        validatePhoto(request.getPhoto());
+
         User user = userService.findUserByUsername(username);
         Chatroom chatroom = chatroomService.findById(chatroomId);
-        validatePhoto(request.getPhoto());
         String photoUrl = fileUploadService.uploadImage(request.getPhoto());
 
         photoService.savePhoto(user, chatroom, photoUrl);
