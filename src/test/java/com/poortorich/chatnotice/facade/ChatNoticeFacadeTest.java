@@ -64,7 +64,7 @@ class ChatNoticeFacadeTest {
         chatNotice = ChatNotice.builder()
                 .id(1L)
                 .chatroom(chatroom)
-                .author(user)
+                .author(chatParticipant)
                 .content("공지 내용")
                 .createdDate(LocalDateTime.of(2025, 8, 8, 0, 0))
                 .build();
@@ -94,7 +94,7 @@ class ChatNoticeFacadeTest {
         chatNotice = ChatNotice.builder()
                 .id(1L)
                 .chatroom(chatroom)
-                .author(user)
+                .author(chatParticipant)
                 .content("코딩하다가 정신 차려보니 새벽 3시가 되었다. 피곤하지만 너무 재밌어서 멈출수가 없다.")
                 .createdDate(LocalDateTime.of(2025, 8, 8, 0, 0))
                 .build();
@@ -120,7 +120,7 @@ class ChatNoticeFacadeTest {
         ChatNotice chatNotice2 = ChatNotice.builder()
                 .id(2L)
                 .chatroom(chatroom)
-                .author(user)
+                .author(chatParticipant)
                 .content("공지 내용")
                 .createdDate(LocalDateTime.of(2025, 8, 8, 0, 0))
                 .build();
@@ -145,7 +145,7 @@ class ChatNoticeFacadeTest {
         ChatNotice chatNotice2 = ChatNotice.builder()
                 .id(2L)
                 .chatroom(chatroom)
-                .author(user)
+                .author(chatParticipant)
                 .content("코딩하다가 정신 차려보니 새벽 3시가 되었다. 피곤하지만 너무 재밌어서 멈출수가 없다.")
                 .createdDate(LocalDateTime.of(2025, 8, 8, 0, 0))
                 .build();
