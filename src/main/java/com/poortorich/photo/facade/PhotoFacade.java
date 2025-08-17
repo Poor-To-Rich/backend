@@ -31,7 +31,7 @@ public class PhotoFacade {
         validatePhoto(request.getPhoto());
         String photoUrl = fileUploadService.uploadImage(request.getPhoto());
 
-        photoService.uploadPhoto(user, chatroom, photoUrl);
+        photoService.savePhoto(user, chatroom, photoUrl);
 
         return PhotoUploadResponse.builder().photoUrl(photoUrl).build();
     }

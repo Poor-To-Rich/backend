@@ -60,7 +60,7 @@ class PhotoFacadeTest {
 
     @Test
     @DisplayName("이미지가 null인 경우 예외 발생")
-    void uploadPhotoNUll() {
+    void uploadPhotoNull() {
         String username = "test";
         Long chatroomId = 1L;
         User user = User.builder().username(username).build();

@@ -13,7 +13,7 @@ public class PhotoService {
 
     private final PhotoRepository photoRepository;
 
-    public void uploadPhoto(User user, Chatroom chatroom, String photoUrl) {
+    public void savePhoto(User user, Chatroom chatroom, String photoUrl) {
         Photo photo = Photo.builder()
                 .user(user)
                 .chatroom(chatroom)

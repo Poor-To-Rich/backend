@@ -30,12 +30,12 @@ class PhotoServiceTest {
 
     @Test
     @DisplayName("채팅방 이미지 저장 성공")
-    void uploadPhotoSuccess() {
+    void savePhotoSuccess() {
         User user = User.builder().build();
         Chatroom chatroom = Chatroom.builder().build();
         String photoUrl = "https://photo.com";
 
-        photoService.uploadPhoto(user, chatroom, photoUrl);
+        photoService.savePhoto(user, chatroom, photoUrl);
 
         verify(photoRepository).save(captor.capture());
         Photo savedPhoto = captor.getValue();
