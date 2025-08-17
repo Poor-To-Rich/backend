@@ -12,7 +12,6 @@ public class UserUpdatedResponsePayload implements ResponsePayload {
 
     private final Long userId;
     private final String profileImage;
-    private final Boolean isDefaultProfile;
     private final String nickname;
     private final Boolean isHost;
     private final RankingStatus rankingType;
