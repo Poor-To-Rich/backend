@@ -34,6 +34,7 @@ public class ChatMessageMapper {
                 .messageId(chatMessage.getId())
                 .chatroomId(chatMessage.getChatroom().getId())
                 .isRankingEnabled(chatMessage.getIsRankingEnabled())
+                .type(chatMessage.getMessageType())
                 .sentAt(chatMessage.getSentAt())
                 .build();
     }
