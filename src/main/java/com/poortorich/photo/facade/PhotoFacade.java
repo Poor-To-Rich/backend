@@ -2,6 +2,7 @@ package com.poortorich.photo.facade;
 
 import com.poortorich.chat.entity.Chatroom;
 import com.poortorich.chat.service.ChatroomService;
+import com.poortorich.chat.validator.ChatParticipantValidator;
 import com.poortorich.global.exceptions.BadRequestException;
 import com.poortorich.photo.request.PhotoUploadRequest;
 import com.poortorich.photo.response.PhotoUploadResponse;
@@ -23,6 +24,7 @@ public class PhotoFacade {
     private final ChatroomService chatroomService;
     private final FileUploadService fileUploadService;
     private final PhotoService photoService;
+    private final ChatParticipantValidator chatParticipantValidator;
 
     @Transactional
     public PhotoUploadResponse uploadPhoto(String username, Long chatroomId, PhotoUploadRequest request) {
@@ -30,6 +32,7 @@ public class PhotoFacade {
 
         User user = userService.findUserByUsername(username);
         Chatroom chatroom = chatroomService.findById(chatroomId);
+        chatParticipantValidator.validateIsParticipate(user, chatroom);
         String photoUrl = fileUploadService.uploadImage(request.getPhoto());
 
         photoService.savePhoto(user, chatroom, photoUrl);

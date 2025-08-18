@@ -1,7 +1,9 @@
 package com.poortorich.photo.facade;
 
 import com.poortorich.chat.entity.Chatroom;
+import com.poortorich.chat.response.enums.ChatResponse;
 import com.poortorich.chat.service.ChatroomService;
+import com.poortorich.chat.validator.ChatParticipantValidator;
 import com.poortorich.global.exceptions.BadRequestException;
 import com.poortorich.photo.request.PhotoUploadRequest;
 import com.poortorich.photo.response.PhotoUploadResponse;
@@ -21,7 +23,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -35,6 +39,8 @@ class PhotoFacadeTest {
     private FileUploadService fileUploadService;
     @Mock
     private PhotoService photoService;
+    @Mock
+    private ChatParticipantValidator chatParticipantValidator;
 
     @InjectMocks
     private PhotoFacade photoFacade;
@@ -84,5 +90,31 @@ class PhotoFacadeTest {
         assertThatThrownBy(() -> photoFacade.uploadPhoto(username, chatroomId, request))
                 .isInstanceOf(BadRequestException.class)
                 .hasMessageContaining(PhotoResponse.PHOTO_REQUIRED.getMessage());
+    }
+
+    @Test
+    @DisplayName("채팅방에 참여중이 아닌 경우 예외 발생")
+    void uploadPhotoNotParticipate() {
+        String username = "test";
+        Long chatroomId = 1L;
+        User user = User.builder().username(username).build();
+        Chatroom chatroom = Chatroom.builder().id(chatroomId).build();
+
+        MultipartFile file = Mockito.mock(MultipartFile.class);
+        when(file.isEmpty()).thenReturn(false);
+        PhotoUploadRequest request = new PhotoUploadRequest(file);
+
+        when(userService.findUserByUsername(username)).thenReturn(user);
+        when(chatroomService.findById(chatroomId)).thenReturn(chatroom);
+
+        doThrow(new BadRequestException(ChatResponse.CHATROOM_NOT_PARTICIPATE))
+                .when(chatParticipantValidator).validateIsParticipate(user, chatroom);
+
+        assertThatThrownBy(() -> photoFacade.uploadPhoto(username, chatroomId, request))
+                .isInstanceOf(BadRequestException.class)
+                .hasMessageContaining(ChatResponse.CHATROOM_NOT_PARTICIPATE.getMessage());
+
+        verify(chatParticipantValidator).validateIsParticipate(user, chatroom);
+        verifyNoInteractions(fileUploadService, photoService);
     }
 }
