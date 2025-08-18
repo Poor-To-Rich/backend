@@ -41,7 +41,7 @@ public class SubscribeService {
         try {
             setOps.remove(getKey(chatroomId), username);
         } catch (RedisConnectionFailureException exception) {
-            throw new InternalServerErrorException(StompResponse.UNSUBSCRIBER_REMOVE_FAILURE);
+            throw new InternalServerErrorException(StompResponse.SUBSCRIBER_REMOVE_FAILURE);
         }
     }
 

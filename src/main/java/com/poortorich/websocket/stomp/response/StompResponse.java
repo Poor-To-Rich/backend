@@ -13,7 +13,7 @@ public enum StompResponse implements Response {
     DESTINATION_INVALID(HttpStatus.BAD_REQUEST, StompResponseMessage.DESTINATION_INVALID, "STOMP"),
     UNSUBSCRIBE_FORBIDDEN(HttpStatus.FORBIDDEN, StompResponseMessage.UNSUBSCRIBE_FORBIDDEN, "STOMP"),
     SUBSCRIBER_SAVE_FAILURE(HttpStatus.INTERNAL_SERVER_ERROR, StompResponseMessage.SUBSCRIBER_SAVE_FAILURE, null),
-    UNSUBSCRIBER_REMOVE_FAILURE(HttpStatus.INTERNAL_SERVER_ERROR, StompResponseMessage.UNSUBSCRIBER_REMOVE_FAILURE, null);
+    SUBSCRIBER_REMOVE_FAILURE(HttpStatus.INTERNAL_SERVER_ERROR, StompResponseMessage.SUBSCRIBER_REMOVE_FAILURE, null);
 
     private final HttpStatus httpStatus;
     private final String message;
