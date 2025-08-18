@@ -2,8 +2,10 @@ package com.poortorich.chat.controller;
 
 import com.poortorich.chat.constants.ChatResponseMessage;
 import com.poortorich.chat.facade.ChatFacade;
+import com.poortorich.chat.model.MarkAllChatroomAsReadResult;
 import com.poortorich.chat.realtime.facade.ChatRealTimeFacade;
 import com.poortorich.chat.realtime.payload.response.BasePayload;
+import com.poortorich.chat.realtime.payload.response.MessageReadPayload;
 import com.poortorich.chat.request.ChatroomCreateRequest;
 import com.poortorich.chat.request.ChatroomEnterRequest;
 import com.poortorich.chat.request.ChatroomLeaveAllRequest;
@@ -21,7 +23,6 @@ import com.poortorich.global.response.DataResponse;
 import com.poortorich.websocket.stomp.command.subscribe.endpoint.SubscribeEndpoint;
 import jakarta.annotation.Nullable;
 import jakarta.validation.Valid;
-import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -31,6 +32,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -38,6 +40,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/chatrooms")
@@ -207,5 +211,20 @@ public class ChatController {
                 pageSize);
 
         return DataResponse.toResponseEntity(ChatResponse.GET_CHAT_MESSAGE_SUCCESS, response);
+    }
+
+    @PatchMapping("/read-all")
+    public ResponseEntity<BaseResponse> markAllChatroomAsRead(@AuthenticationPrincipal UserDetails userDetails) {
+        MarkAllChatroomAsReadResult result = realTimeFacade.markAllChatroomAsRead(userDetails.getUsername());
+
+        result.getBroadcastPayloads()
+                .forEach(basePayload -> {
+                    MessageReadPayload payload = (MessageReadPayload) basePayload.getPayload();
+                    messagingTemplate.convertAndSend(
+                            SubscribeEndpoint.CHATROOM_SUBSCRIBE_PREFIX + payload.getChatroomId(),
+                            basePayload);
+                });
+
+        return DataResponse.toResponseEntity(ChatResponse.MARK_ALL_CHATROOM_AS_READ_SUCCESS, result.getApiResponse());
     }
 }
