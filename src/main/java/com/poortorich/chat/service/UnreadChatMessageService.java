@@ -24,7 +24,6 @@ public class UnreadChatMessageService {
     private final UnreadChatMessageRepository unreadChatMessageRepository;
 
     public List<Long> saveUnreadMember(ChatMessage chatMessage, List<ChatParticipant> chatMembers) {
-
         List<UnreadChatMessage> unreadChatMessages = chatMembers.stream()
                 .map(chatParticipant -> UnreadChatMessage.builder()
                         .user(chatParticipant.getUser())

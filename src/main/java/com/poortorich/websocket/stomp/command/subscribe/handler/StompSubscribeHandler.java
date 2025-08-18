@@ -10,6 +10,7 @@ import com.poortorich.user.repository.UserRepository;
 import com.poortorich.user.response.enums.UserResponse;
 import com.poortorich.websocket.stomp.command.subscribe.util.SubscribeEndpointExtractor;
 import com.poortorich.websocket.stomp.command.subscribe.validator.SubscribeValidator;
+import com.poortorich.websocket.stomp.service.SubscribeService;
 import com.poortorich.websocket.stomp.util.StompSessionManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,6 +26,7 @@ public class StompSubscribeHandler {
     private final ChatroomRepository chatroomRepository;
     private final ChatroomValidator chatroomValidator;
 
+    private final SubscribeService subscribeService;
     private final StompSessionManager sessionManager;
     private final SubscribeValidator subscribeValidator;
     private final SubscribeEndpointExtractor endpointExtractor;
@@ -32,10 +34,10 @@ public class StompSubscribeHandler {
     public void handle(StompHeaderAccessor accessor) {
         log.info("[SUBSCRIBE]: 구독 시작---------------------------");
         subscribeValidator.validateEndPoint(accessor);
-        Long chatRoomId = endpointExtractor.getChatroomId(accessor.getDestination());
-        Chatroom chatroom = chatroomRepository.findById(chatRoomId)
+        Long chatroomId = endpointExtractor.getChatroomId(accessor.getDestination());
+        Chatroom chatroom = chatroomRepository.findById(chatroomId)
                 .orElseThrow(() -> new NotFoundException(ChatResponse.CHATROOM_NOT_FOUND));
-        log.info("[SUBSCRIBE]: 유효한 채팅방 엔드포인트: {}", chatRoomId);
+        log.info("[SUBSCRIBE]: 유효한 채팅방 엔드포인트: {}", chatroomId);
 
         String username = sessionManager.getUsername(accessor);
         User user = userRepository.findByUsername(username)
@@ -44,5 +46,7 @@ public class StompSubscribeHandler {
 
         chatroomValidator.validateSubscribe(user, chatroom);
         log.info("[SUBSCRIBE]: 유저 `{}`가 채팅방[{}] 구독 완료", username, chatroom.getId());
+
+        subscribeService.subscribe(chatroomId, username);
     }
 }

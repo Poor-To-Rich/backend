@@ -54,6 +54,14 @@ public interface ChatParticipantRepository extends JpaRepository<ChatParticipant
 
     List<ChatParticipant> findAllByChatroom(Chatroom chatroom);
 
+    @Query("""
+            SELECT cp
+            FROM ChatParticipant cp
+            JOIN FETCH cp.user
+            WHERE cp.chatroom = :chatroom
+            AND cp.isParticipated = true
+            AND cp.user != :excludedUser
+            """)
     List<ChatParticipant> findAllByChatroomAndIsParticipatedTrueAndUserNot(Chatroom chatroom, User excludedUser);
 
     List<ChatParticipant> findAllByUserAndIsParticipatedTrue(User user);
