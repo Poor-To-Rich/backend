@@ -13,6 +13,10 @@ public class ChatNoticeBuilder {
     private static final int PREVIEW_MAX_LENGTH = 30;
 
     public static LatestNoticeResponse buildLatestNoticeResponse(NoticeStatus status, ChatNotice notice) {
+        if (notice == null) {
+            return null;
+        }
+
         return LatestNoticeResponse.builder()
                 .status(status.name())
                 .noticeId(notice.getId())

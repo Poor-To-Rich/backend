@@ -12,16 +12,20 @@ import com.poortorich.chatnotice.request.ChatNoticeUpdateRequest;
 import com.poortorich.global.exceptions.BadRequestException;
 import com.poortorich.global.exceptions.NotFoundException;
 import com.poortorich.user.entity.User;
-import java.util.List;
+import com.poortorich.websocket.stomp.service.SubscribeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
 public class ChatParticipantService {
 
     private final ChatParticipantRepository chatParticipantRepository;
+    private final SubscribeService subscribeService;
 
     public void createChatroomHost(User user, Chatroom chatroom) {
         ChatParticipant chatParticipant = ChatBuilder.buildChatParticipant(user, ChatroomRole.HOST, chatroom);
@@ -121,5 +125,14 @@ public class ChatParticipantService {
 
     public List<ChatParticipant> findAllByUsernameWithChatroomAndUser(String username) {
         return chatParticipantRepository.findAllByUsernameWithChatroomAndUser(username);
+    }
+
+    @Transactional
+    public List<ChatParticipant> findUnreadMembers(Chatroom chatroom, User user) {
+        Set<String> activeSubscribers = subscribeService.getSubscribers(chatroom.getId());
+
+        return chatParticipantRepository.findAllByChatroomAndIsParticipatedTrueAndUserNot(chatroom, user).stream()
+                .filter(chatParticipant -> !activeSubscribers.contains(chatParticipant.getUser().getUsername()))
+                .toList();
     }
 }

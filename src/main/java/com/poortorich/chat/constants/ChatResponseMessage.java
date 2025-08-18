@@ -47,6 +47,7 @@ public class ChatResponseMessage {
 
     public static final String CHATROOM_ID_REQUIRED = "채팅방 아이디는 필수값입니다.";
     public static final String MESSAGE_TYPE_REQUIRED = "메시지 타입은 필수값입니다.";
+    public static final String MARK_ALL_CHATROOM_AS_READ_SUCCESS = "참여중인 채팅방의 메세지를 모두 읽었습니다.";
 
     private ChatResponseMessage() {
     }
