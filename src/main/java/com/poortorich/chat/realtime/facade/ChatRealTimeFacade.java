@@ -3,6 +3,7 @@ package com.poortorich.chat.realtime.facade;
 import com.poortorich.chat.entity.ChatParticipant;
 import com.poortorich.chat.entity.Chatroom;
 import com.poortorich.chat.entity.enums.ChatMessageType;
+import com.poortorich.chat.model.MarkAllChatroomAsReadResult;
 import com.poortorich.chat.realtime.collect.ChatPayloadCollector;
 import com.poortorich.chat.realtime.model.PayloadContext;
 import com.poortorich.chat.realtime.payload.request.ChatMessageRequestPayload;
@@ -13,6 +14,7 @@ import com.poortorich.chat.realtime.payload.response.MessageReadPayload;
 import com.poortorich.chat.realtime.payload.response.RankingStatusMessagePayload;
 import com.poortorich.chat.realtime.payload.response.UserChatMessagePayload;
 import com.poortorich.chat.realtime.payload.response.UserEnterResponsePayload;
+import com.poortorich.chat.response.MarkAllChatroomAsReadResponse;
 import com.poortorich.chat.service.ChatMessageService;
 import com.poortorich.chat.service.ChatParticipantService;
 import com.poortorich.chat.service.ChatroomService;
@@ -105,5 +107,19 @@ public class ChatRealTimeFacade {
         DateChangeMessagePayload payload = chatMessageService.saveDateChangeMessage(context.chatroom());
 
         return payload.mapToBasePayload();
+    }
+
+    public MarkAllChatroomAsReadResult markAllChatroomAsRead(String username) {
+        List<PayloadContext> contexts = payloadCollector.getAllPayloadContext(username);
+
+        List<Long> chatroomIds = contexts.stream().map(PayloadContext::chatroom).map(Chatroom::getId).toList();
+
+        List<BasePayload> broadcastPayloads = unreadChatMessageService.markAllMessageAsRead(contexts);
+
+        return MarkAllChatroomAsReadResult.builder()
+                .apiResponse(MarkAllChatroomAsReadResponse.builder().chatroomIds(chatroomIds).build())
+                .broadcastPayloads(broadcastPayloads)
+                .build();
+
     }
 }

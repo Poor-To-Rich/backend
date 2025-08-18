@@ -7,6 +7,7 @@ import com.poortorich.chat.service.ChatParticipantService;
 import com.poortorich.chat.service.ChatroomService;
 import com.poortorich.user.entity.User;
 import com.poortorich.user.service.UserService;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -33,5 +34,19 @@ public class ChatPayloadCollector {
     public PayloadContext getPayloadContext(Long chatroomId) {
         Chatroom chatroom = chatroomService.findById(chatroomId);
         return PayloadContext.builder().chatroom(chatroom).build();
+    }
+
+    public List<PayloadContext> getAllPayloadContext(String username) {
+        User user = userService.findUserByUsername(username);
+
+        List<ChatParticipant> participants = chatParticipantService.findAllByUser(user);
+
+        return participants.stream()
+                .map(participant -> PayloadContext.builder()
+                        .user(user)
+                        .chatroom(participant.getChatroom())
+                        .chatParticipant(participant)
+                        .build())
+                .toList();
     }
 }
