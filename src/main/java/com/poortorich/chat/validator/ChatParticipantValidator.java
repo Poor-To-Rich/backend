@@ -31,6 +31,12 @@ public class ChatParticipantValidator {
         }
     }
 
+    public void validateIsHost(ChatParticipant chatParticipant) {
+        if (!ChatroomRole.HOST.equals(chatParticipant.getRole())) {
+            throw new BadRequestException(ChatResponse.CHAT_PARTICIPANT_NOT_HOST);
+        }
+    }
+
     // TODO: 채팅방에서 역할이 멤버가 아니라면 예외를 발생
     public void validateIsMember(User user, Chatroom chatroom) {
     }

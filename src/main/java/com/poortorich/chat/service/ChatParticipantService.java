@@ -4,6 +4,7 @@ import com.poortorich.chat.entity.ChatParticipant;
 import com.poortorich.chat.entity.Chatroom;
 import com.poortorich.chat.entity.enums.ChatroomRole;
 import com.poortorich.chat.entity.enums.NoticeStatus;
+import com.poortorich.chat.realtime.payload.request.enums.NoticeType;
 import com.poortorich.chat.repository.ChatParticipantRepository;
 import com.poortorich.chat.response.ChatParticipantProfile;
 import com.poortorich.chat.response.enums.ChatResponse;
@@ -134,5 +135,18 @@ public class ChatParticipantService {
         return chatParticipantRepository.findAllByChatroomAndIsParticipatedTrueAndUserNot(chatroom, user).stream()
                 .filter(chatParticipant -> !activeSubscribers.contains(chatParticipant.getUser().getUsername()))
                 .toList();
+    }
+
+    public NoticeStatus updateAllNoticeStatus(List<ChatParticipant> chatParticipants, NoticeType noticeType) {
+        NoticeStatus noticeStatus = findByNoticeType(noticeType);
+        chatParticipants.forEach(chatParticipant -> chatParticipant.updateNoticeStatus(noticeStatus));
+        return noticeStatus;
+    }
+
+    private NoticeStatus findByNoticeType(NoticeType noticeType) {
+        return switch (noticeType) {
+            case CREATE, UPDATE -> NoticeStatus.DEFAULT;
+            case DELETE -> NoticeStatus.PERMANENT_HIDDEN;
+        };
     }
 }
