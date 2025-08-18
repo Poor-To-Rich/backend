@@ -33,6 +33,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -127,11 +128,18 @@ public class ChatRealTimeFacade {
         participantValidator.validateIsHost(context.chatParticipant());
         ChatNotice chatNotice = chatNoticeService.handleChatNotice(context, requestPayload);
 
+        if (Objects.isNull(chatNotice)) {
+            return BasePayload.builder()
+                    .type(PayloadType.NOTICE)
+                    .payload(null)
+                    .build();
+        }
+
         List<ChatParticipant> chatParticipants = chatParticipantService.findAllByChatroom(context.chatroom());
         NoticeStatus noticeStatus = chatParticipantService.updateAllNoticeStatus(
                 chatParticipants,
                 requestPayload.getNoticeType());
-
+        
         return BasePayload.builder()
                 .type(PayloadType.NOTICE)
                 .payload(ChatNoticeBuilder.buildLatestNoticeResponse(noticeStatus, chatNotice))

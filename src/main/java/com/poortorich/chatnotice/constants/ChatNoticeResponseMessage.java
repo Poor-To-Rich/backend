@@ -11,6 +11,7 @@ public class ChatNoticeResponseMessage {
 
     public static final String NOTICE_NOT_FOUND = "공지를 찾을 수 없습니다.";
     public static final String NOTICE_TYPE_REQUIRED = "공지 처리 유형은 필수 값입니다.";
+    public static final String NOTICE_CONTENT_REQUIRED = "공지 내용이 없습니다.";
 
     private ChatNoticeResponseMessage() {
     }

@@ -5,6 +5,8 @@ import com.poortorich.chat.realtime.model.PayloadContext;
 import com.poortorich.chat.realtime.payload.request.ChatNoticeRequestPayload;
 import com.poortorich.chatnotice.entity.ChatNotice;
 import com.poortorich.chatnotice.repository.ChatNoticeRepository;
+import com.poortorich.chatnotice.response.enums.ChatNoticeResponse;
+import com.poortorich.global.exceptions.BadRequestException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +21,10 @@ public class ChatNoticeService {
     private final ChatNoticeRepository chatNoticeRepository;
 
     public ChatNotice create(PayloadContext context, ChatNoticeRequestPayload requestPayload) {
+        if (Objects.isNull(requestPayload.getContent())) {
+            throw new BadRequestException(ChatNoticeResponse.CONTENT_REQUIRED);
+        }
+
         ChatNotice notice = ChatNotice.builder()
                 .content(requestPayload.getContent())
                 .author(context.user())
