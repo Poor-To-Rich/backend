@@ -6,7 +6,7 @@ import com.poortorich.websocket.stomp.command.subscribe.endpoint.SubscribeEndpoi
 import com.poortorich.websocket.stomp.response.StompResponse;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.redis.RedisConnectionFailureException;
+import org.springframework.dao.DataAccessException;
 import org.springframework.data.redis.core.SetOperations;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
@@ -32,7 +32,7 @@ public class SubscribeService {
     public void subscribe(Long chatroomId, String username) {
         try {
             setOps.add(getKey(chatroomId), username);
-        } catch (RedisConnectionFailureException exception) {
+        } catch (DataAccessException exception) {
             throw new InternalServerErrorException(StompResponse.SUBSCRIBER_SAVE_FAILURE);
         }
     }
@@ -40,7 +40,7 @@ public class SubscribeService {
     public void unsubscribe(Long chatroomId, String username) {
         try {
             setOps.remove(getKey(chatroomId), username);
-        } catch (RedisConnectionFailureException exception) {
+        } catch (DataAccessException exception) {
             throw new InternalServerErrorException(StompResponse.SUBSCRIBER_REMOVE_FAILURE);
         }
     }
@@ -48,7 +48,7 @@ public class SubscribeService {
     public Set<String> getSubscribers(Long chatroomId) {
         try {
             return setOps.members(getKey(chatroomId));
-        } catch (RedisConnectionFailureException exception) {
+        } catch (DataAccessException exception) {
             throw new InternalServerErrorException(GlobalResponse.INTERNAL_SERVER_EXCEPTION);
         }
     }
