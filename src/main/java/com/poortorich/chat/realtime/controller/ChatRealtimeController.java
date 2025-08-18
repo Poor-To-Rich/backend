@@ -53,7 +53,7 @@ public class ChatRealtimeController {
         );
     }
 
-    @MessageMapping("/chat/notice")
+    @MessageMapping("/chat/notices")
     public void handleChatNotice(StompHeaderAccessor accessor, @Payload @Valid ChatNoticeRequestPayload requestPayload) {
         String username = sessionManager.getUsername(accessor);
         BasePayload responsePayload = chatRealTimeFacade.handleChatNotice(username, requestPayload);
