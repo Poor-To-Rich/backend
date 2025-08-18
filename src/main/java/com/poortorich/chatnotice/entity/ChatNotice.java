@@ -52,6 +52,6 @@ public class ChatNotice {
     private ChatParticipant author;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "chatroom_id")
+    @JoinColumn(name = "chatroom_id", nullable = false)
     private Chatroom chatroom;
 }
