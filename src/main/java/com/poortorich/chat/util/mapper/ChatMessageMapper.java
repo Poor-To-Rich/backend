@@ -36,7 +36,7 @@ public class ChatMessageMapper {
                 .messageId(chatMessage.getId())
                 .chatroomId(chatMessage.getChatroom().getId())
                 .content(chatMessage.getContent())
-                .sendAt(chatMessage.getSentAt())
+                .sentAt(chatMessage.getSentAt())
                 .messageType(chatMessage.getMessageType())
                 .build();
     }

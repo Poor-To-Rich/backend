@@ -17,7 +17,7 @@ public class DateChangeMessagePayload extends ChatMessageResponse implements Res
     private final Long chatroomId;
     private final MessageType messageType;
     private final String content;
-    private final LocalDateTime sendAt;
+    private final LocalDateTime sentAt;
 
     @Override
     public BasePayload mapToBasePayload() {

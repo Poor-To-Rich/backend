@@ -115,7 +115,7 @@ public class ChatMessageService {
                 .chatroomId(dateChangeMessage.getChatroom().getId())
                 .messageType(dateChangeMessage.getMessageType())
                 .content(dateChangeMessage.getContent())
-                .sendAt(dateChangeMessage.getSentAt())
+                .sentAt(dateChangeMessage.getSentAt())
                 .build();
     }
 
