@@ -40,6 +40,7 @@ class ReportFacadeTest {
     void reportMemberSuccess() {
         String username = "test";
         Long chatroomId = 1L;
+        Long reporterId = 1L;
         Long reportedId = 2L;
         ReceiptReportRequest request = new ReceiptReportRequest("INSULT", null);
 
@@ -47,10 +48,12 @@ class ReportFacadeTest {
         User reported = User.builder().id(reportedId).build();
         Chatroom chatroom = Chatroom.builder().id(chatroomId).build();
         ChatParticipant reporterMember = ChatParticipant.builder()
+                .id(reporterId)
                 .user(reporter)
                 .chatroom(chatroom)
                 .build();
         ChatParticipant reportedMember = ChatParticipant.builder()
+                .id(reportedId)
                 .user(reported)
                 .chatroom(chatroom)
                 .build();
@@ -81,6 +84,7 @@ class ReportFacadeTest {
                 .build();
         Chatroom chatroom = Chatroom.builder().id(chatroomId).build();
         ChatParticipant member = ChatParticipant.builder()
+                .id(reportedId)
                 .user(reporter)
                 .chatroom(chatroom)
                 .build();
