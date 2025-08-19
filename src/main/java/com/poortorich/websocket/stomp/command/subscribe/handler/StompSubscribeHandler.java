@@ -47,6 +47,6 @@ public class StompSubscribeHandler {
         chatroomValidator.validateSubscribe(user, chatroom);
         log.info("[SUBSCRIBE]: 유저 `{}`가 채팅방[{}] 구독 완료", username, chatroom.getId());
 
-        subscribeService.subscribe(chatroomId, username);
+        subscribeService.subscribe(chatroomId, username, accessor.getSessionId(), accessor.getSubscriptionId());
     }
 }

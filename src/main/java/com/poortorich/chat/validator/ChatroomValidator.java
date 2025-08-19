@@ -9,9 +9,11 @@ import com.poortorich.global.exceptions.BadRequestException;
 import com.poortorich.global.exceptions.ConflictException;
 import com.poortorich.global.exceptions.ForbiddenException;
 import com.poortorich.user.entity.User;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+
+import java.util.Objects;
+import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
@@ -38,7 +40,7 @@ public class ChatroomValidator {
 
     public void validatePassword(Chatroom chatroom, String password) {
         String chatroomPassword = chatroom.getPassword();
-        if (chatroomPassword != null && !password.equals(chatroomPassword)) {
+        if (!Objects.equals(chatroomPassword, password)) {
             throw new BadRequestException(ChatResponse.CHATROOM_PASSWORD_DO_NOT_MATCH);
         }
     }

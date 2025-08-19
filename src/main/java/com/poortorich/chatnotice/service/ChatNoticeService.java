@@ -7,6 +7,7 @@ import com.poortorich.chatnotice.entity.ChatNotice;
 import com.poortorich.chatnotice.repository.ChatNoticeRepository;
 import com.poortorich.chatnotice.response.enums.ChatNoticeResponse;
 import com.poortorich.global.exceptions.BadRequestException;
+import com.poortorich.global.exceptions.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -27,7 +28,7 @@ public class ChatNoticeService {
 
         ChatNotice notice = ChatNotice.builder()
                 .content(requestPayload.getContent())
-                .author(context.user())
+                .author(context.chatParticipant())
                 .chatroom(context.chatroom())
                 .build();
 
@@ -68,5 +69,10 @@ public class ChatNoticeService {
         Optional<ChatNotice> chatNotice = chatNoticeRepository.findTop1ByChatroomOrderByCreatedDateDesc(context.chatroom());
         chatNotice.ifPresent(chatNoticeRepository::delete);
         return null;
+    }
+
+    public ChatNotice findNotice(Chatroom chatroom, Long noticeId) {
+        return chatNoticeRepository.findByChatroomAndId(chatroom, noticeId)
+                .orElseThrow(() -> new NotFoundException(ChatNoticeResponse.NOTICE_NOT_FOUND));
     }
 }
