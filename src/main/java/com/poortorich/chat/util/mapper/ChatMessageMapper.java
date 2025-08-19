@@ -38,6 +38,7 @@ public class ChatMessageMapper {
                 .content(chatMessage.getContent())
                 .sentAt(chatMessage.getSentAt())
                 .messageType(chatMessage.getMessageType())
+                .type(chatMessage.getType())
                 .build();
     }
 

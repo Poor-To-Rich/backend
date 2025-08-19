@@ -116,6 +116,7 @@ public class ChatMessageService {
                 .messageType(dateChangeMessage.getMessageType())
                 .content(dateChangeMessage.getContent())
                 .sentAt(dateChangeMessage.getSentAt())
+                .type(dateChangeMessage.getType())
                 .build();
     }
 
