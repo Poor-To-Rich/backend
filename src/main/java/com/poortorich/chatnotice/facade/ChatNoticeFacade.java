@@ -36,19 +36,22 @@ public class ChatNoticeFacade {
         Pageable pageable = PageRequest.of(0, PAGEABLE_SIZE);
         Slice<ChatNotice> chatNotices = chatNoticeService.getAllNoticeByCursor(chatroom, cursor, pageable);
 
+        List<ChatNotice> contents = chatNotices.getContent();
+        Long lastId = contents.isEmpty() ? null : contents.getLast().getId();
+
         return ChatNoticeBuilder.buildAllNoticesResponse(
                 chatNotices.hasNext(),
-                getNextCursor(chatNotices.hasNext(), chatNotices.getContent().getLast().getId()),
-                chatNotices.getContent()
+                getNextCursor(chatNotices.hasNext(), lastId),
+                contents.isEmpty() ? null : contents
         );
     }
 
-    private Long getNextCursor(Boolean hasNext, Long lastContentId) {
-        if (hasNext == false) {
+    private Long getNextCursor(Boolean hasNext, Long lastId) {
+        if (!hasNext) {
             return null;
         }
 
-        return lastContentId - 1;
+        return lastId;
     }
 
     public LatestNoticeResponse getLatestNotice(String username, Long chatroomId) {

@@ -236,7 +236,7 @@ class ChatNoticeFacadeTest {
 
         assertThat(result).isNotNull();
         assertThat(result.getHasNext()).isTrue();
-        assertThat(result.getNextCursor()).isEqualTo(slice.getContent().getLast().getId() - 1);
+        assertThat(result.getNextCursor()).isEqualTo(slice.getContent().getLast().getId());
         assertThat(result.getNotices()).hasSize(2);
         assertThat(result.getNotices().get(0).getNoticeId()).isEqualTo(chatNotice.getId());
         assertThat(result.getNotices().get(0).getPreview()).isEqualTo(chatNotice.getContent());
