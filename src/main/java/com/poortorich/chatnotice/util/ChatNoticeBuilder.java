@@ -16,11 +16,15 @@ public class ChatNoticeBuilder {
 
     private static final int PREVIEW_MAX_LENGTH = 30;
 
-    public static AllNoticesResponse buildAllNoticesResponse(Boolean hasNext, Long nextCursor, List<ChatNotice> chatNotices) {
+    public static AllNoticesResponse buildAllNoticesResponse(
+            Boolean hasNext,
+            Long nextCursor,
+            List<ChatNotice> chatNotices
+    ) {
         return AllNoticesResponse.builder()
                 .hasNext(hasNext)
                 .nextCursor(nextCursor)
-                .notices(buildNoticeResponses(chatNotices))
+                .notices(chatNotices == null ? List.of() : buildNoticeResponses(chatNotices))
                 .build();
     }
 
