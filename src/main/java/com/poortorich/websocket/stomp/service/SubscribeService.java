@@ -9,8 +9,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.redis.core.SetOperations;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
 
+import java.util.Objects;
 import java.util.Set;
 
 @Service
@@ -19,27 +21,41 @@ public class SubscribeService {
 
     private final StringRedisTemplate redisTemplate;
     private SetOperations<String, String> setOps;
+    private ValueOperations<String, String> valueOps;
 
     @PostConstruct
     public void init() {
         setOps = redisTemplate.opsForSet();
+        valueOps = redisTemplate.opsForValue();
     }
 
-    private String getKey(Long chatroomId) {
+    private String getChatroomKey(Long chatroomId) {
         return SubscribeEndpoint.CHATROOM_SUBSCRIBE_PREFIX + chatroomId;
     }
 
-    public void subscribe(Long chatroomId, String username) {
+    private String getSubscriptionKey(String sessionId, String subscriptionId) {
+        return sessionId + subscriptionId;
+    }
+
+    public void subscribe(Long chatroomId, String username, String sessionId, String subscriptionId) {
         try {
-            setOps.add(getKey(chatroomId), username);
+            setOps.add(getChatroomKey(chatroomId), username);
+
+            valueOps.append(getSubscriptionKey(sessionId, subscriptionId), chatroomId.toString());
         } catch (DataAccessException exception) {
             throw new InternalServerErrorException(StompResponse.SUBSCRIBER_SAVE_FAILURE);
         }
     }
 
-    public void unsubscribe(Long chatroomId, String username) {
+    public void unsubscribe(String username, String sessionId, String subscriptionId) {
         try {
-            setOps.remove(getKey(chatroomId), username);
+            String subscriptionKey = getSubscriptionKey(sessionId, subscriptionId);
+            String chatroomId = valueOps.get(subscriptionKey);
+
+            if (!Objects.isNull(chatroomId)) {
+                setOps.remove(getChatroomKey(Long.valueOf(chatroomId)), username);
+                redisTemplate.delete(subscriptionKey);
+            }
         } catch (DataAccessException exception) {
             throw new InternalServerErrorException(StompResponse.SUBSCRIBER_REMOVE_FAILURE);
         }
@@ -47,7 +63,7 @@ public class SubscribeService {
 
     public Set<String> getSubscribers(Long chatroomId) {
         try {
-            return setOps.members(getKey(chatroomId));
+            return setOps.members(getChatroomKey(chatroomId));
         } catch (DataAccessException exception) {
             throw new InternalServerErrorException(GlobalResponse.INTERNAL_SERVER_EXCEPTION);
         }

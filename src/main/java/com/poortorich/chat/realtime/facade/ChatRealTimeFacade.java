@@ -9,6 +9,7 @@ import com.poortorich.chat.realtime.model.PayloadContext;
 import com.poortorich.chat.realtime.payload.request.ChatMessageRequestPayload;
 import com.poortorich.chat.realtime.payload.request.MarkMessagesAsReadRequestPayload;
 import com.poortorich.chat.realtime.payload.response.BasePayload;
+import com.poortorich.chat.realtime.payload.response.DateChangeMessagePayload;
 import com.poortorich.chat.realtime.payload.response.MessageReadPayload;
 import com.poortorich.chat.realtime.payload.response.RankingStatusMessagePayload;
 import com.poortorich.chat.realtime.payload.response.UserChatMessagePayload;
@@ -100,6 +101,14 @@ public class ChatRealTimeFacade {
         return payload.mapToBasePayload();
     }
 
+    public BasePayload createDateChangeSystemMessage(Long newChatroomId) {
+        PayloadContext context = payloadCollector.getPayloadContext(newChatroomId);
+
+        DateChangeMessagePayload payload = chatMessageService.saveDateChangeMessage(context.chatroom());
+
+        return payload.mapToBasePayload();
+    }
+
     public MarkAllChatroomAsReadResult markAllChatroomAsRead(String username) {
         List<PayloadContext> contexts = payloadCollector.getAllPayloadContext(username);
 
@@ -111,5 +120,6 @@ public class ChatRealTimeFacade {
                 .apiResponse(MarkAllChatroomAsReadResponse.builder().chatroomIds(chatroomIds).build())
                 .broadcastPayloads(broadcastPayloads)
                 .build();
+
     }
 }

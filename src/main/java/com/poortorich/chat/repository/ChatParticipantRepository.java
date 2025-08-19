@@ -72,5 +72,5 @@ public interface ChatParticipantRepository extends JpaRepository<ChatParticipant
             JOIN FETCH cp.user u
             WHERE u.username = :username
             """)
-    List<ChatParticipant> findAllByUsernameWithChatroomAndUser(String username);
+    List<ChatParticipant> findAllByUsernameWithChatroomAndUser(@Param("username") String username);
 }
