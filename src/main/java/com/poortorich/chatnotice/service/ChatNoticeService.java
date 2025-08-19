@@ -24,4 +24,9 @@ public class ChatNoticeService {
     public List<ChatNotice> getPreviewNotices(Chatroom chatroom) {
         return chatNoticeRepository.findTop3ByChatroomOrderByCreatedDateDesc(chatroom);
     }
+
+    public ChatNotice findNotice(Chatroom chatroom, Long noticeId) {
+        return chatNoticeRepository.findByChatroomAndId(chatroom, noticeId)
+                .orElseThrow(() -> new NotFoundException(ChatNoticeResponse.NOTICE_NOT_FOUND));
+    }
 }

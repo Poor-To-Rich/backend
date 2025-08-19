@@ -110,7 +110,7 @@ public class ChatBuilder {
                 .build();
     }
 
-    private static ProfileResponse buildProfileResponse(ChatParticipant participantInfo) {
+    public static ProfileResponse buildProfileResponse(ChatParticipant participantInfo) {
         return ProfileResponse.builder()
                 .userId(participantInfo.getUser().getId())
                 .profileImage(participantInfo.getUser().getProfileImage())
