@@ -46,13 +46,13 @@ public class ChatParticipantService {
         }
     }
 
-    public void enterUser(User user, Chatroom chatroom) {
+    public ChatParticipant enterUser(User user, Chatroom chatroom) {
         ChatParticipant chatParticipant = chatParticipantRepository.findByUserAndChatroom(user, chatroom)
                 .orElseGet(() -> ChatBuilder.buildChatParticipant(user, ChatroomRole.MEMBER, chatroom));
 
         chatParticipant.restoreParticipation();
 
-        chatParticipantRepository.save(chatParticipant);
+        return chatParticipantRepository.save(chatParticipant);
     }
 
     public ChatParticipant findByUsernameAndChatroom(String username, Chatroom chatroom) {
