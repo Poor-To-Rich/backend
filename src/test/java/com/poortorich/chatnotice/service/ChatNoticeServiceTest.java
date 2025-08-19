@@ -120,7 +120,7 @@ class ChatNoticeServiceTest {
 
         SliceImpl<ChatNotice> repoSlice = new SliceImpl<>(List.of(notice1, notice2), pageable, true);
 
-        when(chatNoticeRepository.findByChatroomAndIdLessThanEqualOrderByIdDesc(chatroom, Long.MAX_VALUE, pageable))
+        when(chatNoticeRepository.findByChatroomAndIdLessThanOrderByIdDesc(chatroom, Long.MAX_VALUE, pageable))
                 .thenReturn(repoSlice);
 
         Slice<ChatNotice> result = chatNoticeService.getAllNoticeByCursor(chatroom, Long.MAX_VALUE, pageable);
@@ -135,14 +135,14 @@ class ChatNoticeServiceTest {
     @DisplayName("전체 공지 목록 - cursor가 있는 경우 조회 성공")
     void getAllNoticeByCursorSuccess() {
         Chatroom chatroom = Chatroom.builder().build();
-        Long cursor = 5L;
+        Long cursor = 6L;
 
         ChatNotice notice1 = ChatNotice.builder().id(5L).chatroom(chatroom).build();
         ChatNotice notice2 = ChatNotice.builder().id(4L).chatroom(chatroom).build();
 
         SliceImpl<ChatNotice> repoSlice = new SliceImpl<>(List.of(notice1, notice2), pageable, true);
 
-        when(chatNoticeRepository.findByChatroomAndIdLessThanEqualOrderByIdDesc(chatroom, cursor, pageable))
+        when(chatNoticeRepository.findByChatroomAndIdLessThanOrderByIdDesc(chatroom, cursor, pageable))
                 .thenReturn(repoSlice);
 
         Slice<ChatNotice> result = chatNoticeService.getAllNoticeByCursor(chatroom, cursor, pageable);

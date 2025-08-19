@@ -13,7 +13,7 @@ import java.util.Optional;
 @Repository
 public interface ChatNoticeRepository extends JpaRepository<ChatNotice, Long> {
 
-    Slice<ChatNotice> findByChatroomAndIdLessThanEqualOrderByIdDesc(Chatroom chatroom, Long cursor, Pageable pageable);
+    Slice<ChatNotice> findByChatroomAndIdLessThanOrderByIdDesc(Chatroom chatroom, Long cursor, Pageable pageable);
 
     Optional<ChatNotice> findTop1ByChatroomOrderByCreatedDateDesc(Chatroom chatroom);
 

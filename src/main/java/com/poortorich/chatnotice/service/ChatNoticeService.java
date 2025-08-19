@@ -38,7 +38,7 @@ public class ChatNoticeService {
     }
 
     public Slice<ChatNotice> getAllNoticeByCursor(Chatroom chatroom, Long cursor, Pageable pageable) {
-        return chatNoticeRepository.findByChatroomAndIdLessThanEqualOrderByIdDesc(chatroom, cursor, pageable);
+        return chatNoticeRepository.findByChatroomAndIdLessThanOrderByIdDesc(chatroom, cursor, pageable);
     }
 
     public ChatNotice getLatestNotice(Chatroom chatroom) {
