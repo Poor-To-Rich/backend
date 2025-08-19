@@ -162,6 +162,7 @@ public class ChatFacade {
         chatParticipantService.updateNoticeStatus(username, chatroom, request);
     }
 
+    @Transactional
     public UserEnterChatroomResult enterChatroom(
             String username,
             Long chatroomId,
