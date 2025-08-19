@@ -8,6 +8,7 @@ import com.poortorich.chat.entity.enums.RankingStatus;
 import com.poortorich.chat.service.ChatParticipantService;
 import com.poortorich.chat.service.ChatroomService;
 import com.poortorich.chatnotice.entity.ChatNotice;
+import com.poortorich.chatnotice.response.AllNoticesResponse;
 import com.poortorich.chatnotice.response.LatestNoticeResponse;
 import com.poortorich.chatnotice.response.NoticeDetailsResponse;
 import com.poortorich.chatnotice.response.PreviewNoticesResponse;
@@ -20,6 +21,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.SliceImpl;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -208,5 +213,63 @@ class ChatNoticeFacadeTest {
         assertThat(result.getCreatedAt()).isEqualTo(chatNotice.getCreatedDate().toString());
         assertThat(result.getAuthor().getUserId()).isEqualTo(user.getId());
         assertThat(result.getAuthor().getNickname()).isEqualTo(user.getNickname());
+    }
+
+    @Test
+    @DisplayName("전체 공지 목록 조회 성공")
+    void getAllNoticesSuccess() {
+        Long cursor = Long.MAX_VALUE;
+        Pageable pageable = PageRequest.of(0, 20);
+        ChatNotice chatNotice2 = ChatNotice.builder()
+                .id(4L)
+                .author(chatParticipant)
+                .chatroom(chatroom)
+                .content("공지 내용")
+                .createdDate(LocalDateTime.of(2025, 8, 8, 0, 0))
+                .build();
+        Slice<ChatNotice> slice = new SliceImpl<>(List.of(chatNotice, chatNotice2), pageable, true);
+
+        when(chatroomService.findById(chatroomId)).thenReturn(chatroom);
+        when(chatNoticeService.getAllNoticeByCursor(chatroom, cursor, pageable)).thenReturn(slice);
+
+        AllNoticesResponse result = chatNoticeFacade.getAllNotices(chatroomId, cursor);
+
+        assertThat(result).isNotNull();
+        assertThat(result.getHasNext()).isTrue();
+        assertThat(result.getNextCursor()).isEqualTo(slice.getContent().getLast().getId() - 1);
+        assertThat(result.getNotices()).hasSize(2);
+        assertThat(result.getNotices().get(0).getNoticeId()).isEqualTo(chatNotice.getId());
+        assertThat(result.getNotices().get(0).getPreview()).isEqualTo(chatNotice.getContent());
+        assertThat(result.getNotices().get(1).getNoticeId()).isEqualTo(chatNotice2.getId());
+        assertThat(result.getNotices().get(1).getPreview()).isEqualTo(chatNotice2.getContent());
+    }
+
+    @Test
+    @DisplayName("전체 공지 목록 조회 성공 - 마지막 페이지")
+    void getAllNoticesLastPageSuccess() {
+        Long cursor = Long.MAX_VALUE;
+        Pageable pageable = PageRequest.of(0, 20);
+        ChatNotice chatNotice2 = ChatNotice.builder()
+                .id(4L)
+                .author(chatParticipant)
+                .chatroom(chatroom)
+                .content("공지 내용")
+                .createdDate(LocalDateTime.of(2025, 8, 8, 0, 0))
+                .build();
+        Slice<ChatNotice> slice = new SliceImpl<>(List.of(chatNotice, chatNotice2), pageable, false);
+
+        when(chatroomService.findById(chatroomId)).thenReturn(chatroom);
+        when(chatNoticeService.getAllNoticeByCursor(chatroom, cursor, pageable)).thenReturn(slice);
+
+        AllNoticesResponse result = chatNoticeFacade.getAllNotices(chatroomId, cursor);
+
+        assertThat(result).isNotNull();
+        assertThat(result.getHasNext()).isFalse();
+        assertThat(result.getNextCursor()).isNull();
+        assertThat(result.getNotices()).hasSize(2);
+        assertThat(result.getNotices().get(0).getNoticeId()).isEqualTo(chatNotice.getId());
+        assertThat(result.getNotices().get(0).getPreview()).isEqualTo(chatNotice.getContent());
+        assertThat(result.getNotices().get(1).getNoticeId()).isEqualTo(chatNotice2.getId());
+        assertThat(result.getNotices().get(1).getPreview()).isEqualTo(chatNotice2.getContent());
     }
 }

@@ -16,6 +16,26 @@ public class ChatNoticeBuilder {
 
     private static final int PREVIEW_MAX_LENGTH = 30;
 
+    public static AllNoticesResponse buildAllNoticesResponse(Boolean hasNext, Long nextCursor, List<ChatNotice> chatNotices) {
+        return AllNoticesResponse.builder()
+                .hasNext(hasNext)
+                .nextCursor(nextCursor)
+                .notices(buildNoticeResponses(chatNotices))
+                .build();
+    }
+
+    private static List<NoticeResponse> buildNoticeResponses(List<ChatNotice> chatNotices) {
+        return chatNotices.stream()
+                .filter(Objects::nonNull)
+                .map(notice -> NoticeResponse.builder()
+                        .noticeId(notice.getId())
+                        .preview(truncateContent(notice.getContent()))
+                        .authorNickname(notice.getAuthor().getUser().getNickname())
+                        .createdAt(notice.getCreatedDate().toString())
+                        .build())
+                .toList();
+    }
+
     public static LatestNoticeResponse buildLatestNoticeResponse(NoticeStatus status, ChatNotice notice) {
         if (notice == null) {
             return null;
