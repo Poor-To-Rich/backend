@@ -3,8 +3,10 @@ package com.poortorich.chatnotice.util;
 import com.poortorich.chat.entity.enums.NoticeStatus;
 import com.poortorich.chat.util.ChatBuilder;
 import com.poortorich.chatnotice.entity.ChatNotice;
+import com.poortorich.chatnotice.response.AllNoticesResponse;
 import com.poortorich.chatnotice.response.LatestNoticeResponse;
 import com.poortorich.chatnotice.response.NoticeDetailsResponse;
+import com.poortorich.chatnotice.response.NoticeResponse;
 import com.poortorich.chatnotice.response.PreviewNoticeResponse;
 
 import java.util.List;
@@ -38,14 +40,6 @@ public class ChatNoticeBuilder {
                 .toList();
     }
 
-    private static String truncateContent(String content) {
-        if (content.length() > PREVIEW_MAX_LENGTH) {
-            return content.substring(0, PREVIEW_MAX_LENGTH);
-        }
-
-        return content;
-    }
-
     public static NoticeDetailsResponse buildNoticeDetailsResponse(ChatNotice notice) {
         return NoticeDetailsResponse.builder()
                 .noticeId(notice.getId())
@@ -53,5 +47,13 @@ public class ChatNoticeBuilder {
                 .createdAt(notice.getCreatedDate().toString())
                 .author(ChatBuilder.buildProfileResponse(notice.getAuthor()))
                 .build();
+    }
+
+    private static String truncateContent(String content) {
+        if (content.length() > PREVIEW_MAX_LENGTH) {
+            return content.substring(0, PREVIEW_MAX_LENGTH);
+        }
+
+        return content;
     }
 }
