@@ -100,7 +100,7 @@ public class ChatParticipantService {
     }
 
     public List<ChatParticipantProfile> getParticipantProfiles(Chatroom chatroom) {
-        List<ChatParticipant> participants = chatParticipantRepository.findAllByChatroomAndIsParticipatedTrue(chatroom);
+        List<ChatParticipant> participants = chatParticipantRepository.findAllByChatroom(chatroom);
 
         return participants.stream()
                 .map(participant -> {
