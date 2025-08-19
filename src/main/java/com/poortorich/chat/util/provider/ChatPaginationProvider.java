@@ -1,15 +1,20 @@
 package com.poortorich.chat.util.provider;
 
 import com.poortorich.chat.entity.ChatMessage;
+import com.poortorich.chat.entity.ChatParticipant;
 import com.poortorich.chat.entity.Chatroom;
 import com.poortorich.chat.model.ChatPaginationContext;
 import com.poortorich.chat.service.ChatMessageService;
+import com.poortorich.chat.service.ChatParticipantService;
 import com.poortorich.chat.service.ChatroomService;
-import java.util.Objects;
+import com.poortorich.user.entity.User;
+import com.poortorich.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Component;
+
+import java.util.Objects;
 
 @Component
 @RequiredArgsConstructor
@@ -17,11 +22,16 @@ public class ChatPaginationProvider {
 
     private final ChatroomService chatroomService;
     private final ChatMessageService chatMessageService;
+    private final ChatParticipantService chatParticipantService;
+    private final UserService userService;
 
-    public ChatPaginationContext getContext(Long chatroomId, Long cursor, Long pageSize) {
+    public ChatPaginationContext getContext(String username, Long chatroomId, Long cursor, Long pageSize) {
+        User user = userService.findUserByUsername(username);
         Chatroom chatroom = chatroomService.findById(chatroomId);
+        ChatParticipant chatParticipant = chatParticipantService.findByUserAndChatroom(user, chatroom);
         return ChatPaginationContext.builder()
                 .chatroom(chatroom)
+                .chatParticipant(chatParticipant)
                 .cursor(getCursor(chatroom, cursor))
                 .pageRequest(getPageRequest(pageSize))
                 .build();

@@ -157,9 +157,10 @@ public class ChatMessageService {
             return new SliceImpl<>(Collections.emptyList(), context.pageRequest(), false);
         }
 
-        return chatMessageRepository.findByChatroomAndIdLessThanEqualOrderByIdDesc(
+        return chatMessageRepository.findByChatroomAndIdLessThanEqualAndCreatedDateAfterOrderByIdDesc(
                 context.chatroom(),
                 context.cursor(),
+                context.chatParticipant().getCreatedDate(),
                 context.pageRequest());
     }
 

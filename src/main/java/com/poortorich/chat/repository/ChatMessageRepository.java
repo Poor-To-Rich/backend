@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,7 +19,11 @@ public interface ChatMessageRepository extends JpaRepository<ChatMessage, Long> 
 
     void deleteAllByChatroom(Chatroom chatroom);
 
-    Slice<ChatMessage> findByChatroomAndIdLessThanEqualOrderByIdDesc(Chatroom chatroom, Long cursor, Pageable pageable);
+    Slice<ChatMessage> findByChatroomAndIdLessThanEqualAndCreatedDateAfterOrderByIdDesc(
+            Chatroom chatroom,
+            Long cursor,
+            LocalDateTime joinedAt,
+            Pageable pageable);
 
     boolean existsByContentAndMessageTypeAndChatroom(String content, MessageType messageType, Chatroom chatroom);
 }
