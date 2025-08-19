@@ -54,4 +54,8 @@ public class ChatNotice {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "chatroom_id", nullable = false)
     private Chatroom chatroom;
+
+    public void updateContent(String content) {
+        this.content = content;
+    }
 }

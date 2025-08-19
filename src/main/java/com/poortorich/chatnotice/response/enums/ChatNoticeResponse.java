@@ -14,7 +14,8 @@ public enum ChatNoticeResponse implements Response {
     GET_PREVIEW_NOTICE_SUCCESS(HttpStatus.OK, ChatNoticeResponseMessage.GET_PREVIEW_NOTICE_SUCCESS, null),
 
     NOTICE_STATUS_INVALID(HttpStatus.BAD_REQUEST, ChatNoticeResponseMessage.NOTICE_STATUS_INVALID, "status"),
-    NOTICE_NOT_FOUND(HttpStatus.NOT_FOUND, ChatNoticeResponseMessage.NOTICE_NOT_FOUND, null);
+    NOTICE_NOT_FOUND(HttpStatus.NOT_FOUND, ChatNoticeResponseMessage.NOTICE_NOT_FOUND, null),
+    CONTENT_REQUIRED(HttpStatus.BAD_REQUEST, ChatNoticeResponseMessage.NOTICE_CONTENT_REQUIRED, null);
 
     private final HttpStatus httpStatus;
     private final String message;
