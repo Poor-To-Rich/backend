@@ -59,6 +59,7 @@ public class ChatController {
             @Valid ChatroomCreateRequest request
     ) {
         ChatroomCreateResponse response = chatFacade.createChatroom(userDetails.getUsername(), request);
+        realTimeFacade.createDateChangeSystemMessage(response.getNewChatroomId());
         realTimeFacade.createUserEnterSystemMessage(userDetails.getUsername(), response.getNewChatroomId());
         realTimeFacade.createRankingStatusMessage(response.getNewChatroomId(), request.getIsRankingEnabled());
         return DataResponse.toResponseEntity(ChatResponse.CREATE_CHATROOM_SUCCESS, response);
@@ -130,8 +131,9 @@ public class ChatController {
 
         BasePayload basePayload = realTimeFacade.createUserEnterSystemMessage(userDetails.getUsername(),
                 chatroomId);
-        messagingTemplate.convertAndSend(SubscribeEndpoint.CHATROOM_SUBSCRIBE_PREFIX + chatroomId, basePayload);
-
+        if (!Objects.isNull(basePayload)) {
+            messagingTemplate.convertAndSend(SubscribeEndpoint.CHATROOM_SUBSCRIBE_PREFIX + chatroomId, basePayload);
+        }
         return DataResponse.toResponseEntity(ChatResponse.CHATROOM_ENTER_SUCCESS, response);
     }
 
