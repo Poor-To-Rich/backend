@@ -17,7 +17,8 @@ public class RankingStatusMessagePayload extends ChatMessageResponse implements 
     private Long chatroomId;
     private Boolean isRankingEnabled;
     private LocalDateTime sentAt;
-    private MessageType type;
+    private MessageType messageType;
+    private ChatMessageType type;
 
     @Override
     public BasePayload mapToBasePayload() {
