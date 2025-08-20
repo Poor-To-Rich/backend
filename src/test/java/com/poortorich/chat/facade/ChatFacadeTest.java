@@ -16,7 +16,7 @@ import com.poortorich.chat.response.ChatroomsResponse;
 import com.poortorich.chat.service.ChatMessageService;
 import com.poortorich.chat.service.ChatParticipantService;
 import com.poortorich.chat.service.ChatroomService;
-import com.poortorich.chatnotice.request.ChatNoticeUpdateRequest;
+import com.poortorich.chatnotice.request.ChatNoticeStatusUpdateRequest;
 import com.poortorich.s3.service.FileUploadService;
 import com.poortorich.tag.service.TagService;
 import com.poortorich.user.entity.User;
@@ -288,7 +288,7 @@ class ChatFacadeTest {
     void updateNoticeStatusSuccess() {
         String username = "testUser";
         Long chatroomId = 1L;
-        ChatNoticeUpdateRequest request = new ChatNoticeUpdateRequest("DEFAULT");
+        ChatNoticeStatusUpdateRequest request = new ChatNoticeStatusUpdateRequest("DEFAULT");
 
         when(chatroomService.findById(chatroomId)).thenReturn(chatroom);
 
