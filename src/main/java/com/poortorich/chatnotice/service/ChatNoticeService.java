@@ -1,12 +1,13 @@
 package com.poortorich.chatnotice.service;
 
+import com.poortorich.chat.entity.ChatParticipant;
 import com.poortorich.chat.entity.Chatroom;
 import com.poortorich.chat.realtime.model.PayloadContext;
 import com.poortorich.chat.realtime.payload.request.ChatNoticeRequestPayload;
 import com.poortorich.chatnotice.entity.ChatNotice;
 import com.poortorich.chatnotice.repository.ChatNoticeRepository;
+import com.poortorich.chatnotice.request.ChatNoticeCreateRequest;
 import com.poortorich.chatnotice.response.enums.ChatNoticeResponse;
-import com.poortorich.global.exceptions.BadRequestException;
 import com.poortorich.global.exceptions.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -21,15 +22,11 @@ public class ChatNoticeService {
 
     private final ChatNoticeRepository chatNoticeRepository;
 
-    public ChatNotice create(PayloadContext context, ChatNoticeRequestPayload requestPayload) {
-        if (Objects.isNull(requestPayload.getContent())) {
-            throw new BadRequestException(ChatNoticeResponse.CONTENT_REQUIRED);
-        }
-
+    public ChatNotice create(ChatParticipant author, ChatNoticeCreateRequest noticeCreateRequest) {
         ChatNotice notice = ChatNotice.builder()
-                .content(requestPayload.getContent())
-                .author(context.chatParticipant())
-                .chatroom(context.chatroom())
+                .content(noticeCreateRequest.getContent())
+                .author(author)
+                .chatroom(author.getChatroom())
                 .build();
 
         return chatNoticeRepository.save(notice);
@@ -55,14 +52,6 @@ public class ChatNoticeService {
         chatNotice.updateContent(requestPayload.getContent());
 
         return chatNoticeRepository.save(chatNotice);
-    }
-
-    public ChatNotice handleChatNotice(PayloadContext context, ChatNoticeRequestPayload requestPayload) {
-        return switch (requestPayload.getNoticeType()) {
-            case CREATE -> create(context, requestPayload);
-            case UPDATE -> update(context, requestPayload);
-            case DELETE -> delete(context);
-        };
     }
 
     public ChatNotice delete(PayloadContext context) {
