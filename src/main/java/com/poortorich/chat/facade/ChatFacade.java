@@ -6,6 +6,8 @@ import com.poortorich.chat.entity.Chatroom;
 import com.poortorich.chat.entity.enums.ChatroomRole;
 import com.poortorich.chat.model.ChatMessageResponse;
 import com.poortorich.chat.model.ChatPaginationContext;
+import com.poortorich.chat.model.UserEnterChatroomResult;
+import com.poortorich.chat.realtime.payload.response.UserEnterProfileResponsePayload;
 import com.poortorich.chat.request.ChatroomCreateRequest;
 import com.poortorich.chat.request.ChatroomEnterRequest;
 import com.poortorich.chat.request.ChatroomLeaveAllRequest;
@@ -160,7 +162,8 @@ public class ChatFacade {
         chatParticipantService.updateNoticeStatus(username, chatroom, request);
     }
 
-    public ChatroomEnterResponse enterChatroom(
+    @Transactional
+    public UserEnterChatroomResult enterChatroom(
             String username,
             Long chatroomId,
             ChatroomEnterRequest chatroomEnterRequest
@@ -171,8 +174,17 @@ public class ChatFacade {
         chatroomValidator.validateEnter(user, chatroom);
         chatroomValidator.validatePassword(chatroom, chatroomEnterRequest.getChatroomPassword());
 
-        chatParticipantService.enterUser(user, chatroom);
-        return ChatroomEnterResponse.builder().chatroomId(chatroomId).build();
+        ChatParticipant newParticipant = chatParticipantService.enterUser(user, chatroom);
+        return UserEnterChatroomResult.builder()
+                .apiResponse(ChatroomEnterResponse.builder().chatroomId(chatroomId).build())
+                .broadcastPayload(UserEnterProfileResponsePayload.builder()
+                        .userId(user.getId())
+                        .profileImage(user.getProfileImage())
+                        .nickname(user.getNickname())
+                        .isHost(ChatroomRole.HOST.equals(newParticipant.getRole()))
+                        .rankingType(newParticipant.getRankingStatus())
+                        .build())
+                .build();
     }
 
     @Transactional

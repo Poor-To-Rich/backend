@@ -5,5 +5,6 @@ import com.poortorich.websocket.payload.interfaces.EventType;
 public enum PayloadType implements EventType {
 
     NOTICE,
+    USER_JOINED,
     USER_UPDATED
 }
