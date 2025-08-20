@@ -19,7 +19,7 @@ public interface ChatMessageRepository extends JpaRepository<ChatMessage, Long> 
 
     void deleteAllByChatroom(Chatroom chatroom);
 
-    Slice<ChatMessage> findByChatroomAndIdLessThanEqualAndCreatedDateAfterOrderByIdDesc(
+    Slice<ChatMessage> findByChatroomAndIdLessThanEqualAndSentAtAfterOrderByIdDesc(
             Chatroom chatroom,
             Long cursor,
             LocalDateTime joinedAt,
