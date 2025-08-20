@@ -326,7 +326,7 @@ class ChatFacadeTest {
         AllParticipantsResponse response = chatFacade.getAllParticipants(username, chatroomId);
 
         assertThat(response).isNotNull();
-        assertThat(response.getMemberCount()).isEqualTo(2);
+        assertThat(response.getMemberCount()).isEqualTo(2L);
         assertThat(response.getMembers().get(0).getUserId()).isEqualTo(hostUser.getId());
         assertThat(response.getMembers().get(0).getNickname()).isEqualTo(hostUser.getNickname());
         assertThat(response.getMembers().get(0).getIsHost()).isTrue();
