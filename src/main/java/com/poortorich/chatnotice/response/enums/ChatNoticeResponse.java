@@ -17,7 +17,17 @@ public enum ChatNoticeResponse implements Response {
     NOTICE_NOT_FOUND(HttpStatus.NOT_FOUND, ChatNoticeResponseMessage.NOTICE_NOT_FOUND, null),
     CONTENT_REQUIRED(HttpStatus.BAD_REQUEST, ChatNoticeResponseMessage.NOTICE_CONTENT_REQUIRED, null),
     CHAT_NOTICE_CREATE_SUCCESS(HttpStatus.CREATED, ChatNoticeResponseMessage.CHAT_NOTICE_CREATE_SUCCESS, null),
-    CHAT_NOTICE_CREATE_FAILURE(HttpStatus.INTERNAL_SERVER_ERROR, ChatNoticeResponseMessage.CHAT_NOTICE_CREATE_FAILURE, null);
+
+    CHAT_NOTICE_CREATE_FAILURE(
+            HttpStatus.INTERNAL_SERVER_ERROR,
+            ChatNoticeResponseMessage.CHAT_NOTICE_CREATE_FAILURE,
+            null),
+    CHAT_NOTICE_UPDATE_SUCCESS(HttpStatus.OK, ChatNoticeResponseMessage.CHAT_NOTICE_UPDATE_SUCCESS, null),
+    CHAT_NOTICE_UPDATE_FAILURE(
+            HttpStatus.INTERNAL_SERVER_ERROR,
+            ChatNoticeResponseMessage.CHAT_NOTICE_UPDATE_FAILURE,
+            null),
+    CHAT_NOTICE_DELETE_SUCCESS(HttpStatus.OK, ChatNoticeResponseMessage.CHAT_NOTICE_DELETE_SUCCESS, null);
 
     private final HttpStatus httpStatus;
     private final String message;
