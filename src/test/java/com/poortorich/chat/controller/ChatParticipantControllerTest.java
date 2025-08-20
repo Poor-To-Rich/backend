@@ -53,7 +53,7 @@ class ChatParticipantControllerTest extends BaseSecurityTest {
     void getAllParticipantsSuccess() throws Exception {
         Long chatroomId = 1L;
 
-        when(chatFacade.getAllParticipants(chatroomId)).thenReturn(AllParticipantsResponse.builder().build());
+        when(chatFacade.getAllParticipants(username, chatroomId)).thenReturn(AllParticipantsResponse.builder().build());
 
         mockMvc.perform(get("/chatrooms/" + chatroomId + "/members/all")
                         .with(csrf()))

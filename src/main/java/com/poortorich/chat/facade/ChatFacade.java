@@ -275,8 +275,10 @@ public class ChatFacade {
                 .build();
     }
 
-    public AllParticipantsResponse getAllParticipants(Long chatroomId) {
+    public AllParticipantsResponse getAllParticipants(String username, Long chatroomId) {
+        User user = userService.findUserByUsername(username);
         Chatroom chatroom = chatroomService.findById(chatroomId);
+        chatParticipantValidator.validateIsParticipate(user, chatroom);
 
         return ChatBuilder.buildAllParticipantsResponse(chatParticipantService.getAllParticipants(chatroom));
     }

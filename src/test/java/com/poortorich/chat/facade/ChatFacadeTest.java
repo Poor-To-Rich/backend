@@ -17,6 +17,7 @@ import com.poortorich.chat.response.ChatroomsResponse;
 import com.poortorich.chat.service.ChatMessageService;
 import com.poortorich.chat.service.ChatParticipantService;
 import com.poortorich.chat.service.ChatroomService;
+import com.poortorich.chat.validator.ChatParticipantValidator;
 import com.poortorich.chatnotice.request.ChatNoticeUpdateRequest;
 import com.poortorich.s3.service.FileUploadService;
 import com.poortorich.tag.service.TagService;
@@ -63,6 +64,8 @@ class ChatFacadeTest {
     private TagService tagService;
     @Mock
     private ChatMessageService chatMessageService;
+    @Mock
+    private ChatParticipantValidator chatParticipantValidator;
     @InjectMocks
     private ChatFacade chatFacade;
     private Chatroom chatroom;
@@ -301,7 +304,8 @@ class ChatFacadeTest {
     @Test
     @DisplayName("전체 참여 인원 목록 조회 성공")
     void getAllParticipantsSuccess() {
-        User hostUser = User.builder().id(1L).profileImage("profileImage.com").nickname("host").build();
+        String username = "host";
+        User hostUser = User.builder().id(1L).profileImage("profileImage.com").nickname(username).build();
         ChatParticipant host = ChatParticipant.builder()
                 .user(hostUser)
                 .chatroom(chatroom)
@@ -319,7 +323,7 @@ class ChatFacadeTest {
         when(chatroomService.findById(chatroomId)).thenReturn(chatroom);
         when(chatParticipantService.getAllParticipants(chatroom)).thenReturn(List.of(host, member1));
 
-        AllParticipantsResponse response = chatFacade.getAllParticipants(chatroomId);
+        AllParticipantsResponse response = chatFacade.getAllParticipants(username, chatroomId);
 
         assertThat(response).isNotNull();
         assertThat(response.getMemberCount()).isEqualTo(2);

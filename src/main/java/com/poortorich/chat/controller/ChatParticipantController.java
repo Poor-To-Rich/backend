@@ -27,10 +27,13 @@ public class ChatParticipantController {
     }
 
     @GetMapping("/chatrooms/{chatroomId}/members/all")
-    public ResponseEntity<BaseResponse> getAllParticipants(@PathVariable Long chatroomId) {
+    public ResponseEntity<BaseResponse> getAllParticipants(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @PathVariable Long chatroomId
+    ) {
         return DataResponse.toResponseEntity(
                 ChatResponse.GET_ALL_PARTICIPANTS_SUCCESS,
-                chatFacade.getAllParticipants(chatroomId)
+                chatFacade.getAllParticipants(userDetails.getUsername(), chatroomId)
         );
     }
 }
