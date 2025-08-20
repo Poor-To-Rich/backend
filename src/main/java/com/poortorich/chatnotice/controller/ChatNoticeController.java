@@ -2,6 +2,7 @@ package com.poortorich.chatnotice.controller;
 
 import com.poortorich.chat.facade.ChatFacade;
 import com.poortorich.chatnotice.facade.ChatNoticeFacade;
+import com.poortorich.chatnotice.request.ChatNoticeCreateRequest;
 import com.poortorich.chatnotice.request.ChatNoticeUpdateRequest;
 import com.poortorich.chatnotice.response.enums.ChatNoticeResponse;
 import com.poortorich.global.response.BaseResponse;
@@ -14,6 +15,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -25,6 +27,16 @@ public class ChatNoticeController {
 
     private final ChatFacade chatFacade;
     private final ChatNoticeFacade chatNoticeFacade;
+
+    @PostMapping
+    public ResponseEntity<BaseResponse> createNewNotice(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @PathVariable Long chatroomId,
+            @RequestBody ChatNoticeCreateRequest noticeCreateRequest
+    ) {
+        chatNoticeFacade.create(userDetails.getUsername(), chatroomId, noticeCreateRequest);
+        return BaseResponse.toResponseEntity(ChatNoticeResponse.CHAT_NOTICE_CREATE_SUCCESS);
+    }
 
     @GetMapping
     public ResponseEntity<BaseResponse> getLatestNotice(

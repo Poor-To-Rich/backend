@@ -2,14 +2,21 @@ package com.poortorich.chatnotice.facade;
 
 import com.poortorich.chat.entity.ChatParticipant;
 import com.poortorich.chat.entity.Chatroom;
+import com.poortorich.chat.entity.enums.NoticeStatus;
 import com.poortorich.chat.service.ChatParticipantService;
 import com.poortorich.chat.service.ChatroomService;
+import com.poortorich.chat.validator.ChatParticipantValidator;
 import com.poortorich.chatnotice.entity.ChatNotice;
+import com.poortorich.chatnotice.model.NoticeCreateResult;
+import com.poortorich.chatnotice.request.ChatNoticeCreateRequest;
 import com.poortorich.chatnotice.response.LatestNoticeResponse;
 import com.poortorich.chatnotice.response.NoticeDetailsResponse;
 import com.poortorich.chatnotice.response.PreviewNoticesResponse;
 import com.poortorich.chatnotice.service.ChatNoticeService;
 import com.poortorich.chatnotice.util.ChatNoticeBuilder;
+import com.poortorich.chatnotice.util.mapper.ChatNoticeDataMapper;
+import com.poortorich.user.entity.User;
+import com.poortorich.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +30,27 @@ public class ChatNoticeFacade {
     private final ChatroomService chatroomService;
     private final ChatParticipantService chatParticipantService;
     private final ChatNoticeService chatNoticeService;
+    private final UserService userService;
+
+    private final ChatNoticeDataMapper noticeDataMapper;
+    private final ChatParticipantValidator participantValidator;
+
+    @Transactional
+    public NoticeCreateResult create(String username, Long chatroomId, ChatNoticeCreateRequest noticeCreateRequest) {
+        User user = userService.findUserByUsername(username);
+        Chatroom chatroom = chatroomService.findById(chatroomId);
+        ChatParticipant chatParticipant = chatParticipantService.findByUserAndChatroom(user, chatroom);
+
+        participantValidator.validateIsHost(chatParticipant);
+
+        ChatNotice newChatNotice = chatNoticeService.create(chatParticipant, noticeCreateRequest);
+        NoticeCreateResult noticeCreateResult = noticeDataMapper.mapToNoticeCreateResult(newChatNotice);
+
+        List<ChatParticipant> participants = chatParticipantService.findAllByChatroom(chatroom);
+        chatParticipantService.updateAllNoticeStatus(participants, NoticeStatus.DEFAULT);
+
+        return noticeCreateResult;
+    }
 
     public LatestNoticeResponse getLatestNotice(String username, Long chatroomId) {
         Chatroom chatroom = chatroomService.findById(chatroomId);
