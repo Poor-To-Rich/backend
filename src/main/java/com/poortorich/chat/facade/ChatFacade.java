@@ -12,6 +12,7 @@ import com.poortorich.chat.request.ChatroomLeaveAllRequest;
 import com.poortorich.chat.request.ChatroomUpdateRequest;
 import com.poortorich.chat.request.enums.SortBy;
 import com.poortorich.chat.response.AllChatroomsResponse;
+import com.poortorich.chat.response.AllParticipantsResponse;
 import com.poortorich.chat.response.ChatMessagePageResponse;
 import com.poortorich.chat.response.ChatParticipantProfile;
 import com.poortorich.chat.response.ChatroomCoverInfoResponse;
@@ -272,5 +273,11 @@ public class ChatFacade {
                                 profile -> profile
                         )))
                 .build();
+    }
+
+    public AllParticipantsResponse getAllParticipants(Long chatroomId) {
+        Chatroom chatroom = chatroomService.findById(chatroomId);
+
+        return ChatBuilder.buildAllParticipantsResponse(chatParticipantService.getAllParticipants(chatroom));
     }
 }

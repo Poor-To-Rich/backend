@@ -1,6 +1,7 @@
 package com.poortorich.chat.controller;
 
 import com.poortorich.chat.facade.ChatFacade;
+import com.poortorich.chat.response.AllParticipantsResponse;
 import com.poortorich.chat.response.ChatroomsResponse;
 import com.poortorich.chat.response.enums.ChatResponse;
 import com.poortorich.global.config.BaseSecurityTest;
@@ -30,17 +31,33 @@ class ChatParticipantControllerTest extends BaseSecurityTest {
     @MockitoBean
     private ChatFacade chatFacade;
 
+    private final String username = "test";
+
     @Test
-    @WithMockUser(username = "test")
+    @WithMockUser(username = username)
     @DisplayName("내가 방장인 채팅방 조회 성공")
     void getHostedChatroomsSuccess() throws Exception {
         ChatroomsResponse response = ChatroomsResponse.builder().build();
-        when(chatFacade.getHostedChatrooms("test")).thenReturn(response);
+        when(chatFacade.getHostedChatrooms(username)).thenReturn(response);
 
         mockMvc.perform(get("/users/hosted-chatrooms")
                         .with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath(("$.message"))
                         .value(ChatResponse.GET_HOSTED_CHATROOMS_SUCCESS.getMessage()));
+    }
+
+    @Test
+    @WithMockUser(username = username)
+    @DisplayName("전체 참여 인원 조회 성공")
+    void getAllParticipantsSuccess() throws Exception {
+        Long chatroomId = 1L;
+
+        when(chatFacade.getAllParticipants(chatroomId)).thenReturn(AllParticipantsResponse.builder().build());
+
+        mockMvc.perform(get("/chatrooms/" + chatroomId + "/members/all")
+                        .with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(("$.message")).value(ChatResponse.GET_ALL_PARTICIPANTS_SUCCESS.getMessage()));
     }
 }

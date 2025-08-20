@@ -149,4 +149,8 @@ public class ChatParticipantService {
             case DELETE -> NoticeStatus.PERMANENT_HIDDEN;
         };
     }
+
+    public List<ChatParticipant> getAllParticipants(Chatroom chatroom) {
+        return chatParticipantRepository.findAllOrderedParticipants(chatroom);
+    }
 }
