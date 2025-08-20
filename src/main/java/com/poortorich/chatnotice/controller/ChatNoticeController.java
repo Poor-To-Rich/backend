@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -23,8 +24,21 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class ChatNoticeController {
 
+    private static final String DEFAULT_VALUE = "" + Long.MAX_VALUE;
+
     private final ChatFacade chatFacade;
     private final ChatNoticeFacade chatNoticeFacade;
+
+    @GetMapping("/all")
+    public ResponseEntity<BaseResponse> getAllNotices(
+            @PathVariable Long chatroomId,
+            @RequestParam(defaultValue = DEFAULT_VALUE) Long cursor
+    ) {
+        return DataResponse.toResponseEntity(
+                ChatNoticeResponse.GET_ALL_NOTICES_SUCCESS,
+                chatNoticeFacade.getAllNotices(chatroomId, cursor)
+        );
+    }
 
     @GetMapping
     public ResponseEntity<BaseResponse> getLatestNotice(
