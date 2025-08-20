@@ -305,7 +305,12 @@ class ChatFacadeTest {
     @DisplayName("전체 참여 인원 목록 조회 성공")
     void getAllParticipantsSuccess() {
         String username = "host";
-        User hostUser = User.builder().id(1L).profileImage("profileImage.com").nickname(username).build();
+        User hostUser = User.builder()
+                .id(1L)
+                .profileImage("profileImage.com")
+                .username(username)
+                .nickname(username)
+                .build();
         ChatParticipant host = ChatParticipant.builder()
                 .user(hostUser)
                 .chatroom(chatroom)
@@ -320,6 +325,7 @@ class ChatFacadeTest {
                 .rankingStatus(RankingStatus.NONE)
                 .build();
 
+        when(userService.findUserByUsername(username)).thenReturn(hostUser);
         when(chatroomService.findById(chatroomId)).thenReturn(chatroom);
         when(chatParticipantService.getAllParticipants(chatroom)).thenReturn(List.of(host, member1));
 
