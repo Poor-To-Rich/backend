@@ -3,12 +3,15 @@ package com.poortorich.chatnotice.facade;
 import com.poortorich.chat.entity.ChatParticipant;
 import com.poortorich.chat.entity.Chatroom;
 import com.poortorich.chat.entity.enums.NoticeStatus;
+import com.poortorich.chat.realtime.payload.response.BasePayload;
 import com.poortorich.chat.service.ChatParticipantService;
 import com.poortorich.chat.service.ChatroomService;
 import com.poortorich.chat.validator.ChatParticipantValidator;
 import com.poortorich.chatnotice.entity.ChatNotice;
 import com.poortorich.chatnotice.model.NoticeCreateResult;
+import com.poortorich.chatnotice.model.NoticeUpdateResult;
 import com.poortorich.chatnotice.request.ChatNoticeCreateRequest;
+import com.poortorich.chatnotice.request.ChatNoticeUpdateRequest;
 import com.poortorich.chatnotice.response.LatestNoticeResponse;
 import com.poortorich.chatnotice.response.NoticeDetailsResponse;
 import com.poortorich.chatnotice.response.PreviewNoticesResponse;
@@ -52,6 +55,31 @@ public class ChatNoticeFacade {
         return noticeCreateResult;
     }
 
+    @Transactional
+    public NoticeUpdateResult update(
+            String username,
+            Long chatroomId,
+            Long noticeId,
+            ChatNoticeUpdateRequest noticeUpdateRequest
+    ) {
+        User user = userService.findUserByUsername(username);
+        Chatroom chatroom = chatroomService.findById(chatroomId);
+        ChatParticipant chatParticipant = chatParticipantService.findByUserAndChatroom(user, chatroom);
+
+        participantValidator.validateIsHost(chatParticipant);
+
+        ChatNotice chatNotice = chatNoticeService.update(noticeId, noticeUpdateRequest);
+        boolean isLatestNotice = chatNoticeService.isLatestNotice(chatNotice);
+        NoticeUpdateResult result = noticeDataMapper.mapToNoticeUpdateResult(chatNotice, isLatestNotice);
+
+        if (isLatestNotice) {
+            List<ChatParticipant> participants = chatParticipantService.findAllByChatroom(chatroom);
+            chatParticipantService.updateAllNoticeStatus(participants, NoticeStatus.DEFAULT);
+
+        }
+        return result;
+    }
+
     public LatestNoticeResponse getLatestNotice(String username, Long chatroomId) {
         Chatroom chatroom = chatroomService.findById(chatroomId);
         ChatParticipant chatParticipant = chatParticipantService.findByUsernameAndChatroom(username, chatroom);
@@ -75,5 +103,24 @@ public class ChatNoticeFacade {
         return PreviewNoticesResponse.builder()
                 .notices(ChatNoticeBuilder.buildPreviewNoticeResponse(previewNotice))
                 .build();
+    }
+
+    @Transactional
+    public BasePayload deleteNotice(String username, Long chatroomId, Long noticeId) {
+        User user = userService.findUserByUsername(username);
+        Chatroom chatroom = chatroomService.findById(chatroomId);
+        ChatParticipant chatParticipant = chatParticipantService.findByUserAndChatroom(user, chatroom);
+
+        participantValidator.validateIsHost(chatParticipant);
+        ChatNotice chatNotice = chatNoticeService.findById(noticeId);
+        boolean isLatestNotice = chatNoticeService.isLatestNotice(chatNotice);
+        chatNoticeService.delete(noticeId);
+
+        if (isLatestNotice) {
+            List<ChatParticipant> participants = chatParticipantService.findAllByChatroom(chatroom);
+            chatParticipantService.updateAllNoticeStatus(participants, NoticeStatus.PERMANENT_HIDDEN);
+        }
+        
+        return noticeDataMapper.mapToNoticeDeletePayload(isLatestNotice);
     }
 }

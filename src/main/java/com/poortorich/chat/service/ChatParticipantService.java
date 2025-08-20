@@ -8,7 +8,7 @@ import com.poortorich.chat.repository.ChatParticipantRepository;
 import com.poortorich.chat.response.ChatParticipantProfile;
 import com.poortorich.chat.response.enums.ChatResponse;
 import com.poortorich.chat.util.ChatBuilder;
-import com.poortorich.chatnotice.request.ChatNoticeUpdateRequest;
+import com.poortorich.chatnotice.request.ChatNoticeStatusUpdateRequest;
 import com.poortorich.global.exceptions.BadRequestException;
 import com.poortorich.global.exceptions.NotFoundException;
 import com.poortorich.user.entity.User;
@@ -32,7 +32,7 @@ public class ChatParticipantService {
         chatParticipantRepository.save(chatParticipant);
     }
 
-    public void updateNoticeStatus(String username, Chatroom chatroom, ChatNoticeUpdateRequest request) {
+    public void updateNoticeStatus(String username, Chatroom chatroom, ChatNoticeStatusUpdateRequest request) {
         ChatParticipant chatParticipant = findByUsernameAndChatroom(username, chatroom);
         validateNoticeStatus(chatParticipant.getNoticeStatus());
         chatParticipant.updateNoticeStatus(request.parseStatus());

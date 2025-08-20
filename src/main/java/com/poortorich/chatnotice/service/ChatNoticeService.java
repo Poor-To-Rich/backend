@@ -2,18 +2,16 @@ package com.poortorich.chatnotice.service;
 
 import com.poortorich.chat.entity.ChatParticipant;
 import com.poortorich.chat.entity.Chatroom;
-import com.poortorich.chat.realtime.model.PayloadContext;
-import com.poortorich.chat.realtime.payload.request.ChatNoticeRequestPayload;
 import com.poortorich.chatnotice.entity.ChatNotice;
 import com.poortorich.chatnotice.repository.ChatNoticeRepository;
 import com.poortorich.chatnotice.request.ChatNoticeCreateRequest;
+import com.poortorich.chatnotice.request.ChatNoticeUpdateRequest;
 import com.poortorich.chatnotice.response.enums.ChatNoticeResponse;
 import com.poortorich.global.exceptions.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -32,6 +30,12 @@ public class ChatNoticeService {
         return chatNoticeRepository.save(notice);
     }
 
+    public ChatNotice update(Long noticeId, ChatNoticeUpdateRequest noticeUpdateRequest) {
+        ChatNotice chatNotice = findById(noticeId);
+        chatNotice.updateContent(noticeUpdateRequest.getContent());
+        return chatNoticeRepository.save(chatNotice);
+    }
+
     public ChatNotice getLatestNotice(Chatroom chatroom) {
         return chatNoticeRepository.findTop1ByChatroomOrderByCreatedDateDesc(chatroom)
                 .orElse(null);
@@ -41,27 +45,26 @@ public class ChatNoticeService {
         return chatNoticeRepository.findTop3ByChatroomOrderByCreatedDateDesc(chatroom);
     }
 
-    public ChatNotice update(PayloadContext context, ChatNoticeRequestPayload requestPayload) {
-        ChatNotice chatNotice = chatNoticeRepository.findTop1ByChatroomOrderByCreatedDateDesc(context.chatroom())
-                .orElse(null);
+    public boolean isLatestNotice(ChatNotice chatNotice) {
+        Optional<ChatNotice> latestChatNotice = chatNoticeRepository.findTop1ByChatroomOrderByCreatedDateDesc(
+                chatNotice.getChatroom());
 
-        if (Objects.isNull(chatNotice)) {
-            return chatNotice;
-        }
-
-        chatNotice.updateContent(requestPayload.getContent());
-
-        return chatNoticeRepository.save(chatNotice);
+        return latestChatNotice.isPresent() && latestChatNotice.get().getId().equals(chatNotice.getId());
     }
 
-    public ChatNotice delete(PayloadContext context) {
-        Optional<ChatNotice> chatNotice = chatNoticeRepository.findTop1ByChatroomOrderByCreatedDateDesc(context.chatroom());
+    public ChatNotice delete(Long noticeId) {
+        Optional<ChatNotice> chatNotice = chatNoticeRepository.findById(noticeId);
         chatNotice.ifPresent(chatNoticeRepository::delete);
         return null;
     }
 
     public ChatNotice findNotice(Chatroom chatroom, Long noticeId) {
         return chatNoticeRepository.findByChatroomAndId(chatroom, noticeId)
+                .orElseThrow(() -> new NotFoundException(ChatNoticeResponse.NOTICE_NOT_FOUND));
+    }
+
+    public ChatNotice findById(Long noticeId) {
+        return chatNoticeRepository.findById(noticeId)
                 .orElseThrow(() -> new NotFoundException(ChatNoticeResponse.NOTICE_NOT_FOUND));
     }
 }
