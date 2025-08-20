@@ -177,6 +177,8 @@ public class ChatMessageService {
                 .chatroomId(context.chatroom().getId())
                 .isRankingEnabled(savedRankingStatusChatMessage.getIsRankingEnabled())
                 .sentAt(savedRankingStatusChatMessage.getSentAt())
+                .messageType(savedRankingStatusChatMessage.getMessageType())
+                .type(savedRankingStatusChatMessage.getType())
                 .build();
     }
 }
