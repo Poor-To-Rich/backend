@@ -6,12 +6,14 @@ import com.poortorich.chat.entity.enums.ChatMessageType;
 import com.poortorich.chat.entity.enums.NoticeStatus;
 import com.poortorich.chat.model.MarkAllChatroomAsReadResult;
 import com.poortorich.chat.realtime.collect.ChatPayloadCollector;
+import com.poortorich.chat.realtime.event.user.HostDelegationEvent;
 import com.poortorich.chat.realtime.model.PayloadContext;
 import com.poortorich.chat.realtime.payload.request.ChatMessageRequestPayload;
 import com.poortorich.chat.realtime.payload.request.ChatNoticeRequestPayload;
 import com.poortorich.chat.realtime.payload.request.MarkMessagesAsReadRequestPayload;
 import com.poortorich.chat.realtime.payload.response.BasePayload;
 import com.poortorich.chat.realtime.payload.response.DateChangeMessagePayload;
+import com.poortorich.chat.realtime.payload.response.HostDelegationMessagePayload;
 import com.poortorich.chat.realtime.payload.response.MessageReadPayload;
 import com.poortorich.chat.realtime.payload.response.RankingStatusMessagePayload;
 import com.poortorich.chat.realtime.payload.response.UserChatMessagePayload;
@@ -30,6 +32,7 @@ import com.poortorich.chatnotice.util.ChatNoticeBuilder;
 import com.poortorich.user.entity.User;
 import com.poortorich.user.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -50,6 +53,8 @@ public class ChatRealTimeFacade {
     private final ChatroomLeaveManager chatroomLeaveManager;
 
     private final ChatParticipantValidator participantValidator;
+
+    private final ApplicationEventPublisher eventPublisher;
 
     public BasePayload createUserEnterSystemMessage(String username, Long chatroomId) {
         User user = userService.findUserByUsername(username);
@@ -149,10 +154,17 @@ public class ChatRealTimeFacade {
         NoticeStatus noticeStatus = chatParticipantService.updateAllNoticeStatus(
                 chatParticipants,
                 requestPayload.getNoticeType());
-        
+
         return BasePayload.builder()
                 .type(PayloadType.NOTICE)
                 .payload(ChatNoticeBuilder.buildLatestNoticeResponse(noticeStatus, chatNotice))
                 .build();
+    }
+
+    @Transactional
+    public BasePayload createHostDelegationMessage(ChatParticipant prevHost, ChatParticipant newHost) {
+        HostDelegationMessagePayload payload = chatMessageService.saveHostDelegationMessage(prevHost, newHost);
+        eventPublisher.publishEvent(new HostDelegationEvent(prevHost, newHost));
+        return payload.mapToBasePayload();
     }
 }

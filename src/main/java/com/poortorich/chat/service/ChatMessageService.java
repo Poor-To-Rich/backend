@@ -12,6 +12,7 @@ import com.poortorich.chat.realtime.model.PayloadContext;
 import com.poortorich.chat.realtime.payload.request.ChatMessageRequestPayload;
 import com.poortorich.chat.realtime.payload.response.ChatroomClosedResponsePayload;
 import com.poortorich.chat.realtime.payload.response.DateChangeMessagePayload;
+import com.poortorich.chat.realtime.payload.response.HostDelegationMessagePayload;
 import com.poortorich.chat.realtime.payload.response.RankingStatusMessagePayload;
 import com.poortorich.chat.realtime.payload.response.UserChatMessagePayload;
 import com.poortorich.chat.realtime.payload.response.UserEnterResponsePayload;
@@ -19,6 +20,7 @@ import com.poortorich.chat.realtime.payload.response.UserLeaveResponsePayload;
 import com.poortorich.chat.repository.ChatMessageRepository;
 import com.poortorich.user.entity.User;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Service;
@@ -36,6 +38,7 @@ public class ChatMessageService {
     private final UnreadChatMessageService unreadChatMessageService;
 
     private final DateChangeDetector dateChangeDetector;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
     public UserEnterResponsePayload saveUserEnterMessage(User user, Chatroom chatroom) {
@@ -179,6 +182,21 @@ public class ChatMessageService {
                 .sentAt(savedRankingStatusChatMessage.getSentAt())
                 .messageType(savedRankingStatusChatMessage.getMessageType())
                 .type(savedRankingStatusChatMessage.getType())
+                .build();
+    }
+
+    public HostDelegationMessagePayload saveHostDelegationMessage(ChatParticipant prevHost, ChatParticipant newHost) {
+        ChatMessage hostDelegationMessage = SystemMessageBuilder.buildHostDelegationMessage(prevHost, newHost);
+
+        ChatMessage savedHostDelegationMessage = chatMessageRepository.save(hostDelegationMessage);
+
+        return HostDelegationMessagePayload.builder()
+                .messageId(savedHostDelegationMessage.getId())
+                .chatroomId(savedHostDelegationMessage.getChatroom().getId())
+                .messageType(savedHostDelegationMessage.getMessageType())
+                .type(savedHostDelegationMessage.getType())
+                .content(savedHostDelegationMessage.getContent())
+                .sentAt(savedHostDelegationMessage.getSentAt())
                 .build();
     }
 }
