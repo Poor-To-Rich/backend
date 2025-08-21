@@ -59,7 +59,7 @@ public class SystemMessageBuilder {
                 .content(
                         String.format(
                                 HOST_DELEGATION_CONTENT_FORMAT,
-                                prevHost.getUser().getUsername(), newHost.getUser().getUsername()))
+                                prevHost.getUser().getNickname(), newHost.getUser().getNickname()))
                 .chatroom(prevHost.getChatroom())
                 .build();
     }
