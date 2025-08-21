@@ -73,4 +73,16 @@ public interface ChatParticipantRepository extends JpaRepository<ChatParticipant
             WHERE u.username = :username
             """)
     List<ChatParticipant> findAllByUsernameWithChatroomAndUser(@Param("username") String username);
+
+    @Query("""
+        SELECT cp
+        FROM ChatParticipant cp
+        JOIN FETCH cp.user u
+        WHERE cp.chatroom = :chatroom
+          AND cp.isParticipated = true
+        ORDER BY
+          CASE WHEN cp.role = com.poortorich.chat.entity.enums.ChatroomRole.HOST THEN 0 ELSE 1 END,
+          u.nickname ASC
+    """)
+    List<ChatParticipant> findAllOrderedParticipants(@Param("chatroom") Chatroom chatroom);
 }

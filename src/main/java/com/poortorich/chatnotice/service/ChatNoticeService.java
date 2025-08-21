@@ -9,6 +9,8 @@ import com.poortorich.chatnotice.request.ChatNoticeUpdateRequest;
 import com.poortorich.chatnotice.response.enums.ChatNoticeResponse;
 import com.poortorich.global.exceptions.NotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -34,6 +36,10 @@ public class ChatNoticeService {
         ChatNotice chatNotice = findById(noticeId);
         chatNotice.updateContent(noticeUpdateRequest.getContent());
         return chatNoticeRepository.save(chatNotice);
+    }
+
+    public Slice<ChatNotice> getAllNoticeByCursor(Chatroom chatroom, Long cursor, Pageable pageable) {
+        return chatNoticeRepository.findByChatroomAndIdLessThanOrderByIdDesc(chatroom, cursor, pageable);
     }
 
     public ChatNotice getLatestNotice(Chatroom chatroom) {

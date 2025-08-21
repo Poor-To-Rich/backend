@@ -1,10 +1,9 @@
-package com.poortorich.chat.controller;
+package com.poortorich.ranking.controller;
 
-import com.poortorich.chat.facade.ChatFacade;
-import com.poortorich.chat.response.AllParticipantsResponse;
-import com.poortorich.chat.response.ChatroomsResponse;
-import com.poortorich.chat.response.enums.ChatResponse;
 import com.poortorich.global.config.BaseSecurityTest;
+import com.poortorich.ranking.facade.RankingFacade;
+import com.poortorich.ranking.response.LatestRankingResponse;
+import com.poortorich.ranking.response.enums.RankingResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,43 +20,49 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(ChatParticipantController.class)
+@WebMvcTest(RankingController.class)
 @ExtendWith(MockitoExtension.class)
-class ChatParticipantControllerTest extends BaseSecurityTest {
+class RankingControllerTest extends BaseSecurityTest {
 
     @Autowired
     private MockMvc mockMvc;
 
     @MockitoBean
-    private ChatFacade chatFacade;
+    private RankingFacade rankingFacade;
 
     private final String username = "test";
 
     @Test
     @WithMockUser(username = username)
-    @DisplayName("내가 방장인 채팅방 조회 성공")
-    void getHostedChatroomsSuccess() throws Exception {
-        ChatroomsResponse response = ChatroomsResponse.builder().build();
-        when(chatFacade.getHostedChatrooms(username)).thenReturn(response);
+    @DisplayName("최신 랭킹 조회 성공")
+    void getLatestRankingSuccess() throws Exception {
+        Long chatroomId = 1L;
 
-        mockMvc.perform(get("/users/hosted-chatrooms")
+        when(rankingFacade.getLatestRanking(username, chatroomId)).thenReturn(
+                RankingFacade.LatestRankingResult.found(LatestRankingResponse.builder().build())
+        );
+
+        mockMvc.perform(get("/chatrooms/" + chatroomId + "/rankings")
                         .with(csrf()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath(("$.message"))
-                        .value(ChatResponse.GET_HOSTED_CHATROOMS_SUCCESS.getMessage()));
+                .andExpect(jsonPath("$.message")
+                        .value(RankingResponse.GET_LATEST_RANKING_SUCCESS.getMessage()));
     }
 
     @Test
     @WithMockUser(username = username)
-    @DisplayName("전체 참여 인원 조회 성공")
-    void getAllParticipantsSuccess() throws Exception {
+    @DisplayName("최신 랭킹이 없는 경우 null 조회 성공")
+    void getLatestRankingNull() throws Exception {
         Long chatroomId = 1L;
 
-        when(chatFacade.getAllParticipants(username, chatroomId)).thenReturn(AllParticipantsResponse.builder().build());
+        when(rankingFacade.getLatestRanking(username, chatroomId)).thenReturn(
+                RankingFacade.LatestRankingResult.notFound(LatestRankingResponse.builder().build())
+        );
 
-        mockMvc.perform(get("/chatrooms/" + chatroomId + "/members/all")
+        mockMvc.perform(get("/chatrooms/" + chatroomId + "/rankings")
                         .with(csrf()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath(("$.message")).value(ChatResponse.GET_ALL_PARTICIPANTS_SUCCESS.getMessage()));
+                .andExpect(jsonPath("$.message")
+                        .value(RankingResponse.GET_LATEST_RANKING_NOT_FOUND.getMessage()));
     }
 }
