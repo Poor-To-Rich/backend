@@ -1,6 +1,7 @@
 package com.poortorich.ranking.controller;
 
 import com.poortorich.global.response.BaseResponse;
+import com.poortorich.global.response.DataResponse;
 import com.poortorich.ranking.facade.RankingFacade;
 import com.poortorich.ranking.response.enums.RankingResponse;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +29,6 @@ public class RankingController {
         RankingResponse code = result.found()
                 ? RankingResponse.GET_LATEST_RANKING_SUCCESS
                 : RankingResponse.GET_LATEST_RANKING_NOT_FOUND;
-        return com.poortorich.global.response.DataResponse.toResponseEntity(code, result.response());
+        return DataResponse.toResponseEntity(code, result.response());
     }
 }
