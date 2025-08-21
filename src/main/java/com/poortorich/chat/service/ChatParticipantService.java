@@ -4,6 +4,7 @@ import com.poortorich.chat.entity.ChatParticipant;
 import com.poortorich.chat.entity.Chatroom;
 import com.poortorich.chat.entity.enums.ChatroomRole;
 import com.poortorich.chat.entity.enums.NoticeStatus;
+import com.poortorich.chat.realtime.payload.request.enums.NoticeType;
 import com.poortorich.chat.repository.ChatParticipantRepository;
 import com.poortorich.chat.response.ChatParticipantProfile;
 import com.poortorich.chat.response.enums.ChatResponse;
@@ -45,13 +46,13 @@ public class ChatParticipantService {
         }
     }
 
-    public void enterUser(User user, Chatroom chatroom) {
+    public ChatParticipant enterUser(User user, Chatroom chatroom) {
         ChatParticipant chatParticipant = chatParticipantRepository.findByUserAndChatroom(user, chatroom)
                 .orElseGet(() -> ChatBuilder.buildChatParticipant(user, ChatroomRole.MEMBER, chatroom));
 
         chatParticipant.restoreParticipation();
 
-        chatParticipantRepository.save(chatParticipant);
+        return chatParticipantRepository.save(chatParticipant);
     }
 
     public ChatParticipant findByUsernameAndChatroom(String username, Chatroom chatroom) {
@@ -99,7 +100,7 @@ public class ChatParticipantService {
     }
 
     public List<ChatParticipantProfile> getParticipantProfiles(Chatroom chatroom) {
-        List<ChatParticipant> participants = chatParticipantRepository.findAllByChatroomAndIsParticipatedTrue(chatroom);
+        List<ChatParticipant> participants = chatParticipantRepository.findAllByChatroom(chatroom);
 
         return participants.stream()
                 .map(participant -> {
@@ -134,5 +135,22 @@ public class ChatParticipantService {
         return chatParticipantRepository.findAllByChatroomAndIsParticipatedTrueAndUserNot(chatroom, user).stream()
                 .filter(chatParticipant -> !activeSubscribers.contains(chatParticipant.getUser().getUsername()))
                 .toList();
+    }
+
+    public NoticeStatus updateAllNoticeStatus(List<ChatParticipant> chatParticipants, NoticeType noticeType) {
+        NoticeStatus noticeStatus = findByNoticeType(noticeType);
+        chatParticipants.forEach(chatParticipant -> chatParticipant.updateNoticeStatus(noticeStatus));
+        return noticeStatus;
+    }
+
+    private NoticeStatus findByNoticeType(NoticeType noticeType) {
+        return switch (noticeType) {
+            case CREATE, UPDATE -> NoticeStatus.DEFAULT;
+            case DELETE -> NoticeStatus.PERMANENT_HIDDEN;
+        };
+    }
+
+    public List<ChatParticipant> getAllParticipants(Chatroom chatroom) {
+        return chatParticipantRepository.findAllOrderedParticipants(chatroom);
     }
 }

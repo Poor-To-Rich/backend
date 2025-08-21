@@ -5,7 +5,9 @@ import com.poortorich.chat.facade.ChatFacade;
 import com.poortorich.chatnotice.constants.ChatNoticeResponseMessage;
 import com.poortorich.chatnotice.facade.ChatNoticeFacade;
 import com.poortorich.chatnotice.request.ChatNoticeUpdateRequest;
+import com.poortorich.chatnotice.response.AllNoticesResponse;
 import com.poortorich.chatnotice.response.LatestNoticeResponse;
+import com.poortorich.chatnotice.response.NoticeDetailsResponse;
 import com.poortorich.chatnotice.response.PreviewNoticesResponse;
 import com.poortorich.chatnotice.response.enums.ChatNoticeResponse;
 import com.poortorich.global.config.BaseSecurityTest;
@@ -106,5 +108,37 @@ class ChatNoticeControllerTest extends BaseSecurityTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message")
                         .value(ChatNoticeResponse.GET_PREVIEW_NOTICE_SUCCESS.getMessage()));
+    }
+
+    @Test
+    @WithMockUser(username = username)
+    @DisplayName("공지 상세 조회 성공")
+    void getNoticeDetailsSuccess() throws Exception {
+        Long chatroomId = 1L;
+        Long noticeId = 1L;
+        when(chatNoticeFacade.getNoticeDetails(chatroomId, noticeId))
+                .thenReturn(NoticeDetailsResponse.builder().build());
+
+        mockMvc.perform(get("/chatrooms/" + chatroomId + "/notices/" + noticeId)
+                        .with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message")
+                        .value(ChatNoticeResponse.GET_NOTICE_DETAILS_SUCCESS.getMessage()));
+    }
+
+    @Test
+    @WithMockUser(username = username)
+    @DisplayName("전체 공지 목록 조회 성공")
+    void getAllNoticesSuccess() throws Exception {
+        Long chatroomId = 1L;
+
+        when(chatNoticeFacade.getAllNotices(chatroomId, Long.MAX_VALUE))
+                .thenReturn(AllNoticesResponse.builder().build());
+
+        mockMvc.perform(get("/chatrooms/" + chatroomId + "/notices/all")
+                        .with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message")
+                        .value(ChatNoticeResponse.GET_ALL_NOTICES_SUCCESS.getMessage()));
     }
 }

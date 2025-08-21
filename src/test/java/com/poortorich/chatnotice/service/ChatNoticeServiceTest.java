@@ -11,12 +11,17 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.SliceImpl;
 
 import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -27,6 +32,8 @@ class ChatNoticeServiceTest {
 
     @InjectMocks
     private ChatNoticeService chatNoticeService;
+
+    private final Pageable pageable = PageRequest.of(0, 20);
 
     @Test
     @DisplayName("최근 공지 조회 성공")
@@ -71,5 +78,78 @@ class ChatNoticeServiceTest {
         assertThat(previewNotice.get(0)).isEqualTo(chatNotice1);
         assertThat(previewNotice.get(1)).isEqualTo(chatNotice2);
         assertThat(previewNotice.get(2)).isEqualTo(chatNotice3);
+    }
+
+    @Test
+    @DisplayName("채팅방과 아이디로 공지 조회 성공")
+    void findNoticeSuccess() {
+        Long noticeId = 1L;
+        Chatroom chatroom = Chatroom.builder().build();
+        ChatNotice chatNotice = ChatNotice.builder()
+                .id(noticeId)
+                .chatroom(chatroom)
+                .build();
+
+        when(chatNoticeRepository.findByChatroomAndId(chatroom, noticeId)).thenReturn(Optional.of(chatNotice));
+
+        ChatNotice result = chatNoticeService.findNotice(chatroom, noticeId);
+
+        assertThat(result.getId()).isEqualTo(noticeId);
+        assertThat(result.getChatroom()).isEqualTo(chatroom);
+    }
+
+    @Test
+    @DisplayName("공지가 없는 경우 예외 발생")
+    void findNoticeNotFound() {
+        Long noticeId = 1L;
+        Chatroom chatroom = Chatroom.builder().build();
+
+        when(chatNoticeRepository.findByChatroomAndId(chatroom, noticeId)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> chatNoticeService.findNotice(chatroom, noticeId))
+                .isInstanceOf(NotFoundException.class)
+                .hasMessageContaining(ChatNoticeResponse.NOTICE_NOT_FOUND.getMessage());
+    }
+
+    @Test
+    @DisplayName("전체 공지 목록 - cursor가 기본 값인 경우 조회 성공")
+    void getAllNoticeByCursorDefaultValueSuccess() {
+        Chatroom chatroom = Chatroom.builder().build();
+        ChatNotice notice1 = ChatNotice.builder().id(5L).chatroom(chatroom).build();
+        ChatNotice notice2 = ChatNotice.builder().id(4L).chatroom(chatroom).build();
+
+        SliceImpl<ChatNotice> repoSlice = new SliceImpl<>(List.of(notice1, notice2), pageable, true);
+
+        when(chatNoticeRepository.findByChatroomAndIdLessThanOrderByIdDesc(chatroom, Long.MAX_VALUE, pageable))
+                .thenReturn(repoSlice);
+
+        Slice<ChatNotice> result = chatNoticeService.getAllNoticeByCursor(chatroom, Long.MAX_VALUE, pageable);
+
+        assertThat(result.getContent()).hasSize(2);
+        assertThat(result.getContent().get(0).getId()).isEqualTo(5L);
+        assertThat(result.getContent().get(1).getId()).isEqualTo(4L);
+        assertThat(result.hasNext()).isTrue();
+    }
+
+    @Test
+    @DisplayName("전체 공지 목록 - cursor가 있는 경우 조회 성공")
+    void getAllNoticeByCursorSuccess() {
+        Chatroom chatroom = Chatroom.builder().build();
+        Long cursor = 6L;
+
+        ChatNotice notice1 = ChatNotice.builder().id(5L).chatroom(chatroom).build();
+        ChatNotice notice2 = ChatNotice.builder().id(4L).chatroom(chatroom).build();
+
+        SliceImpl<ChatNotice> repoSlice = new SliceImpl<>(List.of(notice1, notice2), pageable, true);
+
+        when(chatNoticeRepository.findByChatroomAndIdLessThanOrderByIdDesc(chatroom, cursor, pageable))
+                .thenReturn(repoSlice);
+
+        Slice<ChatNotice> result = chatNoticeService.getAllNoticeByCursor(chatroom, cursor, pageable);
+
+        assertThat(result.getContent()).hasSize(2);
+        assertThat(result.getContent().get(0).getId()).isEqualTo(5L);
+        assertThat(result.getContent().get(1).getId()).isEqualTo(4L);
+        assertThat(result.hasNext()).isTrue();
     }
 }

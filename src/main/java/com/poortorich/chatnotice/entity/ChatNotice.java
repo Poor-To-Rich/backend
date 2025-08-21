@@ -1,7 +1,7 @@
 package com.poortorich.chatnotice.entity;
 
+import com.poortorich.chat.entity.ChatParticipant;
 import com.poortorich.chat.entity.Chatroom;
-import com.poortorich.user.entity.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -49,9 +49,13 @@ public class ChatNotice {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "author_id", nullable = false)
-    private User author;
+    private ChatParticipant author;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "chatroom_id")
+    @JoinColumn(name = "chatroom_id", nullable = false)
     private Chatroom chatroom;
+
+    public void updateContent(String content) {
+        this.content = content;
+    }
 }

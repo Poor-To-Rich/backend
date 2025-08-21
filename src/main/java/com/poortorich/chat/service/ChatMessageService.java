@@ -116,6 +116,7 @@ public class ChatMessageService {
                 .messageType(dateChangeMessage.getMessageType())
                 .content(dateChangeMessage.getContent())
                 .sentAt(dateChangeMessage.getSentAt())
+                .type(dateChangeMessage.getType())
                 .build();
     }
 
@@ -156,9 +157,10 @@ public class ChatMessageService {
             return new SliceImpl<>(Collections.emptyList(), context.pageRequest(), false);
         }
 
-        return chatMessageRepository.findByChatroomAndIdLessThanEqualOrderByIdDesc(
+        return chatMessageRepository.findByChatroomAndIdLessThanEqualAndSentAtAfterOrderByIdDesc(
                 context.chatroom(),
                 context.cursor(),
+                context.chatParticipant().getCreatedDate(),
                 context.pageRequest());
     }
 
@@ -175,6 +177,8 @@ public class ChatMessageService {
                 .chatroomId(context.chatroom().getId())
                 .isRankingEnabled(savedRankingStatusChatMessage.getIsRankingEnabled())
                 .sentAt(savedRankingStatusChatMessage.getSentAt())
+                .messageType(savedRankingStatusChatMessage.getMessageType())
+                .type(savedRankingStatusChatMessage.getType())
                 .build();
     }
 }

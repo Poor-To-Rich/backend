@@ -6,12 +6,15 @@ import com.poortorich.chat.entity.Chatroom;
 import com.poortorich.chat.entity.enums.ChatroomRole;
 import com.poortorich.chat.model.ChatMessageResponse;
 import com.poortorich.chat.model.ChatPaginationContext;
+import com.poortorich.chat.model.UserEnterChatroomResult;
+import com.poortorich.chat.realtime.payload.response.UserEnterProfileResponsePayload;
 import com.poortorich.chat.request.ChatroomCreateRequest;
 import com.poortorich.chat.request.ChatroomEnterRequest;
 import com.poortorich.chat.request.ChatroomLeaveAllRequest;
 import com.poortorich.chat.request.ChatroomUpdateRequest;
 import com.poortorich.chat.request.enums.SortBy;
 import com.poortorich.chat.response.AllChatroomsResponse;
+import com.poortorich.chat.response.AllParticipantsResponse;
 import com.poortorich.chat.response.ChatMessagePageResponse;
 import com.poortorich.chat.response.ChatParticipantProfile;
 import com.poortorich.chat.response.ChatroomCoverInfoResponse;
@@ -160,7 +163,8 @@ public class ChatFacade {
         chatParticipantService.updateNoticeStatus(username, chatroom, request);
     }
 
-    public ChatroomEnterResponse enterChatroom(
+    @Transactional
+    public UserEnterChatroomResult enterChatroom(
             String username,
             Long chatroomId,
             ChatroomEnterRequest chatroomEnterRequest
@@ -171,8 +175,17 @@ public class ChatFacade {
         chatroomValidator.validateEnter(user, chatroom);
         chatroomValidator.validatePassword(chatroom, chatroomEnterRequest.getChatroomPassword());
 
-        chatParticipantService.enterUser(user, chatroom);
-        return ChatroomEnterResponse.builder().chatroomId(chatroomId).build();
+        ChatParticipant newParticipant = chatParticipantService.enterUser(user, chatroom);
+        return UserEnterChatroomResult.builder()
+                .apiResponse(ChatroomEnterResponse.builder().chatroomId(chatroomId).build())
+                .broadcastPayload(UserEnterProfileResponsePayload.builder()
+                        .userId(user.getId())
+                        .profileImage(user.getProfileImage())
+                        .nickname(user.getNickname())
+                        .isHost(ChatroomRole.HOST.equals(newParticipant.getRole()))
+                        .rankingType(newParticipant.getRankingStatus())
+                        .build())
+                .build();
     }
 
     @Transactional
@@ -249,9 +262,10 @@ public class ChatFacade {
         chatroomService.closeChatroomById(chatroom.getId());
     }
 
+    @Transactional
     public ChatMessagePageResponse getChatMessages(String username, Long chatroomId, Long cursor, Long pageSize) {
         User user = userService.findUserByUsername(username);
-        ChatPaginationContext context = paginationProvider.getContext(chatroomId, cursor, pageSize);
+        ChatPaginationContext context = paginationProvider.getContext(username, chatroomId, cursor, pageSize);
         chatParticipantValidator.validateIsParticipate(user, context.chatroom());
 
         Slice<ChatMessage> chatMessages = chatMessageService.getChatMessages(context);
@@ -272,5 +286,14 @@ public class ChatFacade {
                                 profile -> profile
                         )))
                 .build();
+    }
+
+    @Transactional(readOnly = true)
+    public AllParticipantsResponse getAllParticipants(String username, Long chatroomId) {
+        User user = userService.findUserByUsername(username);
+        Chatroom chatroom = chatroomService.findById(chatroomId);
+        chatParticipantValidator.validateIsParticipate(user, chatroom);
+
+        return ChatBuilder.buildAllParticipantsResponse(chatParticipantService.getAllParticipants(chatroom));
     }
 }

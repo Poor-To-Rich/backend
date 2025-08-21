@@ -7,6 +7,7 @@ import com.poortorich.chat.entity.enums.RankingStatus;
 import com.poortorich.chat.request.ChatroomCreateRequest;
 import com.poortorich.chat.request.enums.SortBy;
 import com.poortorich.chat.response.AllChatroomsResponse;
+import com.poortorich.chat.response.AllParticipantsResponse;
 import com.poortorich.chat.response.ChatroomCoverInfoResponse;
 import com.poortorich.chat.response.ChatroomCreateResponse;
 import com.poortorich.chat.response.ChatroomDetailsResponse;
@@ -16,6 +17,7 @@ import com.poortorich.chat.response.ChatroomsResponse;
 import com.poortorich.chat.service.ChatMessageService;
 import com.poortorich.chat.service.ChatParticipantService;
 import com.poortorich.chat.service.ChatroomService;
+import com.poortorich.chat.validator.ChatParticipantValidator;
 import com.poortorich.chatnotice.request.ChatNoticeUpdateRequest;
 import com.poortorich.s3.service.FileUploadService;
 import com.poortorich.tag.service.TagService;
@@ -62,6 +64,8 @@ class ChatFacadeTest {
     private TagService tagService;
     @Mock
     private ChatMessageService chatMessageService;
+    @Mock
+    private ChatParticipantValidator chatParticipantValidator;
     @InjectMocks
     private ChatFacade chatFacade;
     private Chatroom chatroom;
@@ -295,5 +299,45 @@ class ChatFacadeTest {
         chatFacade.updateNoticeStatus(username, chatroomId, request);
 
         verify(chatParticipantService).updateNoticeStatus(username, chatroom, request);
+    }
+
+    @Test
+    @DisplayName("전체 참여 인원 목록 조회 성공")
+    void getAllParticipantsSuccess() {
+        String username = "host";
+        User hostUser = User.builder()
+                .id(1L)
+                .profileImage("profileImage.com")
+                .username(username)
+                .nickname(username)
+                .build();
+        ChatParticipant host = ChatParticipant.builder()
+                .user(hostUser)
+                .chatroom(chatroom)
+                .role(ChatroomRole.HOST)
+                .rankingStatus(RankingStatus.NONE)
+                .build();
+        User memberUser = User.builder().id(2L).profileImage("profileImage.com").nickname("member1").build();
+        ChatParticipant member1 = ChatParticipant.builder()
+                .user(memberUser)
+                .chatroom(chatroom)
+                .role(ChatroomRole.MEMBER)
+                .rankingStatus(RankingStatus.NONE)
+                .build();
+
+        when(userService.findUserByUsername(username)).thenReturn(hostUser);
+        when(chatroomService.findById(chatroomId)).thenReturn(chatroom);
+        when(chatParticipantService.getAllParticipants(chatroom)).thenReturn(List.of(host, member1));
+
+        AllParticipantsResponse response = chatFacade.getAllParticipants(username, chatroomId);
+
+        assertThat(response).isNotNull();
+        assertThat(response.getMemberCount()).isEqualTo(2L);
+        assertThat(response.getMembers().get(0).getUserId()).isEqualTo(hostUser.getId());
+        assertThat(response.getMembers().get(0).getNickname()).isEqualTo(hostUser.getNickname());
+        assertThat(response.getMembers().get(0).getIsHost()).isTrue();
+        assertThat(response.getMembers().get(1).getUserId()).isEqualTo(memberUser.getId());
+        assertThat(response.getMembers().get(1).getNickname()).isEqualTo(memberUser.getNickname());
+        assertThat(response.getMembers().get(1).getIsHost()).isFalse();
     }
 }

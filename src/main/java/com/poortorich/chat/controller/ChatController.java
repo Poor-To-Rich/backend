@@ -3,6 +3,7 @@ package com.poortorich.chat.controller;
 import com.poortorich.chat.constants.ChatResponseMessage;
 import com.poortorich.chat.facade.ChatFacade;
 import com.poortorich.chat.model.MarkAllChatroomAsReadResult;
+import com.poortorich.chat.model.UserEnterChatroomResult;
 import com.poortorich.chat.realtime.facade.ChatRealTimeFacade;
 import com.poortorich.chat.realtime.payload.response.BasePayload;
 import com.poortorich.chat.realtime.payload.response.MessageReadPayload;
@@ -13,7 +14,6 @@ import com.poortorich.chat.request.ChatroomUpdateRequest;
 import com.poortorich.chat.request.enums.SortBy;
 import com.poortorich.chat.response.ChatMessagePageResponse;
 import com.poortorich.chat.response.ChatroomCreateResponse;
-import com.poortorich.chat.response.ChatroomEnterResponse;
 import com.poortorich.chat.response.ChatroomLeaveAllResponse;
 import com.poortorich.chat.response.ChatroomLeaveResponse;
 import com.poortorich.chat.response.ChatroomUpdateResponse;
@@ -124,17 +124,25 @@ public class ChatController {
             @PathVariable("chatroomId") Long chatroomId,
             @RequestBody ChatroomEnterRequest chatroomEnterRequest
     ) {
-        ChatroomEnterResponse response = chatFacade.enterChatroom(
+        UserEnterChatroomResult result = chatFacade.enterChatroom(
                 userDetails.getUsername(),
                 chatroomId,
                 chatroomEnterRequest);
 
         BasePayload basePayload = realTimeFacade.createUserEnterSystemMessage(userDetails.getUsername(),
                 chatroomId);
+
         if (!Objects.isNull(basePayload)) {
             messagingTemplate.convertAndSend(SubscribeEndpoint.CHATROOM_SUBSCRIBE_PREFIX + chatroomId, basePayload);
         }
-        return DataResponse.toResponseEntity(ChatResponse.CHATROOM_ENTER_SUCCESS, response);
+
+        if (!Objects.isNull(result.getBroadcastPayload())) {
+            messagingTemplate.convertAndSend(
+                    SubscribeEndpoint.CHATROOM_SUBSCRIBE_PREFIX + chatroomId,
+                    result.getBroadcastPayload().mapToBasePayload());
+        }
+
+        return DataResponse.toResponseEntity(ChatResponse.CHATROOM_ENTER_SUCCESS, result.getApiResponse());
     }
 
     @PutMapping(value = "/{chatroomId}/edit", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

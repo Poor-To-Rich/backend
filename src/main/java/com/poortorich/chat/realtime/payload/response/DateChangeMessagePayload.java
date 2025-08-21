@@ -16,6 +16,7 @@ public class DateChangeMessagePayload extends ChatMessageResponse implements Res
     private final Long messageId;
     private final Long chatroomId;
     private final MessageType messageType;
+    private final ChatMessageType type;
     private final String content;
     private final LocalDateTime sentAt;
 
