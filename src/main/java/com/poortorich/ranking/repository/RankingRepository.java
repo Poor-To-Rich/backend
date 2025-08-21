@@ -11,7 +11,7 @@ import java.util.Optional;
 @Repository
 public interface RankingRepository extends JpaRepository<Ranking, Long> {
 
-    Optional<Ranking> findByChatroomAndCreatedDateBetween(
+    Optional<Ranking> findFirstByChatroomAndCreatedDateBetweenOrderByCreatedDateDesc(
             Chatroom chatroom,
             LocalDateTime startDate,
             LocalDateTime endDate

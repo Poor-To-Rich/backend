@@ -39,7 +39,7 @@ class RankingServiceTest {
         Chatroom chatroom = Chatroom.builder().build();
         Ranking ranking = Ranking.builder().chatroom(chatroom).build();
 
-        when(rankingRepository.findByChatroomAndCreatedDateBetween(chatroom, lastMonday, now))
+        when(rankingRepository.findFirstByChatroomAndCreatedDateBetweenOrderByCreatedDateDesc(chatroom, lastMonday, now))
                 .thenReturn(Optional.of(ranking));
 
         Ranking result = rankingService.findLatestRanking(chatroom, lastMonday, now);
@@ -53,7 +53,7 @@ class RankingServiceTest {
     void findLatestRankingNull() {
         Chatroom chatroom = Chatroom.builder().build();
 
-        when(rankingRepository.findByChatroomAndCreatedDateBetween(chatroom, lastMonday, now))
+        when(rankingRepository.findFirstByChatroomAndCreatedDateBetweenOrderByCreatedDateDesc(chatroom, lastMonday, now))
                 .thenReturn(Optional.empty());
 
         Ranking result = rankingService.findLatestRanking(chatroom, lastMonday, now);
