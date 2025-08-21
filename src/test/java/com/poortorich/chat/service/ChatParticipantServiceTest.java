@@ -302,4 +302,41 @@ class ChatParticipantServiceTest {
         assertThat(result.get(1)).isEqualTo(member1);
         assertThat(result.get(2)).isEqualTo(member2);
     }
+
+    @Test
+    @DisplayName("참여 인원 검색 성공")
+    void searchParticipantsByKeywordSuccess() {
+        String keyword = "test";
+        Chatroom chatroom = Chatroom.builder().build();
+        ChatParticipant member1 = ChatParticipant.builder().build();
+        ChatParticipant member2 = ChatParticipant.builder().build();
+        ChatParticipant member3 = ChatParticipant.builder().build();
+        ChatParticipant member4 = ChatParticipant.builder().build();
+
+        when(chatParticipantRepository.searchByChatroomAndKeyword(chatroom, keyword))
+                .thenReturn(List.of(member1, member2, member3, member4));
+
+        List<ChatParticipant> result = chatParticipantService.searchParticipantsByKeyword(chatroom, keyword);
+
+        assertThat(result).hasSize(4);
+        assertThat(result).containsExactly(member1, member2, member3, member4);
+    }
+
+    @Test
+    @DisplayName("keyword가 null인 경우 전체 인원 조회 성공")
+    void searchParticipantsByKeywordNullSuccess() {
+        Chatroom chatroom = Chatroom.builder().build();
+        ChatParticipant member1 = ChatParticipant.builder().build();
+        ChatParticipant member2 = ChatParticipant.builder().build();
+        ChatParticipant member3 = ChatParticipant.builder().build();
+        ChatParticipant member4 = ChatParticipant.builder().build();
+
+        when(chatParticipantRepository.findAllOrderedParticipants(chatroom))
+                .thenReturn(List.of(member1, member2, member3, member4));
+
+        List<ChatParticipant> result = chatParticipantService.searchParticipantsByKeyword(chatroom, null);
+
+        assertThat(result).hasSize(4);
+        assertThat(result).containsExactly(member1, member2, member3, member4);
+    }
 }

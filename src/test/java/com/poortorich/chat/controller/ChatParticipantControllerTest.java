@@ -3,6 +3,7 @@ package com.poortorich.chat.controller;
 import com.poortorich.chat.facade.ChatFacade;
 import com.poortorich.chat.response.AllParticipantsResponse;
 import com.poortorich.chat.response.ChatroomsResponse;
+import com.poortorich.chat.response.SearchParticipantsResponse;
 import com.poortorich.chat.response.enums.ChatResponse;
 import com.poortorich.global.config.BaseSecurityTest;
 import org.junit.jupiter.api.DisplayName;
@@ -25,20 +26,20 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExtendWith(MockitoExtension.class)
 class ChatParticipantControllerTest extends BaseSecurityTest {
 
+    private static final String USERNAME = "test";
+
     @Autowired
     private MockMvc mockMvc;
 
     @MockitoBean
     private ChatFacade chatFacade;
 
-    private final String username = "test";
-
     @Test
-    @WithMockUser(username = username)
+    @WithMockUser(username = USERNAME)
     @DisplayName("내가 방장인 채팅방 조회 성공")
     void getHostedChatroomsSuccess() throws Exception {
         ChatroomsResponse response = ChatroomsResponse.builder().build();
-        when(chatFacade.getHostedChatrooms(username)).thenReturn(response);
+        when(chatFacade.getHostedChatrooms(USERNAME)).thenReturn(response);
 
         mockMvc.perform(get("/users/hosted-chatrooms")
                         .with(csrf()))
@@ -48,16 +49,33 @@ class ChatParticipantControllerTest extends BaseSecurityTest {
     }
 
     @Test
-    @WithMockUser(username = username)
+    @WithMockUser(username = USERNAME)
     @DisplayName("전체 참여 인원 조회 성공")
     void getAllParticipantsSuccess() throws Exception {
         Long chatroomId = 1L;
 
-        when(chatFacade.getAllParticipants(username, chatroomId)).thenReturn(AllParticipantsResponse.builder().build());
+        when(chatFacade.getAllParticipants(USERNAME, chatroomId)).thenReturn(AllParticipantsResponse.builder().build());
 
         mockMvc.perform(get("/chatrooms/" + chatroomId + "/members/all")
                         .with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath(("$.message")).value(ChatResponse.GET_ALL_PARTICIPANTS_SUCCESS.getMessage()));
+    }
+
+    @Test
+    @WithMockUser(username = USERNAME)
+    @DisplayName("참여 인원 검색 성공")
+    void searchParticipantsSuccess() throws Exception {
+        Long chatroomId = 1L;
+        String nickname = "test";
+
+        when(chatFacade.searchParticipantsByKeyword(USERNAME, chatroomId, nickname))
+                .thenReturn(SearchParticipantsResponse.builder().build());
+
+        mockMvc.perform(get("/chatrooms/" + chatroomId + "/members/search")
+                        .param("keyword", nickname)
+                        .with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(("$.message")).value(ChatResponse.SEARCH_PARTICIPANTS_SUCCESS.getMessage()));
     }
 }

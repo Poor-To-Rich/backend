@@ -28,6 +28,7 @@ import com.poortorich.chat.response.ChatroomResponse;
 import com.poortorich.chat.response.ChatroomRoleResponse;
 import com.poortorich.chat.response.ChatroomUpdateResponse;
 import com.poortorich.chat.response.ChatroomsResponse;
+import com.poortorich.chat.response.SearchParticipantsResponse;
 import com.poortorich.chat.service.ChatMessageService;
 import com.poortorich.chat.service.ChatParticipantService;
 import com.poortorich.chat.service.ChatroomService;
@@ -295,5 +296,20 @@ public class ChatFacade {
         chatParticipantValidator.validateIsParticipate(user, chatroom);
 
         return ChatBuilder.buildAllParticipantsResponse(chatParticipantService.getAllParticipants(chatroom));
+    }
+
+    public SearchParticipantsResponse searchParticipantsByKeyword(String username, Long chatroomId, String keyword) {
+        User user = userService.findUserByUsername(username);
+        Chatroom chatroom = chatroomService.findById(chatroomId);
+        chatParticipantValidator.validateIsHost(user, chatroom);
+
+        List<ChatParticipant> chatParticipants = chatParticipantService.searchParticipantsByKeyword(chatroom, keyword);
+
+        return SearchParticipantsResponse.builder()
+                .members(chatParticipants.stream()
+                        .filter(chatParticipant -> chatParticipant.getRole().equals(ChatroomRole.MEMBER))
+                        .map(ChatBuilder::buildProfileResponse)
+                        .toList())
+                .build();
     }
 }
