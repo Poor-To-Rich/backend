@@ -113,7 +113,7 @@ class RankingFacadeTest {
     }
 
     @Test
-    @DisplayName("최신 공지가 없는 경우 null 반환")
+    @DisplayName("최신 랭킹이 없는 경우 null 반환")
     void getLatestRankingNull() {
         String username = "test";
         Long chatroomId = 1L;
