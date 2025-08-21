@@ -1,0 +1,76 @@
+package com.poortorich.ranking.facade;
+
+import com.poortorich.chat.entity.ChatParticipant;
+import com.poortorich.chat.entity.Chatroom;
+import com.poortorich.chat.service.ChatParticipantService;
+import com.poortorich.chat.service.ChatroomService;
+import com.poortorich.chat.validator.ChatParticipantValidator;
+import com.poortorich.ranking.entity.Ranking;
+import com.poortorich.ranking.response.LatestRankingResponse;
+import com.poortorich.ranking.service.RankingService;
+import com.poortorich.ranking.util.RankingBuilder;
+import com.poortorich.user.entity.User;
+import com.poortorich.user.service.UserService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.DayOfWeek;
+import java.time.LocalDateTime;
+import java.time.temporal.TemporalAdjusters;
+
+@Service
+@RequiredArgsConstructor
+public class RankingFacade {
+
+    public record LatestRankingResult(boolean found, LatestRankingResponse response) {
+        public static LatestRankingResult create(boolean found, LatestRankingResponse response) {
+            return new LatestRankingResult(found, response);
+        }
+    }
+
+    private final UserService userService;
+    private final ChatroomService chatroomService;
+    private final ChatParticipantService chatParticipantService;
+    private final ChatParticipantValidator chatParticipantValidator;
+    private final RankingService rankingService;
+
+    @Transactional(readOnly = true)
+    public LatestRankingResult getLatestRanking(String username, Long chatroomId) {
+        User user = userService.findUserByUsername(username);
+        Chatroom chatroom = chatroomService.findById(chatroomId);
+        chatParticipantValidator.validateIsParticipate(user, chatroom);
+
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime lastMonday = now
+                .with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
+                .toLocalDate()
+                .atStartOfDay();
+        Ranking latestRanking = rankingService.findLatestRanking(chatroom, lastMonday, now);
+
+        return getLatestRankingResponse(latestRanking, chatroom, lastMonday);
+    }
+
+    private LatestRankingResult getLatestRankingResponse(
+            Ranking latestRanking,
+            Chatroom chatroom,
+            LocalDateTime lastMonday
+    ) {
+        if (latestRanking == null) {
+            LatestRankingResponse response = RankingBuilder.buildNotFoundLatestRankingResponse(lastMonday);
+            return LatestRankingResult.create(false, response);
+        }
+
+        ChatParticipant saver = chatParticipantService.findByUserIdAndChatroom(
+                latestRanking.getSaverFirst(),
+                chatroom
+        );
+        ChatParticipant flexer = chatParticipantService.findByUserIdAndChatroom(
+                latestRanking.getFlexerFirst(),
+                chatroom
+        );
+
+        LatestRankingResponse response = RankingBuilder.buildLatestRankingResponse(latestRanking, saver, flexer);
+        return LatestRankingResult.create(true, response);
+    }
+}
