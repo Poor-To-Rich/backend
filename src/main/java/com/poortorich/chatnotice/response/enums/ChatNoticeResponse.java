@@ -27,7 +27,8 @@ public enum ChatNoticeResponse implements Response {
             HttpStatus.INTERNAL_SERVER_ERROR,
             ChatNoticeResponseMessage.CHAT_NOTICE_UPDATE_FAILURE,
             null),
-    CHAT_NOTICE_DELETE_SUCCESS(HttpStatus.OK, ChatNoticeResponseMessage.CHAT_NOTICE_DELETE_SUCCESS, null);
+    CHAT_NOTICE_DELETE_SUCCESS(HttpStatus.OK, ChatNoticeResponseMessage.CHAT_NOTICE_DELETE_SUCCESS, null),
+    CHATROOM_NOTICE_MISMATCH(HttpStatus.BAD_REQUEST, ChatNoticeResponseMessage.CHATROOM_NOTICE_MISMATCH, null);
 
     private final HttpStatus httpStatus;
     private final String message;

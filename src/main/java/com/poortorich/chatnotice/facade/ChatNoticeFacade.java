@@ -18,6 +18,7 @@ import com.poortorich.chatnotice.response.PreviewNoticesResponse;
 import com.poortorich.chatnotice.service.ChatNoticeService;
 import com.poortorich.chatnotice.util.ChatNoticeBuilder;
 import com.poortorich.chatnotice.util.mapper.ChatNoticeDataMapper;
+import com.poortorich.chatnotice.validator.ChatNoticeValidator;
 import com.poortorich.user.entity.User;
 import com.poortorich.user.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -37,6 +38,7 @@ public class ChatNoticeFacade {
 
     private final ChatNoticeDataMapper noticeDataMapper;
     private final ChatParticipantValidator participantValidator;
+    private final ChatNoticeValidator chatNoticeValidator;
 
     @Transactional
     public NoticeCreateResult create(String username, Long chatroomId, ChatNoticeCreateRequest noticeCreateRequest) {
@@ -67,6 +69,7 @@ public class ChatNoticeFacade {
         ChatParticipant chatParticipant = chatParticipantService.findByUserAndChatroom(user, chatroom);
 
         participantValidator.validateIsHost(chatParticipant);
+        chatNoticeValidator.validateNoticeBelongsToChatroom(noticeId, chatroom);
 
         ChatNotice chatNotice = chatNoticeService.update(noticeId, noticeUpdateRequest);
         boolean isLatestNotice = chatNoticeService.isLatestNotice(chatNotice);
@@ -111,6 +114,8 @@ public class ChatNoticeFacade {
         ChatParticipant chatParticipant = chatParticipantService.findByUserAndChatroom(user, chatroom);
 
         participantValidator.validateIsHost(chatParticipant);
+        chatNoticeValidator.validateNoticeBelongsToChatroom(noticeId, chatroom);
+
         ChatNotice chatNotice = chatNoticeService.findById(noticeId);
         boolean isLatestNotice = chatNoticeService.isLatestNotice(chatNotice);
         chatNoticeService.delete(noticeId);

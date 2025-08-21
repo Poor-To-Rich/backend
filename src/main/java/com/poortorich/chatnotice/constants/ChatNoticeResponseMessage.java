@@ -18,6 +18,7 @@ public class ChatNoticeResponseMessage {
     public static final String CHAT_NOTICE_UPDATE_SUCCESS = "공지를 성공적으로 편집했습니다.";
     public static final String CHAT_NOTICE_UPDATE_FAILURE = "공지 편집을 실패했습니다.";
     public static final String CHAT_NOTICE_DELETE_SUCCESS = "공지를 성공적으로 삭제했습니다.";
+    public static final String CHATROOM_NOTICE_MISMATCH = "해당 공지는 채팅방에 속하지 않습니다.";
 
     private ChatNoticeResponseMessage() {
     }
