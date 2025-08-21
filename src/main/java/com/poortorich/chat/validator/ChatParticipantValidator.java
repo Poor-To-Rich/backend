@@ -23,6 +23,12 @@ public class ChatParticipantValidator {
         }
     }
 
+    public void validateIsParticipate(ChatParticipant chatParticipant) {
+        if (!chatParticipant.getIsParticipated()) {
+            throw new BadRequestException(ChatResponse.CHATROOM_NOT_PARTICIPATE);
+        }
+    }
+
     public void validateIsHost(User user, Chatroom chatroom) {
         ChatParticipant chatParticipant = chatParticipant(user, chatroom);
         validateIsParticipate(chatParticipant);
@@ -38,7 +44,10 @@ public class ChatParticipantValidator {
     }
 
     // TODO: 채팅방에서 역할이 멤버가 아니라면 예외를 발생
-    public void validateIsMember(User user, Chatroom chatroom) {
+    public void validateIsMember(ChatParticipant chatParticipant) {
+        if (!ChatroomRole.MEMBER.equals(chatParticipant.getRole())) {
+            throw new BadRequestException(ChatResponse.CHAT_PARTICIPANT_NOT_MEMBER);
+        }
     }
 
     // TODO: 채탕방에서 사용자가 차단되었다면 예외를 발생
@@ -52,11 +61,5 @@ public class ChatParticipantValidator {
     private ChatParticipant chatParticipant(User user, Chatroom chatroom) {
         return chatParticipantRepository.findByUserAndChatroom(user, chatroom)
                 .orElseThrow(() -> new NotFoundException(ChatResponse.CHAT_PARTICIPANT_NOT_FOUND));
-    }
-
-    private void validateIsParticipate(ChatParticipant chatParticipant) {
-        if (!chatParticipant.getIsParticipated()) {
-            throw new BadRequestException(ChatResponse.CHATROOM_NOT_PARTICIPATE);
-        }
     }
 }
