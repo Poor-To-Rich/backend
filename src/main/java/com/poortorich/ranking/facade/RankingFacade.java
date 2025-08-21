@@ -24,8 +24,12 @@ import java.time.temporal.TemporalAdjusters;
 public class RankingFacade {
 
     public record LatestRankingResult(boolean found, LatestRankingResponse response) {
-        public static LatestRankingResult create(boolean found, LatestRankingResponse response) {
-            return new LatestRankingResult(found, response);
+        public static LatestRankingResult found(LatestRankingResponse response) {
+            return new LatestRankingResult(true, response);
+        }
+
+        public static LatestRankingResult notFound(LatestRankingResponse response) {
+            return new LatestRankingResult(false, response);
         }
     }
 
@@ -58,7 +62,7 @@ public class RankingFacade {
     ) {
         if (latestRanking == null) {
             LatestRankingResponse response = RankingBuilder.buildNotFoundLatestRankingResponse(lastMonday);
-            return LatestRankingResult.create(false, response);
+            return LatestRankingResult.notFound(response);
         }
 
         ChatParticipant saver = chatParticipantService.findByUserIdAndChatroom(
@@ -71,6 +75,6 @@ public class RankingFacade {
         );
 
         LatestRankingResponse response = RankingBuilder.buildLatestRankingResponse(latestRanking, saver, flexer);
-        return LatestRankingResult.create(true, response);
+        return LatestRankingResult.found(response);
     }
 }

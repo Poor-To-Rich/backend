@@ -39,7 +39,7 @@ class RankingControllerTest extends BaseSecurityTest {
         Long chatroomId = 1L;
 
         when(rankingFacade.getLatestRanking(username, chatroomId)).thenReturn(
-                RankingFacade.LatestRankingResult.create(true, LatestRankingResponse.builder().build())
+                RankingFacade.LatestRankingResult.found(LatestRankingResponse.builder().build())
         );
 
         mockMvc.perform(get("/chatrooms/" + chatroomId + "/rankings")
@@ -56,7 +56,7 @@ class RankingControllerTest extends BaseSecurityTest {
         Long chatroomId = 1L;
 
         when(rankingFacade.getLatestRanking(username, chatroomId)).thenReturn(
-                RankingFacade.LatestRankingResult.create(false, LatestRankingResponse.builder().build())
+                RankingFacade.LatestRankingResult.notFound(LatestRankingResponse.builder().build())
         );
 
         mockMvc.perform(get("/chatrooms/" + chatroomId + "/rankings")
