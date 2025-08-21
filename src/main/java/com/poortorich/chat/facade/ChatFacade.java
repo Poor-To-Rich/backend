@@ -12,6 +12,7 @@ import com.poortorich.chat.request.ChatroomCreateRequest;
 import com.poortorich.chat.request.ChatroomEnterRequest;
 import com.poortorich.chat.request.ChatroomLeaveAllRequest;
 import com.poortorich.chat.request.ChatroomUpdateRequest;
+import com.poortorich.chat.request.HostDelegationRequest;
 import com.poortorich.chat.request.enums.SortBy;
 import com.poortorich.chat.response.AllChatroomsResponse;
 import com.poortorich.chat.response.AllParticipantsResponse;
@@ -28,6 +29,7 @@ import com.poortorich.chat.response.ChatroomResponse;
 import com.poortorich.chat.response.ChatroomRoleResponse;
 import com.poortorich.chat.response.ChatroomUpdateResponse;
 import com.poortorich.chat.response.ChatroomsResponse;
+import com.poortorich.chat.response.HostDelegationResponse;
 import com.poortorich.chat.service.ChatMessageService;
 import com.poortorich.chat.service.ChatParticipantService;
 import com.poortorich.chat.service.ChatroomService;
@@ -295,5 +297,24 @@ public class ChatFacade {
         chatParticipantValidator.validateIsParticipate(user, chatroom);
 
         return ChatBuilder.buildAllParticipantsResponse(chatParticipantService.getAllParticipants(chatroom));
+    }
+
+    public HostDelegationResponse delegateHost(String username, Long chatroomId, HostDelegationRequest request) {
+        ChatParticipant currentHost = chatParticipantService.findByUsernameAndChatroomId(username, chatroomId);
+        ChatParticipant nextHost = chatParticipantService.findByUserIdAndChatroomId(
+                request.getTargetUserId(),
+                chatroomId);
+
+        chatParticipantValidator.validateIsHost(currentHost);
+        chatParticipantValidator.validateIsParticipate(nextHost);
+        chatParticipantValidator.validateIsMember(nextHost);
+
+        chatParticipantService.delegateHost(currentHost, nextHost);
+
+        return HostDelegationResponse.builder()
+                .newHostUserId(nextHost.getId())
+                .prevHost(currentHost)
+                .newHost(nextHost)
+                .build();
     }
 }
