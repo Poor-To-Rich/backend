@@ -51,6 +51,7 @@ public class PhotoFacade {
         }
     }
 
+    @Transactional(readOnly = true)
     public PreviewPhotosResponse getPreviewPhotos(String username, Long chatroomId) {
         User user = userService.findUserByUsername(username);
         Chatroom chatroom = chatroomService.findById(chatroomId);
