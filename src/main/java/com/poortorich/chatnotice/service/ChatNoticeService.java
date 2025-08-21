@@ -52,10 +52,9 @@ public class ChatNoticeService {
         return latestChatNotice.isPresent() && latestChatNotice.get().getId().equals(chatNotice.getId());
     }
 
-    public ChatNotice delete(Long noticeId) {
+    public void delete(Long noticeId) {
         Optional<ChatNotice> chatNotice = chatNoticeRepository.findById(noticeId);
         chatNotice.ifPresent(chatNoticeRepository::delete);
-        return null;
     }
 
     public ChatNotice findNotice(Chatroom chatroom, Long noticeId) {
