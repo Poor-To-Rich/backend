@@ -44,7 +44,7 @@ public class ChatNoticeController {
     public ResponseEntity<BaseResponse> createNewNotice(
             @AuthenticationPrincipal UserDetails userDetails,
             @PathVariable Long chatroomId,
-            @RequestBody ChatNoticeCreateRequest noticeCreateRequest
+            @RequestBody @Valid ChatNoticeCreateRequest noticeCreateRequest
     ) {
         NoticeCreateResult result = chatNoticeFacade.create(userDetails.getUsername(), chatroomId, noticeCreateRequest);
         if (!Objects.isNull(result.getBroadcastPayload())) {
@@ -60,7 +60,7 @@ public class ChatNoticeController {
             @AuthenticationPrincipal UserDetails userDetails,
             @PathVariable Long chatroomId,
             @PathVariable Long noticeId,
-            @RequestBody ChatNoticeUpdateRequest noticeUpdateRequest
+            @RequestBody @Valid ChatNoticeUpdateRequest noticeUpdateRequest
     ) {
         NoticeUpdateResult result = chatNoticeFacade.update(
                 userDetails.getUsername(),
@@ -92,7 +92,6 @@ public class ChatNoticeController {
         return BaseResponse.toResponseEntity(ChatNoticeResponse.CHAT_NOTICE_DELETE_SUCCESS);
     }
 
-    @GetMapping
     public ResponseEntity<BaseResponse> getLatestNotice(
             @AuthenticationPrincipal UserDetails userDetails,
             @PathVariable Long chatroomId

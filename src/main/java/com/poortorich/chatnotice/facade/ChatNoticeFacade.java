@@ -75,7 +75,6 @@ public class ChatNoticeFacade {
         if (isLatestNotice) {
             List<ChatParticipant> participants = chatParticipantService.findAllByChatroom(chatroom);
             chatParticipantService.updateAllNoticeStatus(participants, NoticeStatus.DEFAULT);
-
         }
         return result;
     }
@@ -120,7 +119,7 @@ public class ChatNoticeFacade {
             List<ChatParticipant> participants = chatParticipantService.findAllByChatroom(chatroom);
             chatParticipantService.updateAllNoticeStatus(participants, NoticeStatus.PERMANENT_HIDDEN);
         }
-        
+
         return noticeDataMapper.mapToNoticeDeletePayload(isLatestNotice);
     }
 }

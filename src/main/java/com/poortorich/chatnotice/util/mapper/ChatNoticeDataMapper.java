@@ -38,7 +38,7 @@ public class ChatNoticeDataMapper {
             throw new InternalServerErrorException(ChatNoticeResponse.CHAT_NOTICE_UPDATE_FAILURE);
         }
 
-        if (isLatestNotice) {
+        if (!isLatestNotice) {
             return NoticeUpdateResult.builder()
                     .apiResponse(ChatNoticeUpdateResponse.builder().noticeId(chatNotice.getId()).build())
                     .build();
