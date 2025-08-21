@@ -1,7 +1,7 @@
 package com.poortorich.photo.util;
 
 import com.poortorich.photo.entity.Photo;
-import com.poortorich.photo.response.PhotoResponse;
+import com.poortorich.photo.response.PhotoInfoResponse;
 import com.poortorich.photo.response.PreviewPhotosResponse;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -16,13 +16,13 @@ public class PhotoBuilder {
         return PreviewPhotosResponse.builder()
                 .photos(previewPhotos.stream()
                         .filter(Objects::nonNull)
-                        .map(PhotoBuilder::buildPhotoResponse)
+                        .map(PhotoBuilder::buildPhotoInfoResponse)
                         .toList())
                 .build();
     }
 
-    private static PhotoResponse buildPhotoResponse(Photo photo) {
-        return PhotoResponse.builder()
+    private static PhotoInfoResponse buildPhotoInfoResponse(Photo photo) {
+        return PhotoInfoResponse.builder()
                 .photoId(photo.getId())
                 .photoUrl(photo.getPhotoUrl())
                 .build();

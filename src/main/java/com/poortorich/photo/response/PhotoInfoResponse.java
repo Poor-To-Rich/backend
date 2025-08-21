@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class PhotoResponse {
+public class PhotoInfoResponse {
 
     private Long photoId;
     private String photoUrl;

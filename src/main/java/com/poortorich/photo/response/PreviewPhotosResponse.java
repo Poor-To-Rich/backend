@@ -13,5 +13,5 @@ import java.util.List;
 @AllArgsConstructor
 public class PreviewPhotosResponse {
 
-    private List<PhotoResponse> photos;
+    private List<PhotoInfoResponse> photos;
 }
