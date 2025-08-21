@@ -58,7 +58,7 @@ class PhotoServiceTest {
         Photo photo4 = Photo.builder().build();
         Photo photo5 = Photo.builder().build();
 
-        when(photoRepository.findTop10ByChatroomOrderByCreatedDateDesc(chatroom))
+        when(photoRepository.findTop10ByChatroomOrderByCreatedDateDescIdAsc(chatroom))
                 .thenReturn(List.of(photo1, photo2, photo3, photo4, photo5));
 
         List<Photo> result = photoService.getPreviewPhotos(chatroom);

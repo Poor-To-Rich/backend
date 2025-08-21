@@ -10,5 +10,5 @@ import java.util.List;
 @Repository
 public interface PhotoRepository extends JpaRepository<Photo, Long> {
 
-    List<Photo> findTop10ByChatroomOrderByCreatedDateDesc(Chatroom chatroom);
+    List<Photo> findTop10ByChatroomOrderByCreatedDateDescIdAsc(Chatroom chatroom);
 }

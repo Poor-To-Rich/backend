@@ -25,6 +25,6 @@ public class PhotoService {
     }
 
     public List<Photo> getPreviewPhotos(Chatroom chatroom) {
-        return photoRepository.findTop10ByChatroomOrderByCreatedDateDesc(chatroom);
+        return photoRepository.findTop10ByChatroomOrderByCreatedDateDescIdAsc(chatroom);
     }
 }
