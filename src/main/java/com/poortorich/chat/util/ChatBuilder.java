@@ -6,6 +6,7 @@ import com.poortorich.chat.entity.enums.ChatroomRole;
 import com.poortorich.chat.entity.enums.NoticeStatus;
 import com.poortorich.chat.entity.enums.RankingStatus;
 import com.poortorich.chat.request.ChatroomCreateRequest;
+import com.poortorich.chat.response.AllParticipantsResponse;
 import com.poortorich.chat.response.ChatroomCoverInfoResponse;
 import com.poortorich.chat.response.ChatroomDetailsResponse;
 import com.poortorich.chat.response.ChatroomInfoResponse;
@@ -15,6 +16,7 @@ import com.poortorich.s3.constants.S3Constants;
 import com.poortorich.user.entity.User;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class ChatBuilder {
 
@@ -107,6 +109,15 @@ public class ChatBuilder {
                 .isJoined(isJoined)
                 .hasPassword(chatroom.getPassword() != null)
                 .hostProfile(buildProfileResponse(hostInfo))
+                .build();
+    }
+
+    public static AllParticipantsResponse buildAllParticipantsResponse(List<ChatParticipant> participants) {
+        return AllParticipantsResponse.builder()
+                .memberCount((long) participants.size())
+                .members(participants.stream()
+                        .map(ChatBuilder::buildProfileResponse)
+                        .collect(Collectors.toList()))
                 .build();
     }
 

@@ -14,6 +14,7 @@ import com.poortorich.chat.request.ChatroomLeaveAllRequest;
 import com.poortorich.chat.request.ChatroomUpdateRequest;
 import com.poortorich.chat.request.enums.SortBy;
 import com.poortorich.chat.response.AllChatroomsResponse;
+import com.poortorich.chat.response.AllParticipantsResponse;
 import com.poortorich.chat.response.ChatMessagePageResponse;
 import com.poortorich.chat.response.ChatParticipantProfile;
 import com.poortorich.chat.response.ChatroomCoverInfoResponse;
@@ -285,5 +286,14 @@ public class ChatFacade {
                                 profile -> profile
                         )))
                 .build();
+    }
+
+    @Transactional(readOnly = true)
+    public AllParticipantsResponse getAllParticipants(String username, Long chatroomId) {
+        User user = userService.findUserByUsername(username);
+        Chatroom chatroom = chatroomService.findById(chatroomId);
+        chatParticipantValidator.validateIsParticipate(user, chatroom);
+
+        return ChatBuilder.buildAllParticipantsResponse(chatParticipantService.getAllParticipants(chatroom));
     }
 }

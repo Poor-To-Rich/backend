@@ -4,6 +4,7 @@ import com.poortorich.chat.entity.ChatParticipant;
 import com.poortorich.chat.entity.Chatroom;
 import com.poortorich.chat.entity.enums.ChatroomRole;
 import com.poortorich.chat.entity.enums.NoticeStatus;
+import com.poortorich.chat.entity.enums.RankingStatus;
 import com.poortorich.chat.repository.ChatParticipantRepository;
 import com.poortorich.chat.response.enums.ChatResponse;
 import com.poortorich.chatnotice.request.ChatNoticeUpdateRequest;
@@ -20,6 +21,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -280,5 +282,24 @@ class ChatParticipantServiceTest {
         assertThatThrownBy(() -> chatParticipantService.findByUserIdAndChatroom(userId, chatroom))
                 .isInstanceOf(NotFoundException.class)
                 .hasMessageContaining(ChatResponse.CHAT_PARTICIPANT_NOT_FOUND.getMessage());
+    }
+
+    @Test
+    @DisplayName("전체 참여 인원 목록 조회 성공")
+    void getAllParticipantsSuccess() {
+        Chatroom chatroom = Chatroom.builder().build();
+        ChatParticipant host = ChatParticipant.builder().build();
+        ChatParticipant member1 = ChatParticipant.builder().build();
+        ChatParticipant member2 = ChatParticipant.builder().build();
+
+        when(chatParticipantRepository.findAllOrderedParticipants(chatroom))
+                .thenReturn(List.of(host, member1, member2));
+
+        List<ChatParticipant> result = chatParticipantService.getAllParticipants(chatroom);
+
+        assertThat(result).hasSize(3);
+        assertThat(result.get(0)).isEqualTo(host);
+        assertThat(result.get(1)).isEqualTo(member1);
+        assertThat(result.get(2)).isEqualTo(member2);
     }
 }
