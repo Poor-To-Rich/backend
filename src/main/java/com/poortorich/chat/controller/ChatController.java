@@ -17,6 +17,7 @@ import com.poortorich.chat.response.ChatroomCreateResponse;
 import com.poortorich.chat.response.ChatroomLeaveAllResponse;
 import com.poortorich.chat.response.ChatroomLeaveResponse;
 import com.poortorich.chat.response.ChatroomUpdateResponse;
+import com.poortorich.chat.response.KickChatParticipantResponse;
 import com.poortorich.chat.response.enums.ChatResponse;
 import com.poortorich.global.response.BaseResponse;
 import com.poortorich.global.response.DataResponse;
@@ -236,5 +237,17 @@ public class ChatController {
                 });
 
         return DataResponse.toResponseEntity(ChatResponse.MARK_ALL_CHATROOM_AS_READ_SUCCESS, result.getApiResponse());
+    }
+
+    @DeleteMapping("/{chatroomId}/members/{userId}")
+    public ResponseEntity<BaseResponse> kickChatParticipant(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @PathVariable Long chatroomId,
+            @PathVariable Long userId
+    ) {
+        KickChatParticipantResponse apiResponse = chatFacade.kickChatParticipant(
+                userDetails.getUsername(),
+                chatroomId,
+                userId);
     }
 }
