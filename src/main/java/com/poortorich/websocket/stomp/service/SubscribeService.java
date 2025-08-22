@@ -41,7 +41,7 @@ public class SubscribeService {
         try {
             setOps.add(getChatroomKey(chatroomId), username);
 
-            valueOps.append(getSubscriptionKey(sessionId, subscriptionId), chatroomId.toString());
+            valueOps.set(getSubscriptionKey(sessionId, subscriptionId), chatroomId.toString());
         } catch (DataAccessException exception) {
             throw new InternalServerErrorException(StompResponse.SUBSCRIBER_SAVE_FAILURE);
         }
@@ -64,6 +64,22 @@ public class SubscribeService {
     public Set<String> getSubscribers(Long chatroomId) {
         try {
             return setOps.members(getChatroomKey(chatroomId));
+        } catch (DataAccessException exception) {
+            throw new InternalServerErrorException(GlobalResponse.INTERNAL_SERVER_EXCEPTION);
+        }
+    }
+
+    public void unsubscribeAll(String username, String sessionId) {
+        try {
+            Set<String> keys = redisTemplate.keys(sessionId + "*");
+
+            for (String key : keys) {
+                String chatroomId = valueOps.get(key);
+                if (!Objects.isNull(chatroomId)) {
+                    setOps.remove(SubscribeEndpoint.CHATROOM_SUBSCRIBE_PREFIX + chatroomId, username);
+                    redisTemplate.delete(key);
+                }
+            }
         } catch (DataAccessException exception) {
             throw new InternalServerErrorException(GlobalResponse.INTERNAL_SERVER_EXCEPTION);
         }
