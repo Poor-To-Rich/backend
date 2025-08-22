@@ -349,6 +349,7 @@ public class ChatFacade {
 
         return KickChatParticipantResponse.builder()
                 .kickUserId(kickChatParticipant.getUser().getId())
+                .kickChatParticipant(kickChatParticipant)
                 .build();
     }
 }
