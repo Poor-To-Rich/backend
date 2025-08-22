@@ -19,6 +19,6 @@ public class StompDisconnectHandler {
         String username = sessionManager.getUsername(accessor);
         String sessionId = accessor.getSessionId();
 
-        subscribeService.unsubscribeAll(username, sessionId);
+        subscribeService.cleanupSession(username, sessionId);
     }
 }
