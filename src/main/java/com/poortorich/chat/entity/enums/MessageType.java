@@ -14,5 +14,6 @@ public enum MessageType {
     LEAVE,
     RANKING_STATUS,
     CLOSE,
+    DELEGATE,
     DATE
 }

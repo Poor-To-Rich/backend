@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.poortorich.chat.facade.ChatFacade;
 import com.poortorich.chatnotice.constants.ChatNoticeResponseMessage;
 import com.poortorich.chatnotice.facade.ChatNoticeFacade;
-import com.poortorich.chatnotice.request.ChatNoticeUpdateRequest;
+import com.poortorich.chatnotice.request.ChatNoticeStatusUpdateRequest;
 import com.poortorich.chatnotice.response.AllNoticesResponse;
 import com.poortorich.chatnotice.response.LatestNoticeResponse;
 import com.poortorich.chatnotice.response.NoticeDetailsResponse;
@@ -33,17 +33,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExtendWith(MockitoExtension.class)
 class ChatNoticeControllerTest extends BaseSecurityTest {
 
+    private final String username = "test";
     @Autowired
     private MockMvc mockMvc;
     @Autowired
     private ObjectMapper objectMapper;
-
     @MockitoBean
     private ChatFacade chatFacade;
     @MockitoBean
     private ChatNoticeFacade chatNoticeFacade;
-
-    private final String username = "test";
 
     @Test
     @WithMockUser(username = username)
@@ -66,7 +64,7 @@ class ChatNoticeControllerTest extends BaseSecurityTest {
     @DisplayName("공지 상태 변경 성공")
     void updateNoticeStatusSuccess() throws Exception {
         long chatroomId = 1L;
-        ChatNoticeUpdateRequest request = new ChatNoticeUpdateRequest("TEMP_HIDDEN");
+        ChatNoticeStatusUpdateRequest request = new ChatNoticeStatusUpdateRequest("TEMP_HIDDEN");
 
         mockMvc.perform(patch("/chatrooms/" + chatroomId + "/notices")
                         .content(objectMapper.writeValueAsString(request))
@@ -83,7 +81,7 @@ class ChatNoticeControllerTest extends BaseSecurityTest {
     @DisplayName("공지 상태 변경 입력값이 없는 경우 예외 발생")
     void updateNoticeStatusRequestNull() throws Exception {
         long chatroomId = 1L;
-        ChatNoticeUpdateRequest request = new ChatNoticeUpdateRequest(null);
+        ChatNoticeStatusUpdateRequest request = new ChatNoticeStatusUpdateRequest(null);
 
         mockMvc.perform(patch("/chatrooms/" + chatroomId + "/notices")
                         .content(objectMapper.writeValueAsString(request))

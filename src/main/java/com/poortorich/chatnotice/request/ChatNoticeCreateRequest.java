@@ -7,8 +7,8 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class ChatNoticeUpdateRequest {
+public class ChatNoticeCreateRequest {
 
     @NotNull(message = ChatNoticeResponseMessage.NOTICE_CONTENT_REQUIRED)
-    private final String content;
+    private String content;
 }

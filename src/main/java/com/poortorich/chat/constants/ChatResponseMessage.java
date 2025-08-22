@@ -11,6 +11,7 @@ public class ChatResponseMessage {
     public static final String GET_CHATROOM_COVER_INFO_SUCCESS = "채팅방 커버 정보 조회를 완료했습니다.";
     public static final String GET_CHATROOM_ROLE_SUCCESS = "현재 채팅방의 유저 역할 조회를 완료했습니다.";
     public static final String GET_ALL_PARTICIPANTS_SUCCESS = "채팅방 참여자 목록 조회를 완료했습니다.";
+    public static final String SEARCH_PARTICIPANTS_SUCCESS = "채팅방 참여자 검색을 완료했습니다.";
 
     public static final String CHATROOM_TITLE_REQUIRED = "채팅방 이름은 필수값입니다.";
     public static final String CHATROOM_TITLE_TOO_BIG
@@ -49,6 +50,9 @@ public class ChatResponseMessage {
     public static final String CHATROOM_ID_REQUIRED = "채팅방 아이디는 필수값입니다.";
     public static final String MESSAGE_TYPE_REQUIRED = "메시지 타입은 필수값입니다.";
     public static final String MARK_ALL_CHATROOM_AS_READ_SUCCESS = "참여중인 채팅방의 메세지를 모두 읽었습니다.";
+    public static final String TARGET_USER_ID_IS_NULL = "방장을 위임할 회원 아이디는 필수 값입니다.";
+    public static final String CHAT_PARTICIPANT_ROLE_NOT_MEMBER = "이 기능은 일반 멤버만 사용/적용할 수 있습니다.";
+    public static final String HOST_DELEGATION_SUCCESS = "방장이 성공적으로 위임되었습니다.";
 
     private ChatResponseMessage() {
     }

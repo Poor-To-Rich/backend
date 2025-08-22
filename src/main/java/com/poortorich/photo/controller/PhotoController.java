@@ -10,6 +10,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,6 +32,17 @@ public class PhotoController {
         return DataResponse.toResponseEntity(
                 PhotoResponse.UPLOAD_PHOTO_SUCCESS,
                 photoFacade.uploadPhoto(userDetails.getUsername(), chatroomId, request)
+        );
+    }
+
+    @GetMapping("/preview")
+    public ResponseEntity<BaseResponse> getPreviewPhotos(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @PathVariable Long chatroomId
+    ) {
+        return DataResponse.toResponseEntity(
+                PhotoResponse.GET_PREVIEW_PHOTOS_SUCCESS,
+                photoFacade.getPreviewPhotos(userDetails.getUsername(), chatroomId)
         );
     }
 }
