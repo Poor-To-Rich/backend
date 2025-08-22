@@ -33,15 +33,23 @@ public class SubscribeService {
         return SubscribeEndpoint.CHATROOM_SUBSCRIBE_PREFIX + chatroomId;
     }
 
+    private String getChatroomKey(String chatroomId) {
+        return SubscribeEndpoint.CHATROOM_SUBSCRIBE_PREFIX + chatroomId;
+    }
+
     private String getSubscriptionKey(String sessionId, String subscriptionId) {
         return sessionId + subscriptionId;
+    }
+
+    private String getUsernameSessionKey(String username, String sessionId) {
+        return username + sessionId;
     }
 
     public void subscribe(Long chatroomId, String username, String sessionId, String subscriptionId) {
         try {
             setOps.add(getChatroomKey(chatroomId), username);
-
-            valueOps.append(getSubscriptionKey(sessionId, subscriptionId), chatroomId.toString());
+            valueOps.set(getSubscriptionKey(sessionId, subscriptionId), chatroomId.toString());
+            setOps.add(getUsernameSessionKey(username, sessionId), getSubscriptionKey(sessionId, subscriptionId));
         } catch (DataAccessException exception) {
             throw new InternalServerErrorException(StompResponse.SUBSCRIBER_SAVE_FAILURE);
         }
@@ -53,8 +61,11 @@ public class SubscribeService {
             String chatroomId = valueOps.get(subscriptionKey);
 
             if (!Objects.isNull(chatroomId)) {
-                setOps.remove(getChatroomKey(Long.valueOf(chatroomId)), username);
+                setOps.remove(getChatroomKey(chatroomId), username);
                 redisTemplate.delete(subscriptionKey);
+                setOps.remove(
+                        getUsernameSessionKey(username, sessionId),
+                        getSubscriptionKey(sessionId, subscriptionId));
             }
         } catch (DataAccessException exception) {
             throw new InternalServerErrorException(StompResponse.SUBSCRIBER_REMOVE_FAILURE);
@@ -64,6 +75,29 @@ public class SubscribeService {
     public Set<String> getSubscribers(Long chatroomId) {
         try {
             return setOps.members(getChatroomKey(chatroomId));
+        } catch (DataAccessException exception) {
+            throw new InternalServerErrorException(GlobalResponse.INTERNAL_SERVER_EXCEPTION);
+        }
+    }
+
+    public void cleanupSession(String username, String sessionId) {
+        try {
+            String userSessionKey = getUsernameSessionKey(username, sessionId);
+            Set<String> keys = setOps.members(userSessionKey);
+
+            if (Objects.isNull(keys)) {
+                return;
+            }
+
+            for (String key : keys) {
+                String chatroomId = valueOps.get(key);
+                if (!Objects.isNull(chatroomId)) {
+                    setOps.remove(getChatroomKey(chatroomId), username);
+                    redisTemplate.delete(key);
+                }
+            }
+
+            redisTemplate.delete(userSessionKey);
         } catch (DataAccessException exception) {
             throw new InternalServerErrorException(GlobalResponse.INTERNAL_SERVER_EXCEPTION);
         }

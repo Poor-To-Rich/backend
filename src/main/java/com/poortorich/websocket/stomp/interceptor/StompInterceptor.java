@@ -43,7 +43,7 @@ public class StompInterceptor implements ChannelInterceptor {
             } else if (StompCommand.UNSUBSCRIBE.equals(command)) {
                 unsubscribeHandler.handle(accessor);
             } else if (StompCommand.DISCONNECT.equals(command)) {
-                disconnectHandler.handle();
+                disconnectHandler.handle(accessor);
             }
         } catch (Exception e) {
             log.info("[WebSocket 연결 실패] {}", e.getStackTrace()[0]);
