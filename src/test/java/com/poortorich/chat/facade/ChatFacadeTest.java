@@ -361,9 +361,9 @@ class ChatFacadeTest {
                 .nickname("nick2")
                 .build();
         User user3 = User.builder()
-                .id(2L)
+                .id(3L)
                 .profileImage("profileImage.com")
-                .nickname("nick2")
+                .nickname("nick3")
                 .build();
 
         ChatParticipant member1 = ChatParticipant.builder()
