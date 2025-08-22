@@ -91,10 +91,10 @@ public interface ChatParticipantRepository extends JpaRepository<ChatParticipant
           FROM ChatParticipant cp
           JOIN FETCH cp.user u
          WHERE cp.chatroom = :chatroom
-           AND u.nickname LIKE CONCAT('%', :keyword, '%')
+           AND u.nickname LIKE CONCAT('%', :nickname, '%')
     """)
-    List<ChatParticipant> searchByChatroomAndKeyword(
+    List<ChatParticipant> searchByChatroomAndNickname(
             @Param("chatroom") Chatroom chatroom,
-            @Param("keyword") String keyword
+            @Param("nickname") String nickname
     );
 }

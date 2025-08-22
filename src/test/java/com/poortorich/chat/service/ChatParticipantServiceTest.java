@@ -4,7 +4,6 @@ import com.poortorich.chat.entity.ChatParticipant;
 import com.poortorich.chat.entity.Chatroom;
 import com.poortorich.chat.entity.enums.ChatroomRole;
 import com.poortorich.chat.entity.enums.NoticeStatus;
-import com.poortorich.chat.entity.enums.RankingStatus;
 import com.poortorich.chat.repository.ChatParticipantRepository;
 import com.poortorich.chat.response.enums.ChatResponse;
 import com.poortorich.chatnotice.request.ChatNoticeUpdateRequest;
@@ -305,7 +304,7 @@ class ChatParticipantServiceTest {
 
     @Test
     @DisplayName("참여 인원 검색 성공")
-    void searchParticipantsByKeywordSuccess() {
+    void searchParticipantsByNicknameSuccess() {
         String keyword = "test";
         Chatroom chatroom = Chatroom.builder().build();
         ChatParticipant member1 = ChatParticipant.builder().build();
@@ -313,10 +312,10 @@ class ChatParticipantServiceTest {
         ChatParticipant member3 = ChatParticipant.builder().build();
         ChatParticipant member4 = ChatParticipant.builder().build();
 
-        when(chatParticipantRepository.searchByChatroomAndKeyword(chatroom, keyword))
+        when(chatParticipantRepository.searchByChatroomAndNickname(chatroom, keyword))
                 .thenReturn(List.of(member1, member2, member3, member4));
 
-        List<ChatParticipant> result = chatParticipantService.searchParticipantsByKeyword(chatroom, keyword);
+        List<ChatParticipant> result = chatParticipantService.searchParticipantsByNickname(chatroom, keyword);
 
         assertThat(result).hasSize(4);
         assertThat(result).containsExactly(member1, member2, member3, member4);
@@ -324,7 +323,7 @@ class ChatParticipantServiceTest {
 
     @Test
     @DisplayName("keyword가 null인 경우 전체 인원 조회 성공")
-    void searchParticipantsByKeywordNullSuccess() {
+    void searchParticipantsByNicknameNullSuccess() {
         Chatroom chatroom = Chatroom.builder().build();
         ChatParticipant member1 = ChatParticipant.builder().build();
         ChatParticipant member2 = ChatParticipant.builder().build();
@@ -334,7 +333,7 @@ class ChatParticipantServiceTest {
         when(chatParticipantRepository.findAllOrderedParticipants(chatroom))
                 .thenReturn(List.of(member1, member2, member3, member4));
 
-        List<ChatParticipant> result = chatParticipantService.searchParticipantsByKeyword(chatroom, null);
+        List<ChatParticipant> result = chatParticipantService.searchParticipantsByNickname(chatroom, null);
 
         assertThat(result).hasSize(4);
         assertThat(result).containsExactly(member1, member2, member3, member4);

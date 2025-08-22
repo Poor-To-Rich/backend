@@ -36,7 +36,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -345,7 +344,7 @@ class ChatFacadeTest {
 
     @Test
     @DisplayName("참여 인원 검색 성공")
-    void searchParticipantsByKeywordSuccess() {
+    void searchParticipantsByNicknameSuccess() {
         String username = "testUser";
         Long chatroomId = 1L;
         String keyword = "nick";
@@ -388,10 +387,10 @@ class ChatFacadeTest {
 
         when(userService.findUserByUsername(username)).thenReturn(user);
         when(chatroomService.findById(chatroomId)).thenReturn(chatroom);
-        when(chatParticipantService.searchParticipantsByKeyword(chatroom, keyword))
+        when(chatParticipantService.searchParticipantsByNickname(chatroom, keyword))
                 .thenReturn(List.of(member1, member2, member3));
 
-        SearchParticipantsResponse result = chatFacade.searchParticipantsByKeyword(username, chatroomId, keyword);
+        SearchParticipantsResponse result = chatFacade.searchParticipantsByNickname(username, chatroomId, keyword);
 
         assertThat(result).isNotNull();
         assertThat(result.getMembers()).hasSize(3);

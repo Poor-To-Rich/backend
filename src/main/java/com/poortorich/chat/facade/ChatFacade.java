@@ -298,12 +298,12 @@ public class ChatFacade {
         return ChatBuilder.buildAllParticipantsResponse(chatParticipantService.getAllParticipants(chatroom));
     }
 
-    public SearchParticipantsResponse searchParticipantsByKeyword(String username, Long chatroomId, String keyword) {
+    public SearchParticipantsResponse searchParticipantsByNickname(String username, Long chatroomId, String nickname) {
         User user = userService.findUserByUsername(username);
         Chatroom chatroom = chatroomService.findById(chatroomId);
         chatParticipantValidator.validateIsHost(user, chatroom);
 
-        List<ChatParticipant> chatParticipants = chatParticipantService.searchParticipantsByKeyword(chatroom, keyword);
+        List<ChatParticipant> chatParticipants = chatParticipantService.searchParticipantsByNickname(chatroom, nickname);
 
         return SearchParticipantsResponse.builder()
                 .members(chatParticipants.stream()

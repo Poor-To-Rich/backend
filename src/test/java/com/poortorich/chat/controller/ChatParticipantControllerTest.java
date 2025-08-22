@@ -69,11 +69,11 @@ class ChatParticipantControllerTest extends BaseSecurityTest {
         Long chatroomId = 1L;
         String nickname = "test";
 
-        when(chatFacade.searchParticipantsByKeyword(USERNAME, chatroomId, nickname))
+        when(chatFacade.searchParticipantsByNickname(USERNAME, chatroomId, nickname))
                 .thenReturn(SearchParticipantsResponse.builder().build());
 
         mockMvc.perform(get("/chatrooms/" + chatroomId + "/members/search")
-                        .param("keyword", nickname)
+                        .param("nickname", nickname)
                         .with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath(("$.message")).value(ChatResponse.SEARCH_PARTICIPANTS_SUCCESS.getMessage()));

@@ -42,11 +42,11 @@ public class ChatParticipantController {
     public ResponseEntity<BaseResponse> searchParticipants(
             @AuthenticationPrincipal UserDetails userDetails,
             @PathVariable Long chatroomId,
-            @RequestParam(required = false) String nickname
+            @RequestParam(name = "nickname", required = false) String nickname
     ) {
         return DataResponse.toResponseEntity(
                 ChatResponse.SEARCH_PARTICIPANTS_SUCCESS,
-                chatFacade.searchParticipantsByKeyword(userDetails.getUsername(), chatroomId, nickname)
+                chatFacade.searchParticipantsByNickname(userDetails.getUsername(), chatroomId, nickname)
         );
     }
 }

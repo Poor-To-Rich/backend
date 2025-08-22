@@ -154,11 +154,11 @@ public class ChatParticipantService {
         return chatParticipantRepository.findAllOrderedParticipants(chatroom);
     }
 
-    public List<ChatParticipant> searchParticipantsByKeyword(Chatroom chatroom, String keyword) {
-        if (keyword == null || keyword.isEmpty()) {
+    public List<ChatParticipant> searchParticipantsByNickname(Chatroom chatroom, String nickname) {
+        if (nickname == null || nickname.isEmpty()) {
             return chatParticipantRepository.findAllOrderedParticipants(chatroom);
         }
 
-        return chatParticipantRepository.searchByChatroomAndKeyword(chatroom, keyword);
+        return chatParticipantRepository.searchByChatroomAndNickname(chatroom, nickname);
     }
 }
