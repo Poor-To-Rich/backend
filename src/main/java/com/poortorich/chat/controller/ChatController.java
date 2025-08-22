@@ -241,18 +241,6 @@ public class ChatController {
         return DataResponse.toResponseEntity(ChatResponse.MARK_ALL_CHATROOM_AS_READ_SUCCESS, result.getApiResponse());
     }
 
-    @DeleteMapping("/{chatroomId}/members/{userId}")
-    public ResponseEntity<BaseResponse> kickChatParticipant(
-            @AuthenticationPrincipal UserDetails userDetails,
-            @PathVariable Long chatroomId,
-            @PathVariable Long userId
-    ) {
-        KickChatParticipantResponse apiResponse = chatFacade.kickChatParticipant(
-                userDetails.getUsername(),
-                chatroomId,
-                userId);
-    }
-
     @PatchMapping("/{chatroomId}/host/delegate")
     public ResponseEntity<BaseResponse> delegateHost(
             @AuthenticationPrincipal UserDetails userDetails,
@@ -272,5 +260,28 @@ public class ChatController {
         }
 
         return DataResponse.toResponseEntity(ChatResponse.HOST_DELEGATION_SUCCESS, apiResponse);
+    }
+
+    @DeleteMapping("/{chatroomId}/members/{userId}")
+    public ResponseEntity<BaseResponse> kickChatParticipant(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @PathVariable Long chatroomId,
+            @PathVariable Long userId
+    ) {
+        KickChatParticipantResponse apiResponse = chatFacade.kickChatParticipant(
+                userDetails.getUsername(),
+                chatroomId,
+                userId);
+
+        BasePayload basePayload = realTimeFacade.createUserKickMessage(apiResponse.getKickChatParticipant());
+
+        if (!Objects.isNull(basePayload)) {
+            messagingTemplate.convertAndSend(
+                    SubscribeEndpoint.CHATROOM_SUBSCRIBE_PREFIX + chatroomId,
+                    basePayload
+            );
+        }
+
+        return DataResponse.toResponseEntity(ChatResponse.CHAT_PARTICIPANT_KICK_SUCCESS, apiResponse);
     }
 }
