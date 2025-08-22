@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -16,6 +17,10 @@ public class TagService {
     private final TagRepository tagRepository;
 
     public void createTag(List<String> hashtags, Chatroom chatroom) {
+        if (Objects.isNull(hashtags)) {
+            return;
+        }
+        
         List<Tag> tag = hashtags.stream()
                 .map(tagName -> buildTag(tagName, chatroom))
                 .toList();
