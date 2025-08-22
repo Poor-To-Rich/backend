@@ -11,12 +11,14 @@ import com.poortorich.chat.request.ChatroomCreateRequest;
 import com.poortorich.chat.request.ChatroomEnterRequest;
 import com.poortorich.chat.request.ChatroomLeaveAllRequest;
 import com.poortorich.chat.request.ChatroomUpdateRequest;
+import com.poortorich.chat.request.HostDelegationRequest;
 import com.poortorich.chat.request.enums.SortBy;
 import com.poortorich.chat.response.ChatMessagePageResponse;
 import com.poortorich.chat.response.ChatroomCreateResponse;
 import com.poortorich.chat.response.ChatroomLeaveAllResponse;
 import com.poortorich.chat.response.ChatroomLeaveResponse;
 import com.poortorich.chat.response.ChatroomUpdateResponse;
+import com.poortorich.chat.response.HostDelegationResponse;
 import com.poortorich.chat.response.enums.ChatResponse;
 import com.poortorich.global.response.BaseResponse;
 import com.poortorich.global.response.DataResponse;
@@ -236,5 +238,26 @@ public class ChatController {
                 });
 
         return DataResponse.toResponseEntity(ChatResponse.MARK_ALL_CHATROOM_AS_READ_SUCCESS, result.getApiResponse());
+    }
+
+    @PatchMapping("/{chatroomId}/host/delegate")
+    public ResponseEntity<BaseResponse> delegateHost(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @PathVariable Long chatroomId,
+            @RequestBody @Valid HostDelegationRequest request
+    ) {
+        HostDelegationResponse apiResponse = chatFacade.delegateHost(userDetails.getUsername(), chatroomId, request);
+        BasePayload responsePayload = realTimeFacade.createHostDelegationMessage(
+                apiResponse.getPrevHost(),
+                apiResponse.getNewHost());
+
+        if (!Objects.isNull(responsePayload)) {
+            messagingTemplate.convertAndSend(
+                    SubscribeEndpoint.CHATROOM_SUBSCRIBE_PREFIX + chatroomId,
+                    responsePayload
+            );
+        }
+
+        return DataResponse.toResponseEntity(ChatResponse.HOST_DELEGATION_SUCCESS, apiResponse);
     }
 }
