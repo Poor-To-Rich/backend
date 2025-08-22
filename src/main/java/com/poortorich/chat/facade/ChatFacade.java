@@ -222,6 +222,7 @@ public class ChatFacade {
                 .build();
     }
 
+    @Transactional
     public ChatroomLeaveResponse leaveChatroom(String username, Long chatroomId) {
         User user = userService.findUserByUsername(username);
         Chatroom chatroom = chatroomService.findById(chatroomId);
@@ -337,6 +338,7 @@ public class ChatFacade {
                 .build();
     }
 
+    @Transactional
     public KickChatParticipantResponse kickChatParticipant(String username, Long chatroomId, Long userId) {
         ChatParticipant host = chatParticipantService.findByUsernameAndChatroomId(username, chatroomId);
         ChatParticipant kickChatParticipant = chatParticipantService.findByUserIdAndChatroomId(userId, chatroomId);

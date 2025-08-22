@@ -205,6 +205,7 @@ public class ChatMessageService {
                 .build();
     }
 
+    @Transactional
     public KickChatParticipantMessagePayload saveKickChatParticipantMessage(ChatParticipant kickChatParticipant) {
         dateChangeDetector.detect(kickChatParticipant.getChatroom());
 
