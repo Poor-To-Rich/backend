@@ -298,6 +298,7 @@ public class ChatFacade {
         return ChatBuilder.buildAllParticipantsResponse(chatParticipantService.getAllParticipants(chatroom));
     }
 
+    @Transactional(readOnly = true)
     public SearchParticipantsResponse searchParticipantsByNickname(String username, Long chatroomId, String nickname) {
         User user = userService.findUserByUsername(username);
         Chatroom chatroom = chatroomService.findById(chatroomId);
