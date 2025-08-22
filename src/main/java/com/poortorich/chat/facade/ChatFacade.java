@@ -29,11 +29,8 @@ import com.poortorich.chat.response.ChatroomResponse;
 import com.poortorich.chat.response.ChatroomRoleResponse;
 import com.poortorich.chat.response.ChatroomUpdateResponse;
 import com.poortorich.chat.response.ChatroomsResponse;
-<<<<<<< HEAD
 import com.poortorich.chat.response.HostDelegationResponse;
-=======
 import com.poortorich.chat.response.SearchParticipantsResponse;
->>>>>>> dev
 import com.poortorich.chat.service.ChatMessageService;
 import com.poortorich.chat.service.ChatParticipantService;
 import com.poortorich.chat.service.ChatroomService;
