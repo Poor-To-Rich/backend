@@ -106,7 +106,7 @@ public interface ChatParticipantRepository extends JpaRepository<ChatParticipant
             JOIN FETCH cp.chatroom c
             WHERE c.id = :chatroomId
             AND u.id = :userId
-            ABD cp.isParticipated = true
+            AND cp.isParticipated = true
             """)
     Optional<ChatParticipant> findByUserIdAndChatroomId(
             @Param("userId") Long userId,
