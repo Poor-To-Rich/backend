@@ -1,12 +1,12 @@
 package com.poortorich.chatnotice.service;
 
+import com.poortorich.chat.entity.ChatParticipant;
 import com.poortorich.chat.entity.Chatroom;
-import com.poortorich.chat.realtime.model.PayloadContext;
-import com.poortorich.chat.realtime.payload.request.ChatNoticeRequestPayload;
 import com.poortorich.chatnotice.entity.ChatNotice;
 import com.poortorich.chatnotice.repository.ChatNoticeRepository;
+import com.poortorich.chatnotice.request.ChatNoticeCreateRequest;
+import com.poortorich.chatnotice.request.ChatNoticeUpdateRequest;
 import com.poortorich.chatnotice.response.enums.ChatNoticeResponse;
-import com.poortorich.global.exceptions.BadRequestException;
 import com.poortorich.global.exceptions.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -14,7 +14,6 @@ import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -23,18 +22,20 @@ public class ChatNoticeService {
 
     private final ChatNoticeRepository chatNoticeRepository;
 
-    public ChatNotice create(PayloadContext context, ChatNoticeRequestPayload requestPayload) {
-        if (Objects.isNull(requestPayload.getContent())) {
-            throw new BadRequestException(ChatNoticeResponse.CONTENT_REQUIRED);
-        }
-
+    public ChatNotice create(ChatParticipant author, ChatNoticeCreateRequest noticeCreateRequest) {
         ChatNotice notice = ChatNotice.builder()
-                .content(requestPayload.getContent())
-                .author(context.chatParticipant())
-                .chatroom(context.chatroom())
+                .content(noticeCreateRequest.getContent())
+                .author(author)
+                .chatroom(author.getChatroom())
                 .build();
 
         return chatNoticeRepository.save(notice);
+    }
+
+    public ChatNotice update(Long noticeId, ChatNoticeUpdateRequest noticeUpdateRequest) {
+        ChatNotice chatNotice = findById(noticeId);
+        chatNotice.updateContent(noticeUpdateRequest.getContent());
+        return chatNoticeRepository.save(chatNotice);
     }
 
     public Slice<ChatNotice> getAllNoticeByCursor(Chatroom chatroom, Long cursor, Pageable pageable) {
@@ -50,35 +51,25 @@ public class ChatNoticeService {
         return chatNoticeRepository.findTop3ByChatroomOrderByCreatedDateDesc(chatroom);
     }
 
-    public ChatNotice update(PayloadContext context, ChatNoticeRequestPayload requestPayload) {
-        ChatNotice chatNotice = chatNoticeRepository.findTop1ByChatroomOrderByCreatedDateDesc(context.chatroom())
-                .orElse(null);
+    public boolean isLatestNotice(ChatNotice chatNotice) {
+        Optional<ChatNotice> latestChatNotice = chatNoticeRepository.findTop1ByChatroomOrderByCreatedDateDesc(
+                chatNotice.getChatroom());
 
-        if (Objects.isNull(chatNotice)) {
-            return chatNotice;
-        }
-
-        chatNotice.updateContent(requestPayload.getContent());
-
-        return chatNoticeRepository.save(chatNotice);
+        return latestChatNotice.isPresent() && latestChatNotice.get().getId().equals(chatNotice.getId());
     }
 
-    public ChatNotice handleChatNotice(PayloadContext context, ChatNoticeRequestPayload requestPayload) {
-        return switch (requestPayload.getNoticeType()) {
-            case CREATE -> create(context, requestPayload);
-            case UPDATE -> update(context, requestPayload);
-            case DELETE -> delete(context);
-        };
-    }
-
-    public ChatNotice delete(PayloadContext context) {
-        Optional<ChatNotice> chatNotice = chatNoticeRepository.findTop1ByChatroomOrderByCreatedDateDesc(context.chatroom());
+    public void delete(Long noticeId) {
+        Optional<ChatNotice> chatNotice = chatNoticeRepository.findById(noticeId);
         chatNotice.ifPresent(chatNoticeRepository::delete);
-        return null;
     }
 
     public ChatNotice findNotice(Chatroom chatroom, Long noticeId) {
         return chatNoticeRepository.findByChatroomAndId(chatroom, noticeId)
+                .orElseThrow(() -> new NotFoundException(ChatNoticeResponse.NOTICE_NOT_FOUND));
+    }
+
+    public ChatNotice findById(Long noticeId) {
+        return chatNoticeRepository.findById(noticeId)
                 .orElseThrow(() -> new NotFoundException(ChatNoticeResponse.NOTICE_NOT_FOUND));
     }
 }

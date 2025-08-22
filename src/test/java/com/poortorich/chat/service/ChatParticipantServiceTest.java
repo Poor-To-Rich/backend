@@ -6,7 +6,7 @@ import com.poortorich.chat.entity.enums.ChatroomRole;
 import com.poortorich.chat.entity.enums.NoticeStatus;
 import com.poortorich.chat.repository.ChatParticipantRepository;
 import com.poortorich.chat.response.enums.ChatResponse;
-import com.poortorich.chatnotice.request.ChatNoticeUpdateRequest;
+import com.poortorich.chatnotice.request.ChatNoticeStatusUpdateRequest;
 import com.poortorich.chatnotice.response.enums.ChatNoticeResponse;
 import com.poortorich.global.exceptions.BadRequestException;
 import com.poortorich.global.exceptions.NotFoundException;
@@ -185,7 +185,7 @@ class ChatParticipantServiceTest {
     void updateNoticeStatusSuccess() {
         String username = "test";
         Long chatroomId = 1L;
-        ChatNoticeUpdateRequest request = new ChatNoticeUpdateRequest("TEMP_HIDDEN");
+        ChatNoticeStatusUpdateRequest request = new ChatNoticeStatusUpdateRequest("TEMP_HIDDEN");
         Chatroom chatroom = Chatroom.builder()
                 .id(chatroomId)
                 .build();
@@ -210,7 +210,7 @@ class ChatParticipantServiceTest {
     void updateNoticeStatusCurrentStatusPermanentHidden() {
         String username = "test";
         Long chatroomId = 1L;
-        ChatNoticeUpdateRequest request = new ChatNoticeUpdateRequest("TEMP_HIDDEN");
+        ChatNoticeStatusUpdateRequest request = new ChatNoticeStatusUpdateRequest("TEMP_HIDDEN");
         Chatroom chatroom = Chatroom.builder()
                 .id(chatroomId)
                 .build();
@@ -232,7 +232,7 @@ class ChatParticipantServiceTest {
     void updateNoticeStatusInvalidRequest() {
         String username = "test";
         Long chatroomId = 1L;
-        ChatNoticeUpdateRequest request = new ChatNoticeUpdateRequest("INVALID_REQUEST");
+        ChatNoticeStatusUpdateRequest request = new ChatNoticeStatusUpdateRequest("INVALID_REQUEST");
         Chatroom chatroom = Chatroom.builder()
                 .id(chatroomId)
                 .build();
