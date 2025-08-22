@@ -85,4 +85,18 @@ public interface ChatParticipantRepository extends JpaRepository<ChatParticipant
           u.nickname ASC
     """)
     List<ChatParticipant> findAllOrderedParticipants(@Param("chatroom") Chatroom chatroom);
+
+    @Query("""
+        SELECT cp
+          FROM ChatParticipant cp
+          JOIN FETCH cp.user u
+         WHERE cp.chatroom = :chatroom
+           AND cp.isParticipated = true
+           AND LOWER(u.nickname) LIKE CONCAT('%', LOWER(:nickname), '%')
+         ORDER BY u.nickname ASC
+    """)
+    List<ChatParticipant> searchByChatroomAndNickname(
+            @Param("chatroom") Chatroom chatroom,
+            @Param("nickname") String nickname
+    );
 }

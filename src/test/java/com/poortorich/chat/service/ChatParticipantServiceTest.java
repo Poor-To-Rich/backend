@@ -4,7 +4,6 @@ import com.poortorich.chat.entity.ChatParticipant;
 import com.poortorich.chat.entity.Chatroom;
 import com.poortorich.chat.entity.enums.ChatroomRole;
 import com.poortorich.chat.entity.enums.NoticeStatus;
-import com.poortorich.chat.entity.enums.RankingStatus;
 import com.poortorich.chat.repository.ChatParticipantRepository;
 import com.poortorich.chat.response.enums.ChatResponse;
 import com.poortorich.chatnotice.request.ChatNoticeUpdateRequest;
@@ -301,5 +300,42 @@ class ChatParticipantServiceTest {
         assertThat(result.get(0)).isEqualTo(host);
         assertThat(result.get(1)).isEqualTo(member1);
         assertThat(result.get(2)).isEqualTo(member2);
+    }
+
+    @Test
+    @DisplayName("참여 인원 검색 성공")
+    void searchParticipantsByNicknameSuccess() {
+        String keyword = "test";
+        Chatroom chatroom = Chatroom.builder().build();
+        ChatParticipant member1 = ChatParticipant.builder().build();
+        ChatParticipant member2 = ChatParticipant.builder().build();
+        ChatParticipant member3 = ChatParticipant.builder().build();
+        ChatParticipant member4 = ChatParticipant.builder().build();
+
+        when(chatParticipantRepository.searchByChatroomAndNickname(chatroom, keyword))
+                .thenReturn(List.of(member1, member2, member3, member4));
+
+        List<ChatParticipant> result = chatParticipantService.searchParticipantsByNickname(chatroom, keyword);
+
+        assertThat(result).hasSize(4);
+        assertThat(result).containsExactly(member1, member2, member3, member4);
+    }
+
+    @Test
+    @DisplayName("keyword가 null인 경우 전체 인원 조회 성공")
+    void searchParticipantsByNicknameNullSuccess() {
+        Chatroom chatroom = Chatroom.builder().build();
+        ChatParticipant member1 = ChatParticipant.builder().build();
+        ChatParticipant member2 = ChatParticipant.builder().build();
+        ChatParticipant member3 = ChatParticipant.builder().build();
+        ChatParticipant member4 = ChatParticipant.builder().build();
+
+        when(chatParticipantRepository.findAllOrderedParticipants(chatroom))
+                .thenReturn(List.of(member1, member2, member3, member4));
+
+        List<ChatParticipant> result = chatParticipantService.searchParticipantsByNickname(chatroom, null);
+
+        assertThat(result).hasSize(4);
+        assertThat(result).containsExactly(member1, member2, member3, member4);
     }
 }

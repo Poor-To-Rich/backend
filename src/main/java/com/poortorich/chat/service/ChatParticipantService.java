@@ -153,4 +153,12 @@ public class ChatParticipantService {
     public List<ChatParticipant> getAllParticipants(Chatroom chatroom) {
         return chatParticipantRepository.findAllOrderedParticipants(chatroom);
     }
+
+    public List<ChatParticipant> searchParticipantsByNickname(Chatroom chatroom, String nickname) {
+        if (nickname == null || nickname.isEmpty()) {
+            return chatParticipantRepository.findAllOrderedParticipants(chatroom);
+        }
+
+        return chatParticipantRepository.searchByChatroomAndNickname(chatroom, nickname);
+    }
 }
