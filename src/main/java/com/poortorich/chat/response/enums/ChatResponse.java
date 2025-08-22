@@ -43,7 +43,8 @@ public enum ChatResponse implements Response {
     GET_CHAT_MESSAGE_SUCCESS(HttpStatus.OK, ChatResponseMessage.GET_CHAT_MESSAGE_SUCCESS, null),
     MARK_ALL_CHATROOM_AS_READ_SUCCESS(HttpStatus.OK, ChatResponseMessage.MARK_ALL_CHATROOM_AS_READ_SUCCESS, null),
     CHAT_PARTICIPANT_ROLE_NOT_MEMBER(HttpStatus.BAD_REQUEST, ChatResponseMessage.CHAT_PARTICIPANT_ROLE_NOT_MEMBER, null),
-    HOST_DELEGATION_SUCCESS(HttpStatus.OK, ChatResponseMessage.HOST_DELEGATION_SUCCESS, null);
+    HOST_DELEGATION_SUCCESS(HttpStatus.OK, ChatResponseMessage.HOST_DELEGATION_SUCCESS, null),
+    CHAT_PARTICIPANT_KICK_SUCCESS(HttpStatus.OK, ChatResponseMessage.CHAT_PARTICIPANT_KICK_SUCCESS, null);
 
     private final HttpStatus httpStatus;
     private final String message;

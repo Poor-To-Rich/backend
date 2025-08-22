@@ -3,10 +3,12 @@ package com.poortorich.tag.service;
 import com.poortorich.chat.entity.Chatroom;
 import com.poortorich.tag.entity.Tag;
 import com.poortorich.tag.repository.TagRepository;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -15,6 +17,10 @@ public class TagService {
     private final TagRepository tagRepository;
 
     public void createTag(List<String> hashtags, Chatroom chatroom) {
+        if (Objects.isNull(hashtags)) {
+            return;
+        }
+        
         List<Tag> tag = hashtags.stream()
                 .map(tagName -> buildTag(tagName, chatroom))
                 .toList();

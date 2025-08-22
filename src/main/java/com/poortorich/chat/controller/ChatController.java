@@ -19,6 +19,7 @@ import com.poortorich.chat.response.ChatroomLeaveAllResponse;
 import com.poortorich.chat.response.ChatroomLeaveResponse;
 import com.poortorich.chat.response.ChatroomUpdateResponse;
 import com.poortorich.chat.response.HostDelegationResponse;
+import com.poortorich.chat.response.KickChatParticipantResponse;
 import com.poortorich.chat.response.enums.ChatResponse;
 import com.poortorich.global.response.BaseResponse;
 import com.poortorich.global.response.DataResponse;
@@ -259,5 +260,28 @@ public class ChatController {
         }
 
         return DataResponse.toResponseEntity(ChatResponse.HOST_DELEGATION_SUCCESS, apiResponse);
+    }
+
+    @DeleteMapping("/{chatroomId}/members/{userId}")
+    public ResponseEntity<BaseResponse> kickChatParticipant(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @PathVariable Long chatroomId,
+            @PathVariable Long userId
+    ) {
+        KickChatParticipantResponse apiResponse = chatFacade.kickChatParticipant(
+                userDetails.getUsername(),
+                chatroomId,
+                userId);
+
+        BasePayload basePayload = realTimeFacade.createUserKickMessage(apiResponse.getKickChatParticipant());
+
+        if (!Objects.isNull(basePayload)) {
+            messagingTemplate.convertAndSend(
+                    SubscribeEndpoint.CHATROOM_SUBSCRIBE_PREFIX + chatroomId,
+                    basePayload
+            );
+        }
+
+        return DataResponse.toResponseEntity(ChatResponse.CHAT_PARTICIPANT_KICK_SUCCESS, apiResponse);
     }
 }

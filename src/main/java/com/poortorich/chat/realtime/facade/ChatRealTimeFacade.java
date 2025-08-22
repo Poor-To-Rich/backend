@@ -136,4 +136,9 @@ public class ChatRealTimeFacade {
         eventPublisher.publishEvent(new HostDelegationEvent(prevHost, newHost));
         return payload.mapToBasePayload();
     }
+
+    @Transactional
+    public BasePayload createUserKickMessage(ChatParticipant kickChatParticipant) {
+        return chatMessageService.saveKickChatParticipantMessage(kickChatParticipant).mapToBasePayload();
+    }
 }
