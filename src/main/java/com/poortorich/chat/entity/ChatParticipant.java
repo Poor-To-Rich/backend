@@ -79,7 +79,7 @@ public class ChatParticipant {
         this.leaveTime = null;
     }
 
-    public void softDelete() {
+    public void leave() {
         this.isParticipated = Boolean.FALSE;
         this.leaveTime = LocalDateTime.now();
     }
@@ -90,5 +90,9 @@ public class ChatParticipant {
 
     public void updateChatroomRole(ChatroomRole chatroomRole) {
         this.role = chatroomRole;
+    }
+
+    public void kick() {
+        this.role = ChatroomRole.BANNED;
     }
 }

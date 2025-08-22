@@ -30,6 +30,7 @@ import com.poortorich.chat.response.ChatroomRoleResponse;
 import com.poortorich.chat.response.ChatroomUpdateResponse;
 import com.poortorich.chat.response.ChatroomsResponse;
 import com.poortorich.chat.response.HostDelegationResponse;
+import com.poortorich.chat.response.KickChatParticipantResponse;
 import com.poortorich.chat.response.SearchParticipantsResponse;
 import com.poortorich.chat.service.ChatMessageService;
 import com.poortorich.chat.service.ChatParticipantService;
@@ -219,6 +220,7 @@ public class ChatFacade {
                 .build();
     }
 
+    @Transactional
     public ChatroomLeaveResponse leaveChatroom(String username, Long chatroomId) {
         User user = userService.findUserByUsername(username);
         Chatroom chatroom = chatroomService.findById(chatroomId);
@@ -226,10 +228,10 @@ public class ChatFacade {
         chatroomValidator.validateParticipate(user, chatroom);
         ChatParticipant chatParticipant = chatParticipantService.findByUserAndChatroom(user, chatroom);
         if (chatParticipant.getRole().equals(ChatroomRole.HOST)) {
-            chatParticipant.softDelete();
+            chatParticipant.leave();
             deleteChatroom(chatroom);
         } else {
-            chatParticipant.softDelete();
+            chatParticipant.leave();
         }
 
         return ChatroomLeaveResponse.builder().deleteChatroomId(chatroomId).build();
@@ -244,10 +246,10 @@ public class ChatFacade {
             chatroomValidator.validateParticipate(user, chatroom);
             ChatParticipant chatParticipant = chatParticipantService.findByUserAndChatroom(user, chatroom);
             if (chatParticipant.getRole().equals(ChatroomRole.HOST)) {
-                chatParticipant.softDelete();
+                chatParticipant.leave();
                 deleteChatroom(chatroom);
             } else {
-                chatParticipant.softDelete();
+                chatParticipant.leave();
             }
         }
 
@@ -331,6 +333,23 @@ public class ChatFacade {
                         .filter(chatParticipant -> chatParticipant.getRole().equals(ChatroomRole.MEMBER))
                         .map(ChatBuilder::buildProfileResponse)
                         .toList())
+                .build();
+    }
+
+    @Transactional
+    public KickChatParticipantResponse kickChatParticipant(String username, Long chatroomId, Long userId) {
+        ChatParticipant host = chatParticipantService.findByUsernameAndChatroomId(username, chatroomId);
+        ChatParticipant kickChatParticipant = chatParticipantService.findByUserIdAndChatroomId(userId, chatroomId);
+
+        chatParticipantValidator.validateIsHost(host);
+        chatParticipantValidator.validateIsMember(kickChatParticipant);
+        chatParticipantValidator.validateIsParticipate(kickChatParticipant);
+
+        chatParticipantService.kickChatParticipant(kickChatParticipant);
+
+        return KickChatParticipantResponse.builder()
+                .kickUserId(kickChatParticipant.getUser().getId())
+                .kickChatParticipant(kickChatParticipant)
                 .build();
     }
 }

@@ -20,7 +20,7 @@ public class RankingController {
 
     private final RankingFacade rankingFacade;
 
-    @GetMapping
+    @GetMapping("/preview")
     public ResponseEntity<BaseResponse> getLatestRanking(
             @AuthenticationPrincipal UserDetails userDetails,
             @PathVariable Long chatroomId

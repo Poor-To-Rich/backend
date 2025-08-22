@@ -42,7 +42,7 @@ class RankingControllerTest extends BaseSecurityTest {
                 RankingFacade.LatestRankingResult.found(LatestRankingResponse.builder().build())
         );
 
-        mockMvc.perform(get("/chatrooms/" + chatroomId + "/rankings")
+        mockMvc.perform(get("/chatrooms/" + chatroomId + "/rankings/preview")
                         .with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message")
@@ -59,7 +59,7 @@ class RankingControllerTest extends BaseSecurityTest {
                 RankingFacade.LatestRankingResult.notFound(LatestRankingResponse.builder().build())
         );
 
-        mockMvc.perform(get("/chatrooms/" + chatroomId + "/rankings")
+        mockMvc.perform(get("/chatrooms/" + chatroomId + "/rankings/preview")
                         .with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message")
