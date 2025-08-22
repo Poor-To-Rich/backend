@@ -8,7 +8,6 @@ import com.poortorich.chat.service.ChatParticipantService;
 import com.poortorich.user.entity.User;
 import com.poortorich.websocket.stomp.command.subscribe.endpoint.SubscribeEndpoint;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.event.EventListener;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;
@@ -47,7 +46,7 @@ public class UserProfileUpdatedEventListener {
         });
     }
 
-    @EventListener
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void onHostDelegation(HostDelegationEvent event) {
         List<ChatParticipant> participants = List.of(event.getPrevHost(), event.getNewHost());
 

@@ -299,6 +299,7 @@ public class ChatFacade {
         return ChatBuilder.buildAllParticipantsResponse(chatParticipantService.getAllParticipants(chatroom));
     }
 
+    @Transactional
     public HostDelegationResponse delegateHost(String username, Long chatroomId, HostDelegationRequest request) {
         ChatParticipant currentHost = chatParticipantService.findByUsernameAndChatroomId(username, chatroomId);
         ChatParticipant nextHost = chatParticipantService.findByUserIdAndChatroomId(
@@ -312,7 +313,7 @@ public class ChatFacade {
         chatParticipantService.delegateHost(currentHost, nextHost);
 
         return HostDelegationResponse.builder()
-                .newHostUserId(nextHost.getId())
+                .newHostUserId(nextHost.getUser().getId())
                 .prevHost(currentHost)
                 .newHost(nextHost)
                 .build();

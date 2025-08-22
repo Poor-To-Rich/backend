@@ -244,7 +244,7 @@ public class ChatController {
     public ResponseEntity<BaseResponse> delegateHost(
             @AuthenticationPrincipal UserDetails userDetails,
             @PathVariable Long chatroomId,
-            @RequestBody HostDelegationRequest request
+            @RequestBody @Valid HostDelegationRequest request
     ) {
         HostDelegationResponse apiResponse = chatFacade.delegateHost(userDetails.getUsername(), chatroomId, request);
         BasePayload responsePayload = realTimeFacade.createHostDelegationMessage(

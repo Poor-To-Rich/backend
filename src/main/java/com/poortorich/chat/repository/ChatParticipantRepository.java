@@ -93,6 +93,7 @@ public interface ChatParticipantRepository extends JpaRepository<ChatParticipant
             JOIN FETCH cp.chatroom c
             WHERE c.id = :chatroomId
             AND u.username = :username
+            AND cp.isParticipated = true
             """)
     Optional<ChatParticipant> findByUsernameAndChatroomId(
             @Param("username") String username,
@@ -105,6 +106,7 @@ public interface ChatParticipantRepository extends JpaRepository<ChatParticipant
             JOIN FETCH cp.chatroom c
             WHERE c.id = :chatroomId
             AND u.id = :userId
+            ABD cp.isParticipated = true
             """)
     Optional<ChatParticipant> findByUserIdAndChatroomId(
             @Param("userId") Long userId,

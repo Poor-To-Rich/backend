@@ -186,6 +186,7 @@ public class ChatMessageService {
     }
 
     public HostDelegationMessagePayload saveHostDelegationMessage(ChatParticipant prevHost, ChatParticipant newHost) {
+        dateChangeDetector.detect(newHost.getChatroom());
         ChatMessage hostDelegationMessage = SystemMessageBuilder.buildHostDelegationMessage(prevHost, newHost);
 
         ChatMessage savedHostDelegationMessage = chatMessageRepository.save(hostDelegationMessage);
