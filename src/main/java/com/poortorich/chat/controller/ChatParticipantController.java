@@ -44,9 +44,10 @@ public class ChatParticipantController {
             @PathVariable Long chatroomId,
             @RequestParam(name = "nickname", required = false) String nickname
     ) {
+        String trimNickname = (nickname == null) ? null : nickname.trim();
         return DataResponse.toResponseEntity(
                 ChatResponse.SEARCH_PARTICIPANTS_SUCCESS,
-                chatFacade.searchParticipantsByNickname(userDetails.getUsername(), chatroomId, nickname)
+                chatFacade.searchParticipantsByNickname(userDetails.getUsername(), chatroomId, trimNickname)
         );
     }
 }
