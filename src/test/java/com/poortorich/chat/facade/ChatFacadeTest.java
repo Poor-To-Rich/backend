@@ -17,12 +17,8 @@ import com.poortorich.chat.response.ChatroomsResponse;
 import com.poortorich.chat.service.ChatMessageService;
 import com.poortorich.chat.service.ChatParticipantService;
 import com.poortorich.chat.service.ChatroomService;
-<<<<<<< HEAD
-import com.poortorich.chatnotice.request.ChatNoticeStatusUpdateRequest;
-=======
 import com.poortorich.chat.validator.ChatParticipantValidator;
-import com.poortorich.chatnotice.request.ChatNoticeUpdateRequest;
->>>>>>> dev
+import com.poortorich.chatnotice.request.ChatNoticeStatusUpdateRequest;
 import com.poortorich.s3.service.FileUploadService;
 import com.poortorich.tag.service.TagService;
 import com.poortorich.user.entity.User;
