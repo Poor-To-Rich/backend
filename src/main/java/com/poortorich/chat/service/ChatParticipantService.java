@@ -167,4 +167,10 @@ public class ChatParticipantService {
 
         return chatParticipantRepository.searchByChatroomAndNickname(chatroom, nickname);
     }
+
+    @Transactional
+    public void kickChatParticipant(ChatParticipant kickChatParticipant) {
+        kickChatParticipant.kick();
+        kickChatParticipant.leave();
+    }
 }

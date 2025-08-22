@@ -13,6 +13,7 @@ import com.poortorich.chat.realtime.payload.request.ChatMessageRequestPayload;
 import com.poortorich.chat.realtime.payload.response.ChatroomClosedResponsePayload;
 import com.poortorich.chat.realtime.payload.response.DateChangeMessagePayload;
 import com.poortorich.chat.realtime.payload.response.HostDelegationMessagePayload;
+import com.poortorich.chat.realtime.payload.response.KickChatParticipantMessagePayload;
 import com.poortorich.chat.realtime.payload.response.RankingStatusMessagePayload;
 import com.poortorich.chat.realtime.payload.response.UserChatMessagePayload;
 import com.poortorich.chat.realtime.payload.response.UserEnterResponsePayload;
@@ -201,6 +202,24 @@ public class ChatMessageService {
                 .type(savedHostDelegationMessage.getType())
                 .content(savedHostDelegationMessage.getContent())
                 .sentAt(savedHostDelegationMessage.getSentAt())
+                .build();
+    }
+
+    @Transactional
+    public KickChatParticipantMessagePayload saveKickChatParticipantMessage(ChatParticipant kickChatParticipant) {
+        dateChangeDetector.detect(kickChatParticipant.getChatroom());
+
+        ChatMessage kickMessage = SystemMessageBuilder.buildKickChatParticipantMessage(kickChatParticipant);
+        kickMessage = chatMessageRepository.save(kickMessage);
+
+        return KickChatParticipantMessagePayload.builder()
+                .userId(kickMessage.getUserId())
+                .messageId(kickMessage.getId())
+                .chatroomId(kickMessage.getChatroom().getId())
+                .content(kickMessage.getContent())
+                .messageType(kickMessage.getMessageType())
+                .type(kickMessage.getType())
+                .sentAt(kickMessage.getSentAt())
                 .build();
     }
 }
