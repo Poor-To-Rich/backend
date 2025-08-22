@@ -144,6 +144,22 @@ public class ChatParticipantService {
         return chatParticipantRepository.findAllOrderedParticipants(chatroom);
     }
 
+    public ChatParticipant findByUsernameAndChatroomId(String username, Long chatroomId) {
+        return chatParticipantRepository.findByUsernameAndChatroomId(username, chatroomId)
+                .orElseThrow(() -> new NotFoundException(ChatResponse.CHAT_PARTICIPANT_NOT_FOUND));
+    }
+
+    public ChatParticipant findByUserIdAndChatroomId(Long userId, Long chatroomId) {
+        return chatParticipantRepository.findByUserIdAndChatroomId(userId, chatroomId)
+                .orElseThrow(() -> new NotFoundException(ChatResponse.CHAT_PARTICIPANT_NOT_FOUND));
+    }
+
+    @Transactional
+    public void delegateHost(ChatParticipant currentHost, ChatParticipant nextHost) {
+        currentHost.updateChatroomRole(ChatroomRole.MEMBER);
+        nextHost.updateChatroomRole(ChatroomRole.HOST);
+    }
+
     public List<ChatParticipant> searchParticipantsByNickname(Chatroom chatroom, String nickname) {
         if (nickname == null || nickname.isEmpty()) {
             return chatParticipantRepository.findAllOrderedParticipants(chatroom);

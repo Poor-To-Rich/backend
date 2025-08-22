@@ -4,6 +4,7 @@ import com.poortorich.chat.entity.ChatMessage;
 import com.poortorich.chat.model.ChatMessageResponse;
 import com.poortorich.chat.realtime.payload.response.ChatroomClosedResponsePayload;
 import com.poortorich.chat.realtime.payload.response.DateChangeMessagePayload;
+import com.poortorich.chat.realtime.payload.response.HostDelegationMessagePayload;
 import com.poortorich.chat.realtime.payload.response.RankingStatusMessagePayload;
 import com.poortorich.chat.realtime.payload.response.UserChatMessagePayload;
 import com.poortorich.chat.realtime.payload.response.UserEnterResponsePayload;
@@ -28,7 +29,19 @@ public class ChatMessageMapper {
             case CLOSE -> chatroomClosedMessage(chatMessage);
             case TEXT, PHOTO -> userChatMessage(chatMessage);
             case DATE -> dateChangeMessage(chatMessage);
+            case DELEGATE -> hostDelegationMessage(chatMessage);
         };
+    }
+
+    private ChatMessageResponse hostDelegationMessage(ChatMessage chatMessage) {
+        return HostDelegationMessagePayload.builder()
+                .messageId(chatMessage.getId())
+                .messageType(chatMessage.getMessageType())
+                .type(chatMessage.getType())
+                .content(chatMessage.getContent())
+                .chatroomId(chatMessage.getChatroom().getId())
+                .sentAt(chatMessage.getSentAt())
+                .build();
     }
 
     private ChatMessageResponse dateChangeMessage(ChatMessage chatMessage) {

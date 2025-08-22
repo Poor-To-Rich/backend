@@ -45,4 +45,27 @@ public class UserProfileUpdatedEventListener {
                     payload.mapToBasePayload());
         });
     }
+
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    public void onHostDelegation(HostDelegationEvent event) {
+        List<ChatParticipant> participants = List.of(event.getPrevHost(), event.getNewHost());
+
+        participants.forEach(participant -> {
+            User user = participant.getUser();
+            Chatroom chatroom = participant.getChatroom();
+
+            var payload = UserUpdatedResponsePayload.builder()
+                    .userId(user.getId())
+                    .profileImage(user.getProfileImage())
+                    .nickname(user.getNickname())
+                    .isHost(Objects.equals(ChatroomRole.HOST, participant.getRole()))
+                    .rankingType(participant.getRankingStatus())
+                    .build();
+
+            messagingTemplate.convertAndSend(
+                    SubscribeEndpoint.CHATROOM_SUBSCRIBE_PREFIX + chatroom.getId(),
+                    payload.mapToBasePayload()
+            );
+        });
+    }
 }
