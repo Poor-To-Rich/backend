@@ -29,7 +29,11 @@ import com.poortorich.chat.response.ChatroomResponse;
 import com.poortorich.chat.response.ChatroomRoleResponse;
 import com.poortorich.chat.response.ChatroomUpdateResponse;
 import com.poortorich.chat.response.ChatroomsResponse;
+<<<<<<< HEAD
 import com.poortorich.chat.response.HostDelegationResponse;
+=======
+import com.poortorich.chat.response.SearchParticipantsResponse;
+>>>>>>> dev
 import com.poortorich.chat.service.ChatMessageService;
 import com.poortorich.chat.service.ChatParticipantService;
 import com.poortorich.chat.service.ChatroomService;
@@ -39,7 +43,7 @@ import com.poortorich.chat.util.mapper.ChatMessageMapper;
 import com.poortorich.chat.util.provider.ChatPaginationProvider;
 import com.poortorich.chat.validator.ChatParticipantValidator;
 import com.poortorich.chat.validator.ChatroomValidator;
-import com.poortorich.chatnotice.request.ChatNoticeUpdateRequest;
+import com.poortorich.chatnotice.request.ChatNoticeStatusUpdateRequest;
 import com.poortorich.s3.service.FileUploadService;
 import com.poortorich.tag.service.TagService;
 import com.poortorich.user.entity.User;
@@ -160,7 +164,7 @@ public class ChatFacade {
                 .build();
     }
 
-    public void updateNoticeStatus(String username, Long chatroomId, ChatNoticeUpdateRequest request) {
+    public void updateNoticeStatus(String username, Long chatroomId, ChatNoticeStatusUpdateRequest request) {
         Chatroom chatroom = chatroomService.findById(chatroomId);
         chatParticipantService.updateNoticeStatus(username, chatroom, request);
     }
@@ -316,6 +320,22 @@ public class ChatFacade {
                 .newHostUserId(nextHost.getUser().getId())
                 .prevHost(currentHost)
                 .newHost(nextHost)
+                .build();
+    }
+
+    @Transactional(readOnly = true)
+    public SearchParticipantsResponse searchParticipantsByNickname(String username, Long chatroomId, String nickname) {
+        User user = userService.findUserByUsername(username);
+        Chatroom chatroom = chatroomService.findById(chatroomId);
+        chatParticipantValidator.validateIsHost(user, chatroom);
+
+        List<ChatParticipant> chatParticipants = chatParticipantService.searchParticipantsByNickname(chatroom, nickname);
+
+        return SearchParticipantsResponse.builder()
+                .members(chatParticipants.stream()
+                        .filter(chatParticipant -> chatParticipant.getRole().equals(ChatroomRole.MEMBER))
+                        .map(ChatBuilder::buildProfileResponse)
+                        .toList())
                 .build();
     }
 }

@@ -52,6 +52,7 @@ public class ChatMessageService {
                 .messageType(chatMessage.getMessageType())
                 .content(chatMessage.getContent())
                 .sentAt(chatMessage.getSentAt())
+                .type(chatMessage.getType())
                 .build();
     }
 
@@ -67,6 +68,7 @@ public class ChatMessageService {
                 .messageType(chatMessage.getMessageType())
                 .content(chatMessage.getContent())
                 .sentAt(chatMessage.getSentAt())
+                .type(chatMessage.getType())
                 .build();
     }
 
@@ -140,6 +142,7 @@ public class ChatMessageService {
                 .messageType(chatMessage.getMessageType())
                 .content(chatMessage.getContent())
                 .sentAt(chatMessage.getSentAt())
+                .type(chatMessage.getType())
                 .build();
     }
 

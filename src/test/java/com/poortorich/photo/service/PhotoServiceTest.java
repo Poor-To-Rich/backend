@@ -13,8 +13,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class PhotoServiceTest {
@@ -43,5 +46,25 @@ class PhotoServiceTest {
         assertThat(savedPhoto.getUser()).isEqualTo(user);
         assertThat(savedPhoto.getChatroom()).isEqualTo(chatroom);
         assertThat(savedPhoto.getPhotoUrl()).isEqualTo(photoUrl);
+    }
+
+    @Test
+    @DisplayName("최신 사진 목록 조회 성공")
+    void getPreviewPhotosSuccess() {
+        Chatroom chatroom = Chatroom.builder().build();
+        Photo photo1 = Photo.builder().build();
+        Photo photo2 = Photo.builder().build();
+        Photo photo3 = Photo.builder().build();
+        Photo photo4 = Photo.builder().build();
+        Photo photo5 = Photo.builder().build();
+
+        when(photoRepository.findTop10ByChatroomOrderByCreatedDateDescIdAsc(chatroom))
+                .thenReturn(List.of(photo1, photo2, photo3, photo4, photo5));
+
+        List<Photo> result = photoService.getPreviewPhotos(chatroom);
+
+        assertThat(result).isNotNull();
+        assertThat(result).hasSize(5);
+        assertThat(result).containsExactly(photo1, photo2, photo3, photo4, photo5);
     }
 }

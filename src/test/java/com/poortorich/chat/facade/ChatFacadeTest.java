@@ -14,11 +14,12 @@ import com.poortorich.chat.response.ChatroomDetailsResponse;
 import com.poortorich.chat.response.ChatroomInfoResponse;
 import com.poortorich.chat.response.ChatroomRoleResponse;
 import com.poortorich.chat.response.ChatroomsResponse;
+import com.poortorich.chat.response.SearchParticipantsResponse;
 import com.poortorich.chat.service.ChatMessageService;
 import com.poortorich.chat.service.ChatParticipantService;
 import com.poortorich.chat.service.ChatroomService;
 import com.poortorich.chat.validator.ChatParticipantValidator;
-import com.poortorich.chatnotice.request.ChatNoticeUpdateRequest;
+import com.poortorich.chatnotice.request.ChatNoticeStatusUpdateRequest;
 import com.poortorich.s3.service.FileUploadService;
 import com.poortorich.tag.service.TagService;
 import com.poortorich.user.entity.User;
@@ -292,7 +293,7 @@ class ChatFacadeTest {
     void updateNoticeStatusSuccess() {
         String username = "testUser";
         Long chatroomId = 1L;
-        ChatNoticeUpdateRequest request = new ChatNoticeUpdateRequest("DEFAULT");
+        ChatNoticeStatusUpdateRequest request = new ChatNoticeStatusUpdateRequest("DEFAULT");
 
         when(chatroomService.findById(chatroomId)).thenReturn(chatroom);
 
@@ -339,5 +340,65 @@ class ChatFacadeTest {
         assertThat(response.getMembers().get(1).getUserId()).isEqualTo(memberUser.getId());
         assertThat(response.getMembers().get(1).getNickname()).isEqualTo(memberUser.getNickname());
         assertThat(response.getMembers().get(1).getIsHost()).isFalse();
+    }
+
+    @Test
+    @DisplayName("참여 인원 검색 성공")
+    void searchParticipantsByNicknameSuccess() {
+        String username = "testUser";
+        Long chatroomId = 1L;
+        String keyword = "nick";
+        User user = User.builder().username(username).build();
+
+        User user1 = User.builder()
+                .id(1L)
+                .profileImage("profileImage.com")
+                .nickname("nick1")
+                .build();
+        User user2 = User.builder()
+                .id(2L)
+                .profileImage("profileImage.com")
+                .nickname("nick2")
+                .build();
+        User user3 = User.builder()
+                .id(3L)
+                .profileImage("profileImage.com")
+                .nickname("nick3")
+                .build();
+
+        ChatParticipant member1 = ChatParticipant.builder()
+                .user(user1)
+                .chatroom(chatroom)
+                .role(ChatroomRole.MEMBER)
+                .rankingStatus(RankingStatus.NONE)
+                .build();
+        ChatParticipant member2 = ChatParticipant.builder()
+                .user(user2)
+                .chatroom(chatroom)
+                .role(ChatroomRole.MEMBER)
+                .rankingStatus(RankingStatus.NONE)
+                .build();
+        ChatParticipant member3 = ChatParticipant.builder()
+                .user(user3)
+                .chatroom(chatroom)
+                .role(ChatroomRole.MEMBER)
+                .rankingStatus(RankingStatus.NONE)
+                .build();
+
+        when(userService.findUserByUsername(username)).thenReturn(user);
+        when(chatroomService.findById(chatroomId)).thenReturn(chatroom);
+        when(chatParticipantService.searchParticipantsByNickname(chatroom, keyword))
+                .thenReturn(List.of(member1, member2, member3));
+
+        SearchParticipantsResponse result = chatFacade.searchParticipantsByNickname(username, chatroomId, keyword);
+
+        assertThat(result).isNotNull();
+        assertThat(result.getMembers()).hasSize(3);
+        assertThat(result.getMembers().get(0).getUserId()).isEqualTo(user1.getId());
+        assertThat(result.getMembers().get(0).getNickname()).isEqualTo(user1.getNickname());
+        assertThat(result.getMembers().get(1).getUserId()).isEqualTo(user2.getId());
+        assertThat(result.getMembers().get(1).getNickname()).isEqualTo(user2.getNickname());
+        assertThat(result.getMembers().get(2).getUserId()).isEqualTo(user3.getId());
+        assertThat(result.getMembers().get(2).getNickname()).isEqualTo(user3.getNickname());
     }
 }

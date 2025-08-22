@@ -7,6 +7,8 @@ import com.poortorich.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class PhotoService {
@@ -20,5 +22,9 @@ public class PhotoService {
                 .photoUrl(photoUrl)
                 .build();
         photoRepository.save(photo);
+    }
+
+    public List<Photo> getPreviewPhotos(Chatroom chatroom) {
+        return photoRepository.findTop10ByChatroomOrderByCreatedDateDescIdAsc(chatroom);
     }
 }

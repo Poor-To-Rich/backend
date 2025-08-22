@@ -4,12 +4,11 @@ import com.poortorich.chat.entity.ChatParticipant;
 import com.poortorich.chat.entity.Chatroom;
 import com.poortorich.chat.entity.enums.ChatroomRole;
 import com.poortorich.chat.entity.enums.NoticeStatus;
-import com.poortorich.chat.realtime.payload.request.enums.NoticeType;
 import com.poortorich.chat.repository.ChatParticipantRepository;
 import com.poortorich.chat.response.ChatParticipantProfile;
 import com.poortorich.chat.response.enums.ChatResponse;
 import com.poortorich.chat.util.ChatBuilder;
-import com.poortorich.chatnotice.request.ChatNoticeUpdateRequest;
+import com.poortorich.chatnotice.request.ChatNoticeStatusUpdateRequest;
 import com.poortorich.global.exceptions.BadRequestException;
 import com.poortorich.global.exceptions.NotFoundException;
 import com.poortorich.user.entity.User;
@@ -33,7 +32,7 @@ public class ChatParticipantService {
         chatParticipantRepository.save(chatParticipant);
     }
 
-    public void updateNoticeStatus(String username, Chatroom chatroom, ChatNoticeUpdateRequest request) {
+    public void updateNoticeStatus(String username, Chatroom chatroom, ChatNoticeStatusUpdateRequest request) {
         ChatParticipant chatParticipant = findByUsernameAndChatroom(username, chatroom);
         validateNoticeStatus(chatParticipant.getNoticeStatus());
         chatParticipant.updateNoticeStatus(request.parseStatus());
@@ -137,17 +136,8 @@ public class ChatParticipantService {
                 .toList();
     }
 
-    public NoticeStatus updateAllNoticeStatus(List<ChatParticipant> chatParticipants, NoticeType noticeType) {
-        NoticeStatus noticeStatus = findByNoticeType(noticeType);
+    public void updateAllNoticeStatus(List<ChatParticipant> chatParticipants, NoticeStatus noticeStatus) {
         chatParticipants.forEach(chatParticipant -> chatParticipant.updateNoticeStatus(noticeStatus));
-        return noticeStatus;
-    }
-
-    private NoticeStatus findByNoticeType(NoticeType noticeType) {
-        return switch (noticeType) {
-            case CREATE, UPDATE -> NoticeStatus.DEFAULT;
-            case DELETE -> NoticeStatus.PERMANENT_HIDDEN;
-        };
     }
 
     public List<ChatParticipant> getAllParticipants(Chatroom chatroom) {
@@ -168,5 +158,13 @@ public class ChatParticipantService {
     public void delegateHost(ChatParticipant currentHost, ChatParticipant nextHost) {
         currentHost.updateChatroomRole(ChatroomRole.MEMBER);
         nextHost.updateChatroomRole(ChatroomRole.HOST);
+    }
+
+    public List<ChatParticipant> searchParticipantsByNickname(Chatroom chatroom, String nickname) {
+        if (nickname == null || nickname.isEmpty()) {
+            return chatParticipantRepository.findAllOrderedParticipants(chatroom);
+        }
+
+        return chatParticipantRepository.searchByChatroomAndNickname(chatroom, nickname);
     }
 }
