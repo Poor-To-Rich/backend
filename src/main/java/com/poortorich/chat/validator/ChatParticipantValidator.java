@@ -43,10 +43,9 @@ public class ChatParticipantValidator {
         }
     }
 
-    // TODO: 채팅방에서 역할이 멤버가 아니라면 예외를 발생
     public void validateIsMember(ChatParticipant chatParticipant) {
         if (!ChatroomRole.MEMBER.equals(chatParticipant.getRole())) {
-            throw new BadRequestException(ChatResponse.CHAT_PARTICIPANT_NOT_MEMBER);
+            throw new BadRequestException(ChatResponse.CHAT_PARTICIPANT_ROLE_NOT_MEMBER);
         }
     }
 

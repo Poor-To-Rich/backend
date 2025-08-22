@@ -50,7 +50,7 @@ public class ChatResponseMessage {
     public static final String MESSAGE_TYPE_REQUIRED = "메시지 타입은 필수값입니다.";
     public static final String MARK_ALL_CHATROOM_AS_READ_SUCCESS = "참여중인 채팅방의 메세지를 모두 읽었습니다.";
     public static final String TARGET_USER_ID_IS_NULL = "방장을 위임할 회원 아이디는 필수 값입니다.";
-    public static final String CHAT_PARTICIPANT_NOT_MEMBER = "채팅방 멤버가 아닙니다.";
+    public static final String CHAT_PARTICIPANT_ROLE_NOT_MEMBER = "이 기능은 일반 멤버만 사용/적용할 수 있습니다.";
     public static final String HOST_DELEGATION_SUCCESS = "방장이 성공적으로 위임되었습니다.";
 
     private ChatResponseMessage() {
