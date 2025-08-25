@@ -12,6 +12,7 @@ import com.poortorich.chat.service.UnreadChatMessageService;
 import com.poortorich.tag.service.TagService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 @Component
 @RequiredArgsConstructor
@@ -32,6 +33,7 @@ public class ChatroomLeaveManager {
                 .mapToBasePayload();
     }
 
+    @Transactional
     private BasePayload getClosedMessageOrDeleteAll(PayloadContext payloadContext) {
         Chatroom chatroom = payloadContext.chatroom();
         ChatParticipant participant = payloadContext.chatParticipant();
