@@ -167,7 +167,7 @@ public class ChatMessageService {
         return chatMessageRepository.findByChatroomAndIdLessThanEqualAndSentAtAfterOrderByIdDesc(
                 context.chatroom(),
                 context.cursor(),
-                context.chatParticipant().getCreatedDate(),
+                context.chatParticipant().getJoinAt(),
                 context.pageRequest());
     }
 
