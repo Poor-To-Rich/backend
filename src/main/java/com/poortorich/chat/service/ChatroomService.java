@@ -10,11 +10,12 @@ import com.poortorich.chat.response.enums.ChatResponse;
 import com.poortorich.chat.util.ChatBuilder;
 import com.poortorich.global.exceptions.NotFoundException;
 import com.poortorich.user.entity.User;
-import java.util.Comparator;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Comparator;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -89,5 +90,9 @@ public class ChatroomService {
     @Transactional
     public void deleteById(Long chatroomId) {
         chatroomRepository.deleteById(chatroomId);
+    }
+
+    public Long getFirstChatroomIdByUser(User user) {
+        return chatroomRepository.findFirstChatroomIdByUser(user);
     }
 }
