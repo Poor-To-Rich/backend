@@ -19,6 +19,8 @@ import com.poortorich.chat.realtime.payload.response.UserChatMessagePayload;
 import com.poortorich.chat.realtime.payload.response.UserEnterResponsePayload;
 import com.poortorich.chat.realtime.payload.response.UserLeaveResponsePayload;
 import com.poortorich.chat.repository.ChatMessageRepository;
+import com.poortorich.chat.response.enums.ChatResponse;
+import com.poortorich.global.exceptions.NotFoundException;
 import com.poortorich.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
@@ -221,5 +223,10 @@ public class ChatMessageService {
                 .type(kickMessage.getType())
                 .sentAt(kickMessage.getSentAt())
                 .build();
+    }
+
+    public ChatMessage getLastMessage(Chatroom chatroom) {
+        return chatMessageRepository.findTopByChatroomOrderBySentAtDesc(chatroom)
+                .orElseThrow(() -> new NotFoundException(ChatResponse.CHAT_MESSAGE_NOT_FOUND));
     }
 }

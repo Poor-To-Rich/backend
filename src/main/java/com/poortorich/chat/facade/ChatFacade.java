@@ -6,6 +6,7 @@ import com.poortorich.chat.entity.Chatroom;
 import com.poortorich.chat.entity.enums.ChatroomRole;
 import com.poortorich.chat.model.ChatMessageResponse;
 import com.poortorich.chat.model.ChatPaginationContext;
+import com.poortorich.chat.model.ChatroomPaginationContext;
 import com.poortorich.chat.model.UserEnterChatroomResult;
 import com.poortorich.chat.realtime.payload.response.UserEnterProfileResponsePayload;
 import com.poortorich.chat.request.ChatroomCreateRequest;
@@ -31,6 +32,8 @@ import com.poortorich.chat.response.ChatroomUpdateResponse;
 import com.poortorich.chat.response.ChatroomsResponse;
 import com.poortorich.chat.response.HostDelegationResponse;
 import com.poortorich.chat.response.KickChatParticipantResponse;
+import com.poortorich.chat.response.MyChatroom;
+import com.poortorich.chat.response.MyChatroomsResponse;
 import com.poortorich.chat.response.SearchParticipantsResponse;
 import com.poortorich.chat.service.ChatMessageService;
 import com.poortorich.chat.service.ChatParticipantService;
@@ -38,6 +41,7 @@ import com.poortorich.chat.service.ChatroomService;
 import com.poortorich.chat.util.ChatBuilder;
 import com.poortorich.chat.util.detector.RankingStatusChangeDetector;
 import com.poortorich.chat.util.mapper.ChatMessageMapper;
+import com.poortorich.chat.util.mapper.ChatroomMapper;
 import com.poortorich.chat.util.provider.ChatPaginationProvider;
 import com.poortorich.chat.validator.ChatParticipantValidator;
 import com.poortorich.chat.validator.ChatroomValidator;
@@ -66,6 +70,7 @@ public class ChatFacade {
     private final TagService tagService;
 
     private final ChatMessageMapper chatMessageMapper;
+    private final ChatroomMapper chatroomMapper;
     private final ChatPaginationProvider paginationProvider;
     private final ChatroomValidator chatroomValidator;
     private final ChatParticipantValidator chatParticipantValidator;
@@ -268,7 +273,7 @@ public class ChatFacade {
     @Transactional
     public ChatMessagePageResponse getChatMessages(String username, Long chatroomId, Long cursor, Long pageSize) {
         User user = userService.findUserByUsername(username);
-        ChatPaginationContext context = paginationProvider.getContext(username, chatroomId, cursor, pageSize);
+        ChatPaginationContext context = paginationProvider.getChatMessagesContext(username, chatroomId, cursor, pageSize);
         chatParticipantValidator.validateIsParticipate(user, context.chatroom());
 
         Slice<ChatMessage> chatMessages = chatMessageService.getChatMessages(context);
@@ -288,6 +293,25 @@ public class ChatFacade {
                                 ChatParticipantProfile::getUserId,
                                 profile -> profile
                         )))
+                .build();
+    }
+
+    @Transactional
+    public MyChatroomsResponse getMyChatrooms(String username, Long cursor) {
+        ChatroomPaginationContext context = paginationProvider.getMyChatroomsContext(username, cursor);
+
+        Slice<ChatParticipant> participants = chatParticipantService.getMyParticipants(context);
+
+        Long nextCursor = paginationProvider.getChatroomNextCursor(participants);
+
+        List<MyChatroom> myChatrooms = participants.stream()
+                .map(chatroomMapper::mapToMyChatroom)
+                .toList();
+
+        return MyChatroomsResponse.builder()
+                .nextCursor(nextCursor)
+                .hasNext(participants.hasNext())
+                .chatrooms(myChatrooms)
                 .build();
     }
 
