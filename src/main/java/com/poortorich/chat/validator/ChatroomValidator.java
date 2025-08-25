@@ -4,6 +4,7 @@ import com.poortorich.chat.entity.ChatParticipant;
 import com.poortorich.chat.entity.Chatroom;
 import com.poortorich.chat.entity.enums.ChatroomRole;
 import com.poortorich.chat.repository.ChatParticipantRepository;
+import com.poortorich.chat.repository.ChatroomRepository;
 import com.poortorich.chat.response.enums.ChatResponse;
 import com.poortorich.global.exceptions.BadRequestException;
 import com.poortorich.global.exceptions.ConflictException;
@@ -20,8 +21,13 @@ import java.util.Optional;
 public class ChatroomValidator {
 
     private final ChatParticipantRepository chatParticipantRepository;
+    private final ChatroomRepository chatroomRepository;
 
     public void validateEnter(User user, Chatroom chatroom) {
+        if (chatroom.getIsClosed()) {
+            throw new BadRequestException(ChatResponse.CHATROOM_IS_CLOSED);
+        }
+
         Optional<ChatParticipant> chatParticipant = chatParticipantRepository.findByUserAndChatroom(user, chatroom);
         if (chatParticipant.isPresent()) {
             if (chatParticipant.get().getRole().equals(ChatroomRole.BANNED)) {
