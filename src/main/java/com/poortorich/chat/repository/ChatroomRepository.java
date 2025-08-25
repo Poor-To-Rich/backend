@@ -14,63 +14,74 @@ import java.util.List;
 public interface ChatroomRepository extends JpaRepository<Chatroom, Long> {
 
     @Query("""
-        SELECT c
-          FROM Chatroom c
-          JOIN ChatParticipant cp
-            ON cp.chatroom = c
-         WHERE cp.user = :user
-           AND cp.role = :role
-    """)
+                SELECT c
+                  FROM Chatroom c
+                  JOIN ChatParticipant cp
+                    ON cp.chatroom = c
+                 WHERE cp.user = :user
+                   AND cp.role = :role
+            """)
     List<Chatroom> findChatroomByUserAndRole(@Param("user") User user, @Param("role") ChatroomRole role);
 
     @Query("""
-        SELECT c
-          FROM Chatroom c
-          LEFT JOIN ChatMessage cm ON cm.chatroom = c
-          LEFT JOIN Like l ON l.chatroom = c AND l.likeStatus = true
-          LEFT JOIN ChatParticipant cp ON cp.chatroom = c AND cp.isParticipated = true
-        GROUP BY c.id
-        ORDER BY MAX(cm.sentAt) DESC,
-                 COUNT(DISTINCT l.id) DESC,
-                 COUNT(DISTINCT cp.id) DESC,
-                 c.createdDate DESC,
-                 c.id ASC
-    """)
+                SELECT c
+                  FROM Chatroom c
+                  LEFT JOIN ChatMessage cm ON cm.chatroom = c
+                  LEFT JOIN Like l ON l.chatroom = c AND l.likeStatus = true
+                  LEFT JOIN ChatParticipant cp ON cp.chatroom = c AND cp.isParticipated = true
+                GROUP BY c.id
+                ORDER BY MAX(cm.sentAt) DESC,
+                         COUNT(DISTINCT l.id) DESC,
+                         COUNT(DISTINCT cp.id) DESC,
+                         c.createdDate DESC,
+                         c.id ASC
+            """)
     List<Chatroom> findChatroomsSortByUpdatedAt();
 
     @Query("""
-        SELECT c
-          FROM Chatroom c
-        ORDER BY c.createdDate DESC
-    """)
+                SELECT c
+                  FROM Chatroom c
+                ORDER BY c.createdDate DESC
+            """)
     List<Chatroom> findChatroomsSortByCreatedAt();
 
     @Query("""
-        SELECT c
-          FROM Chatroom c
-          LEFT JOIN Like l ON l.chatroom = c AND l.likeStatus = true
-          LEFT JOIN ChatParticipant cp ON cp.chatroom = c AND cp.isParticipated = true
-        GROUP BY c.id
-        ORDER BY COUNT(DISTINCT l.id) DESC,
-                 COUNT(DISTINCT cp.id) DESC,
-                 c.createdDate DESC,
-                 c.id ASC
-    """)
+                SELECT c
+                  FROM Chatroom c
+                  LEFT JOIN Like l ON l.chatroom = c AND l.likeStatus = true
+                  LEFT JOIN ChatParticipant cp ON cp.chatroom = c AND cp.isParticipated = true
+                GROUP BY c.id
+                ORDER BY COUNT(DISTINCT l.id) DESC,
+                         COUNT(DISTINCT cp.id) DESC,
+                         c.createdDate DESC,
+                         c.id ASC
+            """)
     List<Chatroom> findChatroomsSortByLike();
 
     @Query("""
-        SELECT DISTINCT c
-          FROM Chatroom c
-          LEFT JOIN Tag t ON t.chatroom = c
-         INNER JOIN ChatParticipant cp ON cp.chatroom = c AND cp.role = 'HOST'
-        WHERE :keyword <> ''
-          AND (
-                 c.title LIKE CONCAT('%', :keyword, '%')
-              OR c.description LIKE CONCAT('%', :keyword, '%')
-              OR cp.user.nickname LIKE CONCAT('%', :keyword, '%')
-              OR (t.name IS NOT NULL AND t.name LIKE CONCAT('%', :keyword, '%'))
-          )
-        GROUP BY c.id
-    """)
+                SELECT DISTINCT c
+                  FROM Chatroom c
+                  LEFT JOIN Tag t ON t.chatroom = c
+                 INNER JOIN ChatParticipant cp ON cp.chatroom = c AND cp.role = 'HOST'
+                WHERE :keyword <> ''
+                  AND (
+                         c.title LIKE CONCAT('%', :keyword, '%')
+                      OR c.description LIKE CONCAT('%', :keyword, '%')
+                      OR cp.user.nickname LIKE CONCAT('%', :keyword, '%')
+                      OR (t.name IS NOT NULL AND t.name LIKE CONCAT('%', :keyword, '%'))
+                  )
+                GROUP BY c.id
+            """)
     List<Chatroom> searchChatrooms(String keyword);
+
+    @Query("""
+            SELECT c.id
+            FROM Chatroom c
+            JOIN ChatParticipant cp ON cp.chatroom = c
+            WHERE cp.user = :user
+            AND cp.isParticipated = true
+            ORDER BY c.id ASC
+            LIMIT 1
+            """)
+    Long findFirstChatroomIdByUser(@Param("user") User user);
 }
