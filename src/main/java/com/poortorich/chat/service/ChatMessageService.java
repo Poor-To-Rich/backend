@@ -3,6 +3,7 @@ package com.poortorich.chat.service;
 import com.poortorich.chat.entity.ChatMessage;
 import com.poortorich.chat.entity.ChatParticipant;
 import com.poortorich.chat.entity.Chatroom;
+import com.poortorich.chat.entity.enums.ChatMessageType;
 import com.poortorich.chat.model.ChatPaginationContext;
 import com.poortorich.chat.realtime.builder.RankingStatusChatMessageBuilder;
 import com.poortorich.chat.realtime.builder.SystemMessageBuilder;
@@ -30,6 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -221,5 +223,12 @@ public class ChatMessageService {
                 .type(kickMessage.getType())
                 .sentAt(kickMessage.getSentAt())
                 .build();
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<ChatMessage> getLastMessage(Chatroom chatroom) {
+        return chatMessageRepository.findTopByChatroomAndTypeInOrderBySentAtDesc(
+                chatroom,
+                List.of(ChatMessageType.CHAT_MESSAGE, ChatMessageType.RANKING_MESSAGE));
     }
 }

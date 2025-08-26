@@ -82,4 +82,8 @@ public class UnreadChatMessageService {
     public void deleteAllByChatroom(Chatroom chatroom) {
         unreadChatMessageRepository.deleteAllByChatroom(chatroom);
     }
+
+    public Long countByUnreadChatMessage(User user, Chatroom chatroom) {
+        return unreadChatMessageRepository.countByUserAndChatroom(user, chatroom);
+    }
 }
