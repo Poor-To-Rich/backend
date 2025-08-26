@@ -2,6 +2,7 @@ package com.poortorich.photo.util;
 
 import com.poortorich.photo.entity.Photo;
 import com.poortorich.photo.response.AllPhotosResponse;
+import com.poortorich.photo.response.PhotoCursorResponse;
 import com.poortorich.photo.response.PhotoInfoResponse;
 import com.poortorich.photo.response.PreviewPhotosResponse;
 import lombok.AccessLevel;
@@ -37,11 +38,18 @@ public class PhotoBuilder {
     ) {
         return AllPhotosResponse.builder()
                 .hasNext(hasNext)
-                .nextDate(nextDate)
-                .nextId(nextId)
+                .nextCursor(buildPhotoCursorResponse(nextDate, nextId))
+                .photoCount((long) photos.size())
                 .photos(photos.stream()
                         .map(PhotoBuilder::buildPhotoInfoByDateResponse)
                         .toList())
+                .build();
+    }
+
+    private static PhotoCursorResponse buildPhotoCursorResponse(String nextDate, Long nextId) {
+        return PhotoCursorResponse.builder()
+                .date(nextDate)
+                .id(nextId)
                 .build();
     }
 

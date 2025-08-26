@@ -216,7 +216,7 @@ class PhotoFacadeTest {
 
         assertThat(result).isNotNull();
         assertThat(result.getHasNext()).isTrue();
-        assertThat(result.getNextId()).isEqualTo(slice.getContent().getLast().getId());
+        assertThat(result.getNextCursor().getId()).isEqualTo(slice.getContent().getLast().getId());
         assertThat(result.getPhotos()).hasSize(3);
         assertThat(result.getPhotos().get(0).getPhotoId()).isEqualTo(photo3.getId());
         assertThat(result.getPhotos().get(0).getPhotoUrl()).isEqualTo(photo3.getPhotoUrl());
