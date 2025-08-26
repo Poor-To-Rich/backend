@@ -8,6 +8,8 @@ import com.poortorich.chat.model.ChatMessageResponse;
 import com.poortorich.chat.model.ChatPaginationContext;
 import com.poortorich.chat.model.ChatroomPaginationContext;
 import com.poortorich.chat.model.UserEnterChatroomResult;
+import com.poortorich.chat.realtime.event.chatroom.ChatroomUpdateEvent;
+import com.poortorich.chat.realtime.event.chatroom.ParticipantUpdateEvent;
 import com.poortorich.chat.realtime.event.chatroom.detector.ChatroomUpdateDetector;
 import com.poortorich.chat.realtime.payload.response.UserEnterProfileResponsePayload;
 import com.poortorich.chat.request.ChatroomCreateRequest;
@@ -52,6 +54,7 @@ import com.poortorich.tag.service.TagService;
 import com.poortorich.user.entity.User;
 import com.poortorich.user.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -77,6 +80,7 @@ public class ChatFacade {
     private final ChatParticipantValidator chatParticipantValidator;
     private final RankingStatusChangeDetector rankingStatusChangeDetector;
     private final ChatroomUpdateDetector chatroomUpdateDetector;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
     public ChatroomCreateResponse createChatroom(
@@ -185,6 +189,8 @@ public class ChatFacade {
         chatroomValidator.validatePassword(chatroom, chatroomEnterRequest.getChatroomPassword());
 
         ChatParticipant newParticipant = chatParticipantService.enterUser(user, chatroom);
+
+        eventPublisher.publishEvent(new ChatroomUpdateEvent(chatroom));
         return UserEnterChatroomResult.builder()
                 .apiResponse(ChatroomEnterResponse.builder().chatroomId(chatroomId).build())
                 .broadcastPayload(UserEnterProfileResponsePayload.builder()
@@ -242,6 +248,7 @@ public class ChatFacade {
         } else {
             chatParticipant.leave();
         }
+        eventPublisher.publishEvent(new ChatroomUpdateEvent(chatroom));
         return ChatroomLeaveResponse.builder().deleteChatroomId(chatroomId).build();
     }
 
@@ -259,6 +266,7 @@ public class ChatFacade {
             } else {
                 chatParticipant.leave();
             }
+            eventPublisher.publishEvent(new ChatroomUpdateEvent(chatroom));
         }
 
         return ChatroomLeaveAllResponse.builder()
@@ -340,6 +348,9 @@ public class ChatFacade {
 
         chatParticipantService.delegateHost(currentHost, nextHost);
 
+        eventPublisher.publishEvent(new ParticipantUpdateEvent(nextHost));
+        eventPublisher.publishEvent(new ParticipantUpdateEvent(currentHost));
+        
         return HostDelegationResponse.builder()
                 .newHostUserId(nextHost.getUser().getId())
                 .prevHost(currentHost)
@@ -374,6 +385,7 @@ public class ChatFacade {
 
         chatParticipantService.kickChatParticipant(kickChatParticipant);
 
+        eventPublisher.publishEvent(new ChatroomUpdateEvent(host.getChatroom()));
         return KickChatParticipantResponse.builder()
                 .kickUserId(kickChatParticipant.getUser().getId())
                 .kickChatParticipant(kickChatParticipant)

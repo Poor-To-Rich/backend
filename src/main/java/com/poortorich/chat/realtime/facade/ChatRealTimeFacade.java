@@ -5,6 +5,8 @@ import com.poortorich.chat.entity.Chatroom;
 import com.poortorich.chat.entity.enums.ChatMessageType;
 import com.poortorich.chat.model.MarkAllChatroomAsReadResult;
 import com.poortorich.chat.realtime.collect.ChatPayloadCollector;
+import com.poortorich.chat.realtime.event.chatroom.ChatroomUpdateEvent;
+import com.poortorich.chat.realtime.event.chatroom.UserChatroomUpdateEvent;
 import com.poortorich.chat.realtime.event.user.HostDelegationEvent;
 import com.poortorich.chat.realtime.model.PayloadContext;
 import com.poortorich.chat.realtime.payload.request.ChatMessageRequestPayload;
@@ -87,6 +89,8 @@ public class ChatRealTimeFacade {
         UserChatMessagePayload chatMessage = chatMessageService
                 .saveUserChatMessage(chatParticipant, chatMembers, chatMessagePayload);
 
+        eventPublisher.publishEvent(new ChatroomUpdateEvent(chatroom));
+
         return chatMessage.mapToBasePayload();
     }
 
@@ -123,6 +127,8 @@ public class ChatRealTimeFacade {
 
         List<BasePayload> broadcastPayloads = unreadChatMessageService.markAllMessageAsRead(contexts);
 
+        eventPublisher.publishEvent(new UserChatroomUpdateEvent(contexts.getFirst().user()));
+        
         return MarkAllChatroomAsReadResult.builder()
                 .apiResponse(MarkAllChatroomAsReadResponse.builder().chatroomIds(chatroomIds).build())
                 .broadcastPayloads(broadcastPayloads)
