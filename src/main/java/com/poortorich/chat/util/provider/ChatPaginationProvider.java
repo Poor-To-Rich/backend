@@ -72,9 +72,9 @@ public class ChatPaginationProvider {
         return null;
     }
 
-    public Long getChatroomNextCursor(Slice<ChatParticipant> chatrooms) {
-        if (chatrooms.hasContent()) {
-            return chatrooms.getContent().getLast().getId();
+    public Long getChatroomNextCursor(Slice<ChatParticipant> participants) {
+        if (participants.hasContent()) {
+            return participants.getContent().getLast().getChatroom().getId() + 1;
         }
         return null;
     }

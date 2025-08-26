@@ -11,6 +11,8 @@ import com.poortorich.chat.service.UnreadChatMessageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.Optional;
+
 @Component
 @RequiredArgsConstructor
 public class ChatroomMapper {
@@ -24,7 +26,7 @@ public class ChatroomMapper {
     public MyChatroom mapToMyChatroom(ChatParticipant participant) {
         Chatroom chatroom = participant.getChatroom();
 
-        ChatMessage lastMessage = chatMessageService.getLastMessage(participant.getChatroom());
+        Optional<ChatMessage> lastMessage = chatMessageService.getLastMessage(participant.getChatroom());
         Long unreadMessageCount = unreadChatMessageService.countByUnreadChatMessage(
                 participant.getUser(),
                 participant.getChatroom());
@@ -35,8 +37,8 @@ public class ChatroomMapper {
                 .isHost(ChatroomRole.HOST.equals(participant.getRole()))
                 .chatroomTitle(chatroom.getTitle())
                 .currentMemberCount(chatParticipantService.countByChatroom(chatroom))
-                .lastMessage(contentMapper.mapToContent(lastMessage))
-                .lastMessageTime(lastMessage.getSentAt())
+                .lastMessage(lastMessage.map(contentMapper::mapToContent).orElse(null))
+                .lastMessageTime(lastMessage.map(ChatMessage::getSentAt).orElse(null))
                 .unreadMessageCount(unreadMessageCount)
                 .build();
     }

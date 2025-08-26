@@ -20,8 +20,6 @@ import com.poortorich.chat.realtime.payload.response.UserChatMessagePayload;
 import com.poortorich.chat.realtime.payload.response.UserEnterResponsePayload;
 import com.poortorich.chat.realtime.payload.response.UserLeaveResponsePayload;
 import com.poortorich.chat.repository.ChatMessageRepository;
-import com.poortorich.chat.response.enums.ChatResponse;
-import com.poortorich.global.exceptions.NotFoundException;
 import com.poortorich.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
@@ -33,6 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -227,10 +226,9 @@ public class ChatMessageService {
     }
 
     @Transactional(readOnly = true)
-    public ChatMessage getLastMessage(Chatroom chatroom) {
+    public Optional<ChatMessage> getLastMessage(Chatroom chatroom) {
         return chatMessageRepository.findTopByChatroomAndTypeInOrderBySentAtDesc(
-                        chatroom,
-                        List.of(ChatMessageType.CHAT_MESSAGE, ChatMessageType.RANKING_MESSAGE))
-                .orElseThrow(() -> new NotFoundException(ChatResponse.CHAT_MESSAGE_NOT_FOUND));
+                chatroom,
+                List.of(ChatMessageType.CHAT_MESSAGE, ChatMessageType.RANKING_MESSAGE));
     }
 }
