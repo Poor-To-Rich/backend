@@ -7,6 +7,7 @@ import com.poortorich.chat.entity.enums.ChatroomRole;
 import com.poortorich.chat.model.ChatMessageResponse;
 import com.poortorich.chat.model.ChatPaginationContext;
 import com.poortorich.chat.model.UserEnterChatroomResult;
+import com.poortorich.chat.realtime.event.chatroom.detector.ChatroomUpdateDetector;
 import com.poortorich.chat.realtime.payload.response.UserEnterProfileResponsePayload;
 import com.poortorich.chat.request.ChatroomCreateRequest;
 import com.poortorich.chat.request.ChatroomEnterRequest;
@@ -70,6 +71,7 @@ public class ChatFacade {
     private final ChatroomValidator chatroomValidator;
     private final ChatParticipantValidator chatParticipantValidator;
     private final RankingStatusChangeDetector rankingStatusChangeDetector;
+    private final ChatroomUpdateDetector chatroomUpdateDetector;
 
     @Transactional
     public ChatroomCreateResponse createChatroom(
@@ -211,6 +213,8 @@ public class ChatFacade {
                 chatroom.getIsRankingEnabled(),
                 chatroomUpdateRequest.getIsRankingEnabled());
 
+        chatroomUpdateDetector.detect(chatroom, chatroomUpdateRequest, newChatroomImage);
+
         chatroom.updateChatroom(chatroomUpdateRequest, newChatroomImage);
         tagService.updateTag(chatroomUpdateRequest.getHashtags(), chatroom);
 
@@ -233,7 +237,6 @@ public class ChatFacade {
         } else {
             chatParticipant.leave();
         }
-
         return ChatroomLeaveResponse.builder().deleteChatroomId(chatroomId).build();
     }
 
