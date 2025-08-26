@@ -78,4 +78,8 @@ public class UnreadChatMessageService {
                         .mapToBasePayload())
                 .toList();
     }
+
+    public void deleteAllByChatroom(Chatroom chatroom) {
+        unreadChatMessageRepository.deleteAllByChatroom(chatroom);
+    }
 }

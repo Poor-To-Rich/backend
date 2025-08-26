@@ -50,12 +50,12 @@ public class Chatroom {
     @Column(name = "is_ranking_enabled", nullable = false)
     private Boolean isRankingEnabled;
 
-    @Column(name = "is_deleted", nullable = false)
+    @Column(name = "is_closed", nullable = false)
     @Builder.Default
-    private Boolean isDeleted = Boolean.FALSE;
+    private Boolean isClosed = Boolean.FALSE;
 
-    @Column(name = "delete_at")
-    private LocalDateTime deleteAt;
+    @Column(name = "close_at")
+    private LocalDateTime closeAt;
 
     @CreationTimestamp
     @Column(name = "created_date")
@@ -75,7 +75,7 @@ public class Chatroom {
     }
 
     public void closeChatroom() {
-        isDeleted = Boolean.TRUE;
-        deleteAt = LocalDateTime.now();
+        isClosed = Boolean.TRUE;
+        closeAt = LocalDateTime.now();
     }
 }

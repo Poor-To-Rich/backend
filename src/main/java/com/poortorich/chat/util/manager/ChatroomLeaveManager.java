@@ -8,8 +8,11 @@ import com.poortorich.chat.realtime.payload.response.BasePayload;
 import com.poortorich.chat.service.ChatMessageService;
 import com.poortorich.chat.service.ChatParticipantService;
 import com.poortorich.chat.service.ChatroomService;
+import com.poortorich.chat.service.UnreadChatMessageService;
+import com.poortorich.tag.service.TagService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 @Component
 @RequiredArgsConstructor
@@ -18,9 +21,11 @@ public class ChatroomLeaveManager {
     private final ChatroomService chatroomService;
     private final ChatParticipantService chatParticipantService;
     private final ChatMessageService chatMessageService;
+    private final TagService tagService;
+    private final UnreadChatMessageService unreadChatMessageService;
 
     public BasePayload leaveChatroom(PayloadContext payloadContext) {
-        if (payloadContext.chatroom().getIsDeleted()) {
+        if (payloadContext.chatroom().getIsClosed()) {
             return getClosedMessageOrDeleteAll(payloadContext);
         }
 
@@ -28,12 +33,15 @@ public class ChatroomLeaveManager {
                 .mapToBasePayload();
     }
 
+    @Transactional
     private BasePayload getClosedMessageOrDeleteAll(PayloadContext payloadContext) {
         Chatroom chatroom = payloadContext.chatroom();
         ChatParticipant participant = payloadContext.chatParticipant();
 
         if (chatParticipantService.isAllParticipantLeft(chatroom)) {
+            unreadChatMessageService.deleteAllByChatroom(chatroom);
             chatMessageService.deleteAllByChatroom(chatroom);
+            tagService.deleteAllByChatroom(chatroom);
             chatParticipantService.deleteAllByChatroom(chatroom);
             chatroomService.deleteById(chatroom.getId());
             return null;

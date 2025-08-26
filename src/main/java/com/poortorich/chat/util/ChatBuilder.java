@@ -86,7 +86,7 @@ public class ChatBuilder {
                 .chatroomTitle(chatroom.getTitle())
                 .currentMemberCount(currentMemberCount)
                 .isRankingEnabled(chatroom.getIsRankingEnabled())
-                .isClosed(chatroom.getIsDeleted())
+                .isClosed(chatroom.getIsClosed())
                 .build();
     }
 

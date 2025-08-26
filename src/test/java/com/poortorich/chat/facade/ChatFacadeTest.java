@@ -80,7 +80,7 @@ class ChatFacadeTest {
                 .maxMemberCount(maxMemberCount)
                 .isRankingEnabled(isRankingEnabled)
                 .password(chatroomPassword)
-                .isDeleted(false)
+                .isClosed(false)
                 .createdDate(LocalDateTime.of(2025, 8, 3, 15, 24, 51))
                 .build();
     }
