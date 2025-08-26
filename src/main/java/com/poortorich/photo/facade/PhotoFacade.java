@@ -3,9 +3,12 @@ package com.poortorich.photo.facade;
 import com.poortorich.chat.entity.Chatroom;
 import com.poortorich.chat.service.ChatroomService;
 import com.poortorich.chat.validator.ChatParticipantValidator;
+import com.poortorich.global.date.constants.DatePattern;
+import com.poortorich.global.date.util.DateParser;
 import com.poortorich.global.exceptions.BadRequestException;
 import com.poortorich.photo.entity.Photo;
 import com.poortorich.photo.request.PhotoUploadRequest;
+import com.poortorich.photo.response.AllPhotosResponse;
 import com.poortorich.photo.response.PhotoUploadResponse;
 import com.poortorich.photo.response.PreviewPhotosResponse;
 import com.poortorich.photo.response.enums.PhotoResponse;
@@ -15,11 +18,15 @@ import com.poortorich.s3.service.FileUploadService;
 import com.poortorich.user.entity.User;
 import com.poortorich.user.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 @Service
 @RequiredArgsConstructor
@@ -58,5 +65,26 @@ public class PhotoFacade {
         chatParticipantValidator.validateIsParticipate(user, chatroom);
 
         return PhotoBuilder.buildPhotosResponse(photoService.getPreviewPhotos(chatroom));
+    }
+
+    @Transactional(readOnly = true)
+    public AllPhotosResponse getAllPhotosByCursor(String username, Long chatroomId, String date, Long id) {
+        User user = userService.findUserByUsername(username);
+        Chatroom chatroom = chatroomService.findById(chatroomId);
+        chatParticipantValidator.validateIsParticipate(user, chatroom);
+
+        LocalDateTime cursorDate = DateParser.parseDateTime(date);
+        Pageable pageable = PageRequest.of(0, 20);
+        Slice<Photo> photos = photoService.getAllPhotosByCursor(chatroom, cursorDate, id, pageable);
+
+        String nextDate = photos.getContent().getLast().getCreatedDate()
+                .format(DateTimeFormatter.ofPattern(DatePattern.LOCAL_DATE_TIME_PATTERN));
+
+        return PhotoBuilder.buildAllPhotosResponse(
+                photos.hasNext(),
+                photos.hasNext() ? nextDate : null,
+                photos.hasNext() ? photos.getContent().getLast().getId() : null,
+                photos.getContent()
+        );
     }
 }

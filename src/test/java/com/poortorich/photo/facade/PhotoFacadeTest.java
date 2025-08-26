@@ -4,9 +4,11 @@ import com.poortorich.chat.entity.Chatroom;
 import com.poortorich.chat.response.enums.ChatResponse;
 import com.poortorich.chat.service.ChatroomService;
 import com.poortorich.chat.validator.ChatParticipantValidator;
+import com.poortorich.global.date.util.DateParser;
 import com.poortorich.global.exceptions.BadRequestException;
 import com.poortorich.photo.entity.Photo;
 import com.poortorich.photo.request.PhotoUploadRequest;
+import com.poortorich.photo.response.AllPhotosResponse;
 import com.poortorich.photo.response.PhotoUploadResponse;
 import com.poortorich.photo.response.PreviewPhotosResponse;
 import com.poortorich.photo.response.enums.PhotoResponse;
@@ -21,6 +23,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.SliceImpl;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
@@ -166,5 +172,57 @@ class PhotoFacadeTest {
         assertThat(result.getPhotos().get(1).getPhotoUrl()).isEqualTo(photo2.getPhotoUrl());
         assertThat(result.getPhotos().get(2).getPhotoId()).isEqualTo(photo3.getId());
         assertThat(result.getPhotos().get(2).getPhotoUrl()).isEqualTo(photo3.getPhotoUrl());
+    }
+
+    @Test
+    @DisplayName("전체 사진 목록 조회 성공")
+    void getAllPhotosByCursorSuccess() {
+        String username = "test";
+        Long chatroomId = 1L;
+        String dateString = "20250826010000";
+        LocalDateTime date = DateParser.parseDateTime(dateString);
+        Long photoId = 99L;
+        Pageable pageable = PageRequest.of(0, 20);
+        User user = User.builder().username(username).build();
+        Chatroom chatroom = Chatroom.builder().id(chatroomId).build();
+        Photo photo1 = Photo.builder()
+                .id(1L)
+                .user(user)
+                .chatroom(chatroom)
+                .photoUrl("photo1.com")
+                .createdDate(LocalDateTime.of(2025, 8, 20, 0, 0, 0))
+                .build();
+        Photo photo2 = Photo.builder()
+                .id(2L)
+                .user(user)
+                .chatroom(chatroom)
+                .photoUrl("photo2.com")
+                .createdDate(LocalDateTime.of(2025, 8, 19, 0, 0, 0))
+                .build();
+        Photo photo3 = Photo.builder()
+                .id(3L)
+                .user(user)
+                .chatroom(chatroom)
+                .photoUrl("photo3.com")
+                .createdDate(LocalDateTime.of(2025, 8, 18, 0, 0, 0))
+                .build();
+        Slice<Photo> slice = new SliceImpl<>(List.of(photo3, photo2, photo1), pageable, true);
+
+        when(userService.findUserByUsername(username)).thenReturn(user);
+        when(chatroomService.findById(chatroomId)).thenReturn(chatroom);
+        when(photoService.getAllPhotosByCursor(chatroom, date, photoId, pageable)).thenReturn(slice);
+
+        AllPhotosResponse result = photoFacade.getAllPhotosByCursor(username, chatroomId, dateString, photoId);
+
+        assertThat(result).isNotNull();
+        assertThat(result.getHasNext()).isTrue();
+        assertThat(result.getNextId()).isEqualTo(slice.getContent().getLast().getId());
+        assertThat(result.getPhotos()).hasSize(3);
+        assertThat(result.getPhotos().get(0).getPhotoId()).isEqualTo(photo3.getId());
+        assertThat(result.getPhotos().get(0).getPhotoUrl()).isEqualTo(photo3.getPhotoUrl());
+        assertThat(result.getPhotos().get(1).getPhotoId()).isEqualTo(photo2.getId());
+        assertThat(result.getPhotos().get(1).getPhotoUrl()).isEqualTo(photo2.getPhotoUrl());
+        assertThat(result.getPhotos().get(2).getPhotoId()).isEqualTo(photo1.getId());
+        assertThat(result.getPhotos().get(2).getPhotoUrl()).isEqualTo(photo1.getPhotoUrl());
     }
 }
