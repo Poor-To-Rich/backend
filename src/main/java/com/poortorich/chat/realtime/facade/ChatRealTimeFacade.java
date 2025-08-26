@@ -74,6 +74,7 @@ public class ChatRealTimeFacade {
         return chatroomLeaveManager.leaveChatroom(context);
     }
 
+    @Transactional
     public BasePayload createUserChatMessage(String username, ChatMessageRequestPayload chatMessagePayload) {
         PayloadContext context = payloadCollector.getPayloadContext(
                 username,
@@ -128,7 +129,7 @@ public class ChatRealTimeFacade {
         List<BasePayload> broadcastPayloads = unreadChatMessageService.markAllMessageAsRead(contexts);
 
         eventPublisher.publishEvent(new UserChatroomUpdateEvent(contexts.getFirst().user()));
-        
+
         return MarkAllChatroomAsReadResult.builder()
                 .apiResponse(MarkAllChatroomAsReadResponse.builder().chatroomIds(chatroomIds).build())
                 .broadcastPayloads(broadcastPayloads)
