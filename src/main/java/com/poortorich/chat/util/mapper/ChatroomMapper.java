@@ -19,6 +19,8 @@ public class ChatroomMapper {
     private final ChatMessageService chatMessageService;
     private final ChatParticipantService chatParticipantService;
 
+    private final ChatMessageContentMapper contentMapper;
+
     public MyChatroom mapToMyChatroom(ChatParticipant participant) {
         Chatroom chatroom = participant.getChatroom();
 
@@ -33,7 +35,7 @@ public class ChatroomMapper {
                 .isHost(ChatroomRole.HOST.equals(participant.getRole()))
                 .chatroomTitle(chatroom.getTitle())
                 .currentMemberCount(chatParticipantService.countByChatroom(chatroom))
-                .lastMessage(lastMessage.getContent())
+                .lastMessage(contentMapper.mapToContent(lastMessage))
                 .lastMessageTime(lastMessage.getSentAt())
                 .unreadMessageCount(unreadMessageCount)
                 .build();
