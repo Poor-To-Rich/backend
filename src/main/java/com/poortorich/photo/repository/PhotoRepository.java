@@ -21,8 +21,10 @@ public interface PhotoRepository extends JpaRepository<Photo, Long> {
         SELECT p
           FROM Photo p
          WHERE p.chatroom = :chatroom
-           AND p.createdDate < :date
-            OR (p.createdDate = :date AND p.id < :id)
+           AND (
+                  p.createdDate < :date
+               OR (p.createdDate = :date AND p.id < :id)
+           )
          ORDER BY p.createdDate DESC, p.id DESC
     """)
     Slice<Photo> findAllByChatroomAndCursor(
