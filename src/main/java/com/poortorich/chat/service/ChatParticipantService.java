@@ -178,7 +178,7 @@ public class ChatParticipantService {
 
     public Slice<ChatParticipant> getMyParticipants(ChatroomPaginationContext context) {
         return chatParticipantRepository
-                .findAllByUserAndIsParticipatedTrueAndChatroom_IdGreaterThanEqualOrderByChatroom_IdAsc(
+                .findMyParticipants(
                         context.user(),
                         context.cursor(),
                         context.pageRequest());

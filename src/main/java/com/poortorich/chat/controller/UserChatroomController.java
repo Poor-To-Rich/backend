@@ -5,7 +5,6 @@ import com.poortorich.chat.response.MyChatroomsResponse;
 import com.poortorich.chat.response.enums.ChatResponse;
 import com.poortorich.global.response.BaseResponse;
 import com.poortorich.global.response.DataResponse;
-import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -25,7 +24,7 @@ public class UserChatroomController {
     @GetMapping("/me/chatrooms")
     public ResponseEntity<BaseResponse> getMyChatrooms(
             @AuthenticationPrincipal UserDetails userDetails,
-            @RequestParam @Nullable Long cursor
+            @RequestParam(required = false) Long cursor
     ) {
         MyChatroomsResponse response = chatFacade.getMyChatrooms(userDetails.getUsername(), cursor);
         return DataResponse.toResponseEntity(ChatResponse.GET_MY_CHATROOMS_SUCCESS, response);

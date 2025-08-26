@@ -128,8 +128,15 @@ public interface ChatParticipantRepository extends JpaRepository<ChatParticipant
             @Param("nickname") String nickname
     );
 
-    Slice<ChatParticipant> findAllByUserAndIsParticipatedTrueAndChatroom_IdGreaterThanEqualOrderByChatroom_IdAsc(
-            User user,
-            Long cursor,
-            Pageable pageable);
+    @Query("""
+            SELECT cp
+            FROM ChatParticipant cp
+            JOIN FETCH cp.chatroom cr
+            JOIN FETCH cp.user u
+            WHERE u = :user
+            AND cp.isParticipated = true
+            AND cr.id >= :cursor
+            ORDER BY cr.id ASC
+            """)
+    Slice<ChatParticipant> findMyParticipants(@Param("user") User user, @Param("cursor") Long cursor, Pageable pageable);
 }

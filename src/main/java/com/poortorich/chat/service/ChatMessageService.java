@@ -3,6 +3,7 @@ package com.poortorich.chat.service;
 import com.poortorich.chat.entity.ChatMessage;
 import com.poortorich.chat.entity.ChatParticipant;
 import com.poortorich.chat.entity.Chatroom;
+import com.poortorich.chat.entity.enums.ChatMessageType;
 import com.poortorich.chat.model.ChatPaginationContext;
 import com.poortorich.chat.realtime.builder.RankingStatusChatMessageBuilder;
 import com.poortorich.chat.realtime.builder.SystemMessageBuilder;
@@ -225,8 +226,11 @@ public class ChatMessageService {
                 .build();
     }
 
+    @Transactional(readOnly = true)
     public ChatMessage getLastMessage(Chatroom chatroom) {
-        return chatMessageRepository.findTopByChatroomOrderBySentAtDesc(chatroom)
+        return chatMessageRepository.findTopByChatroomAndTypeInOrderBySentAtDesc(
+                        chatroom,
+                        List.of(ChatMessageType.CHAT_MESSAGE, ChatMessageType.RANKING_MESSAGE))
                 .orElseThrow(() -> new NotFoundException(ChatResponse.CHAT_MESSAGE_NOT_FOUND));
     }
 }
