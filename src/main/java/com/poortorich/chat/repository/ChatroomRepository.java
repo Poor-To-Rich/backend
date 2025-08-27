@@ -74,14 +74,14 @@ public interface ChatroomRepository extends JpaRepository<Chatroom, Long> {
             """)
     List<Chatroom> searchChatrooms(String keyword);
 
-    @Query("""
+    @Query(value = """
             SELECT c.id
-            FROM Chatroom c
-            JOIN ChatParticipant cp ON cp.chatroom = c
-            WHERE cp.user = :user
-            AND cp.isParticipated = true
+            FROM chatroom c
+            JOIN chat_participant cp ON cp.chatroom_id = c.id
+            WHERE cp.user_id = :userId
+            AND cp.is_participated = true
             ORDER BY c.id ASC
             LIMIT 1
-            """)
-    Long findFirstChatroomIdByUser(@Param("user") User user);
+            """, nativeQuery = true)
+    Long findFirstChatroomIdByUser(@Param("userId") Long userId);
 }

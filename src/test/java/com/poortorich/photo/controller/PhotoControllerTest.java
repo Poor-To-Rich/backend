@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.poortorich.global.config.BaseSecurityTest;
 import com.poortorich.photo.facade.PhotoFacade;
 import com.poortorich.photo.request.PhotoUploadRequest;
+import com.poortorich.photo.response.AllPhotosResponse;
 import com.poortorich.photo.response.PhotoUploadResponse;
 import com.poortorich.photo.response.PreviewPhotosResponse;
 import com.poortorich.photo.response.enums.PhotoResponse;
@@ -75,5 +76,20 @@ class PhotoControllerTest extends BaseSecurityTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message")
                         .value(PhotoResponse.GET_PREVIEW_PHOTOS_SUCCESS.getMessage()));
+    }
+
+    @Test
+    @WithMockUser(username = USERNAME)
+    @DisplayName("전체 사진 목록 조회 성공")
+    void getAllPhotosByCursorSuccess() throws Exception {
+        Long chatroomId = 1L;
+
+        when(photoFacade.getAllPhotosByCursor(USERNAME, chatroomId, "", Long.MAX_VALUE))
+                .thenReturn(AllPhotosResponse.builder().build());
+
+        mockMvc.perform(get("/chatrooms/" + chatroomId + "/photos/all")
+                        .with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value(PhotoResponse.GET_ALL_PHOTOS_SUCCESS.getMessage()));
     }
 }

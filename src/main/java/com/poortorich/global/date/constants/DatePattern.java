@@ -3,6 +3,7 @@ package com.poortorich.global.date.constants;
 public class DatePattern {
 
     public static final String LOCAL_DATE_PATTERN = "yyyy-MM-dd";
+    public static final String LOCAL_DATE_TIME_PATTERN = "yyyyMMddHHmmss";
     public static final String YEAR_MONTH_PATTERN = "yyyy-MM";
     public static final String YEAR_PATTERN = "yyyy";
 

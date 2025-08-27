@@ -14,12 +14,15 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/chatrooms/{chatroomId}/photos")
 @RequiredArgsConstructor
 public class PhotoController {
+
+    private static final String ID_DEFAULT = "" + Long.MAX_VALUE;
 
     private final PhotoFacade photoFacade;
 
@@ -43,6 +46,19 @@ public class PhotoController {
         return DataResponse.toResponseEntity(
                 PhotoResponse.GET_PREVIEW_PHOTOS_SUCCESS,
                 photoFacade.getPreviewPhotos(userDetails.getUsername(), chatroomId)
+        );
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity<BaseResponse> getAllPhotosByCursor(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @PathVariable Long chatroomId,
+            @RequestParam(defaultValue = "") String date,
+            @RequestParam(defaultValue = ID_DEFAULT) Long id
+    ) {
+        return DataResponse.toResponseEntity(
+                PhotoResponse.GET_ALL_PHOTOS_SUCCESS,
+                photoFacade.getAllPhotosByCursor(userDetails.getUsername(), chatroomId, date, id)
         );
     }
 }

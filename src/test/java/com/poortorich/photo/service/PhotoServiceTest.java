@@ -12,7 +12,12 @@ import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.SliceImpl;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -30,6 +35,8 @@ class PhotoServiceTest {
 
     @Captor
     private ArgumentCaptor<Photo> captor;
+
+    private final Pageable pageable = PageRequest.of(0, 20);
 
     @Test
     @DisplayName("채팅방 이미지 저장 성공")
@@ -66,5 +73,29 @@ class PhotoServiceTest {
         assertThat(result).isNotNull();
         assertThat(result).hasSize(5);
         assertThat(result).containsExactly(photo1, photo2, photo3, photo4, photo5);
+    }
+
+    @Test
+    @DisplayName("전체 사진 목록 조회 성공")
+    void getAllPhotosByCursorSuccess() {
+        Chatroom chatroom = Chatroom.builder().build();
+        LocalDateTime date = LocalDateTime.of(2025, 8, 26, 0, 0, 0);
+        Long photoId = 99L;
+
+        Photo photo1 = Photo.builder().id(1L).photoUrl("photo1.com").build();
+        Photo photo2 = Photo.builder().id(2L).photoUrl("photo2.com").build();
+        Photo photo3 = Photo.builder().id(3L).photoUrl("photo3.com").build();
+
+        SliceImpl<Photo> photoSlice = new SliceImpl<>(List.of(photo3, photo2, photo1), pageable, true);
+
+        when(photoRepository.findAllByChatroomAndCursor(chatroom, date, photoId, pageable))
+                .thenReturn(photoSlice);
+
+        Slice<Photo> result = photoService.getAllPhotosByCursor(chatroom, date, photoId, pageable);
+
+        assertThat(result).isNotNull();
+        assertThat(result).hasSize(3);
+        assertThat(result).containsExactly(photo3, photo2, photo1);
+        assertThat(result.hasNext()).isTrue();
     }
 }

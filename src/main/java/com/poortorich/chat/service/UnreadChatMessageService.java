@@ -79,11 +79,11 @@ public class UnreadChatMessageService {
                 .toList();
     }
 
-    public void deleteAllByChatroom(Chatroom chatroom) {
-        unreadChatMessageRepository.deleteAllByChatroom(chatroom);
-    }
-
     public Long countByUnreadChatMessage(User user, Chatroom chatroom) {
         return unreadChatMessageRepository.countByUserAndChatroom(user, chatroom);
+    }
+
+    public void deleteAllByChatroom(Chatroom chatroom) {
+        unreadChatMessageRepository.deleteAllByChatroom(chatroom);
     }
 }
