@@ -16,16 +16,13 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/chat-websocket")
-                .setAllowedOrigins("*")
-                .withSockJS()
-                .setHeartbeatTime(25000)
-                .setDisconnectDelay(30000);
+                .setAllowedOrigins("*");
     }
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
         registry.enableSimpleBroker("/sub")
-                .setHeartbeatValue(new long[]{20_000, 20_000})
+                .setHeartbeatValue(new long[]{30_000, 30_000})
                 .setTaskScheduler(heartBeatScheduler());
 
         registry.setApplicationDestinationPrefixes("/pub");
@@ -38,7 +35,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         scheduler.setPoolSize(1);
         scheduler.setThreadNamePrefix("wss-heartbeat-");
         scheduler.setWaitForTasksToCompleteOnShutdown(true);
-        scheduler.setAwaitTerminationSeconds(30);
+        scheduler.setAwaitTerminationSeconds(40);
         scheduler.initialize();
         return scheduler;
     }
