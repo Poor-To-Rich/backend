@@ -93,6 +93,6 @@ public class ChatroomService {
     }
 
     public Long getFirstChatroomIdByUser(User user) {
-        return chatroomRepository.findFirstChatroomIdByUser(user);
+        return chatroomRepository.findFirstChatroomIdByUser(user.getId());
     }
 }
