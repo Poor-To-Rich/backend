@@ -23,20 +23,20 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     public void configureMessageBroker(MessageBrokerRegistry registry) {
         registry.enableSimpleBroker("/sub")
                 .setHeartbeatValue(new long[]{30_000, 30_000})
-                .setTaskScheduler(heartBeatScheduler());
+                .setTaskScheduler(heartbeatScheduler());
 
         registry.setApplicationDestinationPrefixes("/pub");
         registry.setUserDestinationPrefix("/chat/user");
     }
 
-    @Bean
-    public TaskScheduler heartBeatScheduler() {
+    @Bean(destroyMethod = "shutdown")
+    public TaskScheduler heartbeatScheduler() {
         ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
         scheduler.setPoolSize(1);
         scheduler.setThreadNamePrefix("wss-heartbeat-");
         scheduler.setWaitForTasksToCompleteOnShutdown(true);
         scheduler.setAwaitTerminationSeconds(40);
-        scheduler.initialize();
+        scheduler.setRemoveOnCancelPolicy(true);
         return scheduler;
     }
 }
