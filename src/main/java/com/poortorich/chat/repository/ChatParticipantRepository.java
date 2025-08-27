@@ -3,6 +3,8 @@ package com.poortorich.chat.repository;
 import com.poortorich.chat.entity.ChatParticipant;
 import com.poortorich.chat.entity.Chatroom;
 import com.poortorich.user.entity.User;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -125,4 +127,16 @@ public interface ChatParticipantRepository extends JpaRepository<ChatParticipant
             @Param("chatroom") Chatroom chatroom,
             @Param("nickname") String nickname
     );
+
+    @Query("""
+            SELECT cp
+            FROM ChatParticipant cp
+            JOIN FETCH cp.chatroom cr
+            JOIN FETCH cp.user u
+            WHERE u = :user
+            AND cp.isParticipated = true
+            AND cr.id >= :cursor
+            ORDER BY cr.id ASC
+            """)
+    Slice<ChatParticipant> findMyParticipants(@Param("user") User user, @Param("cursor") Long cursor, Pageable pageable);
 }
