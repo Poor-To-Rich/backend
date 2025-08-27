@@ -3,7 +3,6 @@ package com.poortorich.websocket.stomp.command.subscribe.handler;
 import com.poortorich.chat.repository.ChatroomRepository;
 import com.poortorich.chat.validator.ChatroomValidator;
 import com.poortorich.global.exceptions.BadRequestException;
-import com.poortorich.global.exceptions.NotFoundException;
 import com.poortorich.user.repository.UserRepository;
 import com.poortorich.websocket.stomp.command.subscribe.endpoint.SubscribeEndpoint;
 import com.poortorich.websocket.stomp.command.subscribe.util.SubscribeEndpointExtractor;
@@ -15,8 +14,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.stereotype.Component;
-
-import java.util.Objects;
 
 @Slf4j
 @Component
@@ -37,9 +34,6 @@ public class StompSubscribeHandler {
         subscribeValidator.validateEndPoint(accessor);
 
         String destination = accessor.getDestination();
-        if (Objects.isNull(destination)) {
-            throw new NotFoundException(StompResponse.DESTINATION_NOT_FOUND);
-        }
 
         if (destination.startsWith(SubscribeEndpoint.CHATROOM_SUBSCRIBE_PREFIX)) {
             subscribeValidator.validateChatroomSubscribe(accessor);
