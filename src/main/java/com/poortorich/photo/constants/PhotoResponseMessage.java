@@ -7,6 +7,7 @@ public class PhotoResponseMessage {
     public static final String GET_ALL_PHOTOS_SUCCESS = "사진 목록 조회를 완료했습니다.";
 
     public static final String PHOTO_REQUIRED = "이미지는 필수값입니다.";
+    public static final String PHOTO_NOT_FOUND = "이미지를 찾을 수 없습니다.";
 
     private PhotoResponseMessage() {
     }

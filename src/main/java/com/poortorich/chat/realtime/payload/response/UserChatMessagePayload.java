@@ -19,6 +19,7 @@ public class UserChatMessagePayload extends ChatMessageResponse implements Respo
     private Long messageId;
     private Long chatroomId;
     private Long senderId;
+    private Long photoId;
     private MessageType messageType;
     private String content;
     private LocalDateTime sentAt;
