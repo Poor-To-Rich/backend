@@ -98,6 +98,7 @@ public class ChatMessageService {
                 .messageId(chatMessage.getId())
                 .chatroomId(chatMessage.getChatroom().getId())
                 .senderId(chatMessage.getUserId())
+                .photoId(chatMessage.getPhotoId())
                 .messageType(chatMessage.getMessageType())
                 .content(chatMessage.getContent())
                 .sentAt(chatMessage.getSentAt())
