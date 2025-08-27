@@ -54,7 +54,7 @@ public class ChatRealTimeFacade {
         User user = userService.findUserByUsername(username);
         Chatroom chatroom = chatroomService.findById(chatroomId);
 
-        if (chatroom.getIsDeleted()) {
+        if (chatroom.getIsClosed()) {
             return null;
         }
 

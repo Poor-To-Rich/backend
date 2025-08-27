@@ -264,7 +264,7 @@ public class ChatFacade {
     }
 
     @Transactional
-    private void deleteChatroom(Chatroom chatroom) {
+    public void deleteChatroom(Chatroom chatroom) {
         tagService.deleteAllByChatroom(chatroom);
         chatMessageService.closeAllMessagesByChatroom(chatroom);
         chatroomService.closeChatroomById(chatroom.getId());
