@@ -46,7 +46,8 @@ public enum ChatResponse implements Response {
     HOST_DELEGATION_SUCCESS(HttpStatus.OK, ChatResponseMessage.HOST_DELEGATION_SUCCESS, null),
     CHAT_PARTICIPANT_KICK_SUCCESS(HttpStatus.OK, ChatResponseMessage.CHAT_PARTICIPANT_KICK_SUCCESS, null),
     CHATROOM_IS_CLOSED(HttpStatus.BAD_REQUEST, ChatResponseMessage.CHATROOM_IS_CLOSED, null),
-    GET_MY_CHATROOMS_SUCCESS(HttpStatus.OK, ChatResponseMessage.GET_MY_CHATROOMS_SUCCESS, null);
+    GET_MY_CHATROOMS_SUCCESS(HttpStatus.OK, ChatResponseMessage.GET_MY_CHATROOMS_SUCCESS, null),
+    MESSAGE_TYPE_INVALID(HttpStatus.BAD_REQUEST, ChatResponseMessage.MESSAGE_TYPE_INVALID, null);
 
     private final HttpStatus httpStatus;
     private final String message;

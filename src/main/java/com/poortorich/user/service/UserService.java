@@ -59,6 +59,7 @@ public class UserService {
         }
 
         return UserDetailResponse.builder()
+                .userId(user.getId())
                 .profileImage(profileImage)
                 .isDefaultProfile(isDefaultProfile)
                 .name(user.getName())

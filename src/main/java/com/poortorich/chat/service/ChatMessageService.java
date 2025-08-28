@@ -40,6 +40,7 @@ public class ChatMessageService {
     private final ChatMessageRepository chatMessageRepository;
     private final UnreadChatMessageService unreadChatMessageService;
 
+    private final UserChatMessageBuilder userChatMessageBuilder;
     private final DateChangeDetector dateChangeDetector;
     private final ApplicationEventPublisher eventPublisher;
 
@@ -89,7 +90,7 @@ public class ChatMessageService {
     ) {
         dateChangeDetector.detect(chatParticipant.getChatroom());
         ChatMessage chatMessage = chatMessageRepository.save(
-                UserChatMessageBuilder.buildChatMessage(chatParticipant, chatMessageRequestPayload));
+                userChatMessageBuilder.buildChatMessage(chatParticipant, chatMessageRequestPayload));
 
         List<Long> unreadBy = unreadChatMessageService.saveUnreadMember(chatMessage, chatMembers);
 
@@ -97,6 +98,7 @@ public class ChatMessageService {
                 .messageId(chatMessage.getId())
                 .chatroomId(chatMessage.getChatroom().getId())
                 .senderId(chatMessage.getUserId())
+                .photoId(chatMessage.getPhotoId())
                 .messageType(chatMessage.getMessageType())
                 .content(chatMessage.getContent())
                 .sentAt(chatMessage.getSentAt())
