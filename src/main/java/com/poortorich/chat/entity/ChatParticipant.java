@@ -25,6 +25,7 @@ import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Entity
 @Getter
@@ -102,6 +103,10 @@ public class ChatParticipant {
     }
 
     public void updateRankingStatus(RankingStatus rankingStatus) {
+        if (Objects.isNull(rankingStatus)) {
+            this.rankingStatus = RankingStatus.NONE;
+            return;
+        }
         this.rankingStatus = rankingStatus;
     }
 }

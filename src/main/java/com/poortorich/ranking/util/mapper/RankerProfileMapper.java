@@ -46,14 +46,14 @@ public class RankerProfileMapper {
             return List.of();
         }
 
-        List<Long> savers = Stream.of(
+        List<Long> flexers = Stream.of(
                         ranking.getFlexerFirst(),
                         ranking.getFlexerSecond(),
                         ranking.getFlexerThird())
                 .filter(Objects::nonNull)
                 .toList();
 
-        return savers.stream()
+        return flexers.stream()
                 .map(flexer -> participantService.findByUserIdAndChatroom(flexer, ranking.getChatroom()))
                 .map(flexer -> ProfileResponse.builder()
                         .userId(flexer.getUser().getId())

@@ -58,7 +58,7 @@ public class RankingService {
             rankers.getSavers().getFirst().updateRankingStatus(RankingStatus.SAVER);
         }
 
-        if (!Objects.isNull(rankers.secondFlexer())) {
+        if (!Objects.isNull(rankers.firstFlexer())) {
             rankers.getFlexers().getFirst().updateRankingStatus(RankingStatus.FLEXER);
         }
     }
@@ -67,7 +67,7 @@ public class RankingService {
         if (Objects.isNull(rankingId)) {
             return null;
         }
-        
+
         return rankingRepository.findById(rankingId)
                 .orElse(null);
     }

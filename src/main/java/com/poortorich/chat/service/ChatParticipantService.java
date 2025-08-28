@@ -185,6 +185,7 @@ public class ChatParticipantService {
                         context.pageRequest());
     }
 
+    @Transactional
     public void updateAllRankingStatus(List<ChatParticipant> participants, RankingStatus rankingStatus) {
         participants.forEach(participant -> participant.updateRankingStatus(rankingStatus));
     }
