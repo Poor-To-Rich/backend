@@ -17,7 +17,7 @@ import java.util.List;
 
 @Component
 @RequiredArgsConstructor
-public class ChatroomUpdateEventListner {
+public class ChatroomUpdateEventListener {
 
     private final SimpMessagingTemplate messagingTemplate;
     private final ChatParticipantService chatParticipantService;
