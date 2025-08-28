@@ -5,6 +5,7 @@ import com.poortorich.chat.entity.ChatParticipant;
 import com.poortorich.chat.entity.Chatroom;
 import com.poortorich.chat.entity.enums.ChatMessageType;
 import com.poortorich.chat.model.ChatPaginationContext;
+import com.poortorich.chat.realtime.builder.RankingMessageBuilder;
 import com.poortorich.chat.realtime.builder.RankingStatusChatMessageBuilder;
 import com.poortorich.chat.realtime.builder.SystemMessageBuilder;
 import com.poortorich.chat.realtime.builder.UserChatMessageBuilder;
@@ -20,6 +21,9 @@ import com.poortorich.chat.realtime.payload.response.UserChatMessagePayload;
 import com.poortorich.chat.realtime.payload.response.UserEnterResponsePayload;
 import com.poortorich.chat.realtime.payload.response.UserLeaveResponsePayload;
 import com.poortorich.chat.repository.ChatMessageRepository;
+import com.poortorich.ranking.entity.Ranking;
+import com.poortorich.ranking.payload.response.RankingResponsePayload;
+import com.poortorich.ranking.util.mapper.RankerProfileMapper;
 import com.poortorich.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
@@ -40,6 +44,7 @@ public class ChatMessageService {
     private final ChatMessageRepository chatMessageRepository;
     private final UnreadChatMessageService unreadChatMessageService;
 
+    private final RankerProfileMapper rankerProfileMapper;
     private final UserChatMessageBuilder userChatMessageBuilder;
     private final DateChangeDetector dateChangeDetector;
     private final ApplicationEventPublisher eventPublisher;
@@ -232,5 +237,25 @@ public class ChatMessageService {
         return chatMessageRepository.findTopByChatroomAndTypeInOrderBySentAtDesc(
                 chatroom,
                 List.of(ChatMessageType.CHAT_MESSAGE, ChatMessageType.RANKING_MESSAGE));
+    }
+
+    @Transactional
+    public RankingResponsePayload saveRankingMessage(Chatroom chatroom, Ranking ranking) {
+        dateChangeDetector.detect(chatroom);
+
+        ChatMessage rankingMessage = RankingMessageBuilder.buildRankingMessage(chatroom, ranking);
+        rankingMessage = chatMessageRepository.save(rankingMessage);
+
+        return RankingResponsePayload.builder()
+                .messageId(rankingMessage.getId())
+                .rankingId(rankingMessage.getRankingId())
+                .chatroomId(rankingMessage.getChatroom().getId())
+                .rankedAt(rankingMessage.getSentAt())
+                .sentAt(rankingMessage.getSentAt())
+                .saverRankings(rankerProfileMapper.mapToSavers(ranking))
+                .flexerRankings(rankerProfileMapper.mapToFlexer(ranking))
+                .type(rankingMessage.getType())
+                .messageType(rankingMessage.getMessageType())
+                .build();
     }
 }
