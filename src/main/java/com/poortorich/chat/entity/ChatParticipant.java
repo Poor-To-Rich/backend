@@ -100,4 +100,8 @@ public class ChatParticipant {
     public void kick() {
         this.role = ChatroomRole.BANNED;
     }
+
+    public void updateRankingStatus(RankingStatus rankingStatus) {
+        this.rankingStatus = rankingStatus;
+    }
 }
