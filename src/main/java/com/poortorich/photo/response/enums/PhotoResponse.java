@@ -12,8 +12,10 @@ public enum PhotoResponse implements Response {
 
     UPLOAD_PHOTO_SUCCESS(HttpStatus.CREATED, PhotoResponseMessage.UPLOAD_PHOTO_SUCCESS, null),
     GET_PREVIEW_PHOTOS_SUCCESS(HttpStatus.OK, PhotoResponseMessage.GET_PREVIEW_PHOTOS_SUCCESS, null),
+    GET_ALL_PHOTOS_SUCCESS(HttpStatus.OK, PhotoResponseMessage.GET_ALL_PHOTOS_SUCCESS, null),
 
-    PHOTO_REQUIRED(HttpStatus.BAD_REQUEST, PhotoResponseMessage.PHOTO_REQUIRED , "photo");
+    PHOTO_REQUIRED(HttpStatus.BAD_REQUEST, PhotoResponseMessage.PHOTO_REQUIRED, "photo"),
+    PHOTO_NOT_FOUND(HttpStatus.NOT_FOUND, PhotoResponseMessage.PHOTO_NOT_FOUND, null);
 
     private final HttpStatus httpStatus;
     private final String message;

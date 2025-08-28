@@ -62,6 +62,10 @@ public class ChatParticipant {
     @Column(name = "created_date")
     private LocalDateTime createdDate;
 
+    @CreationTimestamp
+    @Column(name = "joinAt")
+    private LocalDateTime joinAt;
+
     @UpdateTimestamp
     @Column(name = "updated_date")
     private LocalDateTime updatedDate;
@@ -77,6 +81,7 @@ public class ChatParticipant {
     public void restoreParticipation() {
         this.isParticipated = Boolean.TRUE;
         this.leaveTime = null;
+        this.joinAt = LocalDateTime.now();
     }
 
     public void leave() {

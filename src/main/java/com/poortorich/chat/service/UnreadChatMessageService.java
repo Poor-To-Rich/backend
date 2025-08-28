@@ -78,4 +78,12 @@ public class UnreadChatMessageService {
                         .mapToBasePayload())
                 .toList();
     }
+
+    public Long countByUnreadChatMessage(User user, Chatroom chatroom) {
+        return unreadChatMessageRepository.countByUserAndChatroom(user, chatroom);
+    }
+
+    public void deleteAllByChatroom(Chatroom chatroom) {
+        unreadChatMessageRepository.deleteAllByChatroom(chatroom);
+    }
 }
