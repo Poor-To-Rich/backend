@@ -6,7 +6,8 @@ import lombok.Data;
 @Data
 @Builder
 public class UserDetailResponse {
-
+    
+    private Long userId;
     private String profileImage;
     private Boolean isDefaultProfile;
     private String name;
