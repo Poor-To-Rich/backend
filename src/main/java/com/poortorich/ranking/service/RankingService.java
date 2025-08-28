@@ -62,4 +62,13 @@ public class RankingService {
             rankers.getFlexers().getFirst().updateRankingStatus(RankingStatus.FLEXER);
         }
     }
+
+    public Ranking findById(Long rankingId) {
+        if (Objects.isNull(rankingId)) {
+            return null;
+        }
+        
+        return rankingRepository.findById(rankingId)
+                .orElse(null);
+    }
 }
