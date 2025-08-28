@@ -14,7 +14,7 @@ public class ChatMessageContentMapper {
     private static final String PHOTO_MESSAGE = "사진을 보냈습니다.";
 
     public String mapToContent(ChatMessage chatMessage) {
-        if (Objects.isNull(chatMessage)) {
+        if (Objects.isNull(chatMessage) || Objects.isNull(chatMessage.getMessageType())) {
             return null;
         }
         

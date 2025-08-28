@@ -54,8 +54,8 @@ public class ChatResponseMessage {
     public static final String CHAT_PARTICIPANT_ROLE_NOT_MEMBER = "이 기능은 일반 멤버만 사용/적용할 수 있습니다.";
     public static final String HOST_DELEGATION_SUCCESS = "방장이 성공적으로 위임되었습니다.";
     public static final String CHAT_PARTICIPANT_KICK_SUCCESS = "사용자 강제퇴장이 완료됐습니다.";
-    public static final String GET_MY_CHATROOMS_SUCCESS = "참여중인 채팅방 목록 조회가 완료되었습니다.";
     public static final String CHATROOM_IS_CLOSED = "채팅방이 종료되었습니다.";
+    public static final String GET_MY_CHATROOMS_SUCCESS = "참여중인 채팅방 목록 조회가 완료되었습니다.";
     public static final String MESSAGE_TYPE_INVALID = "유효하지 않은 메시지 타입입니다.";
 
     private ChatResponseMessage() {
