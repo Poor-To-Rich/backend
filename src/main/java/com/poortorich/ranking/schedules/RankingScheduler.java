@@ -6,6 +6,8 @@ import com.poortorich.ranking.facade.RankingFacade;
 import com.poortorich.ranking.payload.response.RankingResponsePayload;
 import com.poortorich.websocket.stomp.command.subscribe.endpoint.SubscribeEndpoint;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -17,6 +19,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class RankingScheduler {
@@ -24,6 +27,8 @@ public class RankingScheduler {
     private final RankingFacade rankingFacade;
     private final SimpMessagingTemplate messagingTemplate;
     private final ChatroomService chatroomService;
+
+    private final TaskExecutor taskExecutor;
 
     @Scheduled(cron = "0 0 12 * * MON")
     public void calculateAndBroadcastWeeklyRanking() {
@@ -35,13 +40,13 @@ public class RankingScheduler {
                 .values();
 
         batches.forEach(batch -> {
-            CompletableFuture.runAsync(() -> processBatch(batch));
-
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException exception) {
-                Thread.currentThread().interrupt();
-            }
+            CompletableFuture.runAsync(() -> {
+                try {
+                    processBatch(batch);
+                } catch (Exception exception) {
+                    log.error("랭킹 집계 실패");
+                }
+            }, taskExecutor);
         });
     }
 
