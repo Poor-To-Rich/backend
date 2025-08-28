@@ -4,9 +4,11 @@ import com.poortorich.global.response.BaseResponse;
 import com.poortorich.global.response.DataResponse;
 import com.poortorich.ranking.facade.RankingFacade;
 import com.poortorich.ranking.response.enums.RankingResponse;
+import com.poortorich.websocket.stomp.command.subscribe.endpoint.SubscribeEndpoint;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class RankingController {
 
     private final RankingFacade rankingFacade;
+    private final SimpMessagingTemplate messagingTemplate;
 
     @GetMapping("/preview")
     public ResponseEntity<BaseResponse> getLatestRanking(
@@ -39,9 +42,11 @@ public class RankingController {
             @AuthenticationPrincipal UserDetails userDetails,
             @PathVariable Long chatroomId
     ) {
+        var payload = rankingFacade.calculateRankingTest(chatroomId);
+        messagingTemplate.convertAndSend(SubscribeEndpoint.CHATROOM_SUBSCRIBE_PREFIX + chatroomId, payload);
         return DataResponse.toResponseEntity(
                 HttpStatus.OK,
                 "랭킹 집계 테스트 성공",
-                rankingFacade.calculateRankingTest(chatroomId));
+                payload);
     }
 }

@@ -9,6 +9,7 @@ import com.poortorich.chat.response.ProfileResponse;
 import lombok.Builder;
 import lombok.Data;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -19,7 +20,7 @@ public class RankingResponsePayload extends ChatMessageResponse implements Respo
     private Long messageId;
     private Long rankingId;
     private Long chatroomId;
-    private LocalDateTime rankedAt;
+    private LocalDate rankedAt;
     private LocalDateTime sentAt;
     private List<ProfileResponse> saverRankings;
     private List<ProfileResponse> flexerRankings;

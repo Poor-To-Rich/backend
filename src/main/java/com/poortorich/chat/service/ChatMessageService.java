@@ -250,7 +250,7 @@ public class ChatMessageService {
                 .messageId(rankingMessage.getId())
                 .rankingId(rankingMessage.getRankingId())
                 .chatroomId(rankingMessage.getChatroom().getId())
-                .rankedAt(rankingMessage.getSentAt())
+                .rankedAt(rankingMessage.getSentAt().toLocalDate())
                 .sentAt(rankingMessage.getSentAt())
                 .saverRankings(rankerProfileMapper.mapToSavers(ranking))
                 .flexerRankings(rankerProfileMapper.mapToFlexer(ranking))

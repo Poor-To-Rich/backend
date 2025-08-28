@@ -9,25 +9,27 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Stream;
 
 @Component
 @RequiredArgsConstructor
 public class RankerProfileMapper {
 
-    private ChatParticipantService participantService;
+    private final ChatParticipantService participantService;
 
     public List<ProfileResponse> mapToSavers(Ranking ranking) {
         if (Objects.isNull(ranking)) {
             return List.of();
         }
 
-        List<Long> savers = List.of(
-                ranking.getSaverFirst(),
-                ranking.getSaverSecond(),
-                ranking.getSaverThird());
+        List<Long> savers = Stream.of(
+                        ranking.getSaverFirst(),
+                        ranking.getSaverSecond(),
+                        ranking.getSaverThird())
+                .filter(Objects::nonNull)
+                .toList();
 
         return savers.stream()
-                .filter(saverId -> !Objects.isNull(saverId))
                 .map(saverId -> participantService.findByUserIdAndChatroom(saverId, ranking.getChatroom()))
                 .map(saver -> ProfileResponse.builder()
                         .userId(saver.getUser().getId())
@@ -44,13 +46,14 @@ public class RankerProfileMapper {
             return List.of();
         }
 
-        List<Long> savers = List.of(
-                ranking.getFlexerFirst(),
-                ranking.getFlexerSecond(),
-                ranking.getFlexerThird());
+        List<Long> savers = Stream.of(
+                        ranking.getFlexerFirst(),
+                        ranking.getFlexerSecond(),
+                        ranking.getFlexerThird())
+                .filter(Objects::nonNull)
+                .toList();
 
         return savers.stream()
-                .filter(flexerId -> !Objects.isNull(flexerId))
                 .map(flexer -> participantService.findByUserIdAndChatroom(flexer, ranking.getChatroom()))
                 .map(flexer -> ProfileResponse.builder()
                         .userId(flexer.getUser().getId())

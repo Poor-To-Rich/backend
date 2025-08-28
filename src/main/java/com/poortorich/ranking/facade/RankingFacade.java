@@ -26,6 +26,7 @@ import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.time.temporal.TemporalAdjusters;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -46,7 +47,7 @@ public class RankingFacade {
         Chatroom chatroom = chatroomService.findById(chatroomId);
         return calculateRanking(chatroom);
     }
-    
+
     @Transactional
     public RankingResponsePayload calculateRanking(Chatroom chatroom) {
         Rankers rankers = rankingCalculator.calculate(chatroom);
@@ -64,10 +65,12 @@ public class RankingFacade {
 
         chatParticipantService.updateAllRankingStatus(participants, RankingStatus.NONE);
         rankingService.updateRankingStatus(rankers);
-
-        eventPublisher.publishEvent(new UserProfileUpdateEvent(prevSaver.getUser().getUsername()));
-        eventPublisher.publishEvent(new UserProfileUpdateEvent(prevFLexer.getUser().getUsername()));
-
+        if (!Objects.isNull(prevSaver)) {
+            eventPublisher.publishEvent(new UserProfileUpdateEvent(prevSaver.getUser().getUsername()));
+        }
+        if (!Objects.isNull(prevFLexer)) {
+            eventPublisher.publishEvent(new UserProfileUpdateEvent(prevFLexer.getUser().getUsername()));
+        }
         return chatMessageService.saveRankingMessage(chatroom, ranking);
     }
 
