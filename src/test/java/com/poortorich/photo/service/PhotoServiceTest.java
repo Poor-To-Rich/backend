@@ -1,8 +1,10 @@
 package com.poortorich.photo.service;
 
 import com.poortorich.chat.entity.Chatroom;
+import com.poortorich.global.exceptions.BadRequestException;
 import com.poortorich.photo.entity.Photo;
 import com.poortorich.photo.repository.PhotoRepository;
+import com.poortorich.photo.response.enums.PhotoResponse;
 import com.poortorich.user.entity.User;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -19,8 +21,10 @@ import org.springframework.data.domain.SliceImpl;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -97,5 +101,79 @@ class PhotoServiceTest {
         assertThat(result).hasSize(3);
         assertThat(result).containsExactly(photo3, photo2, photo1);
         assertThat(result.hasNext()).isTrue();
+    }
+
+    @Test
+    @DisplayName("채팅방과 사진 아이디로 사진 조회 성공")
+    void findByChatroomAndIdSuccess() {
+        Chatroom chatroom = Chatroom.builder().build();
+        Long photoId = 1L;
+        Photo photo = Photo.builder()
+                .id(photoId)
+                .chatroom(chatroom)
+                .build();
+
+        when(photoRepository.findByChatroomAndId(chatroom, photoId)).thenReturn(Optional.of(photo));
+
+        Photo result = photoService.findByChatroomAndId(chatroom, photoId);
+
+        assertThat(result).isNotNull();
+        assertThat(result).isEqualTo(photo);
+        assertThat(result.getId()).isEqualTo(photoId);
+    }
+
+    @Test
+    @DisplayName("채팅방과 사진 아이디로 사진 조회 실패")
+    void findByChatroomAndIdFail() {
+        Chatroom chatroom = Chatroom.builder().build();
+        Long photoId = 1L;
+
+        when(photoRepository.findByChatroomAndId(chatroom, photoId)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> photoService.findByChatroomAndId(chatroom, photoId))
+                .isInstanceOf(BadRequestException.class)
+                .hasMessageContaining(PhotoResponse.PHOTO_NOT_FOUND.getMessage());
+    }
+
+    @Test
+    @DisplayName("이전 사진 아이디 조회 성공")
+    void findPrevPhotoIdSuccess() {
+        Chatroom chatroom = Chatroom.builder().build();
+        Long prevPhotoId = 1L;
+        Long currentPhotoId = 2L;
+        LocalDateTime createdDate = LocalDateTime.of(2025, 8, 26, 0, 0, 0);
+        Photo currentPhoto = Photo.builder()
+                .id(currentPhotoId)
+                .chatroom(chatroom)
+                .createdDate(createdDate)
+                .build();
+
+        when(photoRepository.findPrevPhotoId(chatroom, createdDate, currentPhotoId)).thenReturn(List.of(prevPhotoId));
+
+        Long result = photoService.findPrevPhotoId(chatroom, currentPhoto);
+
+        assertThat(result).isNotNull();
+        assertThat(result).isEqualTo(prevPhotoId);
+    }
+
+    @Test
+    @DisplayName("다음 사진 아이디 조회 성공")
+    void findNextPhotoIdSuccess() {
+        Chatroom chatroom = Chatroom.builder().build();
+        Long nextPhotoId = 3L;
+        Long currentPhotoId = 2L;
+        LocalDateTime createdDate = LocalDateTime.of(2025, 8, 26, 0, 0, 0);
+        Photo currentPhoto = Photo.builder()
+                .id(currentPhotoId)
+                .chatroom(chatroom)
+                .createdDate(createdDate)
+                .build();
+
+        when(photoRepository.findPrevPhotoId(chatroom, createdDate, currentPhotoId)).thenReturn(List.of(nextPhotoId));
+
+        Long result = photoService.findPrevPhotoId(chatroom, currentPhoto);
+
+        assertThat(result).isNotNull();
+        assertThat(result).isEqualTo(nextPhotoId);
     }
 }

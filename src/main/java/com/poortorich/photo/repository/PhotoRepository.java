@@ -36,4 +36,30 @@ public interface PhotoRepository extends JpaRepository<Photo, Long> {
     );
 
     Optional<Photo> findByPhotoUrl(String content);
+
+    Optional<Photo> findByChatroomAndId(Chatroom chatroom, Long photoId);
+
+    @Query("""
+        SELECT p.id
+          FROM Photo p
+        WHERE p.chatroom = :chatroom
+          AND (
+               p.createdDate < :createdDate
+               OR (p.createdDate = :createdDate AND p.id < :id)
+          )
+        ORDER BY p.createdDate DESC , p.id DESC
+    """)
+    List<Long> findPrevPhotoId(Chatroom chatroom, LocalDateTime createdDate, Long id);
+
+    @Query("""
+        SELECT p.id
+          FROM Photo p
+        WHERE p.chatroom = :chatroom
+          AND (
+               p.createdDate > :createdDate
+               OR (p.createdDate = :createdDate AND p.id > :id)
+          )
+        ORDER BY p.createdDate ASC , p.id ASC
+    """)
+    List<Long> findNextPhotoId(Chatroom chatroom, LocalDateTime createdDate, Long id);
 }
