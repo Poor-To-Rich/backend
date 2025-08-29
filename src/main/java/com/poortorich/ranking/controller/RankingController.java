@@ -11,6 +11,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -30,5 +31,17 @@ public class RankingController {
                 ? RankingResponse.GET_LATEST_RANKING_SUCCESS
                 : RankingResponse.GET_LATEST_RANKING_NOT_FOUND;
         return DataResponse.toResponseEntity(code, result.response());
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity<BaseResponse> getAllRankings(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @PathVariable Long chatroomId,
+            @RequestParam(required = false) String cursor
+    ) {
+        return DataResponse.toResponseEntity(
+                RankingResponse.GET_ALL_RANKINGS_SUCCESS,
+                rankingFacade.getAllRankings(userDetails.getUsername(), chatroomId, cursor)
+        );
     }
 }
