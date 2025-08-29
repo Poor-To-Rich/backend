@@ -5,8 +5,8 @@ import com.poortorich.chat.service.ChatroomService;
 import com.poortorich.ranking.facade.RankingFacade;
 import com.poortorich.ranking.payload.response.RankingResponsePayload;
 import com.poortorich.websocket.stomp.command.subscribe.endpoint.SubscribeEndpoint;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -21,15 +21,25 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Component
-@RequiredArgsConstructor
 public class RankingScheduler {
 
     private final RankingFacade rankingFacade;
     private final SimpMessagingTemplate messagingTemplate;
     private final ChatroomService chatroomService;
-
     private final TaskExecutor taskExecutor;
 
+    public RankingScheduler(
+            RankingFacade rankingFacade,
+            SimpMessagingTemplate messagingTemplate,
+            ChatroomService chatroomService,
+            @Qualifier("rankingTaskExecutor") TaskExecutor taskExecutor
+    ) {
+        this.rankingFacade = rankingFacade;
+        this.messagingTemplate = messagingTemplate;
+        this.chatroomService = chatroomService;
+        this.taskExecutor = taskExecutor;
+    }
+    
     @Scheduled(cron = "0 0 12 * * MON")
     public void calculateAndBroadcastWeeklyRanking() {
         List<Chatroom> activeChatrooms = chatroomService.getChatroomsByRankingEnabledIsTrue();
