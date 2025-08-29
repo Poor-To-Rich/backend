@@ -15,7 +15,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.time.LocalDate;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/chatrooms/{chatroomId}/rankings")
@@ -40,13 +44,19 @@ public class RankingController {
     @PostMapping("/test/calculate")
     public ResponseEntity<BaseResponse> calculateRankingTest(
             @AuthenticationPrincipal UserDetails userDetails,
-            @PathVariable Long chatroomId
+            @PathVariable Long chatroomId,
+            @RequestParam(name = "date", required = false) LocalDate date
     ) {
-        var payload = rankingFacade.calculateRankingTest(chatroomId);
-        messagingTemplate.convertAndSend(SubscribeEndpoint.CHATROOM_SUBSCRIBE_PREFIX + chatroomId, payload);
+        if (Objects.isNull(date)) {
+            date = LocalDate.now();
+        }
+        var payload = rankingFacade.calculateRankingTest(chatroomId, date);
+        messagingTemplate.convertAndSend(
+                SubscribeEndpoint.CHATROOM_SUBSCRIBE_PREFIX + chatroomId,
+                payload.mapToBasePayload());
         return DataResponse.toResponseEntity(
                 HttpStatus.OK,
                 "랭킹 집계 테스트 성공",
-                payload);
+                payload.mapToBasePayload());
     }
 }

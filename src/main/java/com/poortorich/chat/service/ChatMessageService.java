@@ -32,6 +32,9 @@ import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.temporal.TemporalAdjusters;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -246,6 +249,28 @@ public class ChatMessageService {
         ChatMessage rankingMessage = RankingMessageBuilder.buildRankingMessage(chatroom, ranking);
         rankingMessage = chatMessageRepository.save(rankingMessage);
 
+        return RankingResponsePayload.builder()
+                .messageId(rankingMessage.getId())
+                .rankingId(rankingMessage.getRankingId())
+                .chatroomId(rankingMessage.getChatroom().getId())
+                .rankedAt(rankingMessage.getSentAt().toLocalDate())
+                .sentAt(rankingMessage.getSentAt())
+                .saverRankings(rankerProfileMapper.mapToSavers(ranking))
+                .flexerRankings(rankerProfileMapper.mapToFlexer(ranking))
+                .type(rankingMessage.getType())
+                .messageType(rankingMessage.getMessageType())
+                .build();
+    }
+
+    // TODO: 테스트 이후 삭제
+    @Transactional
+    public RankingResponsePayload saveRankingMessage(Chatroom chatroom, Ranking ranking, LocalDate date) {
+        dateChangeDetector.detect(chatroom);
+
+        ChatMessage rankingMessage = RankingMessageBuilder.buildRankingMessage(chatroom, ranking);
+        rankingMessage = chatMessageRepository.save(rankingMessage);
+        rankingMessage.updateSentAt(date.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY)));
+        
         return RankingResponsePayload.builder()
                 .messageId(rankingMessage.getId())
                 .rankingId(rankingMessage.getRankingId())

@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.TemporalAdjusters;
 import java.util.List;
@@ -46,6 +47,45 @@ public class RankingFacade {
     public RankingResponsePayload calculateRankingTest(Long chatroomId) {
         Chatroom chatroom = chatroomService.findById(chatroomId);
         return calculateRanking(chatroom);
+    }
+
+    // TODO: 테스트 이후 삭제
+    @Transactional
+    public RankingResponsePayload calculateRankingTest(Long chatroomId, LocalDate date) {
+        Chatroom chatroom = chatroomService.findById(chatroomId);
+        return calculateRanking(chatroom, date);
+    }
+
+    // TODO: 테스트 이후 삭제
+    @Transactional
+    public RankingResponsePayload calculateRanking(Chatroom chatroom, LocalDate date) {
+        Rankers rankers = rankingCalculator.calculate(chatroom, date);
+        Ranking ranking = rankingService.create(
+                chatroom,
+                rankers,
+                date.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY)));
+
+        if (LocalDate.now().equals(date)) {
+            List<ChatParticipant> participants = chatParticipantService.findAllByChatroom(chatroom);
+            ChatParticipant prevSaver = chatParticipantService.findByChatroomAndRankingStatus(
+                    chatroom,
+                    RankingStatus.SAVER);
+
+            ChatParticipant prevFLexer = chatParticipantService.findByChatroomAndRankingStatus(
+                    chatroom,
+                    RankingStatus.FLEXER);
+
+            chatParticipantService.updateAllRankingStatus(participants, RankingStatus.NONE);
+            rankingService.updateRankingStatus(rankers);
+            if (!Objects.isNull(prevSaver)) {
+                eventPublisher.publishEvent(new UserProfileUpdateEvent(prevSaver.getUser().getUsername()));
+            }
+            if (!Objects.isNull(prevFLexer)) {
+                eventPublisher.publishEvent(new UserProfileUpdateEvent(prevFLexer.getUser().getUsername()));
+            }
+        }
+
+        return chatMessageService.saveRankingMessage(chatroom, ranking, date);
     }
 
     @Transactional

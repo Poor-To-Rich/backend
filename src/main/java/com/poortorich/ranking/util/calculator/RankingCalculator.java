@@ -19,6 +19,7 @@ import java.time.temporal.TemporalAdjusters;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Component
@@ -30,7 +31,8 @@ public class RankingCalculator {
 
     public Rankers calculate(Chatroom chatroom) {
         List<ChatParticipant> participants = participantService.findAllByChatroom(chatroom);
-        RankingCalculationData rankingCalculationData = getRankingCalculationData(participants);
+        // TODO: null 파라미터 삭제
+        RankingCalculationData rankingCalculationData = getRankingCalculationData(participants, null);
 
         if (!rankingCalculationData.isCalculate()) {
             return null;
@@ -42,8 +44,24 @@ public class RankingCalculator {
                 .build();
     }
 
-    private RankingCalculationData getRankingCalculationData(List<ChatParticipant> participants) {
-        LocalDate today = LocalDate.now();
+    // TODO: 테스트 이후 삭제
+    public Rankers calculate(Chatroom chatroom, LocalDate date) {
+        List<ChatParticipant> participants = participantService.findAllByChatroom(chatroom);
+        RankingCalculationData rankingCalculationData = getRankingCalculationData(participants, date);
+
+        if (!rankingCalculationData.isCalculate()) {
+            return null;
+        }
+
+        return Rankers.builder()
+                .savers(calculateSaver(rankingCalculationData))
+                .flexers(calculateFlexer(rankingCalculationData))
+                .build();
+    }
+
+    // TODO: 테스트 이후 date 파라미터 삭제
+    private RankingCalculationData getRankingCalculationData(List<ChatParticipant> participants, LocalDate date) {
+        LocalDate today = (Objects.nonNull(date)) ? date : LocalDate.now();
         LocalDate lastWeekSunday = today.with(TemporalAdjusters.previous(DayOfWeek.SUNDAY));
         LocalDate lastWeekMonday = lastWeekSunday.with(TemporalAdjusters.previous(DayOfWeek.MONDAY));
 

@@ -13,8 +13,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import java.time.LocalDateTime;
-
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -22,6 +20,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.DynamicUpdate;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -78,5 +79,10 @@ public class ChatMessage {
     public void closeChatroom() {
         isDeleted = Boolean.TRUE;
         deleteAt = LocalDateTime.now();
+    }
+
+    // TODO: 테스트 이후 삭제
+    public void updateSentAt(LocalDate date) {
+        this.sentAt = date.atStartOfDay();
     }
 }
