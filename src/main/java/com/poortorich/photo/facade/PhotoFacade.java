@@ -9,6 +9,7 @@ import com.poortorich.global.exceptions.BadRequestException;
 import com.poortorich.photo.entity.Photo;
 import com.poortorich.photo.request.PhotoUploadRequest;
 import com.poortorich.photo.response.AllPhotosResponse;
+import com.poortorich.photo.response.PhotoDetailsResponse;
 import com.poortorich.photo.response.PhotoUploadResponse;
 import com.poortorich.photo.response.PreviewPhotosResponse;
 import com.poortorich.photo.response.enums.PhotoResponse;
@@ -85,6 +86,21 @@ public class PhotoFacade {
                 photos.hasNext() ? nextDate : null,
                 photos.hasNext() ? photos.getContent().getLast().getId() : null,
                 photos.getContent()
+        );
+    }
+
+    @Transactional(readOnly = true)
+    public PhotoDetailsResponse getPhotoDetails(String username, Long chatroomId, Long photoId) {
+        User user = userService.findUserByUsername(username);
+        Chatroom chatroom = chatroomService.findById(chatroomId);
+        chatParticipantValidator.validateIsParticipate(user, chatroom);
+
+        Photo photo = photoService.findByChatroomAndId(chatroom, photoId);
+
+        return PhotoBuilder.buildPhotoDetailsResponse(
+                photo,
+                photoService.findPrevPhotoId(chatroom, photo),
+                photoService.findNextPhotoId(chatroom, photo)
         );
     }
 }

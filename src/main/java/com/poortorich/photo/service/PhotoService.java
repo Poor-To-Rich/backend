@@ -1,10 +1,13 @@
 package com.poortorich.photo.service;
 
 import com.poortorich.chat.entity.Chatroom;
+import com.poortorich.global.exceptions.BadRequestException;
 import com.poortorich.photo.entity.Photo;
 import com.poortorich.photo.repository.PhotoRepository;
+import com.poortorich.photo.response.enums.PhotoResponse;
 import com.poortorich.user.entity.User;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
@@ -33,5 +36,22 @@ public class PhotoService {
 
     public Slice<Photo> getAllPhotosByCursor(Chatroom chatroom, LocalDateTime date, Long id, Pageable pageable) {
         return photoRepository.findAllByChatroomAndCursor(chatroom, date, id, pageable);
+    }
+
+    public Photo findByChatroomAndId(Chatroom chatroom, Long photoId) {
+        return photoRepository.findByChatroomAndId(chatroom, photoId)
+                .orElseThrow(() -> new BadRequestException(PhotoResponse.PHOTO_NOT_FOUND));
+    }
+
+    public Long findPrevPhotoId(Chatroom chatroom, Photo currentPhoto) {
+        return photoRepository.findPrevPhotoId(chatroom, currentPhoto.getCreatedDate(), currentPhoto.getId()).stream()
+                .findFirst()
+                .orElse(null);
+    }
+
+    public Long findNextPhotoId(Chatroom chatroom, Photo currentPhoto) {
+        return photoRepository.findNextPhotoId(chatroom, currentPhoto.getCreatedDate(), currentPhoto.getId()).stream()
+                .findFirst()
+                .orElse(null);
     }
 }

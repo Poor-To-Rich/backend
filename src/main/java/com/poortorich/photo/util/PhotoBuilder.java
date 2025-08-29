@@ -3,8 +3,11 @@ package com.poortorich.photo.util;
 import com.poortorich.photo.entity.Photo;
 import com.poortorich.photo.response.AllPhotosResponse;
 import com.poortorich.photo.response.PhotoCursorResponse;
+import com.poortorich.photo.response.PhotoDetailsResponse;
 import com.poortorich.photo.response.PhotoInfoResponse;
 import com.poortorich.photo.response.PreviewPhotosResponse;
+import com.poortorich.photo.response.UploadedUserResponse;
+import com.poortorich.user.entity.User;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
@@ -58,6 +61,24 @@ public class PhotoBuilder {
                 .photoId(photo.getId())
                 .photoUrl(photo.getPhotoUrl())
                 .uploadedAt(photo.getCreatedDate().toLocalDate().toString())
+                .build();
+    }
+
+    public static PhotoDetailsResponse buildPhotoDetailsResponse(Photo photo, Long prevPhotoId, Long nextPhotoId) {
+        return PhotoDetailsResponse.builder()
+                .photoId(photo.getId())
+                .photoUrl(photo.getPhotoUrl())
+                .uploadedAt(photo.getCreatedDate().toString())
+                .uploadedBy(buildUploadedUserResponse(photo.getUser()))
+                .prevPhotoId(prevPhotoId)
+                .nextPhotoId(nextPhotoId)
+                .build();
+    }
+
+    private static UploadedUserResponse buildUploadedUserResponse(User user) {
+        return UploadedUserResponse.builder()
+                .userId(user.getId())
+                .nickname(user.getNickname())
                 .build();
     }
 }
