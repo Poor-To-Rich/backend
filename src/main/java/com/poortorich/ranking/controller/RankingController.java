@@ -59,4 +59,16 @@ public class RankingController {
                 "랭킹 집계 테스트 성공",
                 payload.mapToBasePayload());
     }
+
+    @GetMapping("/all")
+    public ResponseEntity<BaseResponse> getAllRankings(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @PathVariable Long chatroomId,
+            @RequestParam(required = false) String cursor
+    ) {
+        return DataResponse.toResponseEntity(
+                RankingResponse.GET_ALL_RANKINGS_SUCCESS,
+                rankingFacade.getAllRankings(userDetails.getUsername(), chatroomId, cursor)
+        );
+    }
 }

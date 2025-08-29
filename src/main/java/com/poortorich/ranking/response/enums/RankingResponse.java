@@ -11,7 +11,8 @@ import org.springframework.http.HttpStatus;
 public enum RankingResponse implements Response {
 
     GET_LATEST_RANKING_SUCCESS(HttpStatus.OK, RankingResponseMessage.GET_LATEST_RANKING_SUCCESS, null),
-    GET_LATEST_RANKING_NOT_FOUND(HttpStatus.OK, RankingResponseMessage.GET_LATEST_RANKING_NOT_FOUND, null);
+    GET_LATEST_RANKING_NOT_FOUND(HttpStatus.OK, RankingResponseMessage.GET_LATEST_RANKING_NOT_FOUND, null),
+    GET_ALL_RANKINGS_SUCCESS(HttpStatus.OK, RankingResponseMessage.GET_ALL_RANKINGS_SUCCESS, null);
 
     private final HttpStatus httpStatus;
     private final String message;

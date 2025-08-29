@@ -104,4 +104,8 @@ public class RankingService {
         return rankingRepository.findById(rankingId)
                 .orElse(null);
     }
+
+    public List<Ranking> findAllRankings(Chatroom chatroom, List<LocalDateTime> mondays) {
+        return rankingRepository.findAllByChatroomWithDateIn(chatroom, mondays);
+    }
 }

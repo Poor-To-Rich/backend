@@ -130,4 +130,14 @@ public class ChatBuilder {
                 .rankingType(participantInfo.getRankingStatus().toString())
                 .build();
     }
+
+    public static ProfileResponse buildProfileResponse(ChatParticipant participantInfo, RankingStatus rankingStatus) {
+        return ProfileResponse.builder()
+                .userId(participantInfo.getUser().getId())
+                .profileImage(participantInfo.getUser().getProfileImage())
+                .nickname(participantInfo.getUser().getNickname())
+                .isHost(participantInfo.getRole().equals(ChatroomRole.HOST))
+                .rankingType(rankingStatus.toString())
+                .build();
+    }
 }
