@@ -169,9 +169,9 @@ class PhotoServiceTest {
                 .createdDate(createdDate)
                 .build();
 
-        when(photoRepository.findPrevPhotoId(chatroom, createdDate, currentPhotoId)).thenReturn(List.of(nextPhotoId));
+        when(photoRepository.findNextPhotoId(chatroom, createdDate, currentPhotoId)).thenReturn(List.of(nextPhotoId));
 
-        Long result = photoService.findPrevPhotoId(chatroom, currentPhoto);
+        Long result = photoService.findNextPhotoId(chatroom, currentPhoto);
 
         assertThat(result).isNotNull();
         assertThat(result).isEqualTo(nextPhotoId);
