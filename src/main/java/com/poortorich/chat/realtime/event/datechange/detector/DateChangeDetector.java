@@ -21,7 +21,7 @@ public class DateChangeDetector {
         String currentDate = LocalDate.now().toString();
 
         if (!chatMessageRepository.existsByContentAndMessageTypeAndChatroom(currentDate, MessageType.DATE, chatroom)) {
-            eventPublisher.publishEvent(new DateChangeEvent(chatroom));
+            eventPublisher.publishEvent(new DateChangeEvent(chatroom.getId()));
         }
     }
 }

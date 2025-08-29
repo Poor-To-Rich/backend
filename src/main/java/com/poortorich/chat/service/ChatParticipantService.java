@@ -4,6 +4,7 @@ import com.poortorich.chat.entity.ChatParticipant;
 import com.poortorich.chat.entity.Chatroom;
 import com.poortorich.chat.entity.enums.ChatroomRole;
 import com.poortorich.chat.entity.enums.NoticeStatus;
+import com.poortorich.chat.entity.enums.RankingStatus;
 import com.poortorich.chat.model.ChatroomPaginationContext;
 import com.poortorich.chat.repository.ChatParticipantRepository;
 import com.poortorich.chat.response.ChatParticipantProfile;
@@ -20,7 +21,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -182,5 +187,27 @@ public class ChatParticipantService {
                         context.user(),
                         context.cursor(),
                         context.pageRequest());
+    }
+
+    public List<ChatParticipant> findAllByIdIn(List<Long> chatParticipantIds) {
+        List<ChatParticipant> participants = chatParticipantRepository.findAllByIdIn(chatParticipantIds);
+
+        Map<Long, ChatParticipant> participantMap = participants.stream()
+                .collect(Collectors.toMap(ChatParticipant::getId, Function.identity()));
+
+        return chatParticipantIds.stream()
+                .map(participantMap::get)
+                .filter(Objects::nonNull)
+                .toList();
+    }
+
+    @Transactional
+    public void updateAllRankingStatus(List<ChatParticipant> participants, RankingStatus rankingStatus) {
+        participants.forEach(participant -> participant.updateRankingStatus(rankingStatus));
+    }
+
+    public ChatParticipant findByChatroomAndRankingStatus(Chatroom chatroom, RankingStatus rankingStatus) {
+        return chatParticipantRepository.findByChatroomAndRankingStatus(chatroom, rankingStatus)
+                .orElse(null);
     }
 }

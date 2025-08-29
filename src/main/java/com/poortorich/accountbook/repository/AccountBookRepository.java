@@ -4,16 +4,18 @@ import com.poortorich.accountbook.entity.AccountBook;
 import com.poortorich.accountbook.enums.AccountBookType;
 import com.poortorich.accountbook.util.strategy.AccountBookStrategyFactory;
 import com.poortorich.category.entity.Category;
+import com.poortorich.ranking.model.UserExpenseAggregate;
 import com.poortorich.user.entity.User;
-import java.time.LocalDate;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Component;
+
+import java.time.LocalDate;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
@@ -146,5 +148,18 @@ public class AccountBookRepository {
         for (var type : AccountBookType.values()) {
             strategyFactory.getStrategy(type).deleteByUser(user);
         }
+    }
+
+    public List<UserExpenseAggregate> findExpenseAggregatesByUsersInRange(
+            List<User> users,
+            LocalDate startDate,
+            LocalDate endDate
+    ) {
+        if (users == null || users.isEmpty()) {
+            return List.of();
+        }
+
+        return strategyFactory.getStrategy(AccountBookType.EXPENSE)
+                .findExpenseAggregatesByUsersAndDateRange(users, startDate, endDate);
     }
 }

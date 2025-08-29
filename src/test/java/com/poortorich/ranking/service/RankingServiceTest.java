@@ -13,6 +13,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.time.temporal.TemporalAdjusters;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -59,5 +60,20 @@ class RankingServiceTest {
         Ranking result = rankingService.findLatestRanking(chatroom, lastMonday, now);
 
         assertThat(result).isNull();
+    }
+
+    @Test
+    @DisplayName("전체 랭킹 목록 조회 구현")
+    void getAllRankingsSuccess() {
+        Chatroom chatroom = Chatroom.builder().build();
+        List<LocalDateTime> mondays = List.of(lastMonday);
+        Ranking ranking = Ranking.builder().chatroom(chatroom).build();
+
+        when(rankingRepository.findAllByChatroomWithDateIn(chatroom, mondays)).thenReturn(List.of(ranking));
+
+        List<Ranking> result = rankingService.findAllRankings(chatroom, mondays);
+
+        assertThat(result).hasSize(1);
+        assertThat(result.get(0).getChatroom()).isEqualTo(chatroom);
     }
 }

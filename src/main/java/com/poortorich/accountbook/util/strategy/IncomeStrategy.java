@@ -4,16 +4,18 @@ import com.poortorich.accountbook.entity.AccountBook;
 import com.poortorich.category.entity.Category;
 import com.poortorich.income.entity.Income;
 import com.poortorich.income.repository.IncomeRepository;
+import com.poortorich.ranking.model.UserExpenseAggregate;
 import com.poortorich.user.entity.User;
-import java.time.LocalDate;
-import java.util.List;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Component;
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
@@ -161,6 +163,11 @@ public class IncomeStrategy implements AccountBookStrategy {
         );
 
         return mapToAccountBookSlice(incomesPage, pageable);
+    }
+
+    @Override
+    public List<UserExpenseAggregate> findExpenseAggregatesByUsersAndDateRange(List<User> users, LocalDate startDate, LocalDate endDate) {
+        return List.of();
     }
 
     private Slice<AccountBook> mapToAccountBookSlice(Slice<Income> incomesPage, Pageable pageable) {

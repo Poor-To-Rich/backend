@@ -84,4 +84,6 @@ public interface ChatroomRepository extends JpaRepository<Chatroom, Long> {
             LIMIT 1
             """, nativeQuery = true)
     Long findFirstChatroomIdByUser(@Param("userId") Long userId);
+
+    List<Chatroom> findAllByIsRankingEnabledIsTrueAndIsClosedIsFalse();
 }

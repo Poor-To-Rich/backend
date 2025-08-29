@@ -338,4 +338,21 @@ class ChatParticipantServiceTest {
         assertThat(result).hasSize(4);
         assertThat(result).containsExactly(member1, member2, member3, member4);
     }
+
+    @Test
+    @DisplayName("채팅방 참여자 아이디 목록으로 채팅방 참여자 조회 성공")
+    void findAllByIdInSuccess() {
+        List<Long> ids = List.of(1L, 2L, 3L);
+        ChatParticipant participant1 = ChatParticipant.builder().id(1L).build();
+        ChatParticipant participant2 = ChatParticipant.builder().id(2L).build();
+        ChatParticipant participant3 = ChatParticipant.builder().id(3L).build();
+
+        when(chatParticipantRepository.findAllByIdIn(ids))
+                .thenReturn(List.of(participant1, participant2, participant3));
+
+        List<ChatParticipant> result = chatParticipantService.findAllByIdIn(ids);
+
+        assertThat(result).hasSize(3);
+        assertThat(result).containsExactly(participant1, participant2, participant3);
+    }
 }

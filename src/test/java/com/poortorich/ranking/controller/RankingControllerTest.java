@@ -2,6 +2,7 @@ package com.poortorich.ranking.controller;
 
 import com.poortorich.global.config.BaseSecurityTest;
 import com.poortorich.ranking.facade.RankingFacade;
+import com.poortorich.ranking.response.AllRankingsResponse;
 import com.poortorich.ranking.response.LatestRankingResponse;
 import com.poortorich.ranking.response.enums.RankingResponse;
 import org.junit.jupiter.api.DisplayName;
@@ -64,5 +65,22 @@ class RankingControllerTest extends BaseSecurityTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message")
                         .value(RankingResponse.GET_LATEST_RANKING_NOT_FOUND.getMessage()));
+    }
+
+    @Test
+    @WithMockUser(username = username)
+    @DisplayName("전체 랭킹 목록 조회 성공")
+    void getAllRankingsSuccess() throws Exception {
+        Long chatroomId = 1L;
+        String cursor = "2025-08-18";
+
+        when(rankingFacade.getAllRankings(username, chatroomId, cursor))
+                .thenReturn(AllRankingsResponse.builder().build());
+
+        mockMvc.perform(get("/chatrooms/" + chatroomId + "/rankings/all")
+                        .with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message")
+                        .value(RankingResponse.GET_ALL_RANKINGS_SUCCESS.getMessage()));
     }
 }

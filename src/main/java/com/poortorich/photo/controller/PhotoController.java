@@ -61,4 +61,16 @@ public class PhotoController {
                 photoFacade.getAllPhotosByCursor(userDetails.getUsername(), chatroomId, date, id)
         );
     }
+
+    @GetMapping("/{photoId}")
+    public ResponseEntity<BaseResponse> getPhotoDetails(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @PathVariable Long chatroomId,
+            @PathVariable Long photoId
+    ) {
+        return DataResponse.toResponseEntity(
+                PhotoResponse.GET_PHOTO_DETAILS_SUCCESS,
+                photoFacade.getPhotoDetails(userDetails.getUsername(), chatroomId, photoId)
+        );
+    }
 }

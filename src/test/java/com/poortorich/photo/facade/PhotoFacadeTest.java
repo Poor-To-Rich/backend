@@ -9,6 +9,7 @@ import com.poortorich.global.exceptions.BadRequestException;
 import com.poortorich.photo.entity.Photo;
 import com.poortorich.photo.request.PhotoUploadRequest;
 import com.poortorich.photo.response.AllPhotosResponse;
+import com.poortorich.photo.response.PhotoDetailsResponse;
 import com.poortorich.photo.response.PhotoUploadResponse;
 import com.poortorich.photo.response.PreviewPhotosResponse;
 import com.poortorich.photo.response.enums.PhotoResponse;
@@ -224,5 +225,45 @@ class PhotoFacadeTest {
         assertThat(result.getPhotos().get(1).getPhotoUrl()).isEqualTo(photo2.getPhotoUrl());
         assertThat(result.getPhotos().get(2).getPhotoId()).isEqualTo(photo1.getId());
         assertThat(result.getPhotos().get(2).getPhotoUrl()).isEqualTo(photo1.getPhotoUrl());
+    }
+
+    @Test
+    @DisplayName("사진 상세 조회 성공")
+    void getPhotoDetailsSuccess() {
+        String username = "test";
+        Long chatroomId = 1L;
+        Long photoId = 2L;
+        Chatroom chatroom = Chatroom.builder().id(chatroomId).build();
+        User user = User.builder()
+                .id(1L)
+                .username(username)
+                .nickname(username)
+                .build();
+        Photo photo = Photo.builder()
+                .id(photoId)
+                .user(user)
+                .chatroom(chatroom)
+                .photoUrl("photo2.com")
+                .createdDate(LocalDateTime.of(2025, 8, 20, 0, 0, 0))
+                .build();
+        Long prevPhotoId = 1L;
+        Long nextPhotoId = 3L;
+
+        when(userService.findUserByUsername(username)).thenReturn(user);
+        when(chatroomService.findById(chatroomId)).thenReturn(chatroom);
+        when(photoService.findByChatroomAndId(chatroom, photoId)).thenReturn(photo);
+        when(photoService.findPrevPhotoId(chatroom, photo)).thenReturn(prevPhotoId);
+        when(photoService.findNextPhotoId(chatroom, photo)).thenReturn(nextPhotoId);
+
+        PhotoDetailsResponse result = photoFacade.getPhotoDetails(username, chatroomId, photoId);
+
+        assertThat(result).isNotNull();
+        assertThat(result.getPhotoId()).isEqualTo(photo.getId());
+        assertThat(result.getPhotoUrl()).isEqualTo(photo.getPhotoUrl());
+        assertThat(result.getUploadedAt()).isEqualTo(photo.getCreatedDate().toString());
+        assertThat(result.getUploadedBy().getUserId()).isEqualTo(photo.getUser().getId());
+        assertThat(result.getUploadedBy().getNickname()).isEqualTo(photo.getUser().getNickname());
+        assertThat(result.getPrevPhotoId()).isEqualTo(prevPhotoId);
+        assertThat(result.getNextPhotoId()).isEqualTo(nextPhotoId);
     }
 }
