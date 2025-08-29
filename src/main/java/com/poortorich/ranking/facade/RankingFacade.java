@@ -116,6 +116,9 @@ public class RankingFacade {
 
     private Map<LocalDateTime, Ranking> getMondayRankings(Chatroom chatroom, String cursor) {
         List<LocalDateTime> mondays = getMondays(DateParser.parseDate(cursor).atStartOfDay(), getFloorMonday(chatroom));
+        if (mondays.isEmpty()) {
+            return new LinkedHashMap<>();
+        }
         List<Ranking> rankings = rankingService.findAllRankings(chatroom, mondays);
 
         Map<LocalDateTime, Ranking> byDate = rankings.stream()
@@ -155,6 +158,10 @@ public class RankingFacade {
             String nextCursor,
             Map<LocalDateTime, Ranking> rankings
     ) {
+        if (rankings.isEmpty()) {
+            return AllRankingsResponse.builder().build();
+        }
+
         return AllRankingsResponse.builder()
                 .hasNext(hasNext)
                 .nextCursor(nextCursor)
