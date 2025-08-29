@@ -10,6 +10,10 @@ import com.poortorich.chat.realtime.payload.response.UserChatMessagePayload;
 import com.poortorich.chat.realtime.payload.response.UserEnterResponsePayload;
 import com.poortorich.chat.realtime.payload.response.UserLeaveResponsePayload;
 import com.poortorich.chat.service.UnreadChatMessageService;
+import com.poortorich.ranking.entity.Ranking;
+import com.poortorich.ranking.payload.response.RankingResponsePayload;
+import com.poortorich.ranking.service.RankingService;
+import com.poortorich.ranking.util.mapper.RankerProfileMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -18,11 +22,13 @@ import org.springframework.stereotype.Component;
 public class ChatMessageMapper {
 
     private final UnreadChatMessageService unreadChatMessageService;
+    private final RankingService rankingService;
+
+    private final RankerProfileMapper rankerProfileMapper;
 
     public ChatMessageResponse mapToChatMessageResponse(ChatMessage chatMessage) {
         return switch (chatMessage.getMessageType()) {
-            // TODO: 랭킹 기능 구현 후 추가 예정
-            case RANKING -> null;
+            case RANKING -> rankingMessage(chatMessage);
             case RANKING_STATUS -> rankingStatusMessage(chatMessage);
             case ENTER -> userEnterMessage(chatMessage);
             case LEAVE -> userLeaveMessage(chatMessage);
@@ -31,6 +37,22 @@ public class ChatMessageMapper {
             case DATE -> dateChangeMessage(chatMessage);
             case DELEGATE -> hostDelegationMessage(chatMessage);
         };
+    }
+
+    private ChatMessageResponse rankingMessage(ChatMessage chatMessage) {
+        Ranking ranking = rankingService.findById(chatMessage.getRankingId());
+
+        return RankingResponsePayload.builder()
+                .messageId(chatMessage.getId())
+                .rankingId(chatMessage.getRankingId())
+                .chatroomId(chatMessage.getChatroom().getId())
+                .rankedAt(chatMessage.getSentAt().toLocalDate())
+                .sentAt(chatMessage.getSentAt())
+                .saverRankings(rankerProfileMapper.mapToSavers(ranking))
+                .flexerRankings(rankerProfileMapper.mapToFlexer(ranking))
+                .type(chatMessage.getType())
+                .messageType(chatMessage.getMessageType())
+                .build();
     }
 
     private ChatMessageResponse hostDelegationMessage(ChatMessage chatMessage) {
@@ -106,6 +128,7 @@ public class ChatMessageMapper {
                 .messageId(chatMessage.getId())
                 .chatroomId(chatMessage.getChatroom().getId())
                 .senderId(chatMessage.getUserId())
+                .photoId(chatMessage.getPhotoId())
                 .messageType(chatMessage.getMessageType())
                 .content(chatMessage.getContent())
                 .sentAt(chatMessage.getSentAt())

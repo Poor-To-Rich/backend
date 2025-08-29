@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class SubscribeEndpointExtractor {
 
-    public Long getChatroomId(String endpoint) {
+    public Long getDestinationValue(String endpoint) {
         return SubscribeEndpoint.SUB_PREFIXES.stream()
                 .filter(endpoint::startsWith)
                 .findFirst()

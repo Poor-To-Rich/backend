@@ -18,7 +18,6 @@ public class StompUnsubscribeHandler {
     private final SubscribeService subscribeService;
 
     public void handle(StompHeaderAccessor accessor) {
-        subscribeValidator.validateEndPoint(accessor);
         String username = sessionManager.getUsername(accessor);
 
         subscribeService.unsubscribe(username, accessor.getSessionId(), accessor.getSubscriptionId());

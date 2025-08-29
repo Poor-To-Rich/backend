@@ -20,12 +20,8 @@ import com.poortorich.income.response.enums.IncomeResponse;
 import com.poortorich.iteration.entity.Iteration;
 import com.poortorich.iteration.response.CustomIterationInfoResponse;
 import com.poortorich.page.domain.Pagination;
+import com.poortorich.ranking.model.UserExpenseAggregate;
 import com.poortorich.user.entity.User;
-import java.beans.Transient;
-import java.time.LocalDate;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -33,6 +29,12 @@ import org.springframework.data.domain.SliceImpl;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
+
+import java.beans.Transient;
+import java.time.LocalDate;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -300,5 +302,17 @@ public class AccountBookService {
         return accountBookRepository.findByIdAndUser(expenseId, user, type)
                 .orElseThrow(() -> new NotFoundException(ExpenseResponse.EXPENSE_NON_EXISTENT))
                 .getCategory();
+    }
+
+    public List<UserExpenseAggregate> getExpenseAggregatesForUsersInRange(
+            List<User> users,
+            LocalDate startDate,
+            LocalDate endDate
+    ) {
+        if (users == null || users.isEmpty()) {
+            return List.of();
+        }
+
+        return accountBookRepository.findExpenseAggregatesByUsersInRange(users, startDate, endDate);
     }
 }

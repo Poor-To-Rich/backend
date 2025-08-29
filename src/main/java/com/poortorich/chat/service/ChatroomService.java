@@ -95,4 +95,8 @@ public class ChatroomService {
     public Long getFirstChatroomIdByUser(User user) {
         return chatroomRepository.findFirstChatroomIdByUser(user.getId());
     }
+
+    public List<Chatroom> getChatroomsByRankingEnabledIsTrue() {
+        return chatroomRepository.findAllByIsRankingEnabledIsTrueAndIsClosedIsFalse();
+    }
 }
