@@ -140,5 +140,11 @@ public interface ChatParticipantRepository extends JpaRepository<ChatParticipant
             """)
     Slice<ChatParticipant> findMyParticipants(@Param("user") User user, @Param("cursor") Long cursor, Pageable pageable);
 
-    List<ChatParticipant> findAllByIdIn(List<Long> chatParticipantIds);
+    @Query("""
+        SELECT cp
+         FROM ChatParticipant cp
+         JOIN FETCH cp.user u
+        WHERE cp.id In :ids
+    """)
+    List<ChatParticipant> findAllByIdIn(@Param("ids") List<Long> ids);
 }
