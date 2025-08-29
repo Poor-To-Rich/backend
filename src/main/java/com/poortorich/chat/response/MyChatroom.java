@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 
 @Data
 @Builder
-public class MyChatroom {
+public class MyChatroom implements Comparable<MyChatroom> {
 
     private final Long chatroomId;
     private final String chatroomImage;
@@ -17,4 +17,9 @@ public class MyChatroom {
     private final String lastMessage;
     private final LocalDateTime lastMessageTime;
     private final Long unreadMessageCount;
+
+    @Override
+    public int compareTo(MyChatroom other) {
+        return other.getLastMessageTime().compareTo(this.lastMessageTime);
+    }
 }

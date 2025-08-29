@@ -317,6 +317,7 @@ public class ChatFacade {
 
         List<MyChatroom> myChatrooms = participants.stream()
                 .map(chatroomMapper::mapToMyChatroom)
+                .sorted()
                 .toList();
 
         return MyChatroomsResponse.builder()
@@ -350,7 +351,7 @@ public class ChatFacade {
 
         eventPublisher.publishEvent(new ParticipantUpdateEvent(nextHost));
         eventPublisher.publishEvent(new ParticipantUpdateEvent(currentHost));
-        
+
         return HostDelegationResponse.builder()
                 .newHostUserId(nextHost.getUser().getId())
                 .prevHost(currentHost)
