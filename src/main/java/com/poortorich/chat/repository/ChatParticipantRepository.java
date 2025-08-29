@@ -2,6 +2,7 @@ package com.poortorich.chat.repository;
 
 import com.poortorich.chat.entity.ChatParticipant;
 import com.poortorich.chat.entity.Chatroom;
+import com.poortorich.chat.entity.enums.RankingStatus;
 import com.poortorich.user.entity.User;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -139,4 +140,6 @@ public interface ChatParticipantRepository extends JpaRepository<ChatParticipant
             ORDER BY cr.id ASC
             """)
     Slice<ChatParticipant> findMyParticipants(@Param("user") User user, @Param("cursor") Long cursor, Pageable pageable);
+
+    Optional<ChatParticipant> findByChatroomAndRankingStatus(Chatroom chatroom, RankingStatus rankingStatus);
 }
