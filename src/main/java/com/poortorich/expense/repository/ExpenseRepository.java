@@ -133,7 +133,7 @@ public interface ExpenseRepository extends JpaRepository<Expense, Long> {
     @Query("""
             SELECT NEW  com.poortorich.ranking.model.UserExpenseAggregate(
                 e.user.id,
-                COALESCE(SUM(e.cost, 0L),
+                COALESCE(SUM(e.cost), 0L),
                 COUNT(DISTINCT e.expenseDate)
             )
             FROM Expense e
