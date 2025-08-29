@@ -1,24 +1,25 @@
 package com.poortorich.ranking.util.calculator;
 
-import com.poortorich.accountbook.entity.AccountBook;
-import com.poortorich.accountbook.enums.AccountBookType;
 import com.poortorich.accountbook.service.AccountBookService;
-import com.poortorich.accountbook.util.AccountBookCalculator;
 import com.poortorich.chat.entity.ChatParticipant;
 import com.poortorich.chat.entity.Chatroom;
 import com.poortorich.chat.service.ChatParticipantService;
 import com.poortorich.ranking.model.Rankers;
+import com.poortorich.ranking.model.UserExpenseAggregate;
+import com.poortorich.user.entity.User;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.temporal.TemporalAdjusters;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -43,37 +44,35 @@ public class RankingCalculator {
 
     private RankingCalculationData getRankingCalculationData(List<ChatParticipant> participants) {
         LocalDate today = LocalDate.now();
-        LocalDate lastWeekMonday = today.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
-                .minusWeeks(1);
+        LocalDate lastWeekSunday = today.with(TemporalAdjusters.previous(DayOfWeek.SUNDAY));
+        LocalDate lastWeekMonday = lastWeekSunday.with(TemporalAdjusters.previous(DayOfWeek.MONDAY));
 
-        List<CalculableParticipant> calculableParticipants = new ArrayList<>();
+        List<User> users = participants.stream().map(ChatParticipant::getUser).toList();
 
-        for (ChatParticipant participant : participants) {
-            int expenseDaysCount = 0;
+        List<UserExpenseAggregate> expenseAggregates = accountBookService
+                .getExpenseAggregatesForUsersInRange(users, lastWeekMonday, lastWeekSunday);
 
-            for (int i = 0; i < 7; i++) {
-                LocalDate checkDate = lastWeekMonday.plusDays(i);
-                List<AccountBook> expenses = accountBookService.getAccountBooksByUserAndDate(
-                        participant.getUser(),
-                        checkDate,
-                        AccountBookType.EXPENSE);
+        Map<Long, UserExpenseAggregate> aggregateGroupByUserId = expenseAggregates.stream()
+                .collect(Collectors.toMap(UserExpenseAggregate::getUserId, aggregate -> aggregate));
 
-                if (!expenses.isEmpty()) {
-                    expenseDaysCount++;
-                }
-            }
-
-            if (expenseDaysCount >= 3) {
-                calculableParticipants.add(CalculableParticipant.builder()
-                        .expenseDays(expenseDaysCount)
-                        .participant(participant)
-                        .build());
-            }
-        }
+        List<CalculableParticipant> calculableParticipants = participants.stream()
+                .filter(participant -> {
+                    UserExpenseAggregate aggregate = aggregateGroupByUserId.get(participant.getUser().getId());
+                    return aggregate != null && aggregate.getExpenseDaysCount() >= 3;
+                })
+                .map(participant -> {
+                    UserExpenseAggregate aggregate = aggregateGroupByUserId.get(participant.getUser().getId());
+                    return CalculableParticipant.builder()
+                            .expenseDays(aggregate.getExpenseDaysCount())
+                            .participant(participant)
+                            .totalExpenseCost(aggregate.getTotalCostAsBigDecimal())
+                            .build();
+                })
+                .toList();
 
         return RankingCalculationData.builder()
                 .startDate(lastWeekMonday)
-                .endDate(lastWeekMonday.plusDays(6))
+                .endDate(lastWeekSunday)
                 .participants(calculableParticipants)
                 .build();
     }
@@ -82,7 +81,7 @@ public class RankingCalculator {
         List<CalculableParticipant> participants = calculationData.getParticipants();
         List<RankingResult> rankingResults = participants.stream()
                 .map(participant -> RankingResult.builder()
-                        .score(getScore(participant, calculationData.getStartDate(), calculationData.getEndDate()))
+                        .score(getScore(participant))
                         .participant(participant.getParticipant())
                         .build())
                 .sorted()
@@ -97,7 +96,7 @@ public class RankingCalculator {
         List<CalculableParticipant> participants = calculationData.getParticipants();
         List<RankingResult> rankingResults = participants.stream()
                 .map(participant -> RankingResult.builder()
-                        .score(getScore(participant, calculationData.getStartDate(), calculationData.getEndDate()))
+                        .score(getScore(participant))
                         .participant(participant.getParticipant())
                         .build())
                 .sorted(Comparator.reverseOrder())
@@ -108,17 +107,10 @@ public class RankingCalculator {
                 .toList();
     }
 
-    private Double getScore(CalculableParticipant participant, LocalDate startDate, LocalDate endDate) {
-        List<AccountBook> accountBooks = accountBookService.getAccountBookBetweenDates(
-                participant.getParticipant().getUser(),
-                startDate,
-                endDate,
-                AccountBookType.EXPENSE
-        );
-
-        Long totalSpending = AccountBookCalculator.sum(accountBooks);
-
-        return totalSpending * (participant.getExpenseDays() / 7.);
+    private BigDecimal getScore(CalculableParticipant participant) {
+        BigDecimal totalCost = participant.getTotalExpenseCost();
+        double dayRatio = participant.getExpenseDays() / 7.;
+        return totalCost.multiply(BigDecimal.valueOf(dayRatio));
     }
 
     @Getter
@@ -126,6 +118,7 @@ public class RankingCalculator {
     protected static class CalculableParticipant {
         private int expenseDays;
         private ChatParticipant participant;
+        private BigDecimal totalExpenseCost;
     }
 
     @Getter
@@ -143,7 +136,7 @@ public class RankingCalculator {
     @Getter
     @Builder
     protected static class RankingResult implements Comparable<RankingResult> {
-        private Double score;
+        private BigDecimal score;
         private ChatParticipant participant;
 
         @Override

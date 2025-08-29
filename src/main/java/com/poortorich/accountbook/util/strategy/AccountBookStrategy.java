@@ -2,13 +2,15 @@ package com.poortorich.accountbook.util.strategy;
 
 import com.poortorich.accountbook.entity.AccountBook;
 import com.poortorich.category.entity.Category;
+import com.poortorich.ranking.model.UserExpenseAggregate;
 import com.poortorich.user.entity.User;
-import java.time.LocalDate;
-import java.util.List;
-import java.util.Optional;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort.Direction;
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
 
 public interface AccountBookStrategy {
 
@@ -57,5 +59,11 @@ public interface AccountBookStrategy {
             LocalDate endDate,
             LocalDate cursor,
             Pageable pageable
+    );
+
+    List<UserExpenseAggregate> findExpenseAggregatesByUsersAndDateRange(
+            List<User> users,
+            LocalDate startDate,
+            LocalDate endDate
     );
 }
