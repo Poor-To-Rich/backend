@@ -177,10 +177,10 @@ public class ChatMessageService {
 
     @Transactional
     public RankingStatusMessagePayload saveRankingStatusMessage(PayloadContext context) {
+        dateChangeDetector.detect(context.chatroom());
         ChatMessage rankingStatusChatMessage = RankingStatusChatMessageBuilder.buildRankingStatusMessage(
                 context.chatroom());
 
-        dateChangeDetector.detect(context.chatroom());
         ChatMessage savedRankingStatusChatMessage = chatMessageRepository.save(rankingStatusChatMessage);
 
         return RankingStatusMessagePayload.builder()
