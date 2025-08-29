@@ -28,7 +28,6 @@ public class ChatMessageMapper {
 
     public ChatMessageResponse mapToChatMessageResponse(ChatMessage chatMessage) {
         return switch (chatMessage.getMessageType()) {
-            // TODO: 랭킹 기능 구현 후 추가 예정
             case RANKING -> rankingMessage(chatMessage);
             case RANKING_STATUS -> rankingStatusMessage(chatMessage);
             case ENTER -> userEnterMessage(chatMessage);
