@@ -20,6 +20,15 @@ public class MyChatroom implements Comparable<MyChatroom> {
 
     @Override
     public int compareTo(MyChatroom other) {
+        if (this.lastMessageTime == null && other.lastMessageTime == null) {
+            return 0;
+        }
+        if (this.lastMessageTime == null) {
+            return 1;
+        }
+        if (other.lastMessageTime == null) {
+            return -1;
+        }
         return other.getLastMessageTime().compareTo(this.lastMessageTime);
     }
 }
