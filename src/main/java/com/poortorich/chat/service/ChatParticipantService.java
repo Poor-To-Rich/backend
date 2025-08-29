@@ -20,7 +20,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -182,5 +186,17 @@ public class ChatParticipantService {
                         context.user(),
                         context.cursor(),
                         context.pageRequest());
+    }
+
+    public List<ChatParticipant> findAllByIdIn(List<Long> chatParticipantIds) {
+        List<ChatParticipant> participants = chatParticipantRepository.findAllByIdIn(chatParticipantIds);
+
+        Map<Long, ChatParticipant> participantMap = participants.stream()
+                .collect(Collectors.toMap(ChatParticipant::getId, Function.identity()));
+
+        return chatParticipantIds.stream()
+                .map(participantMap::get)
+                .filter(Objects::nonNull)
+                .toList();
     }
 }

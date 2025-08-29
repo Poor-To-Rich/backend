@@ -139,4 +139,6 @@ public interface ChatParticipantRepository extends JpaRepository<ChatParticipant
             ORDER BY cr.id ASC
             """)
     Slice<ChatParticipant> findMyParticipants(@Param("user") User user, @Param("cursor") Long cursor, Pageable pageable);
+
+    List<ChatParticipant> findAllByIdIn(List<Long> chatParticipantIds);
 }
