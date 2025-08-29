@@ -49,7 +49,11 @@ public interface PhotoRepository extends JpaRepository<Photo, Long> {
           )
         ORDER BY p.createdDate DESC , p.id DESC
     """)
-    List<Long> findPrevPhotoId(Chatroom chatroom, LocalDateTime createdDate, Long id);
+    List<Long> findPrevPhotoId(
+            @Param("chatroom") Chatroom chatroom,
+            @Param("createdDate") LocalDateTime createdDate,
+            @Param("id") Long id
+    );
 
     @Query("""
         SELECT p.id
@@ -61,5 +65,9 @@ public interface PhotoRepository extends JpaRepository<Photo, Long> {
           )
         ORDER BY p.createdDate ASC , p.id ASC
     """)
-    List<Long> findNextPhotoId(Chatroom chatroom, LocalDateTime createdDate, Long id);
+    List<Long> findNextPhotoId(
+            @Param("chatroom") Chatroom chatroom,
+            @Param("createdDate") LocalDateTime createdDate,
+            @Param("id") Long id
+    );
 }
