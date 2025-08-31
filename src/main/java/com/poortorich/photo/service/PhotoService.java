@@ -7,10 +7,10 @@ import com.poortorich.photo.repository.PhotoRepository;
 import com.poortorich.photo.response.enums.PhotoResponse;
 import com.poortorich.user.entity.User;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -53,5 +53,10 @@ public class PhotoService {
         return photoRepository.findNextPhotoId(chatroom, currentPhoto.getCreatedDate(), currentPhoto.getId()).stream()
                 .findFirst()
                 .orElse(null);
+    }
+
+    @Transactional
+    public void deleteAllByChatroom(Chatroom chatroom) {
+        photoRepository.deleteAllByChatroom(chatroom);
     }
 }

@@ -108,4 +108,9 @@ public class RankingService {
     public List<Ranking> findAllRankings(Chatroom chatroom, List<LocalDateTime> mondays) {
         return rankingRepository.findAllByChatroomWithDateIn(chatroom, mondays);
     }
+
+    @Transactional
+    public void deleteAllByChatroom(Chatroom chatroom) {
+        rankingRepository.deleteAllByChatroom(chatroom);
+    }
 }

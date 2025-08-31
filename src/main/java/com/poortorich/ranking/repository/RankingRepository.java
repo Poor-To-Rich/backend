@@ -20,11 +20,13 @@ public interface RankingRepository extends JpaRepository<Ranking, Long> {
     );
 
     @Query("""
-        SELECT r
-          FROM Ranking r
-         WHERE r.chatroom = :chatroom
-           AND r.createdDate IN :mondays
-         ORDER BY r.createdDate DESC
-    """)
+                SELECT r
+                  FROM Ranking r
+                 WHERE r.chatroom = :chatroom
+                   AND r.createdDate IN :mondays
+                 ORDER BY r.createdDate DESC
+            """)
     List<Ranking> findAllByChatroomWithDateIn(Chatroom chatroom, List<LocalDateTime> mondays);
+
+    void deleteAllByChatroom(Chatroom chatroom);
 }
