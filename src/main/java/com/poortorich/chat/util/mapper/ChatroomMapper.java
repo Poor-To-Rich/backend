@@ -37,8 +37,10 @@ public class ChatroomMapper {
                 .isHost(ChatroomRole.HOST.equals(participant.getRole()))
                 .chatroomTitle(chatroom.getTitle())
                 .currentMemberCount(chatParticipantService.countByChatroom(chatroom))
-                .lastMessage(lastMessage.map(contentMapper::mapToContent).orElse(null))
-                .lastMessageTime(lastMessage.map(ChatMessage::getSentAt).orElse(null))
+                .lastMessage(lastMessage.map(contentMapper::mapToContent)
+                        .orElse(contentMapper.mapToContent(participant)))
+                .lastMessageTime(lastMessage.map(ChatMessage::getSentAt)
+                        .orElse(contentMapper.mapToTime(participant)))
                 .unreadMessageCount(unreadMessageCount)
                 .build();
     }
