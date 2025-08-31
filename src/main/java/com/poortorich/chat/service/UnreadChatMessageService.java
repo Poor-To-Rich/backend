@@ -83,6 +83,7 @@ public class UnreadChatMessageService {
         return unreadChatMessageRepository.countByUserAndChatroom(user, chatroom);
     }
 
+    @Transactional
     public void deleteAllByChatroom(Chatroom chatroom) {
         unreadChatMessageRepository.deleteAllByChatroom(chatroom);
     }
