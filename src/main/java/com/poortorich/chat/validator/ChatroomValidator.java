@@ -71,4 +71,10 @@ public class ChatroomValidator {
             throw new BadRequestException(ChatResponse.CHATROOM_LEAVE_ALREADY);
         }
     }
+
+    public void validateIsOpened(Chatroom chatroom) {
+        if (chatroom.getIsClosed()) {
+            throw new BadRequestException(ChatResponse.CHATROOM_IS_CLOSED);
+        }
+    }
 }
