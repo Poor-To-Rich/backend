@@ -22,10 +22,7 @@ public class ChatroomValidator {
     private final ChatParticipantRepository chatParticipantRepository;
 
     public void validateEnter(User user, Chatroom chatroom) {
-        if (chatroom.getIsClosed()) {
-            throw new BadRequestException(ChatResponse.CHATROOM_IS_CLOSED);
-        }
-
+        validateIsOpened(chatroom);
         Optional<ChatParticipant> chatParticipant = chatParticipantRepository.findByUserAndChatroom(user, chatroom);
         if (chatParticipant.isPresent()) {
             if (chatParticipant.get().getRole().equals(ChatroomRole.BANNED)) {
