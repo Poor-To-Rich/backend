@@ -201,13 +201,23 @@ public class ChatController {
                 chatroomLeaveAllRequest);
 
         for (Long chatroomId : chatroomLeaveAllRequest.getChatroomsToLeave()) {
-            BasePayload basePayload = realTimeFacade.createUserLeaveSystemMessage(
+            BasePayload leavePayload = realTimeFacade.createUserLeaveSystemMessage(
                     userDetails.getUsername(),
                     chatroomId);
-            if (!Objects.isNull(basePayload)) {
+            BasePayload closedPayload = realTimeFacade.createChatroomClosedMessageOrDeleteAll(
+                    userDetails.getUsername(),
+                    chatroomId);
+
+            if (!Objects.isNull(leavePayload)) {
                 messagingTemplate.convertAndSend(
                         SubscribeEndpoint.CHATROOM_SUBSCRIBE_PREFIX + chatroomId,
-                        basePayload);
+                        leavePayload);
+            }
+
+            if (!Objects.isNull(closedPayload)) {
+                messagingTemplate.convertAndSend(
+                        SubscribeEndpoint.CHATROOM_SUBSCRIBE_PREFIX + chatroomId,
+                        closedPayload);
             }
         }
 

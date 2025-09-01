@@ -5,6 +5,7 @@ import com.poortorich.global.exceptions.BadRequestException;
 import com.poortorich.photo.entity.Photo;
 import com.poortorich.photo.repository.PhotoRepository;
 import com.poortorich.photo.response.enums.PhotoResponse;
+import com.poortorich.s3.service.FileUploadService;
 import com.poortorich.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -20,6 +21,7 @@ import java.util.List;
 public class PhotoService {
 
     private final PhotoRepository photoRepository;
+    private final FileUploadService fileUploadService;
 
     public void savePhoto(User user, Chatroom chatroom, String photoUrl) {
         Photo photo = Photo.builder()
@@ -57,6 +59,8 @@ public class PhotoService {
 
     @Transactional
     public void deleteAllByChatroom(Chatroom chatroom) {
-        photoRepository.deleteAllByChatroom(chatroom);
+        List<Photo> photos = photoRepository.findAllByChatroom(chatroom);
+        photos.forEach(photo -> fileUploadService.deleteImage(photo.getPhotoUrl()));
+        photoRepository.deleteByChatroom(chatroom);
     }
 }
