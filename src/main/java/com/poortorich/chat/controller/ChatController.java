@@ -6,7 +6,6 @@ import com.poortorich.chat.model.MarkAllChatroomAsReadResult;
 import com.poortorich.chat.model.UserEnterChatroomResult;
 import com.poortorich.chat.realtime.facade.ChatRealTimeFacade;
 import com.poortorich.chat.realtime.payload.response.BasePayload;
-import com.poortorich.chat.realtime.payload.response.MessageReadPayload;
 import com.poortorich.chat.request.ChatroomCreateRequest;
 import com.poortorich.chat.request.ChatroomEnterRequest;
 import com.poortorich.chat.request.ChatroomLeaveAllRequest;
@@ -231,11 +230,12 @@ public class ChatController {
         MarkAllChatroomAsReadResult result = realTimeFacade.markAllChatroomAsRead(userDetails.getUsername());
 
         result.getBroadcastPayloads()
-                .forEach(basePayload -> {
-                    MessageReadPayload payload = (MessageReadPayload) basePayload.getPayload();
-                    messagingTemplate.convertAndSend(
-                            SubscribeEndpoint.CHATROOM_SUBSCRIBE_PREFIX + payload.getChatroomId(),
-                            basePayload);
+                .forEach(payload -> {
+                    if (!Objects.isNull(payload)) {
+                        messagingTemplate.convertAndSend(
+                                SubscribeEndpoint.CHATROOM_SUBSCRIBE_PREFIX + payload.getChatroomId(),
+                                payload.mapToBasePayload());
+                    }
                 });
 
         return DataResponse.toResponseEntity(ChatResponse.MARK_ALL_CHATROOM_AS_READ_SUCCESS, result.getApiResponse());
