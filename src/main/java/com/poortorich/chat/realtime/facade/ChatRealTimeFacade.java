@@ -70,7 +70,11 @@ public class ChatRealTimeFacade {
 
     public BasePayload createUserLeaveSystemMessage(String username, Long chatroomId) {
         PayloadContext context = payloadCollector.getPayloadContext(username, chatroomId);
+        return chatMessageService.saveUserLeaveMessage(context.user(), context.chatroom()).mapToBasePayload();
+    }
 
+    public BasePayload createChatroomClosedMessageOrDeleteAll(String username, Long chatroomId) {
+        PayloadContext context = payloadCollector.getPayloadContext(username, chatroomId);
         return chatroomLeaveManager.leaveChatroom(context);
     }
 

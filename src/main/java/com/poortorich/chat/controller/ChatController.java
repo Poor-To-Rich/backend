@@ -177,10 +177,16 @@ public class ChatController {
     ) {
         ChatroomLeaveResponse response = chatFacade.leaveChatroom(userDetails.getUsername(), chatroomId);
 
-        BasePayload basePayload = realTimeFacade.createUserLeaveSystemMessage(userDetails.getUsername(), chatroomId);
+        BasePayload leavePayload = realTimeFacade.createUserLeaveSystemMessage(userDetails.getUsername(), chatroomId);
+        BasePayload closedPayload = realTimeFacade.createChatroomClosedMessageOrDeleteAll(
+                userDetails.getUsername(),
+                chatroomId);
 
-        if (!Objects.isNull(basePayload)) {
-            messagingTemplate.convertAndSend(SubscribeEndpoint.CHATROOM_SUBSCRIBE_PREFIX + chatroomId, basePayload);
+        if (!Objects.isNull(leavePayload)) {
+            messagingTemplate.convertAndSend(SubscribeEndpoint.CHATROOM_SUBSCRIBE_PREFIX + chatroomId, leavePayload);
+        }
+        if (!Objects.isNull(closedPayload)) {
+            messagingTemplate.convertAndSend(SubscribeEndpoint.CHATROOM_SUBSCRIBE_PREFIX + chatroomId, closedPayload);
         }
         return DataResponse.toResponseEntity(ChatResponse.CHATROOM_LEAVE_SUCCESS, response);
     }
