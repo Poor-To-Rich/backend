@@ -76,6 +76,6 @@ public class ChatNoticeService {
 
     @Transactional
     public void deleteAllByChatroom(Chatroom chatroom) {
-        chatNoticeRepository.deleteAllByChatroom(chatroom);
+        chatNoticeRepository.deleteByChatroom(chatroom);
     }
 }

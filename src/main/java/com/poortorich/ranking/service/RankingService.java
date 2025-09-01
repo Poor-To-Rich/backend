@@ -111,6 +111,6 @@ public class RankingService {
 
     @Transactional
     public void deleteAllByChatroom(Chatroom chatroom) {
-        rankingRepository.deleteAllByChatroom(chatroom);
+        rankingRepository.deleteByChatroom(chatroom);
     }
 }

@@ -23,5 +23,5 @@ public interface ChatNoticeRepository extends JpaRepository<ChatNotice, Long> {
 
     boolean existsByIdAndChatroom(Long noticeId, Chatroom chatroom);
 
-    void deleteAllByChatroom(Chatroom chatroom);
+    void deleteByChatroom(Chatroom chatroom);
 }

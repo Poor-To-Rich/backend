@@ -28,5 +28,5 @@ public interface RankingRepository extends JpaRepository<Ranking, Long> {
             """)
     List<Ranking> findAllByChatroomWithDateIn(Chatroom chatroom, List<LocalDateTime> mondays);
 
-    void deleteAllByChatroom(Chatroom chatroom);
+    void deleteByChatroom(Chatroom chatroom);
 }

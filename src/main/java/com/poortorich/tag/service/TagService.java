@@ -20,7 +20,7 @@ public class TagService {
         if (Objects.isNull(hashtags)) {
             return;
         }
-        
+
         List<Tag> tag = hashtags.stream()
                 .map(tagName -> buildTag(tagName, chatroom))
                 .toList();
@@ -41,13 +41,14 @@ public class TagService {
                 .toList();
     }
 
+    @Transactional
     public void updateTag(List<String> hashtags, Chatroom chatroom) {
-        tagRepository.deleteAllByChatroom(chatroom);
+        tagRepository.deleteByChatroom(chatroom);
         createTag(hashtags, chatroom);
     }
 
     @Transactional
     public void deleteAllByChatroom(Chatroom chatroom) {
-        tagRepository.deleteAllByChatroom(chatroom);
+        tagRepository.deleteByChatroom(chatroom);
     }
 }

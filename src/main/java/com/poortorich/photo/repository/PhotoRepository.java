@@ -71,5 +71,7 @@ public interface PhotoRepository extends JpaRepository<Photo, Long> {
             @Param("id") Long id
     );
 
-    void deleteAllByChatroom(Chatroom chatroom);
+    void deleteByChatroom(Chatroom chatroom);
+
+    List<Photo> findAllByChatroom(Chatroom chatroom);
 }

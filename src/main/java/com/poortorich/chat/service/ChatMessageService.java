@@ -161,7 +161,7 @@ public class ChatMessageService {
 
     @Transactional
     public void deleteAllByChatroom(Chatroom chatroom) {
-        chatMessageRepository.deleteAllByChatroom(chatroom);
+        chatMessageRepository.deleteByChatroom(chatroom);
     }
 
     public Long getLatestMessageId(Chatroom chatroom) {
@@ -270,7 +270,7 @@ public class ChatMessageService {
         ChatMessage rankingMessage = RankingMessageBuilder.buildRankingMessage(chatroom, ranking);
         rankingMessage = chatMessageRepository.save(rankingMessage);
         rankingMessage.updateSentAt(date.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY)));
-        
+
         return RankingResponsePayload.builder()
                 .messageId(rankingMessage.getId())
                 .rankingId(rankingMessage.getRankingId())

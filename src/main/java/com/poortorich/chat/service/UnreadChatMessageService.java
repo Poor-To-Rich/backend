@@ -85,6 +85,6 @@ public class UnreadChatMessageService {
 
     @Transactional
     public void deleteAllByChatroom(Chatroom chatroom) {
-        unreadChatMessageRepository.deleteAllByChatroom(chatroom);
+        unreadChatMessageRepository.deleteByChatroom(chatroom);
     }
 }
