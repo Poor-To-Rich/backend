@@ -54,7 +54,7 @@ public class ChatroomService {
     }
 
     private List<Chatroom> findByIds(List<Long> chatroomIds) {
-        List<Chatroom> chatrooms = chatroomRepository.findAllById(chatroomIds);
+        List<Chatroom> chatrooms = chatroomRepository.findAllByIdInAndIsClosedFalse(chatroomIds);
         chatrooms.sort(Comparator.comparingInt(c -> chatroomIds.indexOf(c.getId())));
         return chatrooms;
     }

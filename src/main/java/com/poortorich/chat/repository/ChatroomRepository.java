@@ -13,12 +13,15 @@ import java.util.List;
 @Repository
 public interface ChatroomRepository extends JpaRepository<Chatroom, Long> {
 
+    List<Chatroom> findAllByIdInAndIsClosedFalse(List<Long> chatroomId);
+
     @Query("""
                 SELECT c
                   FROM Chatroom c
                   JOIN ChatParticipant cp
                     ON cp.chatroom = c
-                 WHERE cp.user = :user
+                WHERE c.isClosed = false
+                   AND cp.user = :user
                    AND cp.role = :role
             """)
     List<Chatroom> findChatroomByUserAndRole(@Param("user") User user, @Param("role") ChatroomRole role);
@@ -29,6 +32,7 @@ public interface ChatroomRepository extends JpaRepository<Chatroom, Long> {
                   LEFT JOIN ChatMessage cm ON cm.chatroom = c
                   LEFT JOIN Like l ON l.chatroom = c AND l.likeStatus = true
                   LEFT JOIN ChatParticipant cp ON cp.chatroom = c AND cp.isParticipated = true
+                WHERE c.isClosed = false
                 GROUP BY c.id
                 ORDER BY MAX(cm.sentAt) DESC,
                          COUNT(DISTINCT l.id) DESC,
@@ -41,6 +45,7 @@ public interface ChatroomRepository extends JpaRepository<Chatroom, Long> {
     @Query("""
                 SELECT c
                   FROM Chatroom c
+                WHERE c.isClosed = false
                 ORDER BY c.createdDate DESC
             """)
     List<Chatroom> findChatroomsSortByCreatedAt();
@@ -50,6 +55,7 @@ public interface ChatroomRepository extends JpaRepository<Chatroom, Long> {
                   FROM Chatroom c
                   LEFT JOIN Like l ON l.chatroom = c AND l.likeStatus = true
                   LEFT JOIN ChatParticipant cp ON cp.chatroom = c AND cp.isParticipated = true
+                WHERE c.isClosed = false
                 GROUP BY c.id
                 ORDER BY COUNT(DISTINCT l.id) DESC,
                          COUNT(DISTINCT cp.id) DESC,
@@ -63,7 +69,8 @@ public interface ChatroomRepository extends JpaRepository<Chatroom, Long> {
                   FROM Chatroom c
                   LEFT JOIN Tag t ON t.chatroom = c
                  INNER JOIN ChatParticipant cp ON cp.chatroom = c AND cp.role = 'HOST'
-                WHERE :keyword <> ''
+                WHERE c.isClosed = false
+                  AND :keyword <> ''
                   AND (
                          c.title LIKE CONCAT('%', :keyword, '%')
                       OR c.description LIKE CONCAT('%', :keyword, '%')
