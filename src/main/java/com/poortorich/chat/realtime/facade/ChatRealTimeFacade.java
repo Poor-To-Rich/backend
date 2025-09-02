@@ -96,7 +96,7 @@ public class ChatRealTimeFacade {
         ChatParticipant chatParticipant = chatParticipantService.findByUserAndChatroom(user, chatroom);
 
         chatroomValidator.validateIsOpened(chatroom);
-        participantValidator.validateIsParticipate(chatParticipant);
+        participantValidator.validateIsBanned(chatParticipant);
 
         List<ChatParticipant> chatMembers = chatParticipantService.findUnreadMembers(chatroom, user);
 
