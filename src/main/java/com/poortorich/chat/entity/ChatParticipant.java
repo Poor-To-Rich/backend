@@ -67,6 +67,9 @@ public class ChatParticipant {
     @Column(name = "joinAt")
     private LocalDateTime joinAt;
 
+    @Column(name = "banned_at")
+    private LocalDateTime bannedAt;
+
     @UpdateTimestamp
     @Column(name = "updated_date")
     private LocalDateTime updatedDate;
