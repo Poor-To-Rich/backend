@@ -102,7 +102,7 @@ public class ChatParticipantService {
 
     @Transactional
     public void deleteAllByChatroom(Chatroom chatroom) {
-        chatParticipantRepository.deleteAllByChatroom(chatroom);
+        chatParticipantRepository.deleteByChatroom(chatroom);
     }
 
     public List<ChatParticipantProfile> getParticipantProfiles(Chatroom chatroom) {

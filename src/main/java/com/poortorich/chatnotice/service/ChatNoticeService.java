@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -71,5 +72,10 @@ public class ChatNoticeService {
     public ChatNotice findById(Long noticeId) {
         return chatNoticeRepository.findById(noticeId)
                 .orElseThrow(() -> new NotFoundException(ChatNoticeResponse.NOTICE_NOT_FOUND));
+    }
+
+    @Transactional
+    public void deleteAllByChatroom(Chatroom chatroom) {
+        chatNoticeRepository.deleteByChatroom(chatroom);
     }
 }

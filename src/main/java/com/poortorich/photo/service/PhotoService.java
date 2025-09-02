@@ -5,12 +5,13 @@ import com.poortorich.global.exceptions.BadRequestException;
 import com.poortorich.photo.entity.Photo;
 import com.poortorich.photo.repository.PhotoRepository;
 import com.poortorich.photo.response.enums.PhotoResponse;
+import com.poortorich.s3.service.FileUploadService;
 import com.poortorich.user.entity.User;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -20,6 +21,7 @@ import java.util.List;
 public class PhotoService {
 
     private final PhotoRepository photoRepository;
+    private final FileUploadService fileUploadService;
 
     public void savePhoto(User user, Chatroom chatroom, String photoUrl) {
         Photo photo = Photo.builder()
@@ -53,5 +55,12 @@ public class PhotoService {
         return photoRepository.findNextPhotoId(chatroom, currentPhoto.getCreatedDate(), currentPhoto.getId()).stream()
                 .findFirst()
                 .orElse(null);
+    }
+
+    @Transactional
+    public void deleteAllByChatroom(Chatroom chatroom) {
+        List<Photo> photos = photoRepository.findAllByChatroom(chatroom);
+        photos.forEach(photo -> fileUploadService.deleteImage(photo.getPhotoUrl()));
+        photoRepository.deleteByChatroom(chatroom);
     }
 }

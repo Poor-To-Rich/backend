@@ -53,7 +53,7 @@ public interface ChatParticipantRepository extends JpaRepository<ChatParticipant
 
     List<ChatParticipant> findAllByChatroomAndIsParticipatedTrue(Chatroom chatroom);
 
-    void deleteAllByChatroom(Chatroom chatroom);
+    void deleteByChatroom(Chatroom chatroom);
 
     List<ChatParticipant> findAllByChatroom(Chatroom chatroom);
 
@@ -142,11 +142,11 @@ public interface ChatParticipantRepository extends JpaRepository<ChatParticipant
     Slice<ChatParticipant> findMyParticipants(@Param("user") User user, @Param("cursor") Long cursor, Pageable pageable);
 
     @Query("""
-        SELECT cp
-         FROM ChatParticipant cp
-         JOIN FETCH cp.user u
-        WHERE cp.id In :ids
-    """)
+                SELECT cp
+                 FROM ChatParticipant cp
+                 JOIN FETCH cp.user u
+                WHERE cp.id In :ids
+            """)
     List<ChatParticipant> findAllByIdIn(@Param("ids") List<Long> ids);
 
     Optional<ChatParticipant> findByChatroomAndRankingStatus(Chatroom chatroom, RankingStatus rankingStatus);
