@@ -129,12 +129,13 @@ public class ChatRealTimeFacade {
     public MarkAllChatroomAsReadResult markAllChatroomAsRead(String username) {
         List<PayloadContext> contexts = payloadCollector.getAllPayloadContext(username);
 
-        List<Long> chatroomIds = contexts.stream().map(PayloadContext::chatroom).map(Chatroom::getId).toList();
-
-        List<BasePayload> broadcastPayloads = unreadChatMessageService.markAllMessageAsRead(contexts);
+        List<MessageReadPayload> broadcastPayloads = unreadChatMessageService.markAllMessageAsRead(contexts);
 
         eventPublisher.publishEvent(new UserChatroomUpdateEvent(contexts.getFirst().user()));
-
+        List<Long> chatroomIds = broadcastPayloads.stream()
+                .map(MessageReadPayload::getChatroomId)
+                .toList();
+        
         return MarkAllChatroomAsReadResult.builder()
                 .apiResponse(MarkAllChatroomAsReadResponse.builder().chatroomIds(chatroomIds).build())
                 .broadcastPayloads(broadcastPayloads)
