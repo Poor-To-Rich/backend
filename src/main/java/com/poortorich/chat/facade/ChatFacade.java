@@ -293,9 +293,8 @@ public class ChatFacade {
 
     @Transactional
     public ChatMessagePageResponse getChatMessages(String username, Long chatroomId, Long cursor, Long pageSize) {
-        User user = userService.findUserByUsername(username);
         ChatPaginationContext context = paginationProvider.getChatMessagesContext(username, chatroomId, cursor, pageSize);
-        chatParticipantValidator.validateIsParticipate(user, context.chatroom());
+        chatParticipantValidator.validateIsParticipate(context.chatParticipant().getUser(), context.chatroom());
 
         Slice<ChatMessage> chatMessages = chatMessageService.getChatMessages(context);
 

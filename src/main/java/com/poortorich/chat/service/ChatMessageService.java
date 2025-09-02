@@ -4,6 +4,7 @@ import com.poortorich.chat.entity.ChatMessage;
 import com.poortorich.chat.entity.ChatParticipant;
 import com.poortorich.chat.entity.Chatroom;
 import com.poortorich.chat.entity.enums.ChatMessageType;
+import com.poortorich.chat.entity.enums.ChatroomRole;
 import com.poortorich.chat.model.ChatPaginationContext;
 import com.poortorich.chat.realtime.builder.RankingMessageBuilder;
 import com.poortorich.chat.realtime.builder.RankingStatusChatMessageBuilder;
@@ -176,6 +177,15 @@ public class ChatMessageService {
             return new SliceImpl<>(Collections.emptyList(), context.pageRequest(), false);
         }
 
+        if (ChatroomRole.BANNED.equals(context.chatParticipant().getRole())) {
+            return chatMessageRepository.findByChatroomAndIdLessThanEqualAndSentAtBetweenOrderByIdDesc(
+                    context.chatroom(),
+                    context.cursor(),
+                    context.chatParticipant().getJoinAt(),
+                    context.chatParticipant().getBannedAt(),
+                    context.pageRequest()
+            );
+        }
         return chatMessageRepository.findByChatroomAndIdLessThanEqualAndSentAtAfterOrderByIdDesc(
                 context.chatroom(),
                 context.cursor(),
