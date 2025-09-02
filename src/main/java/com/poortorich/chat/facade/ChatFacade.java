@@ -8,6 +8,7 @@ import com.poortorich.chat.model.ChatMessageResponse;
 import com.poortorich.chat.model.ChatPaginationContext;
 import com.poortorich.chat.model.ChatroomPaginationContext;
 import com.poortorich.chat.model.UserEnterChatroomResult;
+import com.poortorich.chat.realtime.event.chatparticipants.KickChatroomEvent;
 import com.poortorich.chat.realtime.event.chatroom.ChatroomUpdateEvent;
 import com.poortorich.chat.realtime.event.chatroom.ParticipantUpdateEvent;
 import com.poortorich.chat.realtime.event.chatroom.detector.ChatroomUpdateDetector;
@@ -393,6 +394,7 @@ public class ChatFacade {
         chatParticipantValidator.validateIsMember(kickChatParticipant);
         chatParticipantValidator.validateIsParticipate(kickChatParticipant);
 
+        eventPublisher.publishEvent(new KickChatroomEvent(kickChatParticipant.getId()));
         chatParticipantService.kickChatParticipant(kickChatParticipant);
 
         eventPublisher.publishEvent(new ChatroomUpdateEvent(host.getChatroom()));

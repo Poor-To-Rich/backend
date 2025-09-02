@@ -209,4 +209,9 @@ public class ChatParticipantService {
         return chatParticipantRepository.findByChatroomAndRankingStatus(chatroom, rankingStatus)
                 .orElse(null);
     }
+
+    public ChatParticipant findByIdOrThrow(Long chatParticipantId) {
+        return chatParticipantRepository.findById(chatParticipantId)
+                .orElseThrow(() -> new NotFoundException(ChatResponse.CHAT_PARTICIPANT_NOT_FOUND));
+    }
 }
