@@ -13,7 +13,7 @@ import java.util.List;
 @Repository
 public interface ChatroomRepository extends JpaRepository<Chatroom, Long> {
 
-    List<Chatroom> findAllByIdInAndIsClosedFalse(List<Long> chatroomId);
+    List<Chatroom> findAllByIdInAndIsClosedFalse(List<Long> chatroomIds);
 
     @Query("""
                 SELECT c
