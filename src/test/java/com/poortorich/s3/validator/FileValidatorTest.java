@@ -54,6 +54,6 @@ class FileValidatorTest {
                 () -> fileValidator.validateFileSize(largeFile)
         );
 
-        Assertions.assertEquals(S3Response.INVALID_FILE_SIZE, exception.getResponse());
+        Assertions.assertEquals(S3Response.FILE_SIZE_TO_LARGE, exception.getResponse());
     }
 }

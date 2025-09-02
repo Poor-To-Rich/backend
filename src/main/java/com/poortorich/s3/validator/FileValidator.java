@@ -17,7 +17,7 @@ public class FileValidator {
 
     public void validateFileSize(MultipartFile imageFile) {
         if (S3ValidationConstraints.FILE_MAX_SIZE < imageFile.getSize()) {
-            throw new BadRequestException(S3Response.INVALID_FILE_SIZE);
+            throw new BadRequestException(S3Response.FILE_SIZE_TO_LARGE);
         }
     }
 }
