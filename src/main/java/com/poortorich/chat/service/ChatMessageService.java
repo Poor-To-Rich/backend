@@ -85,7 +85,7 @@ public class ChatMessageService {
     }
 
     public String getLastMessageTime(Chatroom chatroom) {
-        return chatMessageRepository.findTopByChatroomOrderBySentAtDesc(chatroom)
+        return chatMessageRepository.findTopByChatroomOrderByIdDesc(chatroom)
                 .map(chatMessage -> chatMessage.getSentAt().toString())
                 .orElse(null);
     }
