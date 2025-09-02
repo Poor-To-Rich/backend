@@ -16,4 +16,6 @@ public interface ReportRepository extends JpaRepository<Report, Long> {
             Chatroom chatroom,
             ReportReason reportReason
     );
+
+    void deleteByChatroom(Chatroom chatroom);
 }
