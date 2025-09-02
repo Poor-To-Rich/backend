@@ -17,10 +17,6 @@ public interface ChatMessageRepository extends JpaRepository<ChatMessage, Long> 
 
     Optional<ChatMessage> findTopByChatroomOrderBySentAtDesc(Chatroom chatroom);
 
-    Optional<ChatMessage> findTopByChatroomAndTypeInOrderBySentAtDesc(
-            Chatroom chatroom,
-            Collection<ChatMessageType> types);
-
     List<ChatMessage> findAllByChatroom(Chatroom chatroom);
 
     void deleteByChatroom(Chatroom chatroom);
@@ -34,4 +30,8 @@ public interface ChatMessageRepository extends JpaRepository<ChatMessage, Long> 
     boolean existsByContentAndMessageTypeAndChatroom(String content, MessageType messageType, Chatroom chatroom);
 
     Optional<ChatMessage> findTopByChatroomOrderByIdDesc(Chatroom chatroom);
+
+    Optional<ChatMessage> findTopByChatroomAndTypeInOrderByIdDesc(
+            Chatroom chatroom,
+            Collection<ChatMessageType> chatMessage);
 }
