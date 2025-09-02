@@ -103,6 +103,7 @@ public class ChatParticipant {
 
     public void kick() {
         this.role = ChatroomRole.BANNED;
+        this.bannedAt = LocalDateTime.now();
     }
 
     public void updateRankingStatus(RankingStatus rankingStatus) {

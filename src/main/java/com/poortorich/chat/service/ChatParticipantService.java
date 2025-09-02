@@ -178,7 +178,6 @@ public class ChatParticipantService {
     @Transactional
     public void kickChatParticipant(ChatParticipant kickChatParticipant) {
         kickChatParticipant.kick();
-        kickChatParticipant.leave();
     }
 
     public Slice<ChatParticipant> getMyParticipants(ChatroomPaginationContext context) {
