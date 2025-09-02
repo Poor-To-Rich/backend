@@ -108,6 +108,14 @@ public class ChatFacade {
     public AllChatroomsResponse getAllChatrooms(SortBy sortBy, Long cursor) {
         List<Chatroom> chatrooms = chatroomService.getAllChatrooms(sortBy, cursor);
 
+        if (chatrooms.isEmpty()) {
+            return AllChatroomsResponse.builder()
+                    .hasNext(false)
+                    .nextCursor(null)
+                    .chatrooms(List.of())
+                    .build();
+        }
+
         return AllChatroomsResponse.builder()
                 .hasNext(chatroomService.hasNext(sortBy, chatrooms.getLast().getId()))
                 .nextCursor(chatroomService.getNextCursor(sortBy, chatrooms.getLast().getId()))
