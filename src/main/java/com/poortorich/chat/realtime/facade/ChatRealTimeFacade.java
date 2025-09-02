@@ -25,6 +25,7 @@ import com.poortorich.chat.service.ChatroomService;
 import com.poortorich.chat.service.UnreadChatMessageService;
 import com.poortorich.chat.util.manager.ChatroomLeaveManager;
 import com.poortorich.chat.validator.ChatParticipantValidator;
+import com.poortorich.chat.validator.ChatroomValidator;
 import com.poortorich.chatnotice.service.ChatNoticeService;
 import com.poortorich.user.entity.User;
 import com.poortorich.user.service.UserService;
@@ -48,6 +49,7 @@ public class ChatRealTimeFacade {
     private final ChatPayloadCollector payloadCollector;
     private final ChatroomLeaveManager chatroomLeaveManager;
 
+    private final ChatroomValidator chatroomValidator;
     private final ChatParticipantValidator participantValidator;
 
     private final ApplicationEventPublisher eventPublisher;
@@ -85,6 +87,9 @@ public class ChatRealTimeFacade {
 
         ChatParticipant chatParticipant = chatParticipantService.findByUserAndChatroom(user, chatroom);
 
+        chatroomValidator.validateIsOpened(chatroom);
+        participantValidator.validateIsParticipate(chatParticipant);
+        
         List<ChatParticipant> chatMembers = chatParticipantService.findUnreadMembers(chatroom, user);
 
         UserChatMessagePayload chatMessage = chatMessageService
