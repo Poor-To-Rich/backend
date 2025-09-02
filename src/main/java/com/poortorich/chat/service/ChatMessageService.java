@@ -85,7 +85,7 @@ public class ChatMessageService {
     }
 
     public String getLastMessageTime(Chatroom chatroom) {
-        return chatMessageRepository.findTopByChatroomOrderBySentAtDesc(chatroom)
+        return chatMessageRepository.findTopByChatroomOrderByIdDesc(chatroom)
                 .map(chatMessage -> chatMessage.getSentAt().toString())
                 .orElse(null);
     }
@@ -165,7 +165,7 @@ public class ChatMessageService {
     }
 
     public Long getLatestMessageId(Chatroom chatroom) {
-        return chatMessageRepository.findTopByChatroomOrderBySentAtDesc(chatroom)
+        return chatMessageRepository.findTopByChatroomOrderByIdDesc(chatroom)
                 .map(ChatMessage::getId)
                 .orElse(null);
     }
@@ -237,7 +237,7 @@ public class ChatMessageService {
 
     @Transactional(readOnly = true)
     public Optional<ChatMessage> getLastMessage(Chatroom chatroom) {
-        return chatMessageRepository.findTopByChatroomAndTypeInOrderBySentAtDesc(
+        return chatMessageRepository.findTopByChatroomAndTypeInOrderByIdDesc(
                 chatroom,
                 List.of(ChatMessageType.CHAT_MESSAGE, ChatMessageType.RANKING_MESSAGE));
     }
