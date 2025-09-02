@@ -165,7 +165,7 @@ public class ChatMessageService {
     }
 
     public Long getLatestMessageId(Chatroom chatroom) {
-        return chatMessageRepository.findTopByChatroomOrderBySentAtDesc(chatroom)
+        return chatMessageRepository.findTopByChatroomOrderByIdDesc(chatroom)
                 .map(ChatMessage::getId)
                 .orElse(null);
     }

@@ -32,4 +32,6 @@ public interface ChatMessageRepository extends JpaRepository<ChatMessage, Long> 
             Pageable pageable);
 
     boolean existsByContentAndMessageTypeAndChatroom(String content, MessageType messageType, Chatroom chatroom);
+
+    Optional<ChatMessage> findTopByChatroomOrderByIdDesc(Chatroom chatroom);
 }
