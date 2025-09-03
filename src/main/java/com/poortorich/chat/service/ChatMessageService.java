@@ -293,4 +293,8 @@ public class ChatMessageService {
                 .messageType(rankingMessage.getMessageType())
                 .build();
     }
+
+    public Long getLatestReadMessageId(ChatParticipant participant) {
+        return chatMessageRepository.findLatestReadMessageId(participant.getChatroom(), participant.getUser());
+    }
 }

@@ -30,6 +30,7 @@ public class ChatroomMapper {
         Long unreadMessageCount = unreadChatMessageService.countByUnreadChatMessage(
                 participant.getUser(),
                 participant.getChatroom());
+        Long latestReadMessageId = chatMessageService.getLatestReadMessageId(participant);
 
         return MyChatroom.builder()
                 .chatroomId(chatroom.getId())
@@ -37,6 +38,7 @@ public class ChatroomMapper {
                 .isHost(ChatroomRole.HOST.equals(participant.getRole()))
                 .chatroomTitle(chatroom.getTitle())
                 .currentMemberCount(chatParticipantService.countByChatroom(chatroom))
+                .latestReadMessageId(latestReadMessageId)
                 .lastMessage(lastMessage.map(contentMapper::mapToContent)
                         .orElseGet(() -> contentMapper.mapToContent(participant)))
                 .lastMessageTime(lastMessage.map(ChatMessage::getSentAt)

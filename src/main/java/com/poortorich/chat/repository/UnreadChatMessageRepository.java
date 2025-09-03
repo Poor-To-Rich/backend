@@ -57,5 +57,4 @@ public interface UnreadChatMessageRepository extends JpaRepository<UnreadChatMes
     void deleteByChatroom(Chatroom chatroom);
 
     Long countByUserAndChatroom(User user, Chatroom chatroom);
-
 }
