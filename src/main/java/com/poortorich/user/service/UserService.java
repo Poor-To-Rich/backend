@@ -2,6 +2,7 @@ package com.poortorich.user.service;
 
 import com.poortorich.global.exceptions.NotFoundException;
 import com.poortorich.s3.constants.S3Constants;
+import com.poortorich.s3.service.FileUploadService;
 import com.poortorich.user.entity.User;
 import com.poortorich.user.entity.enums.Role;
 import com.poortorich.user.repository.UserRepository;
@@ -26,6 +27,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final FileUploadService fileService;
 
     public User save(UserRegistrationRequest userRegistrationRequest, String profileImageUrl) {
         User user = User.builder()
@@ -107,6 +109,7 @@ public class UserService {
 
     @Transactional
     public void deleteUserAccount(User user) {
+        fileService.deleteImage(user.getProfileImage());
         String password = passwordEncoder.encode(UUID.randomUUID().toString());
         user.withdraw(password);
     }

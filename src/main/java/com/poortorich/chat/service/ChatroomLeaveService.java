@@ -46,11 +46,9 @@ public class ChatroomLeaveService {
     @Transactional
     public void leaveChatroom(ChatParticipant participant) {
         participantValidator.validateIsParticipate(participant);
+        participant.leave();
         if (ChatroomRole.HOST.equals(participant.getRole())) {
-            participant.leave();
             deleteChatroom(participant.getChatroom());
-        } else {
-            participant.leave();
         }
         eventPublisher.publishEvent(new ChatroomUpdateEvent(participant.getChatroom()));
         if (!ChatroomRole.BANNED.equals(participant.getRole())) {

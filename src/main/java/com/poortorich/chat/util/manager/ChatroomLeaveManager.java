@@ -55,7 +55,7 @@ public class ChatroomLeaveManager {
             return null;
         }
 
-        if (participant.getRole().equals(ChatroomRole.HOST)) {
+        if (ChatroomRole.HOST.equals(participant.getRole())) {
             return chatMessageService.saveChatroomClosedMessage(chatroom);
         }
         return null;

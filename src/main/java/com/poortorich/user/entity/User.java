@@ -1,5 +1,6 @@
 package com.poortorich.user.entity;
 
+import com.poortorich.s3.constants.S3Constants;
 import com.poortorich.user.constants.UserValidationRules;
 import com.poortorich.user.entity.enums.Gender;
 import com.poortorich.user.entity.enums.Role;
@@ -111,7 +112,7 @@ public class User implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return role != Role.WITHDRAW;
     }
 
     public void updateProfile(ProfileUpdateRequest userProfile, String newProfileImage) {
@@ -144,11 +145,14 @@ public class User implements UserDetails {
     }
 
     public void withdraw(String password) {
-        this.nickname = UUID.randomUUID().toString();
-        this.email = UUID.randomUUID().toString();
-        this.username = UUID.randomUUID().toString();
+        String uuid = UUID.randomUUID().toString();
+        this.nickname = uuid;
+        this.email = uuid;
+        this.username = uuid;
         this.password = password;
         this.role = Role.WITHDRAW;
+        this.job = null;
+        this.profileImage = S3Constants.DEFAULT_PROFILE_IMAGE;
         this.withdrawAt = LocalDateTime.now();
     }
 }
