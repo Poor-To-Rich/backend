@@ -53,8 +53,10 @@ public class ChatroomLeaveService {
             participant.leave();
         }
         eventPublisher.publishEvent(new ChatroomUpdateEvent(participant.getChatroom()));
-        saveLeaveMessageAndBroadcast(participant.getUser(), participant.getChatroom());
-        saveCloseMessageAndBroadcast(participant);
+        if (!ChatroomRole.BANNED.equals(participant.getRole())) {
+            saveLeaveMessageAndBroadcast(participant.getUser(), participant.getChatroom());
+            saveCloseMessageAndBroadcast(participant);
+        }
     }
 
     @Transactional
