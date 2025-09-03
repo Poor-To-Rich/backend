@@ -12,6 +12,7 @@ import com.poortorich.chat.realtime.model.PayloadContext;
 import com.poortorich.chat.realtime.payload.request.ChatMessageRequestPayload;
 import com.poortorich.chat.realtime.payload.request.MarkMessagesAsReadRequestPayload;
 import com.poortorich.chat.realtime.payload.response.BasePayload;
+import com.poortorich.chat.realtime.payload.response.ChatroomClosedResponsePayload;
 import com.poortorich.chat.realtime.payload.response.DateChangeMessagePayload;
 import com.poortorich.chat.realtime.payload.response.HostDelegationMessagePayload;
 import com.poortorich.chat.realtime.payload.response.MessageReadPayload;
@@ -75,9 +76,9 @@ public class ChatRealTimeFacade {
         return chatMessageService.saveUserLeaveMessage(context.user(), context.chatroom()).mapToBasePayload();
     }
 
-    public BasePayload createChatroomClosedMessageOrDeleteAll(String username, Long chatroomId) {
+    public ChatroomClosedResponsePayload createChatroomClosedMessageOrDeleteAll(String username, Long chatroomId) {
         PayloadContext context = payloadCollector.getPayloadContext(username, chatroomId);
-        return chatroomLeaveManager.leaveChatroom(context);
+        return chatroomLeaveManager.leaveChatroom(context.chatParticipant());
     }
 
     @Transactional
@@ -93,7 +94,7 @@ public class ChatRealTimeFacade {
 
         chatroomValidator.validateIsOpened(chatroom);
         participantValidator.validateIsParticipate(chatParticipant);
-        
+
         List<ChatParticipant> chatMembers = chatParticipantService.findUnreadMembers(chatroom, user);
 
         UserChatMessagePayload chatMessage = chatMessageService
@@ -139,7 +140,7 @@ public class ChatRealTimeFacade {
         List<Long> chatroomIds = broadcastPayloads.stream()
                 .map(MessageReadPayload::getChatroomId)
                 .toList();
-        
+
         return MarkAllChatroomAsReadResult.builder()
                 .apiResponse(MarkAllChatroomAsReadResponse.builder().chatroomIds(chatroomIds).build())
                 .broadcastPayloads(broadcastPayloads)

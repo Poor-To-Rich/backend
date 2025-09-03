@@ -40,6 +40,7 @@ import com.poortorich.chat.response.MyChatroomsResponse;
 import com.poortorich.chat.response.SearchParticipantsResponse;
 import com.poortorich.chat.service.ChatMessageService;
 import com.poortorich.chat.service.ChatParticipantService;
+import com.poortorich.chat.service.ChatroomLeaveService;
 import com.poortorich.chat.service.ChatroomService;
 import com.poortorich.chat.util.ChatBuilder;
 import com.poortorich.chat.util.detector.RankingStatusChangeDetector;
@@ -70,6 +71,7 @@ public class ChatFacade {
     private final UserService userService;
     private final ChatroomService chatroomService;
     private final ChatParticipantService chatParticipantService;
+    private final ChatroomLeaveService chatroomLeaveService;
     private final ChatMessageService chatMessageService;
     private final FileUploadService fileUploadService;
     private final TagService tagService;
@@ -249,16 +251,10 @@ public class ChatFacade {
     public ChatroomLeaveResponse leaveChatroom(String username, Long chatroomId) {
         User user = userService.findUserByUsername(username);
         Chatroom chatroom = chatroomService.findById(chatroomId);
-
-        chatroomValidator.validateParticipate(user, chatroom);
         ChatParticipant chatParticipant = chatParticipantService.findByUserAndChatroom(user, chatroom);
-        if (chatParticipant.getRole().equals(ChatroomRole.HOST)) {
-            chatParticipant.leave();
-            deleteChatroom(chatroom);
-        } else {
-            chatParticipant.leave();
-        }
-        eventPublisher.publishEvent(new ChatroomUpdateEvent(chatroom));
+
+        chatroomLeaveService.leaveChatroom(chatParticipant);
+
         return ChatroomLeaveResponse.builder().deleteChatroomId(chatroomId).build();
     }
 
@@ -267,16 +263,8 @@ public class ChatFacade {
         User user = userService.findUserByUsername(username);
         for (Long chatroomId : chatroomLeaveAllRequest.getChatroomsToLeave()) {
             Chatroom chatroom = chatroomService.findById(chatroomId);
-
-            chatroomValidator.validateParticipate(user, chatroom);
             ChatParticipant chatParticipant = chatParticipantService.findByUserAndChatroom(user, chatroom);
-            if (chatParticipant.getRole().equals(ChatroomRole.HOST)) {
-                chatParticipant.leave();
-                deleteChatroom(chatroom);
-            } else {
-                chatParticipant.leave();
-            }
-            eventPublisher.publishEvent(new ChatroomUpdateEvent(chatroom));
+            chatroomLeaveService.leaveChatroom(chatParticipant);
         }
 
         return ChatroomLeaveAllResponse.builder()

@@ -100,6 +100,7 @@ public class UserFacade {
     public Response resetAllByUser(String username) {
         User user = userService.findUserByUsername(username);
         userResetService.deleteUserAllData(user);
+        userResetService.closeChatroom(user);
         return UserResponse.RESET_SUCCESS;
     }
 
