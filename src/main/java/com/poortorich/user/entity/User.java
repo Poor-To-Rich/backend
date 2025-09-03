@@ -12,12 +12,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.Collection;
-import java.util.List;
-
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -29,6 +23,13 @@ import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Collection;
+import java.util.List;
+import java.util.UUID;
 
 @Entity
 @Table(name = "user")
@@ -76,6 +77,9 @@ public class User implements UserDetails {
     @Enumerated(EnumType.STRING)
     @Builder.Default
     private Role role = Role.USER;
+
+    @Column(name = "withdraw_at")
+    private LocalDateTime withdrawAt;
 
     @Column(name = "created_date", nullable = false)
     @CreationTimestamp
@@ -137,5 +141,14 @@ public class User implements UserDetails {
         this.profileImage = profileImage;
         this.nickname = name;
         return this;
+    }
+
+    public void withdraw(String password) {
+        this.nickname = UUID.randomUUID().toString();
+        this.email = UUID.randomUUID().toString();
+        this.username = UUID.randomUUID().toString();
+        this.password = password;
+        this.role = Role.WITHDRAW;
+        this.withdrawAt = LocalDateTime.now();
     }
 }

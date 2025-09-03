@@ -16,6 +16,9 @@ import com.poortorich.user.response.enums.UserResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -102,8 +105,10 @@ public class UserService {
         user.updateEmail(emailUpdateRequest.getEmail());
     }
 
+    @Transactional
     public void deleteUserAccount(User user) {
-        userRepository.delete(user);
+        String password = passwordEncoder.encode(UUID.randomUUID().toString());
+        user.withdraw(password);
     }
 
     public UsernameResponse findUsernameByEmail(String email) {
