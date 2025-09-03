@@ -68,7 +68,7 @@ public class SystemMessageBuilder {
     public static ChatMessage buildKickChatParticipantMessage(ChatParticipant kickChatParticipant) {
         return ChatMessage.builder()
                 .userId(kickChatParticipant.getUser().getId())
-                .messageType(MessageType.LEAVE)
+                .messageType(MessageType.KICK)
                 .type(ChatMessageType.SYSTEM_MESSAGE)
                 .content(kickChatParticipant.getUser().getNickname() + KICK_CONTENT_SUFFIX)
                 .chatroom(kickChatParticipant.getChatroom())

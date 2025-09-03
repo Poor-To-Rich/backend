@@ -4,17 +4,17 @@ import com.poortorich.chat.entity.ChatParticipant;
 import com.poortorich.chat.entity.Chatroom;
 import com.poortorich.chat.entity.enums.RankingStatus;
 import com.poortorich.chat.realtime.event.user.UserProfileUpdateEvent;
-import com.poortorich.chat.service.ChatMessageService;
 import com.poortorich.chat.response.ProfileResponse;
+import com.poortorich.chat.service.ChatMessageService;
 import com.poortorich.chat.service.ChatParticipantService;
 import com.poortorich.chat.service.ChatroomService;
 import com.poortorich.chat.util.ChatBuilder;
 import com.poortorich.chat.validator.ChatParticipantValidator;
 import com.poortorich.global.date.util.DateParser;
 import com.poortorich.ranking.entity.Ranking;
-import com.poortorich.ranking.response.AllRankingsResponse;
 import com.poortorich.ranking.model.Rankers;
 import com.poortorich.ranking.payload.response.RankingResponsePayload;
+import com.poortorich.ranking.response.AllRankingsResponse;
 import com.poortorich.ranking.response.LatestRankingResponse;
 import com.poortorich.ranking.response.RankingInfoResponse;
 import com.poortorich.ranking.service.RankingService;
@@ -77,24 +77,22 @@ public class RankingFacade {
                 rankers,
                 date.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY)));
 
-        if (LocalDate.now().equals(date)) {
-            List<ChatParticipant> participants = chatParticipantService.findAllByChatroom(chatroom);
-            ChatParticipant prevSaver = chatParticipantService.findByChatroomAndRankingStatus(
-                    chatroom,
-                    RankingStatus.SAVER);
+        List<ChatParticipant> participants = chatParticipantService.findAllByChatroom(chatroom);
+        ChatParticipant prevSaver = chatParticipantService.findByChatroomAndRankingStatus(
+                chatroom,
+                RankingStatus.SAVER);
 
-            ChatParticipant prevFLexer = chatParticipantService.findByChatroomAndRankingStatus(
-                    chatroom,
-                    RankingStatus.FLEXER);
+        ChatParticipant prevFLexer = chatParticipantService.findByChatroomAndRankingStatus(
+                chatroom,
+                RankingStatus.FLEXER);
 
-            chatParticipantService.updateAllRankingStatus(participants, RankingStatus.NONE);
-            rankingService.updateRankingStatus(rankers);
-            if (!Objects.isNull(prevSaver)) {
-                eventPublisher.publishEvent(new UserProfileUpdateEvent(prevSaver.getUser().getUsername()));
-            }
-            if (!Objects.isNull(prevFLexer)) {
-                eventPublisher.publishEvent(new UserProfileUpdateEvent(prevFLexer.getUser().getUsername()));
-            }
+        chatParticipantService.updateAllRankingStatus(participants, RankingStatus.NONE);
+        rankingService.updateRankingStatus(rankers);
+        if (!Objects.isNull(prevSaver)) {
+            eventPublisher.publishEvent(new UserProfileUpdateEvent(prevSaver.getUser().getUsername()));
+        }
+        if (!Objects.isNull(prevFLexer)) {
+            eventPublisher.publishEvent(new UserProfileUpdateEvent(prevFLexer.getUser().getUsername()));
         }
 
         return chatMessageService.saveRankingMessage(chatroom, ranking, date);

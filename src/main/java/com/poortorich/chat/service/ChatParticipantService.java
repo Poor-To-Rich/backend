@@ -102,7 +102,7 @@ public class ChatParticipantService {
 
     @Transactional
     public void deleteAllByChatroom(Chatroom chatroom) {
-        chatParticipantRepository.deleteAllByChatroom(chatroom);
+        chatParticipantRepository.deleteByChatroom(chatroom);
     }
 
     public List<ChatParticipantProfile> getParticipantProfiles(Chatroom chatroom) {
@@ -178,7 +178,6 @@ public class ChatParticipantService {
     @Transactional
     public void kickChatParticipant(ChatParticipant kickChatParticipant) {
         kickChatParticipant.kick();
-        kickChatParticipant.leave();
     }
 
     public Slice<ChatParticipant> getMyParticipants(ChatroomPaginationContext context) {
@@ -209,5 +208,10 @@ public class ChatParticipantService {
     public ChatParticipant findByChatroomAndRankingStatus(Chatroom chatroom, RankingStatus rankingStatus) {
         return chatParticipantRepository.findByChatroomAndRankingStatus(chatroom, rankingStatus)
                 .orElse(null);
+    }
+
+    public ChatParticipant findByIdOrThrow(Long chatParticipantId) {
+        return chatParticipantRepository.findById(chatParticipantId)
+                .orElseThrow(() -> new NotFoundException(ChatResponse.CHAT_PARTICIPANT_NOT_FOUND));
     }
 }

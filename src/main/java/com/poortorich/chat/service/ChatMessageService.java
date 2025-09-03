@@ -4,6 +4,7 @@ import com.poortorich.chat.entity.ChatMessage;
 import com.poortorich.chat.entity.ChatParticipant;
 import com.poortorich.chat.entity.Chatroom;
 import com.poortorich.chat.entity.enums.ChatMessageType;
+import com.poortorich.chat.entity.enums.ChatroomRole;
 import com.poortorich.chat.model.ChatPaginationContext;
 import com.poortorich.chat.realtime.builder.RankingMessageBuilder;
 import com.poortorich.chat.realtime.builder.RankingStatusChatMessageBuilder;
@@ -85,7 +86,7 @@ public class ChatMessageService {
     }
 
     public String getLastMessageTime(Chatroom chatroom) {
-        return chatMessageRepository.findTopByChatroomOrderBySentAtDesc(chatroom)
+        return chatMessageRepository.findTopByChatroomOrderByIdDesc(chatroom)
                 .map(chatMessage -> chatMessage.getSentAt().toString())
                 .orElse(null);
     }
@@ -161,11 +162,11 @@ public class ChatMessageService {
 
     @Transactional
     public void deleteAllByChatroom(Chatroom chatroom) {
-        chatMessageRepository.deleteAllByChatroom(chatroom);
+        chatMessageRepository.deleteByChatroom(chatroom);
     }
 
     public Long getLatestMessageId(Chatroom chatroom) {
-        return chatMessageRepository.findTopByChatroomOrderBySentAtDesc(chatroom)
+        return chatMessageRepository.findTopByChatroomOrderByIdDesc(chatroom)
                 .map(ChatMessage::getId)
                 .orElse(null);
     }
@@ -176,6 +177,15 @@ public class ChatMessageService {
             return new SliceImpl<>(Collections.emptyList(), context.pageRequest(), false);
         }
 
+        if (ChatroomRole.BANNED.equals(context.chatParticipant().getRole())) {
+            return chatMessageRepository.findByChatroomAndIdLessThanEqualAndSentAtBetweenOrderByIdDesc(
+                    context.chatroom(),
+                    context.cursor(),
+                    context.chatParticipant().getJoinAt(),
+                    context.chatParticipant().getBannedAt(),
+                    context.pageRequest()
+            );
+        }
         return chatMessageRepository.findByChatroomAndIdLessThanEqualAndSentAtAfterOrderByIdDesc(
                 context.chatroom(),
                 context.cursor(),
@@ -237,7 +247,7 @@ public class ChatMessageService {
 
     @Transactional(readOnly = true)
     public Optional<ChatMessage> getLastMessage(Chatroom chatroom) {
-        return chatMessageRepository.findTopByChatroomAndTypeInOrderBySentAtDesc(
+        return chatMessageRepository.findTopByChatroomAndTypeInOrderByIdDesc(
                 chatroom,
                 List.of(ChatMessageType.CHAT_MESSAGE, ChatMessageType.RANKING_MESSAGE));
     }
@@ -270,7 +280,7 @@ public class ChatMessageService {
         ChatMessage rankingMessage = RankingMessageBuilder.buildRankingMessage(chatroom, ranking);
         rankingMessage = chatMessageRepository.save(rankingMessage);
         rankingMessage.updateSentAt(date.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY)));
-        
+
         return RankingResponsePayload.builder()
                 .messageId(rankingMessage.getId())
                 .rankingId(rankingMessage.getRankingId())

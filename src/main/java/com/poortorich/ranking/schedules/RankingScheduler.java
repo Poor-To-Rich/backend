@@ -39,8 +39,8 @@ public class RankingScheduler {
         this.chatroomService = chatroomService;
         this.taskExecutor = taskExecutor;
     }
-    
-    @Scheduled(cron = "0 0 12 * * MON")
+
+    @Scheduled(cron = "0 0 0 * * MON", zone = "Asia/Seoul")
     public void calculateAndBroadcastWeeklyRanking() {
         List<Chatroom> activeChatrooms = chatroomService.getChatroomsByRankingEnabledIsTrue();
 

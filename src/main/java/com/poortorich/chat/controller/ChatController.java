@@ -6,7 +6,6 @@ import com.poortorich.chat.model.MarkAllChatroomAsReadResult;
 import com.poortorich.chat.model.UserEnterChatroomResult;
 import com.poortorich.chat.realtime.facade.ChatRealTimeFacade;
 import com.poortorich.chat.realtime.payload.response.BasePayload;
-import com.poortorich.chat.realtime.payload.response.MessageReadPayload;
 import com.poortorich.chat.request.ChatroomCreateRequest;
 import com.poortorich.chat.request.ChatroomEnterRequest;
 import com.poortorich.chat.request.ChatroomLeaveAllRequest;
@@ -177,12 +176,16 @@ public class ChatController {
     ) {
         ChatroomLeaveResponse response = chatFacade.leaveChatroom(userDetails.getUsername(), chatroomId);
 
-        BasePayload basePayload = realTimeFacade.createUserLeaveSystemMessage(
+        BasePayload leavePayload = realTimeFacade.createUserLeaveSystemMessage(userDetails.getUsername(), chatroomId);
+        BasePayload closedPayload = realTimeFacade.createChatroomClosedMessageOrDeleteAll(
                 userDetails.getUsername(),
                 chatroomId);
 
-        if (!Objects.isNull(basePayload)) {
-            messagingTemplate.convertAndSend(SubscribeEndpoint.CHATROOM_SUBSCRIBE_PREFIX + chatroomId, basePayload);
+        if (!Objects.isNull(leavePayload)) {
+            messagingTemplate.convertAndSend(SubscribeEndpoint.CHATROOM_SUBSCRIBE_PREFIX + chatroomId, leavePayload);
+        }
+        if (!Objects.isNull(closedPayload)) {
+            messagingTemplate.convertAndSend(SubscribeEndpoint.CHATROOM_SUBSCRIBE_PREFIX + chatroomId, closedPayload);
         }
         return DataResponse.toResponseEntity(ChatResponse.CHATROOM_LEAVE_SUCCESS, response);
     }
@@ -197,13 +200,23 @@ public class ChatController {
                 chatroomLeaveAllRequest);
 
         for (Long chatroomId : chatroomLeaveAllRequest.getChatroomsToLeave()) {
-            BasePayload basePayload = realTimeFacade.createUserLeaveSystemMessage(
+            BasePayload leavePayload = realTimeFacade.createUserLeaveSystemMessage(
                     userDetails.getUsername(),
                     chatroomId);
-            if (!Objects.isNull(basePayload)) {
+            BasePayload closedPayload = realTimeFacade.createChatroomClosedMessageOrDeleteAll(
+                    userDetails.getUsername(),
+                    chatroomId);
+
+            if (!Objects.isNull(leavePayload)) {
                 messagingTemplate.convertAndSend(
                         SubscribeEndpoint.CHATROOM_SUBSCRIBE_PREFIX + chatroomId,
-                        basePayload);
+                        leavePayload);
+            }
+
+            if (!Objects.isNull(closedPayload)) {
+                messagingTemplate.convertAndSend(
+                        SubscribeEndpoint.CHATROOM_SUBSCRIBE_PREFIX + chatroomId,
+                        closedPayload);
             }
         }
 
@@ -231,11 +244,12 @@ public class ChatController {
         MarkAllChatroomAsReadResult result = realTimeFacade.markAllChatroomAsRead(userDetails.getUsername());
 
         result.getBroadcastPayloads()
-                .forEach(basePayload -> {
-                    MessageReadPayload payload = (MessageReadPayload) basePayload.getPayload();
-                    messagingTemplate.convertAndSend(
-                            SubscribeEndpoint.CHATROOM_SUBSCRIBE_PREFIX + payload.getChatroomId(),
-                            basePayload);
+                .forEach(payload -> {
+                    if (!Objects.isNull(payload)) {
+                        messagingTemplate.convertAndSend(
+                                SubscribeEndpoint.CHATROOM_SUBSCRIBE_PREFIX + payload.getChatroomId(),
+                                payload.mapToBasePayload());
+                    }
                 });
 
         return DataResponse.toResponseEntity(ChatResponse.MARK_ALL_CHATROOM_AS_READ_SUCCESS, result.getApiResponse());
@@ -272,15 +286,6 @@ public class ChatController {
                 userDetails.getUsername(),
                 chatroomId,
                 userId);
-
-        BasePayload basePayload = realTimeFacade.createUserKickMessage(apiResponse.getKickChatParticipant());
-
-        if (!Objects.isNull(basePayload)) {
-            messagingTemplate.convertAndSend(
-                    SubscribeEndpoint.CHATROOM_SUBSCRIBE_PREFIX + chatroomId,
-                    basePayload
-            );
-        }
 
         return DataResponse.toResponseEntity(ChatResponse.CHAT_PARTICIPANT_KICK_SUCCESS, apiResponse);
     }

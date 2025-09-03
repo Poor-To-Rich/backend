@@ -3,6 +3,7 @@ package com.poortorich.chat.realtime.facade;
 import com.poortorich.chat.entity.ChatParticipant;
 import com.poortorich.chat.entity.Chatroom;
 import com.poortorich.chat.entity.enums.ChatMessageType;
+import com.poortorich.chat.entity.enums.ChatroomRole;
 import com.poortorich.chat.model.MarkAllChatroomAsReadResult;
 import com.poortorich.chat.realtime.collect.ChatPayloadCollector;
 import com.poortorich.chat.realtime.event.chatroom.ChatroomUpdateEvent;
@@ -25,6 +26,7 @@ import com.poortorich.chat.service.ChatroomService;
 import com.poortorich.chat.service.UnreadChatMessageService;
 import com.poortorich.chat.util.manager.ChatroomLeaveManager;
 import com.poortorich.chat.validator.ChatParticipantValidator;
+import com.poortorich.chat.validator.ChatroomValidator;
 import com.poortorich.chatnotice.service.ChatNoticeService;
 import com.poortorich.user.entity.User;
 import com.poortorich.user.service.UserService;
@@ -48,6 +50,7 @@ public class ChatRealTimeFacade {
     private final ChatPayloadCollector payloadCollector;
     private final ChatroomLeaveManager chatroomLeaveManager;
 
+    private final ChatroomValidator chatroomValidator;
     private final ChatParticipantValidator participantValidator;
 
     private final ApplicationEventPublisher eventPublisher;
@@ -70,7 +73,14 @@ public class ChatRealTimeFacade {
 
     public BasePayload createUserLeaveSystemMessage(String username, Long chatroomId) {
         PayloadContext context = payloadCollector.getPayloadContext(username, chatroomId);
+        if (ChatroomRole.BANNED.equals(context.chatParticipant().getRole())) {
+            return null;
+        }
+        return chatMessageService.saveUserLeaveMessage(context.user(), context.chatroom()).mapToBasePayload();
+    }
 
+    public BasePayload createChatroomClosedMessageOrDeleteAll(String username, Long chatroomId) {
+        PayloadContext context = payloadCollector.getPayloadContext(username, chatroomId);
         return chatroomLeaveManager.leaveChatroom(context);
     }
 
@@ -84,6 +94,10 @@ public class ChatRealTimeFacade {
         Chatroom chatroom = context.chatroom();
 
         ChatParticipant chatParticipant = chatParticipantService.findByUserAndChatroom(user, chatroom);
+
+        chatroomValidator.validateIsOpened(chatroom);
+        participantValidator.validateIsParticipate(chatParticipant);
+        participantValidator.validateIsBanned(chatParticipant);
 
         List<ChatParticipant> chatMembers = chatParticipantService.findUnreadMembers(chatroom, user);
 
@@ -124,11 +138,12 @@ public class ChatRealTimeFacade {
     public MarkAllChatroomAsReadResult markAllChatroomAsRead(String username) {
         List<PayloadContext> contexts = payloadCollector.getAllPayloadContext(username);
 
-        List<Long> chatroomIds = contexts.stream().map(PayloadContext::chatroom).map(Chatroom::getId).toList();
-
-        List<BasePayload> broadcastPayloads = unreadChatMessageService.markAllMessageAsRead(contexts);
+        List<MessageReadPayload> broadcastPayloads = unreadChatMessageService.markAllMessageAsRead(contexts);
 
         eventPublisher.publishEvent(new UserChatroomUpdateEvent(contexts.getFirst().user()));
+        List<Long> chatroomIds = broadcastPayloads.stream()
+                .map(MessageReadPayload::getChatroomId)
+                .toList();
 
         return MarkAllChatroomAsReadResult.builder()
                 .apiResponse(MarkAllChatroomAsReadResponse.builder().chatroomIds(chatroomIds).build())

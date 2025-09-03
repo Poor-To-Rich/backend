@@ -4,8 +4,8 @@ import com.poortorich.chat.entity.ChatMessage;
 import com.poortorich.chat.entity.ChatParticipant;
 import com.poortorich.chat.entity.Chatroom;
 import com.poortorich.chat.entity.UnreadChatMessage;
+import com.poortorich.chat.model.UnreadChatInfo;
 import com.poortorich.chat.realtime.model.PayloadContext;
-import com.poortorich.chat.realtime.payload.response.BasePayload;
 import com.poortorich.chat.realtime.payload.response.MessageReadPayload;
 import com.poortorich.chat.repository.UnreadChatMessageRepository;
 import com.poortorich.user.entity.User;
@@ -15,7 +15,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.IntStream;
 
 @Service
 @RequiredArgsConstructor
@@ -61,21 +60,20 @@ public class UnreadChatMessageService {
     }
 
     @Transactional
-    public List<BasePayload> markAllMessageAsRead(List<PayloadContext> contexts) {
+    public List<MessageReadPayload> markAllMessageAsRead(List<PayloadContext> contexts) {
         List<Chatroom> chatrooms = contexts.stream().map(PayloadContext::chatroom).toList();
         List<User> users = contexts.stream().map(PayloadContext::user).toList();
 
-        List<Long> lastReadMessageIds = unreadChatMessageRepository.findLastUnreadMessageIds(chatrooms, users);
+        List<UnreadChatInfo> unreadChatInfos = unreadChatMessageRepository.findLastUnreadMessageIds(chatrooms, users);
         unreadChatMessageRepository.markAllMessageAsRead(chatrooms, users);
 
-        return IntStream.range(0, contexts.size())
-                .mapToObj(index -> MessageReadPayload.builder()
-                        .chatroomId(chatrooms.get(index).getId())
-                        .lastReadMessageId(lastReadMessageIds.get(index))
-                        .userId(users.get(index).getId())
+        return unreadChatInfos.stream()
+                .map(unreadChatInfo -> MessageReadPayload.builder()
+                        .chatroomId(unreadChatInfo.getChatroomId())
+                        .lastReadMessageId(unreadChatInfo.getLastReadMessageId())
+                        .userId(unreadChatInfo.getUserId())
                         .readAt(LocalDateTime.now())
-                        .build()
-                        .mapToBasePayload())
+                        .build())
                 .toList();
     }
 
@@ -83,7 +81,8 @@ public class UnreadChatMessageService {
         return unreadChatMessageRepository.countByUserAndChatroom(user, chatroom);
     }
 
+    @Transactional
     public void deleteAllByChatroom(Chatroom chatroom) {
-        unreadChatMessageRepository.deleteAllByChatroom(chatroom);
+        unreadChatMessageRepository.deleteByChatroom(chatroom);
     }
 }

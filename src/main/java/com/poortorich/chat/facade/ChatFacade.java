@@ -8,6 +8,7 @@ import com.poortorich.chat.model.ChatMessageResponse;
 import com.poortorich.chat.model.ChatPaginationContext;
 import com.poortorich.chat.model.ChatroomPaginationContext;
 import com.poortorich.chat.model.UserEnterChatroomResult;
+import com.poortorich.chat.realtime.event.chatparticipants.KickChatroomEvent;
 import com.poortorich.chat.realtime.event.chatroom.ChatroomUpdateEvent;
 import com.poortorich.chat.realtime.event.chatroom.ParticipantUpdateEvent;
 import com.poortorich.chat.realtime.event.chatroom.detector.ChatroomUpdateDetector;
@@ -60,6 +61,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -107,6 +109,14 @@ public class ChatFacade {
     public AllChatroomsResponse getAllChatrooms(SortBy sortBy, Long cursor) {
         List<Chatroom> chatrooms = chatroomService.getAllChatrooms(sortBy, cursor);
 
+        if (chatrooms.isEmpty()) {
+            return AllChatroomsResponse.builder()
+                    .hasNext(false)
+                    .nextCursor(null)
+                    .chatrooms(List.of())
+                    .build();
+        }
+
         return AllChatroomsResponse.builder()
                 .hasNext(chatroomService.hasNext(sortBy, chatrooms.getLast().getId()))
                 .nextCursor(chatroomService.getNextCursor(sortBy, chatrooms.getLast().getId()))
@@ -133,6 +143,7 @@ public class ChatFacade {
 
     private List<ChatroomResponse> getChatroomResponses(List<Chatroom> chatrooms) {
         return chatrooms.stream()
+                .filter(Objects::nonNull)
                 .map(chatroom ->
                         ChatBuilder.buildChatroomResponse(
                                 chatroom,
@@ -283,9 +294,8 @@ public class ChatFacade {
 
     @Transactional
     public ChatMessagePageResponse getChatMessages(String username, Long chatroomId, Long cursor, Long pageSize) {
-        User user = userService.findUserByUsername(username);
         ChatPaginationContext context = paginationProvider.getChatMessagesContext(username, chatroomId, cursor, pageSize);
-        chatParticipantValidator.validateIsParticipate(user, context.chatroom());
+        chatParticipantValidator.validateIsParticipate(context.chatParticipant().getUser(), context.chatroom());
 
         Slice<ChatMessage> chatMessages = chatMessageService.getChatMessages(context);
 
@@ -384,6 +394,7 @@ public class ChatFacade {
         chatParticipantValidator.validateIsMember(kickChatParticipant);
         chatParticipantValidator.validateIsParticipate(kickChatParticipant);
 
+        eventPublisher.publishEvent(new KickChatroomEvent(kickChatParticipant.getId()));
         chatParticipantService.kickChatParticipant(kickChatParticipant);
 
         eventPublisher.publishEvent(new ChatroomUpdateEvent(host.getChatroom()));
