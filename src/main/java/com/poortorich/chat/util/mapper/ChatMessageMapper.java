@@ -31,7 +31,7 @@ public class ChatMessageMapper {
             case RANKING -> rankingMessage(chatMessage);
             case RANKING_STATUS -> rankingStatusMessage(chatMessage);
             case ENTER -> userEnterMessage(chatMessage);
-            case LEAVE -> userLeaveMessage(chatMessage);
+            case LEAVE, KICK -> userLeaveMessage(chatMessage);
             case CLOSE -> chatroomClosedMessage(chatMessage);
             case TEXT, PHOTO -> userChatMessage(chatMessage);
             case DATE -> dateChangeMessage(chatMessage);

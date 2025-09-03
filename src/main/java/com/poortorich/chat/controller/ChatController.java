@@ -287,15 +287,6 @@ public class ChatController {
                 chatroomId,
                 userId);
 
-        BasePayload basePayload = realTimeFacade.createUserKickMessage(apiResponse.getKickChatParticipant());
-
-        if (!Objects.isNull(basePayload)) {
-            messagingTemplate.convertAndSend(
-                    SubscribeEndpoint.CHATROOM_SUBSCRIBE_PREFIX + chatroomId,
-                    basePayload
-            );
-        }
-
         return DataResponse.toResponseEntity(ChatResponse.CHAT_PARTICIPANT_KICK_SUCCESS, apiResponse);
     }
 }

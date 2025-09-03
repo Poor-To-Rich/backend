@@ -4,6 +4,7 @@ import com.poortorich.chat.entity.ChatMessage;
 import com.poortorich.chat.entity.Chatroom;
 import com.poortorich.chat.entity.enums.ChatMessageType;
 import com.poortorich.chat.entity.enums.MessageType;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -26,6 +27,13 @@ public interface ChatMessageRepository extends JpaRepository<ChatMessage, Long> 
             Long cursor,
             LocalDateTime joinedAt,
             Pageable pageable);
+
+    Slice<ChatMessage> findByChatroomAndIdLessThanEqualAndSentAtBetweenOrderByIdDesc(
+            Chatroom chatroom,
+            Long cursor,
+            LocalDateTime joinAt,
+            LocalDateTime bannedAt,
+            PageRequest pageRequest);
 
     boolean existsByContentAndMessageTypeAndChatroom(String content, MessageType messageType, Chatroom chatroom);
 

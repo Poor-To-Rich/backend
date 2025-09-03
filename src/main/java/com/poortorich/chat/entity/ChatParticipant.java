@@ -67,6 +67,9 @@ public class ChatParticipant {
     @Column(name = "joinAt")
     private LocalDateTime joinAt;
 
+    @Column(name = "banned_at")
+    private LocalDateTime bannedAt;
+
     @UpdateTimestamp
     @Column(name = "updated_date")
     private LocalDateTime updatedDate;
@@ -100,6 +103,9 @@ public class ChatParticipant {
 
     public void kick() {
         this.role = ChatroomRole.BANNED;
+        if (Objects.isNull(this.bannedAt)) {
+            this.bannedAt = LocalDateTime.now();
+        }
     }
 
     public void updateRankingStatus(RankingStatus rankingStatus) {

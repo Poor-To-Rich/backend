@@ -57,6 +57,7 @@ public class ChatResponseMessage {
     public static final String CHATROOM_IS_CLOSED = "채팅방이 종료되었습니다.";
     public static final String GET_MY_CHATROOMS_SUCCESS = "참여중인 채팅방 목록 조회가 완료되었습니다.";
     public static final String MESSAGE_TYPE_INVALID = "유효하지 않은 메시지 타입입니다.";
+    public static final String CHAT_PARTICIPANT_BANNED = "채팅방에서 강제퇴장 되었습니다.";
 
     private ChatResponseMessage() {
     }
