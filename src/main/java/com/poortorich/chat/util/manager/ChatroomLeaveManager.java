@@ -39,7 +39,7 @@ public class ChatroomLeaveManager {
     }
 
     @Transactional
-    private ChatroomClosedResponsePayload getClosedMessageOrDeleteAll(ChatParticipant participant) {
+    public ChatroomClosedResponsePayload getClosedMessageOrDeleteAll(ChatParticipant participant) {
         Chatroom chatroom = participant.getChatroom();
 
         if (chatParticipantService.isAllParticipantLeft(chatroom)) {
