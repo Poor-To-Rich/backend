@@ -12,6 +12,7 @@ import com.poortorich.chat.service.UnreadChatMessageService;
 import com.poortorich.chatnotice.service.ChatNoticeService;
 import com.poortorich.photo.service.PhotoService;
 import com.poortorich.ranking.service.RankingService;
+import com.poortorich.report.service.ReportService;
 import com.poortorich.tag.service.TagService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -29,6 +30,7 @@ public class ChatroomLeaveManager {
     private final RankingService rankingService;
     private final ChatNoticeService chatNoticeService;
     private final UnreadChatMessageService unreadChatMessageService;
+    private final ReportService reportService;
 
     public BasePayload leaveChatroom(PayloadContext payloadContext) {
         if (payloadContext.chatroom().getIsClosed()) {
@@ -49,6 +51,7 @@ public class ChatroomLeaveManager {
             photoService.deleteAllByChatroom(chatroom);
             rankingService.deleteAllByChatroom(chatroom);
             chatNoticeService.deleteAllByChatroom(chatroom);
+            reportService.deleteAllByChatroom(chatroom);
             chatParticipantService.deleteAllByChatroom(chatroom);
             chatroomService.deleteById(chatroom.getId());
             return null;
