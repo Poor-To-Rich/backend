@@ -79,6 +79,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.DELETE, "/user/reset", "/user/leave").hasRole("USER")
                         .requestMatchers("/user/oauth/**").hasRole("PENDING")
                         .requestMatchers(HttpMethod.GET, "/user/role").hasAnyRole("ADMIN", "USER", "TEST", "PENDING")
+                        .requestMatchers(HttpMethod.POST, "/auth/logout").hasAnyRole("ADMIN", "USER", "TEST", "PENDING")
                         .anyRequest().hasAnyRole("USER", "TEST", "ADMIN")
                 )
                 .exceptionHandling(exception -> exception.accessDeniedHandler(accessDeniedHandler))
