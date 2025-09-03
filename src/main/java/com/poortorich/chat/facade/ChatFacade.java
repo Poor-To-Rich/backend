@@ -47,6 +47,7 @@ import com.poortorich.chat.util.ChatBuilder;
 import com.poortorich.chat.util.detector.RankingStatusChangeDetector;
 import com.poortorich.chat.util.mapper.ChatMessageMapper;
 import com.poortorich.chat.util.mapper.ChatroomMapper;
+import com.poortorich.chat.util.mapper.ParticipantProfileMapper;
 import com.poortorich.chat.util.provider.ChatPaginationProvider;
 import com.poortorich.chat.validator.ChatParticipantValidator;
 import com.poortorich.chat.validator.ChatroomValidator;
@@ -84,7 +85,9 @@ public class ChatFacade {
     private final ChatParticipantValidator chatParticipantValidator;
     private final RankingStatusChangeDetector rankingStatusChangeDetector;
     private final ChatroomUpdateDetector chatroomUpdateDetector;
+    private final ParticipantProfileMapper participantProfileMapper;
     private final ApplicationEventPublisher eventPublisher;
+    private final ChatBuilder chatBuilder;
 
     @Transactional
     public ChatroomCreateResponse createChatroom(
@@ -105,7 +108,7 @@ public class ChatFacade {
         Chatroom chatroom = chatroomService.findById(chatroomId);
         List<String> hashtags = tagService.getTagNames(chatroom);
 
-        return ChatBuilder.buildChatroomInfoResponse(chatroom, hashtags);
+        return chatBuilder.buildChatroomInfoResponse(chatroom, hashtags);
     }
 
     public AllChatroomsResponse getAllChatrooms(SortBy sortBy, Long cursor) {
@@ -147,7 +150,7 @@ public class ChatFacade {
         return chatrooms.stream()
                 .filter(Objects::nonNull)
                 .map(chatroom ->
-                        ChatBuilder.buildChatroomResponse(
+                        chatBuilder.buildChatroomResponse(
                                 chatroom,
                                 tagService.getTagNames(chatroom),
                                 chatParticipantService.countByChatroom(chatroom),
@@ -158,14 +161,14 @@ public class ChatFacade {
 
     public ChatroomDetailsResponse getChatroomDetails(Long chatroomId) {
         Chatroom chatroom = chatroomService.findById(chatroomId);
-        return ChatBuilder.buildChatroomDetailsResponse(chatroom, chatParticipantService.countByChatroom(chatroom));
+        return chatBuilder.buildChatroomDetailsResponse(chatroom, chatParticipantService.countByChatroom(chatroom));
     }
 
     public ChatroomCoverInfoResponse getChatroomCoverInfo(String username, Long chatroomId) {
         User user = userService.findUserByUsername(username);
         Chatroom chatroom = chatroomService.findById(chatroomId);
 
-        return ChatBuilder.buildChatroomCoverInfoResponse(
+        return chatBuilder.buildChatroomCoverInfoResponse(
                 chatroom,
                 tagService.getTagNames(chatroom),
                 chatParticipantService.countByChatroom(chatroom),
@@ -331,7 +334,7 @@ public class ChatFacade {
         Chatroom chatroom = chatroomService.findById(chatroomId);
         chatParticipantValidator.validateIsParticipate(user, chatroom);
 
-        return ChatBuilder.buildAllParticipantsResponse(chatParticipantService.getAllParticipants(chatroom));
+        return chatBuilder.buildAllParticipantsResponse(chatParticipantService.getAllParticipants(chatroom));
     }
 
     @Transactional
@@ -368,7 +371,7 @@ public class ChatFacade {
         return SearchParticipantsResponse.builder()
                 .members(chatParticipants.stream()
                         .filter(chatParticipant -> chatParticipant.getRole().equals(ChatroomRole.MEMBER))
-                        .map(ChatBuilder::buildProfileResponse)
+                        .map(participantProfileMapper::mapToProfile)
                         .toList())
                 .build();
     }

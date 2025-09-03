@@ -32,6 +32,22 @@ public class ParticipantProfileMapper {
                 .build();
     }
 
+    public ChatParticipantProfile mapToProfile(ChatParticipant participant, RankingStatus status) {
+        User user = participant.getUser();
+
+        if (Role.WITHDRAW.equals(user.getRole())) {
+            return mapToWithdrawUserProfile(participant);
+        }
+
+        return ChatParticipantProfile.builder()
+                .userId(user.getId())
+                .nickname(user.getNickname())
+                .profileImage(user.getProfileImage())
+                .rankingType(status)
+                .isHost(ChatroomRole.HOST.equals(participant.getRole()))
+                .build();
+    }
+
     private ChatParticipantProfile mapToWithdrawUserProfile(ChatParticipant participant) {
         return ChatParticipantProfile.builder()
                 .userId(participant.getUser().getId())

@@ -12,12 +12,16 @@ import com.poortorich.chatnotice.response.LatestNoticeResponse;
 import com.poortorich.chatnotice.response.enums.ChatNoticeResponse;
 import com.poortorich.chatnotice.util.ChatNoticeBuilder;
 import com.poortorich.global.exceptions.InternalServerErrorException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.Objects;
 
 @Component
+@RequiredArgsConstructor
 public class ChatNoticeDataMapper {
+
+    private final ChatNoticeBuilder chatNoticeBuilder;
 
     public NoticeCreateResult mapToNoticeCreateResult(ChatNotice chatNotice) {
         if (Objects.isNull(chatNotice)) {
@@ -28,7 +32,7 @@ public class ChatNoticeDataMapper {
                 .apiResponse(ChatNoticeCreateResponse.builder().noticeId(chatNotice.getId()).build())
                 .broadcastPayload(BasePayload.builder()
                         .type(PayloadType.NOTICE)
-                        .payload(ChatNoticeBuilder.buildLatestNoticeResponse(NoticeStatus.DEFAULT, chatNotice))
+                        .payload(chatNoticeBuilder.buildLatestNoticeResponse(NoticeStatus.DEFAULT, chatNotice))
                         .build())
                 .build();
     }
@@ -48,7 +52,7 @@ public class ChatNoticeDataMapper {
                 .apiResponse(ChatNoticeUpdateResponse.builder().noticeId(chatNotice.getId()).build())
                 .broadcastPayload(BasePayload.builder()
                         .type(PayloadType.NOTICE)
-                        .payload(ChatNoticeBuilder.buildLatestNoticeResponse(NoticeStatus.DEFAULT, chatNotice))
+                        .payload(chatNoticeBuilder.buildLatestNoticeResponse(NoticeStatus.DEFAULT, chatNotice))
                         .build())
                 .build();
     }

@@ -4,11 +4,11 @@ import com.poortorich.chat.entity.ChatParticipant;
 import com.poortorich.chat.entity.Chatroom;
 import com.poortorich.chat.entity.enums.RankingStatus;
 import com.poortorich.chat.realtime.event.user.UserProfileUpdateEvent;
-import com.poortorich.chat.response.ProfileResponse;
+import com.poortorich.chat.response.ChatParticipantProfile;
 import com.poortorich.chat.service.ChatMessageService;
 import com.poortorich.chat.service.ChatParticipantService;
 import com.poortorich.chat.service.ChatroomService;
-import com.poortorich.chat.util.ChatBuilder;
+import com.poortorich.chat.util.mapper.ParticipantProfileMapper;
 import com.poortorich.chat.validator.ChatParticipantValidator;
 import com.poortorich.global.date.util.DateParser;
 import com.poortorich.ranking.entity.Ranking;
@@ -48,12 +48,14 @@ public class RankingFacade {
     private final UserService userService;
     private final ChatroomService chatroomService;
     private final ChatParticipantService chatParticipantService;
-    private final ChatParticipantValidator chatParticipantValidator;
+    private final ChatMessageService chatMessageService;
     private final RankingService rankingService;
 
+    private final ParticipantProfileMapper profileMapper;
     private final RankingCalculator rankingCalculator;
-    private final ChatMessageService chatMessageService;
+    private final ChatParticipantValidator chatParticipantValidator;
     private final ApplicationEventPublisher eventPublisher;
+    private final RankingBuilder rankingBuilder;
 
     @Transactional
     public RankingResponsePayload calculateRankingTest(Long chatroomId) {
@@ -146,7 +148,7 @@ public class RankingFacade {
             LocalDateTime lastMonday
     ) {
         if (latestRanking == null) {
-            LatestRankingResponse response = RankingBuilder.buildNotFoundLatestRankingResponse(lastMonday);
+            LatestRankingResponse response = rankingBuilder.buildNotFoundLatestRankingResponse(lastMonday);
             return LatestRankingResult.notFound(response);
         }
 
@@ -159,7 +161,7 @@ public class RankingFacade {
                 chatroom
         );
 
-        LatestRankingResponse response = RankingBuilder.buildLatestRankingResponse(latestRanking, saver, flexer);
+        LatestRankingResponse response = rankingBuilder.buildLatestRankingResponse(latestRanking, saver, flexer);
         return LatestRankingResult.found(response);
     }
 
@@ -265,7 +267,7 @@ public class RankingFacade {
                 .build();
     }
 
-    private List<ProfileResponse> buildProfileResponse(List<Long> chatParticipantIds, RankingStatus type) {
+    private List<ChatParticipantProfile> buildProfileResponse(List<Long> chatParticipantIds, RankingStatus type) {
         List<ChatParticipant> participants = chatParticipantService.findAllByIdIn(chatParticipantIds);
 
         return IntStream.range(0, chatParticipantIds.size())
@@ -279,7 +281,7 @@ public class RankingFacade {
                         return null;
                     }
 
-                    return ChatBuilder.buildProfileResponse(chatParticipant, i == 0 ? type : RankingStatus.NONE);
+                    return profileMapper.mapToProfile(chatParticipant, i == 0 ? type : RankingStatus.NONE);
                 })
                 .filter(Objects::nonNull)
                 .toList();

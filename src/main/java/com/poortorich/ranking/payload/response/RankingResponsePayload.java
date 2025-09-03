@@ -5,7 +5,7 @@ import com.poortorich.chat.entity.enums.MessageType;
 import com.poortorich.chat.model.ChatMessageResponse;
 import com.poortorich.chat.realtime.payload.interfaces.ResponsePayload;
 import com.poortorich.chat.realtime.payload.response.BasePayload;
-import com.poortorich.chat.response.ProfileResponse;
+import com.poortorich.chat.response.ChatParticipantProfile;
 import lombok.Builder;
 import lombok.Data;
 
@@ -22,8 +22,8 @@ public class RankingResponsePayload extends ChatMessageResponse implements Respo
     private Long chatroomId;
     private LocalDate rankedAt;
     private LocalDateTime sentAt;
-    private List<ProfileResponse> saverRankings;
-    private List<ProfileResponse> flexerRankings;
+    private List<ChatParticipantProfile> saverRankings;
+    private List<ChatParticipantProfile> flexerRankings;
     private MessageType messageType;
     private ChatMessageType type;
 

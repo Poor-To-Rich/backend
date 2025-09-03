@@ -1,27 +1,21 @@
 package com.poortorich.ranking.util;
 
 import com.poortorich.chat.entity.ChatParticipant;
-import com.poortorich.chat.util.ChatBuilder;
+import com.poortorich.chat.util.mapper.ParticipantProfileMapper;
 import com.poortorich.ranking.entity.Ranking;
 import com.poortorich.ranking.response.LatestRankingResponse;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
+@Component
+@RequiredArgsConstructor
 public class RankingBuilder {
 
-    public static LatestRankingResponse buildNotFoundLatestRankingResponse(LocalDateTime rankedAt) {
-        return LatestRankingResponse.builder()
-                .rankedAt(rankedAt.toString())
-                .rankingId(null)
-                .saver(null)
-                .flexer(null)
-                .build();
-    }
+    private final ParticipantProfileMapper profileMapper;
 
-    public static LatestRankingResponse buildLatestRankingResponse(
+    public LatestRankingResponse buildLatestRankingResponse(
             Ranking latestRanking,
             ChatParticipant saver,
             ChatParticipant flexer
@@ -29,8 +23,17 @@ public class RankingBuilder {
         return LatestRankingResponse.builder()
                 .rankedAt(latestRanking.getCreatedDate().toString())
                 .rankingId(latestRanking.getId())
-                .saver(ChatBuilder.buildProfileResponse(saver))
-                .flexer(ChatBuilder.buildProfileResponse(flexer))
+                .saver(profileMapper.mapToProfile(saver))
+                .flexer(profileMapper.mapToProfile(flexer))
+                .build();
+    }
+
+    public LatestRankingResponse buildNotFoundLatestRankingResponse(LocalDateTime rankedAt) {
+        return LatestRankingResponse.builder()
+                .rankedAt(rankedAt.toString())
+                .rankingId(null)
+                .saver(null)
+                .flexer(null)
                 .build();
     }
 }

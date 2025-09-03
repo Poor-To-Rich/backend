@@ -1,6 +1,6 @@
 package com.poortorich.ranking.response;
 
-import com.poortorich.chat.response.ProfileResponse;
+import com.poortorich.chat.response.ChatParticipantProfile;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -14,6 +14,6 @@ public class LatestRankingResponse {
 
     private String rankedAt;
     private Long rankingId;
-    private ProfileResponse saver;
-    private ProfileResponse flexer;
+    private ChatParticipantProfile saver;
+    private ChatParticipantProfile flexer;
 }
