@@ -239,7 +239,7 @@ public class RankingFacade {
                 .hasNext(hasNext)
                 .nextCursor(nextCursor)
                 .rankings(rankings.entrySet().stream()
-                        .limit(Math.max(1, rankings.size() - 1L))
+                        .limit(hasNext ? (rankings.size() - 1L) : rankings.size())
                         .map(entry -> buildRankingInfoResponse(entry.getKey(), entry.getValue(), chatroom))
                         .toList())
                 .build();
