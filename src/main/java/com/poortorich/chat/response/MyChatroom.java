@@ -14,6 +14,7 @@ public class MyChatroom implements Comparable<MyChatroom> {
     private final Boolean isHost;
     private final String chatroomTitle;
     private final Long currentMemberCount;
+    private final Long latestReadMessageId;
     private final String lastMessage;
     private final LocalDateTime lastMessageTime;
     private final Long unreadMessageCount;

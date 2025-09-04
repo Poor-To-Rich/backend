@@ -246,9 +246,15 @@ public class ChatMessageService {
     }
 
     @Transactional(readOnly = true)
-    public Optional<ChatMessage> getLastMessage(Chatroom chatroom) {
+    public Optional<ChatMessage> getLastMessage(ChatParticipant participant) {
+        if (ChatroomRole.BANNED.equals(participant.getRole())) {
+            return chatMessageRepository.findTopByChatroomAndTypeInAndSentAtLessThanEqualOrderByIdDesc(
+                    participant.getChatroom(),
+                    List.of(ChatMessageType.CHAT_MESSAGE, ChatMessageType.RANKING_MESSAGE),
+                    participant.getBannedAt());
+        }
         return chatMessageRepository.findTopByChatroomAndTypeInOrderByIdDesc(
-                chatroom,
+                participant.getChatroom(),
                 List.of(ChatMessageType.CHAT_MESSAGE, ChatMessageType.RANKING_MESSAGE));
     }
 
@@ -292,5 +298,13 @@ public class ChatMessageService {
                 .type(rankingMessage.getType())
                 .messageType(rankingMessage.getMessageType())
                 .build();
+    }
+
+    @Transactional(readOnly = true)
+    public Long getLatestReadMessageId(ChatParticipant participant) {
+        return chatMessageRepository.findLatestReadMessageId(
+                participant.getChatroom(),
+                participant.getUser(),
+                ChatMessageType.CHAT_MESSAGE);
     }
 }
