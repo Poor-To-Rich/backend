@@ -53,7 +53,16 @@ public interface ChatMessageRepository extends JpaRepository<ChatMessage, Long> 
                 ON u.chatMessage = m
                 AND u.user = :user
             WHERE m.chatroom = :chatroom
+            AND m.type = :messageType
             AND u.id IS NULL
             """)
-    Long findLatestReadMessageId(@Param("chatroom") Chatroom chatroom, @Param("user") User user);
+    Long findLatestReadMessageId(
+            @Param("chatroom") Chatroom chatroom,
+            @Param("user") User user,
+            @Param("messageType") ChatMessageType messageType);
+
+    Optional<ChatMessage> findTopByChatroomAndTypeInAndSentAtBeforeOrderByIdDesc(
+            Chatroom chatroom,
+            List<ChatMessageType> chatMessage,
+            LocalDateTime bannedAt);
 }

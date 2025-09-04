@@ -26,7 +26,7 @@ public class ChatroomMapper {
     public MyChatroom mapToMyChatroom(ChatParticipant participant) {
         Chatroom chatroom = participant.getChatroom();
 
-        Optional<ChatMessage> lastMessage = chatMessageService.getLastMessage(participant.getChatroom());
+        Optional<ChatMessage> lastMessage = chatMessageService.getLastMessage(participant);
         Long unreadMessageCount = unreadChatMessageService.countByUnreadChatMessage(
                 participant.getUser(),
                 participant.getChatroom());
