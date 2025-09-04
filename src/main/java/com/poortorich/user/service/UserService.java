@@ -1,5 +1,6 @@
 package com.poortorich.user.service;
 
+import com.poortorich.chat.entity.ChatParticipant;
 import com.poortorich.global.exceptions.NotFoundException;
 import com.poortorich.s3.constants.S3Constants;
 import com.poortorich.user.entity.User;
@@ -16,6 +17,12 @@ import com.poortorich.user.response.enums.UserResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -125,5 +132,17 @@ public class UserService {
         userRepository.findByUsername(username)
                 .orElseThrow(() -> new NotFoundException(UserResponse.USER_NOT_FOUND))
                 .updateRole(role);
+    }
+
+    public List<User> findAllByIdIn(List<Long> userIds) {
+        List<User> users = userRepository.findAllByIdIn(userIds);
+
+        Map<Long, User> userMap = users.stream()
+                .collect(Collectors.toMap(User::getId, Function.identity()));
+
+        return userIds.stream()
+                .map(userMap::get)
+                .filter(Objects::nonNull)
+                .toList();
     }
 }

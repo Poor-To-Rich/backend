@@ -22,6 +22,8 @@ import com.poortorich.user.response.UserEmailResponse;
 import com.poortorich.user.response.enums.UserResponse;
 import com.poortorich.user.util.ProfileUpdateRequestTestBuilder;
 import com.poortorich.user.util.UserRegistrationRequestTestBuilder;
+
+import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -175,5 +177,22 @@ public class UserServiceTest {
         assertThat(mockUser.getPassword()).isEqualTo(encodedNewPassword);
 
         verify(userRepository, times(1)).findByUsername(anyString());
+    }
+
+    @Test
+    @DisplayName("유저 아이디 목록으로 유저 조회 성공")
+    void findAllByIdInSuccess() {
+        List<Long> ids = List.of(1L, 2L, 3L);
+        User user1 = User.builder().id(1L).build();
+        User user2 = User.builder().id(2L).build();
+        User user3 = User.builder().id(3L).build();
+
+        when(userRepository.findAllByIdIn(ids))
+                .thenReturn(List.of(user1, user2, user3));
+
+        List<User> result = userService.findAllByIdIn(ids);
+
+        assertThat(result).hasSize(3);
+        assertThat(result).containsExactly(user1, user2, user3);
     }
 }

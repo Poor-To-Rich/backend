@@ -182,7 +182,8 @@ public class RankingFacade {
         return buildAllRankingsResponse(
                 hasNext,
                 hasNext ? lastKey.toString() : null,
-                rankings
+                rankings,
+                chatroom
         );
     }
 
@@ -232,7 +233,8 @@ public class RankingFacade {
     private AllRankingsResponse buildAllRankingsResponse(
             Boolean hasNext,
             String nextCursor,
-            Map<LocalDate, Ranking> rankings
+            Map<LocalDate, Ranking> rankings,
+            Chatroom chatroom
     ) {
         if (rankings.isEmpty()) {
             return AllRankingsResponse.builder().build();
@@ -243,12 +245,12 @@ public class RankingFacade {
                 .nextCursor(nextCursor)
                 .rankings(rankings.entrySet().stream()
                         .limit(rankings.size() - 1)
-                        .map(entry -> buildRankingInfoResponse(entry.getKey(), entry.getValue()))
+                        .map(entry -> buildRankingInfoResponse(entry.getKey(), entry.getValue(), chatroom))
                         .toList())
                 .build();
     }
 
-    private RankingInfoResponse buildRankingInfoResponse(LocalDate rankingAt, Ranking ranking) {
+    private RankingInfoResponse buildRankingInfoResponse(LocalDate rankingAt, Ranking ranking, Chatroom chatroom) {
         if (ranking == null) {
             return RankingInfoResponse.builder()
                     .rankingAt(rankingAt.toString())
@@ -262,29 +264,32 @@ public class RankingFacade {
                 .rankingAt(rankingAt.toString())
                 .saverRankings(buildProfileResponse(
                         Arrays.asList(ranking.getSaverFirst(), ranking.getSaverSecond(), ranking.getSaverThird()),
-                        RankingStatus.SAVER)
+                        RankingStatus.SAVER,
+                        chatroom)
                 )
                 .flexerRankings(buildProfileResponse(
                         Arrays.asList(ranking.getFlexerFirst(), ranking.getFlexerSecond(), ranking.getFlexerThird()),
-                        RankingStatus.FLEXER)
+                        RankingStatus.FLEXER,
+                        chatroom)
                 )
                 .build();
     }
 
-    private List<ProfileResponse> buildProfileResponse(List<Long> chatParticipantIds, RankingStatus type) {
-        List<ChatParticipant> participants = chatParticipantService.findAllByIdIn(chatParticipantIds);
+    private List<ProfileResponse> buildProfileResponse(List<Long> userIds, RankingStatus type, Chatroom chatroom) {
+        List<User> users = userService.findAllByIdIn(userIds);
 
-        return IntStream.range(0, chatParticipantIds.size())
+        return IntStream.range(0, userIds.size())
                 .mapToObj(i -> {
-                    ChatParticipant chatParticipant = participants.stream()
-                            .filter(p -> Objects.equals(p.getId(), chatParticipantIds.get(i)))
+                    User user = users.stream()
+                            .filter(p -> Objects.equals(p.getId(), userIds.get(i)))
                             .findFirst()
                             .orElse(null);
 
-                    if (chatParticipant == null) {
+                    if (user == null) {
                         return null;
                     }
 
+                    ChatParticipant chatParticipant = chatParticipantService.findByUserAndChatroom(user, chatroom);
                     return ChatBuilder.buildProfileResponse(chatParticipant, i == 0 ? type : RankingStatus.NONE);
                 })
                 .filter(Objects::nonNull)
