@@ -271,7 +271,7 @@ public class RankingFacade {
     }
 
     private List<ProfileResponse> buildProfileResponse(List<Long> userIds, RankingStatus type, Chatroom chatroom) {
-        List<User> users = userService.findAllByIdIn(userIds);
+        List<User> users = userService.findAllById(userIds);
 
         return IntStream.range(0, userIds.size())
                 .mapToObj(i -> {

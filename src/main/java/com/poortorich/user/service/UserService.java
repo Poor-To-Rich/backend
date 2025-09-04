@@ -1,6 +1,5 @@
 package com.poortorich.user.service;
 
-import com.poortorich.chat.entity.ChatParticipant;
 import com.poortorich.global.exceptions.NotFoundException;
 import com.poortorich.s3.constants.S3Constants;
 import com.poortorich.user.entity.User;
@@ -134,8 +133,8 @@ public class UserService {
                 .updateRole(role);
     }
 
-    public List<User> findAllByIdIn(List<Long> userIds) {
-        List<User> users = userRepository.findAllByIdIn(userIds);
+    public List<User> findAllById(List<Long> userIds) {
+        List<User> users = userRepository.findAllById(userIds);
 
         Map<Long, User> userMap = users.stream()
                 .collect(Collectors.toMap(User::getId, Function.identity()));

@@ -181,16 +181,15 @@ public class UserServiceTest {
 
     @Test
     @DisplayName("유저 아이디 목록으로 유저 조회 성공")
-    void findAllByIdInSuccess() {
+    void findAllByIdSuccess() {
         List<Long> ids = List.of(1L, 2L, 3L);
         User user1 = User.builder().id(1L).build();
         User user2 = User.builder().id(2L).build();
         User user3 = User.builder().id(3L).build();
 
-        when(userRepository.findAllByIdIn(ids))
-                .thenReturn(List.of(user1, user2, user3));
+        when(userRepository.findAllById(ids)).thenReturn(List.of(user1, user2, user3));
 
-        List<User> result = userService.findAllByIdIn(ids);
+        List<User> result = userService.findAllById(ids);
 
         assertThat(result).hasSize(3);
         assertThat(result).containsExactly(user1, user2, user3);
