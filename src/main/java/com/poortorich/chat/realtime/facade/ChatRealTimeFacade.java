@@ -4,6 +4,7 @@ import com.poortorich.chat.entity.ChatParticipant;
 import com.poortorich.chat.entity.Chatroom;
 import com.poortorich.chat.entity.enums.ChatMessageType;
 import com.poortorich.chat.model.MarkAllChatroomAsReadResult;
+import com.poortorich.chat.model.UnreadChatInfo;
 import com.poortorich.chat.realtime.collect.ChatPayloadCollector;
 import com.poortorich.chat.realtime.event.chatroom.ChatroomUpdateEvent;
 import com.poortorich.chat.realtime.event.chatroom.UserChatroomUpdateEvent;
@@ -34,7 +35,9 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.IntStream;
 
 @Service
 @RequiredArgsConstructor
@@ -107,8 +110,9 @@ public class ChatRealTimeFacade {
     @Transactional
     public BasePayload markMessagesAsRead(String username, MarkMessagesAsReadRequestPayload requestPayload) {
         PayloadContext context = payloadCollector.getPayloadContext(username, requestPayload.getChatroomId());
-
+        Long latestReadMessageId = chatMessageService.getLatestReadMessageId(context.chatParticipant());
         MessageReadPayload payload = unreadChatMessageService.markMessageAsRead(context.chatParticipant());
+        payload.setLastReadMessageId(latestReadMessageId);
 
         return payload.mapToBasePayload();
     }
@@ -124,7 +128,16 @@ public class ChatRealTimeFacade {
     public MarkAllChatroomAsReadResult markAllChatroomAsRead(String username) {
         List<PayloadContext> contexts = payloadCollector.getAllPayloadContext(username);
 
-        List<MessageReadPayload> broadcastPayloads = unreadChatMessageService.markAllMessageAsRead(contexts);
+        List<Long> latestReadMessageIds = chatMessageService.getLatestReadMessageIds(contexts);
+        List<UnreadChatInfo> unreadChatInfos = unreadChatMessageService.markAllMessageAsRead(contexts);
+        List<MessageReadPayload> broadcastPayloads = IntStream.range(0, latestReadMessageIds.size())
+                .mapToObj(index -> MessageReadPayload.builder()
+                        .chatroomId(unreadChatInfos.get(index).getChatroomId())
+                        .userId(unreadChatInfos.get(index).getUserId())
+                        .lastReadMessageId(latestReadMessageIds.get(index))
+                        .readAt(LocalDateTime.now())
+                        .build())
+                .toList();
 
         eventPublisher.publishEvent(new UserChatroomUpdateEvent(contexts.getFirst().user()));
         List<Long> chatroomIds = broadcastPayloads.stream()
