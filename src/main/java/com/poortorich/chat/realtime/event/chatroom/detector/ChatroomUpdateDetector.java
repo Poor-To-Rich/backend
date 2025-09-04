@@ -2,6 +2,7 @@ package com.poortorich.chat.realtime.event.chatroom.detector;
 
 import com.poortorich.chat.entity.Chatroom;
 import com.poortorich.chat.realtime.event.chatroom.ChatroomUpdateEvent;
+import com.poortorich.chat.realtime.payload.response.enums.PayloadType;
 import com.poortorich.chat.request.ChatroomUpdateRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
@@ -18,7 +19,7 @@ public class ChatroomUpdateDetector {
     public void detect(Chatroom chatroom, ChatroomUpdateRequest chatroomUpdateRequest, String newImage) {
         if (isTitleChanged(chatroom.getTitle(), chatroomUpdateRequest.getChatroomTitle())
                 || isImageChanged(chatroom.getImage(), newImage)) {
-            eventPublisher.publishEvent(new ChatroomUpdateEvent(chatroom));
+            eventPublisher.publishEvent(new ChatroomUpdateEvent(chatroom, PayloadType.CHATROOM_INFO_UPDATED));
         }
     }
 

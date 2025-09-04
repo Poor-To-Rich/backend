@@ -13,6 +13,7 @@ import com.poortorich.chat.realtime.event.chatroom.ChatroomUpdateEvent;
 import com.poortorich.chat.realtime.event.chatroom.ParticipantUpdateEvent;
 import com.poortorich.chat.realtime.event.chatroom.detector.ChatroomUpdateDetector;
 import com.poortorich.chat.realtime.payload.response.UserEnterProfileResponsePayload;
+import com.poortorich.chat.realtime.payload.response.enums.PayloadType;
 import com.poortorich.chat.request.ChatroomCreateRequest;
 import com.poortorich.chat.request.ChatroomEnterRequest;
 import com.poortorich.chat.request.ChatroomLeaveAllRequest;
@@ -206,7 +207,7 @@ public class ChatFacade {
 
         ChatParticipant newParticipant = chatParticipantService.enterUser(user, chatroom);
 
-        eventPublisher.publishEvent(new ChatroomUpdateEvent(chatroom));
+        eventPublisher.publishEvent(new ChatroomUpdateEvent(chatroom, PayloadType.CHATROOM_INFO_UPDATED));
         return UserEnterChatroomResult.builder()
                 .apiResponse(ChatroomEnterResponse.builder().chatroomId(chatroomId).build())
                 .broadcastPayload(UserEnterProfileResponsePayload.builder()
@@ -269,6 +270,7 @@ public class ChatFacade {
             Chatroom chatroom = chatroomService.findById(chatroomId);
             ChatParticipant chatParticipant = chatParticipantService.findByUserAndChatroom(user, chatroom);
             chatroomLeaveService.leaveChatroom(chatParticipant);
+
         }
 
         return ChatroomLeaveAllResponse.builder()
@@ -388,7 +390,7 @@ public class ChatFacade {
         eventPublisher.publishEvent(new KickChatroomEvent(kickChatParticipant.getId()));
         chatParticipantService.kickChatParticipant(kickChatParticipant);
 
-        eventPublisher.publishEvent(new ChatroomUpdateEvent(host.getChatroom()));
+        eventPublisher.publishEvent(new ChatroomUpdateEvent(host.getChatroom(), PayloadType.CHATROOM_INFO_UPDATED));
         return KickChatParticipantResponse.builder()
                 .kickUserId(kickChatParticipant.getUser().getId())
                 .kickChatParticipant(kickChatParticipant)
