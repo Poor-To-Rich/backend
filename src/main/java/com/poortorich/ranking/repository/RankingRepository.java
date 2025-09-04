@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -23,10 +24,10 @@ public interface RankingRepository extends JpaRepository<Ranking, Long> {
                 SELECT r
                   FROM Ranking r
                  WHERE r.chatroom = :chatroom
-                   AND r.createdDate IN :mondays
+                   AND function('date', r.createdDate) IN :mondays
                  ORDER BY r.createdDate DESC
             """)
-    List<Ranking> findAllByChatroomWithDateIn(Chatroom chatroom, List<LocalDateTime> mondays);
+    List<Ranking> findAllByChatroomWithDateIn(Chatroom chatroom, List<LocalDate> mondays);
 
     void deleteByChatroom(Chatroom chatroom);
 }

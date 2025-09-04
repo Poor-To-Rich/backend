@@ -23,6 +23,7 @@ import com.poortorich.ranking.util.calculator.RankingCalculator;
 import com.poortorich.user.entity.User;
 import com.poortorich.user.service.UserService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,6 +40,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class RankingFacade {
@@ -169,52 +171,56 @@ public class RankingFacade {
         Chatroom chatroom = chatroomService.findById(chatroomId);
         chatParticipantValidator.validateIsParticipate(user, chatroom);
 
-        Map<LocalDateTime, Ranking> rankings = getMondayRankings(chatroom, cursor);
+        Map<LocalDate, Ranking> rankings = getMondayRankings(chatroom, cursor);
 
         boolean hasNext = rankings.size() == PAGE_SIZE;
-        LocalDateTime lastKey = rankings.keySet()
+        LocalDate lastKey = rankings.keySet()
                 .stream()
                 .reduce((first, second) -> second)
                 .orElse(null);
 
         return buildAllRankingsResponse(
                 hasNext,
-                hasNext ? lastKey.toLocalDate().toString() : null,
+                hasNext ? lastKey.toString() : null,
                 rankings
         );
     }
 
-    private Map<LocalDateTime, Ranking> getMondayRankings(Chatroom chatroom, String cursor) {
-        List<LocalDateTime> mondays = getMondays(DateParser.parseDate(cursor).atStartOfDay(), getFloorMonday(chatroom));
+    private Map<LocalDate, Ranking> getMondayRankings(Chatroom chatroom, String cursor) {
+        List<LocalDate> mondays = getMondays(DateParser.parseDate(cursor).atStartOfDay(), getFloorMonday(chatroom));
         if (mondays.isEmpty()) {
             return new LinkedHashMap<>();
         }
         List<Ranking> rankings = rankingService.findAllRankings(chatroom, mondays);
+        for (Ranking ranking : rankings) {
+            log.info(ranking.toString());
+        }
 
-        Map<LocalDateTime, Ranking> byDate = rankings.stream()
-                .collect(Collectors.toMap(Ranking::getCreatedDate, ranking -> ranking));
+        Map<LocalDate, Ranking> byDate = rankings.stream()
+                .collect(Collectors.toMap(
+                        ranking -> ranking.getCreatedDate().toLocalDate(),
+                        ranking -> ranking)
+                );
 
-        Map<LocalDateTime, Ranking> result = new LinkedHashMap<>();
-        for (LocalDateTime monday : mondays) {
+        Map<LocalDate, Ranking> result = new LinkedHashMap<>();
+        for (LocalDate monday : mondays) {
             result.put(monday, byDate.getOrDefault(monday, null));
         }
         return result;
     }
 
-    private LocalDateTime getFloorMonday(Chatroom chatroom) {
+    private LocalDate getFloorMonday(Chatroom chatroom) {
         return chatroom.getCreatedDate()
                 .with(TemporalAdjusters.nextOrSame(DayOfWeek.MONDAY))
-                .toLocalDate()
-                .atStartOfDay();
+                .toLocalDate();
     }
 
-    private List<LocalDateTime> getMondays(LocalDateTime cursor, LocalDateTime floorMonday) {
-        LocalDateTime recentMonday = cursor
+    private List<LocalDate> getMondays(LocalDateTime cursor, LocalDate floorMonday) {
+        LocalDate recentMonday = cursor
                 .with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
-                .toLocalDate()
-                .atStartOfDay();
+                .toLocalDate();
 
-        List<LocalDateTime> mondays = IntStream.range(0, PAGE_SIZE)
+        List<LocalDate> mondays = IntStream.range(0, PAGE_SIZE)
                 .mapToObj(recentMonday::minusWeeks)
                 .toList();
 
@@ -226,7 +232,7 @@ public class RankingFacade {
     private AllRankingsResponse buildAllRankingsResponse(
             Boolean hasNext,
             String nextCursor,
-            Map<LocalDateTime, Ranking> rankings
+            Map<LocalDate, Ranking> rankings
     ) {
         if (rankings.isEmpty()) {
             return AllRankingsResponse.builder().build();
@@ -242,10 +248,10 @@ public class RankingFacade {
                 .build();
     }
 
-    private RankingInfoResponse buildRankingInfoResponse(LocalDateTime rankingAt, Ranking ranking) {
+    private RankingInfoResponse buildRankingInfoResponse(LocalDate rankingAt, Ranking ranking) {
         if (ranking == null) {
             return RankingInfoResponse.builder()
-                    .rankingAt(rankingAt.toLocalDate().toString())
+                    .rankingAt(rankingAt.toString())
                     .saverRankings(List.of())
                     .flexerRankings(List.of())
                     .build();
@@ -253,7 +259,7 @@ public class RankingFacade {
 
         return RankingInfoResponse.builder()
                 .rankingId(ranking.getId())
-                .rankingAt(rankingAt.toLocalDate().toString())
+                .rankingAt(rankingAt.toString())
                 .saverRankings(buildProfileResponse(
                         Arrays.asList(ranking.getSaverFirst(), ranking.getSaverSecond(), ranking.getSaverThird()),
                         RankingStatus.SAVER)

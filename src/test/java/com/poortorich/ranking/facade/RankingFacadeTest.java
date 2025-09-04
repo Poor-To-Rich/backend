@@ -24,6 +24,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.TemporalAdjusters;
 import java.util.Optional;
@@ -51,10 +52,9 @@ class RankingFacadeTest {
     private RankingFacade rankingFacade;
 
     private final LocalDateTime now = LocalDateTime.now();
-    private final LocalDateTime lastMonday = now
+    private final LocalDate lastMonday = now
             .with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
-            .toLocalDate()
-            .atStartOfDay();
+            .toLocalDate();
 
     @Test
     @DisplayName("최신 랭킹 조회 성공")
@@ -97,7 +97,7 @@ class RankingFacadeTest {
 
         when(userService.findUserByUsername(username)).thenReturn(user);
         when(chatroomService.findById(chatroomId)).thenReturn(chatroom);
-        when(rankingService.findLatestRanking(eq(chatroom), eq(lastMonday), any(LocalDateTime.class)))
+        when(rankingService.findLatestRanking(eq(chatroom), eq(lastMonday.atStartOfDay()), any(LocalDateTime.class)))
                 .thenReturn(ranking);
         when(chatParticipantService.findByUserIdAndChatroom(saverId, chatroom)).thenReturn(saver);
         when(chatParticipantService.findByUserIdAndChatroom(flexerId, chatroom)).thenReturn(flexer);
@@ -122,7 +122,7 @@ class RankingFacadeTest {
 
         when(userService.findUserByUsername(username)).thenReturn(user);
         when(chatroomService.findById(chatroomId)).thenReturn(chatroom);
-        when(rankingService.findLatestRanking(eq(chatroom), eq(lastMonday), any(LocalDateTime.class)))
+        when(rankingService.findLatestRanking(eq(chatroom), eq(lastMonday.atStartOfDay()), any(LocalDateTime.class)))
                 .thenReturn(null);
 
         var result = rankingFacade.getLatestRanking(username, chatroomId);

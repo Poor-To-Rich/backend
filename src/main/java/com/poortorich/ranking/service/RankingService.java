@@ -105,7 +105,7 @@ public class RankingService {
                 .orElse(null);
     }
 
-    public List<Ranking> findAllRankings(Chatroom chatroom, List<LocalDateTime> mondays) {
+    public List<Ranking> findAllRankings(Chatroom chatroom, List<LocalDate> mondays) {
         return rankingRepository.findAllByChatroomWithDateIn(chatroom, mondays);
     }
 
