@@ -61,7 +61,7 @@ public interface ChatMessageRepository extends JpaRepository<ChatMessage, Long> 
             @Param("user") User user,
             @Param("messageType") ChatMessageType messageType);
 
-    Optional<ChatMessage> findTopByChatroomAndTypeInAndSentAtBeforeOrderByIdDesc(
+    Optional<ChatMessage> findTopByChatroomAndTypeInAndSentAtLessThanEqualOrderByIdDesc(
             Chatroom chatroom,
             List<ChatMessageType> chatMessage,
             LocalDateTime bannedAt);

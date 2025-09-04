@@ -248,7 +248,7 @@ public class ChatMessageService {
     @Transactional(readOnly = true)
     public Optional<ChatMessage> getLastMessage(ChatParticipant participant) {
         if (ChatroomRole.BANNED.equals(participant.getRole())) {
-            return chatMessageRepository.findTopByChatroomAndTypeInAndSentAtBeforeOrderByIdDesc(
+            return chatMessageRepository.findTopByChatroomAndTypeInAndSentAtLessThanEqualOrderByIdDesc(
                     participant.getChatroom(),
                     List.of(ChatMessageType.CHAT_MESSAGE, ChatMessageType.RANKING_MESSAGE),
                     participant.getBannedAt());
@@ -300,6 +300,7 @@ public class ChatMessageService {
                 .build();
     }
 
+    @Transactional(readOnly = true)
     public Long getLatestReadMessageId(ChatParticipant participant) {
         return chatMessageRepository.findLatestReadMessageId(
                 participant.getChatroom(),
