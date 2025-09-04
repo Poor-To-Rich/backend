@@ -171,52 +171,54 @@ public class RankingFacade {
         Chatroom chatroom = chatroomService.findById(chatroomId);
         chatParticipantValidator.validateIsParticipate(user, chatroom);
 
-        Map<LocalDateTime, Ranking> rankings = getMondayRankings(chatroom, cursor);
+        Map<LocalDate, Ranking> rankings = getMondayRankings(chatroom, cursor);
 
         boolean hasNext = rankings.size() == PAGE_SIZE;
-        LocalDateTime lastKey = rankings.keySet()
+        LocalDate lastKey = rankings.keySet()
                 .stream()
                 .reduce((first, second) -> second)
                 .orElse(null);
 
         return buildAllRankingsResponse(
                 hasNext,
-                hasNext ? lastKey.toLocalDate().toString() : null,
-                rankings
+                hasNext ? lastKey.toString() : null,
+                rankings,
+                chatroom
         );
     }
 
-    private Map<LocalDateTime, Ranking> getMondayRankings(Chatroom chatroom, String cursor) {
-        List<LocalDateTime> mondays = getMondays(DateParser.parseDate(cursor).atStartOfDay(), getFloorMonday(chatroom));
+    private Map<LocalDate, Ranking> getMondayRankings(Chatroom chatroom, String cursor) {
+        List<LocalDate> mondays = getMondays(DateParser.parseDate(cursor).atStartOfDay(), getFloorMonday(chatroom));
         if (mondays.isEmpty()) {
             return new LinkedHashMap<>();
         }
         List<Ranking> rankings = rankingService.findAllRankings(chatroom, mondays);
 
-        Map<LocalDateTime, Ranking> byDate = rankings.stream()
-                .collect(Collectors.toMap(Ranking::getCreatedDate, ranking -> ranking));
+        Map<LocalDate, Ranking> byDate = rankings.stream()
+                .collect(Collectors.toMap(
+                        ranking -> ranking.getCreatedDate().toLocalDate(),
+                        ranking -> ranking)
+                );
 
-        Map<LocalDateTime, Ranking> result = new LinkedHashMap<>();
-        for (LocalDateTime monday : mondays) {
+        Map<LocalDate, Ranking> result = new LinkedHashMap<>();
+        for (LocalDate monday : mondays) {
             result.put(monday, byDate.getOrDefault(monday, null));
         }
         return result;
     }
 
-    private LocalDateTime getFloorMonday(Chatroom chatroom) {
+    private LocalDate getFloorMonday(Chatroom chatroom) {
         return chatroom.getCreatedDate()
                 .with(TemporalAdjusters.nextOrSame(DayOfWeek.MONDAY))
-                .toLocalDate()
-                .atStartOfDay();
+                .toLocalDate();
     }
 
-    private List<LocalDateTime> getMondays(LocalDateTime cursor, LocalDateTime floorMonday) {
-        LocalDateTime recentMonday = cursor
+    private List<LocalDate> getMondays(LocalDateTime cursor, LocalDate floorMonday) {
+        LocalDate recentMonday = cursor
                 .with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
-                .toLocalDate()
-                .atStartOfDay();
+                .toLocalDate();
 
-        List<LocalDateTime> mondays = IntStream.range(0, PAGE_SIZE)
+        List<LocalDate> mondays = IntStream.range(0, PAGE_SIZE)
                 .mapToObj(recentMonday::minusWeeks)
                 .toList();
 
@@ -228,7 +230,8 @@ public class RankingFacade {
     private AllRankingsResponse buildAllRankingsResponse(
             Boolean hasNext,
             String nextCursor,
-            Map<LocalDateTime, Ranking> rankings
+            Map<LocalDate, Ranking> rankings,
+            Chatroom chatroom
     ) {
         if (rankings.isEmpty()) {
             return AllRankingsResponse.builder().build();
@@ -238,16 +241,16 @@ public class RankingFacade {
                 .hasNext(hasNext)
                 .nextCursor(nextCursor)
                 .rankings(rankings.entrySet().stream()
-                        .limit(rankings.size() - 1)
-                        .map(entry -> buildRankingInfoResponse(entry.getKey(), entry.getValue()))
+                        .limit(hasNext ? (rankings.size() - 1L) : rankings.size())
+                        .map(entry -> buildRankingInfoResponse(entry.getKey(), entry.getValue(), chatroom))
                         .toList())
                 .build();
     }
 
-    private RankingInfoResponse buildRankingInfoResponse(LocalDateTime rankingAt, Ranking ranking) {
+    private RankingInfoResponse buildRankingInfoResponse(LocalDate rankingAt, Ranking ranking, Chatroom chatroom) {
         if (ranking == null) {
             return RankingInfoResponse.builder()
-                    .rankingAt(rankingAt.toLocalDate().toString())
+                    .rankingAt(rankingAt.toString())
                     .saverRankings(List.of())
                     .flexerRankings(List.of())
                     .build();
@@ -255,33 +258,36 @@ public class RankingFacade {
 
         return RankingInfoResponse.builder()
                 .rankingId(ranking.getId())
-                .rankingAt(rankingAt.toLocalDate().toString())
+                .rankingAt(rankingAt.toString())
                 .saverRankings(buildProfileResponse(
                         Arrays.asList(ranking.getSaverFirst(), ranking.getSaverSecond(), ranking.getSaverThird()),
-                        RankingStatus.SAVER)
+                        RankingStatus.SAVER,
+                        chatroom)
                 )
                 .flexerRankings(buildProfileResponse(
                         Arrays.asList(ranking.getFlexerFirst(), ranking.getFlexerSecond(), ranking.getFlexerThird()),
-                        RankingStatus.FLEXER)
+                        RankingStatus.FLEXER,
+                        chatroom)
                 )
                 .build();
     }
 
-    private List<ChatParticipantProfile> buildProfileResponse(List<Long> chatParticipantIds, RankingStatus type) {
-        List<ChatParticipant> participants = chatParticipantService.findAllByIdIn(chatParticipantIds);
+    private List<ChatParticipantProfile> buildProfileResponse(List<Long> userIds, RankingStatus type, Chatroom chatroom) {
+        List<User> users = userService.findAllById(userIds);
 
-        return IntStream.range(0, chatParticipantIds.size())
+        return IntStream.range(0, userIds.size())
                 .mapToObj(i -> {
-                    ChatParticipant chatParticipant = participants.stream()
-                            .filter(p -> Objects.equals(p.getId(), chatParticipantIds.get(i)))
+                    User user = users.stream()
+                            .filter(p -> Objects.equals(p.getId(), userIds.get(i)))
                             .findFirst()
                             .orElse(null);
 
-                    if (chatParticipant == null) {
+                    if (user == null) {
                         return null;
                     }
 
-                    return profileMapper.mapToProfile(chatParticipant, i == 0 ? type : RankingStatus.NONE);
+                    ChatParticipant chatParticipant = chatParticipantService.findByUserAndChatroom(user, chatroom);
+                   return profileMapper.mapToProfile(chatParticipant, i == 0 ? type : RankingStatus.NONE);
                 })
                 .filter(Objects::nonNull)
                 .toList();

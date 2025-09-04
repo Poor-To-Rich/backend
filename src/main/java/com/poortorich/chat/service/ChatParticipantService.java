@@ -183,18 +183,6 @@ public class ChatParticipantService {
                         context.pageRequest());
     }
 
-    public List<ChatParticipant> findAllByIdIn(List<Long> chatParticipantIds) {
-        List<ChatParticipant> participants = chatParticipantRepository.findAllByIdIn(chatParticipantIds);
-
-        Map<Long, ChatParticipant> participantMap = participants.stream()
-                .collect(Collectors.toMap(ChatParticipant::getId, Function.identity()));
-
-        return chatParticipantIds.stream()
-                .map(participantMap::get)
-                .filter(Objects::nonNull)
-                .toList();
-    }
-
     @Transactional
     public void updateAllRankingStatus(List<ChatParticipant> participants, RankingStatus rankingStatus) {
         participants.forEach(participant -> participant.updateRankingStatus(rankingStatus));
