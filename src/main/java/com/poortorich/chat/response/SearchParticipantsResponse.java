@@ -13,5 +13,5 @@ import java.util.List;
 @AllArgsConstructor
 public class SearchParticipantsResponse {
 
-    private List<ProfileResponse> members;
+    private List<ChatParticipantProfile> members;
 }

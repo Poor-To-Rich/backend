@@ -1,8 +1,8 @@
 package com.poortorich.ranking.util.mapper;
 
-import com.poortorich.chat.entity.enums.ChatroomRole;
-import com.poortorich.chat.response.ProfileResponse;
+import com.poortorich.chat.response.ChatParticipantProfile;
 import com.poortorich.chat.service.ChatParticipantService;
+import com.poortorich.chat.util.mapper.ParticipantProfileMapper;
 import com.poortorich.ranking.entity.Ranking;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -16,8 +16,9 @@ import java.util.stream.Stream;
 public class RankerProfileMapper {
 
     private final ChatParticipantService participantService;
+    private final ParticipantProfileMapper participantProfileMapper;
 
-    public List<ProfileResponse> mapToSavers(Ranking ranking) {
+    public List<ChatParticipantProfile> mapToSavers(Ranking ranking) {
         if (Objects.isNull(ranking)) {
             return List.of();
         }
@@ -31,17 +32,11 @@ public class RankerProfileMapper {
 
         return savers.stream()
                 .map(saverId -> participantService.findByUserIdAndChatroom(saverId, ranking.getChatroom()))
-                .map(saver -> ProfileResponse.builder()
-                        .userId(saver.getUser().getId())
-                        .profileImage(saver.getUser().getProfileImage())
-                        .nickname(saver.getUser().getNickname())
-                        .isHost(ChatroomRole.HOST.equals(saver.getRole()))
-                        .rankingType(saver.getRankingStatus().name())
-                        .build())
+                .map(participantProfileMapper::mapToProfile)
                 .toList();
     }
 
-    public List<ProfileResponse> mapToFlexer(Ranking ranking) {
+    public List<ChatParticipantProfile> mapToFlexer(Ranking ranking) {
         if (Objects.isNull(ranking)) {
             return List.of();
         }
@@ -55,13 +50,7 @@ public class RankerProfileMapper {
 
         return flexers.stream()
                 .map(flexer -> participantService.findByUserIdAndChatroom(flexer, ranking.getChatroom()))
-                .map(flexer -> ProfileResponse.builder()
-                        .userId(flexer.getUser().getId())
-                        .profileImage(flexer.getUser().getProfileImage())
-                        .nickname(flexer.getUser().getNickname())
-                        .isHost(ChatroomRole.HOST.equals(flexer.getRole()))
-                        .rankingType(flexer.getRankingStatus().name())
-                        .build())
+                .map(participantProfileMapper::mapToProfile)
                 .toList();
     }
 }

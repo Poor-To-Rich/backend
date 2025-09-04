@@ -45,6 +45,7 @@ public class ChatNoticeFacade {
     private final ChatNoticeDataMapper noticeDataMapper;
     private final ChatParticipantValidator participantValidator;
     private final ChatNoticeValidator chatNoticeValidator;
+    private final ChatNoticeBuilder chatNoticeBuilder;
 
     @Transactional
     public NoticeCreateResult create(String username, Long chatroomId, ChatNoticeCreateRequest noticeCreateRequest) {
@@ -97,7 +98,7 @@ public class ChatNoticeFacade {
         List<ChatNotice> contents = chatNotices.getContent();
         Long lastId = contents.isEmpty() ? null : contents.getLast().getId();
 
-        return ChatNoticeBuilder.buildAllNoticesResponse(
+        return chatNoticeBuilder.buildAllNoticesResponse(
                 chatNotices.hasNext(),
                 getNextCursor(chatNotices.hasNext(), lastId),
                 contents.isEmpty() ? null : contents
@@ -117,7 +118,7 @@ public class ChatNoticeFacade {
         ChatParticipant chatParticipant = chatParticipantService.findByUsernameAndChatroom(username, chatroom);
         ChatNotice notice = chatNoticeService.getLatestNotice(chatroom);
 
-        return ChatNoticeBuilder.buildLatestNoticeResponse(chatParticipant.getNoticeStatus(), notice);
+        return chatNoticeBuilder.buildLatestNoticeResponse(chatParticipant.getNoticeStatus(), notice);
     }
 
     @Transactional(readOnly = true)
@@ -125,7 +126,7 @@ public class ChatNoticeFacade {
         Chatroom chatroom = chatroomService.findById(chatroomId);
         ChatNotice notice = chatNoticeService.findNotice(chatroom, noticeId);
 
-        return ChatNoticeBuilder.buildNoticeDetailsResponse(notice);
+        return chatNoticeBuilder.buildNoticeDetailsResponse(notice);
     }
 
     public PreviewNoticesResponse getPreviewNotices(Long chatroomId) {
@@ -133,7 +134,7 @@ public class ChatNoticeFacade {
         List<ChatNotice> previewNotice = chatNoticeService.getPreviewNotices(chatroom);
 
         return PreviewNoticesResponse.builder()
-                .notices(ChatNoticeBuilder.buildPreviewNoticeResponse(previewNotice))
+                .notices(chatNoticeBuilder.buildPreviewNoticeResponse(previewNotice))
                 .build();
     }
 

@@ -26,7 +26,6 @@ public class KakaoService {
     private String KAKAO_ADMIN_KEY;
 
     public Mono<String> callUnlinkAPI(String username) {
-        System.out.println(KAKAO_ADMIN_KEY);
         if (isKakaoUser(username)) {
             MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
             formData.add("target_id_type", "user_id");

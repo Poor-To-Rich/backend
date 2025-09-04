@@ -10,6 +10,7 @@ import com.poortorich.chat.repository.ChatParticipantRepository;
 import com.poortorich.chat.response.ChatParticipantProfile;
 import com.poortorich.chat.response.enums.ChatResponse;
 import com.poortorich.chat.util.ChatBuilder;
+import com.poortorich.chat.util.mapper.ParticipantProfileMapper;
 import com.poortorich.chatnotice.request.ChatNoticeStatusUpdateRequest;
 import com.poortorich.global.exceptions.BadRequestException;
 import com.poortorich.global.exceptions.NotFoundException;
@@ -34,8 +35,11 @@ public class ChatParticipantService {
     private final ChatParticipantRepository chatParticipantRepository;
     private final SubscribeService subscribeService;
 
+    private final ChatBuilder chatBuilder;
+    private final ParticipantProfileMapper profileMapper;
+
     public void createChatroomHost(User user, Chatroom chatroom) {
-        ChatParticipant chatParticipant = ChatBuilder.buildChatParticipant(user, ChatroomRole.HOST, chatroom);
+        ChatParticipant chatParticipant = chatBuilder.buildChatParticipant(user, ChatroomRole.HOST, chatroom);
         chatParticipantRepository.save(chatParticipant);
     }
 
@@ -54,7 +58,7 @@ public class ChatParticipantService {
 
     public ChatParticipant enterUser(User user, Chatroom chatroom) {
         ChatParticipant chatParticipant = chatParticipantRepository.findByUserAndChatroom(user, chatroom)
-                .orElseGet(() -> ChatBuilder.buildChatParticipant(user, ChatroomRole.MEMBER, chatroom));
+                .orElseGet(() -> chatBuilder.buildChatParticipant(user, ChatroomRole.MEMBER, chatroom));
 
         chatParticipant.restoreParticipation();
 
@@ -109,16 +113,7 @@ public class ChatParticipantService {
         List<ChatParticipant> participants = chatParticipantRepository.findAllByChatroom(chatroom);
 
         return participants.stream()
-                .map(participant -> {
-                    User user = participant.getUser();
-                    return ChatParticipantProfile.builder()
-                            .userId(user.getId())
-                            .nickname(user.getNickname())
-                            .profileImage(user.getProfileImage())
-                            .rankingType(participant.getRankingStatus())
-                            .isHost(ChatroomRole.HOST.equals(participant.getRole()))
-                            .build();
-                })
+                .map(profileMapper::mapToProfile)
                 .toList();
     }
 
