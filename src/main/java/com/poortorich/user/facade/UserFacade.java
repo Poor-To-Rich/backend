@@ -97,8 +97,10 @@ public class UserFacade {
         return UserResponse.PASSWORD_UPDATE_SUCCESS;
     }
 
+    @Transactional
     public Response resetAllByUser(String username) {
         User user = userService.findUserByUsername(username);
+        userResetService.closeChatroom(user);
         userResetService.deleteUserAllData(user);
         return UserResponse.RESET_SUCCESS;
     }

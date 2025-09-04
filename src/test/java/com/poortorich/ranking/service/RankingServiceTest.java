@@ -11,6 +11,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.TemporalAdjusters;
 import java.util.List;
@@ -29,10 +30,9 @@ class RankingServiceTest {
     private RankingService rankingService;
 
     private final LocalDateTime now = LocalDateTime.now();
-    private final LocalDateTime lastMonday = now
+    private final LocalDate lastMonday = now
             .with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
-            .toLocalDate()
-            .atStartOfDay();
+            .toLocalDate();
 
     @Test
     @DisplayName("최신 랭킹 조회 성공")
@@ -40,10 +40,13 @@ class RankingServiceTest {
         Chatroom chatroom = Chatroom.builder().build();
         Ranking ranking = Ranking.builder().chatroom(chatroom).build();
 
-        when(rankingRepository.findFirstByChatroomAndCreatedDateBetweenOrderByCreatedDateDesc(chatroom, lastMonday, now))
-                .thenReturn(Optional.of(ranking));
+        when(rankingRepository.findFirstByChatroomAndCreatedDateBetweenOrderByCreatedDateDesc(
+                chatroom,
+                lastMonday.atStartOfDay(),
+                now)
+        ).thenReturn(Optional.of(ranking));
 
-        Ranking result = rankingService.findLatestRanking(chatroom, lastMonday, now);
+        Ranking result = rankingService.findLatestRanking(chatroom, lastMonday.atStartOfDay(), now);
 
         assertThat(result).isEqualTo(ranking);
         assertThat(result.getChatroom()).isEqualTo(chatroom);
@@ -54,10 +57,13 @@ class RankingServiceTest {
     void findLatestRankingNull() {
         Chatroom chatroom = Chatroom.builder().build();
 
-        when(rankingRepository.findFirstByChatroomAndCreatedDateBetweenOrderByCreatedDateDesc(chatroom, lastMonday, now))
-                .thenReturn(Optional.empty());
+        when(rankingRepository.findFirstByChatroomAndCreatedDateBetweenOrderByCreatedDateDesc(
+                chatroom,
+                lastMonday.atStartOfDay(),
+                now)
+        ).thenReturn(Optional.empty());
 
-        Ranking result = rankingService.findLatestRanking(chatroom, lastMonday, now);
+        Ranking result = rankingService.findLatestRanking(chatroom, lastMonday.atStartOfDay(), now);
 
         assertThat(result).isNull();
     }
@@ -66,7 +72,7 @@ class RankingServiceTest {
     @DisplayName("전체 랭킹 목록 조회 구현")
     void getAllRankingsSuccess() {
         Chatroom chatroom = Chatroom.builder().build();
-        List<LocalDateTime> mondays = List.of(lastMonday);
+        List<LocalDate> mondays = List.of(lastMonday);
         Ranking ranking = Ranking.builder().chatroom(chatroom).build();
 
         when(rankingRepository.findAllByChatroomWithDateIn(chatroom, mondays)).thenReturn(List.of(ranking));

@@ -1,5 +1,6 @@
 package com.poortorich.user.controller;
 
+import com.poortorich.chat.facade.ChatFacade;
 import com.poortorich.global.response.BaseResponse;
 import com.poortorich.global.response.DataResponse;
 import com.poortorich.global.response.Response;
@@ -37,6 +38,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserController {
 
     private final UserFacade userFacade;
+    private final ChatFacade chatFacade;
 
     @PostMapping(value = "/register", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<BaseResponse> registerUser(

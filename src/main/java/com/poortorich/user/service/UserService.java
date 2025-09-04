@@ -2,6 +2,7 @@ package com.poortorich.user.service;
 
 import com.poortorich.global.exceptions.NotFoundException;
 import com.poortorich.s3.constants.S3Constants;
+import com.poortorich.s3.service.FileUploadService;
 import com.poortorich.user.entity.User;
 import com.poortorich.user.entity.enums.Role;
 import com.poortorich.user.repository.UserRepository;
@@ -16,6 +17,17 @@ import com.poortorich.user.response.enums.UserResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
+
+import java.util.UUID;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -23,6 +35,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final FileUploadService fileService;
 
     public User save(UserRegistrationRequest userRegistrationRequest, String profileImageUrl) {
         User user = User.builder()
@@ -102,8 +115,17 @@ public class UserService {
         user.updateEmail(emailUpdateRequest.getEmail());
     }
 
+    @Transactional
     public void deleteUserAccount(User user) {
-        userRepository.delete(user);
+        String profileImage = user.getProfileImage();
+        String password = passwordEncoder.encode(UUID.randomUUID().toString());
+        user.withdraw(password);
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+            @Override
+            public void afterCommit() {
+                fileService.deleteImage(profileImage);
+            }
+        });
     }
 
     public UsernameResponse findUsernameByEmail(String email) {
@@ -125,5 +147,17 @@ public class UserService {
         userRepository.findByUsername(username)
                 .orElseThrow(() -> new NotFoundException(UserResponse.USER_NOT_FOUND))
                 .updateRole(role);
+    }
+
+    public List<User> findAllById(List<Long> userIds) {
+        List<User> users = userRepository.findAllById(userIds);
+
+        Map<Long, User> userMap = users.stream()
+                .collect(Collectors.toMap(User::getId, Function.identity()));
+
+        return userIds.stream()
+                .map(userMap::get)
+                .filter(Objects::nonNull)
+                .toList();
     }
 }

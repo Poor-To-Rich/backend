@@ -4,26 +4,30 @@ import com.poortorich.accountbook.enums.AccountBookType;
 import com.poortorich.accountbook.repository.AccountBookRepository;
 import com.poortorich.category.entity.enums.CategoryType;
 import com.poortorich.category.repository.CategoryRepository;
+import com.poortorich.chat.service.ChatroomLeaveService;
 import com.poortorich.global.exceptions.InternalServerErrorException;
 import com.poortorich.global.response.enums.GlobalResponse;
 import com.poortorich.iteration.entity.Iteration;
 import com.poortorich.iteration.repository.IterationInfoRepository;
 import com.poortorich.iteration.util.strategy.IterationStrategyFactory;
 import com.poortorich.user.entity.User;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @Transactional
 @RequiredArgsConstructor
 @Slf4j
 public class UserResetService {
+
+    private final ChatroomLeaveService chatroomLeaveService;
 
     private final IterationStrategyFactory iterationStrategyFactory;
     private final AccountBookRepository accountBookRepository;
@@ -77,5 +81,9 @@ public class UserResetService {
             log.error("모든 데이터 초기화 중 예외가 발생: {}", user.getId(), e);
             throw new InternalServerErrorException(GlobalResponse.INTERNAL_SERVER_EXCEPTION);
         }
+    }
+
+    public void closeChatroom(User user) {
+        chatroomLeaveService.leaveAllChatroom(user);
     }
 }

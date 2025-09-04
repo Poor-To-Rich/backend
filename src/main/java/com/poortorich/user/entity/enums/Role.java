@@ -12,7 +12,8 @@ public enum Role {
     ADMIN("ROLE_ADMIN", "관리자"),
     USER("ROLE_USER", "일반회원"),
     TEST("ROLE_TEST", "테스트용"),
-    PENDING("ROLE_PENDING", "보류중");
+    PENDING("ROLE_PENDING", "보류중"),
+    WITHDRAW("ROLE_WITHDRAW", "회원탈퇴");
 
     private final String value;
     private final String description;

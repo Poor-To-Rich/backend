@@ -14,5 +14,5 @@ import java.util.List;
 public class AllParticipantsResponse {
 
     private Long memberCount;
-    private List<ProfileResponse> members;
+    private List<ChatParticipantProfile> members;
 }

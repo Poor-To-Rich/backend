@@ -7,5 +7,6 @@ public enum PayloadType implements EventType {
     NOTICE,
     USER_JOINED,
     USER_UPDATED,
-    JOINED_CHATROOMS_UPDATED
+    CHATROOM_MESSAGE_UPDATED,
+    CHATROOM_INFO_UPDATED
 }
