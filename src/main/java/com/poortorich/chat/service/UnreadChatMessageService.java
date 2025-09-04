@@ -46,14 +46,10 @@ public class UnreadChatMessageService {
 
     @Transactional
     public MessageReadPayload markMessageAsRead(ChatParticipant chatParticipant) {
-        Long lastReadMessageId = unreadChatMessageRepository.findLastUnreadMessageId(
-                chatParticipant.getChatroom(),
-                chatParticipant.getUser());
         unreadChatMessageRepository.markMessagesAsRead(chatParticipant.getChatroom(), chatParticipant.getUser());
 
         return MessageReadPayload.builder()
                 .chatroomId(chatParticipant.getChatroom().getId())
-                .lastReadMessageId(lastReadMessageId)
                 .userId(chatParticipant.getUser().getId())
                 .readAt(LocalDateTime.now())
                 .build();
