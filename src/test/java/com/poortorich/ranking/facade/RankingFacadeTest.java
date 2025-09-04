@@ -129,7 +129,7 @@ class RankingFacadeTest {
 
         assertThat(result).isNotNull();
         assertThat(result.found()).isFalse();
-        assertThat(result.response().getRankedAt()).isEqualTo(lastMonday.toString());
+        assertThat(result.response().getRankedAt()).isEqualTo(lastMonday.atStartOfDay().toString());
         assertThat(result.response().getRankingId()).isNull();
         assertThat(result.response().getSaver()).isNull();
         assertThat(result.response().getFlexer()).isNull();
