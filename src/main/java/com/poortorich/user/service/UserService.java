@@ -18,6 +18,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.util.UUID;
 
@@ -109,9 +111,15 @@ public class UserService {
 
     @Transactional
     public void deleteUserAccount(User user) {
-        fileService.deleteImage(user.getProfileImage());
+        String profileImage = user.getProfileImage();
         String password = passwordEncoder.encode(UUID.randomUUID().toString());
         user.withdraw(password);
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+            @Override
+            public void afterCommit() {
+                fileService.deleteImage(profileImage);
+            }
+        });
     }
 
     public UsernameResponse findUsernameByEmail(String email) {
