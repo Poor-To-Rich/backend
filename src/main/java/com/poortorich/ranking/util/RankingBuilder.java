@@ -14,7 +14,7 @@ public class RankingBuilder {
 
     public static LatestRankingResponse buildNotFoundLatestRankingResponse(LocalDateTime rankedAt) {
         return LatestRankingResponse.builder()
-                .rankedAt(rankedAt.toString())
+                .rankedAt(rankedAt.toLocalDate().toString())
                 .rankingId(null)
                 .saver(null)
                 .flexer(null)
