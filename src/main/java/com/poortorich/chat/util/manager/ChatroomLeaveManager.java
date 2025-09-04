@@ -3,8 +3,7 @@ package com.poortorich.chat.util.manager;
 import com.poortorich.chat.entity.ChatParticipant;
 import com.poortorich.chat.entity.Chatroom;
 import com.poortorich.chat.entity.enums.ChatroomRole;
-import com.poortorich.chat.realtime.model.PayloadContext;
-import com.poortorich.chat.realtime.payload.response.BasePayload;
+import com.poortorich.chat.realtime.payload.response.ChatroomClosedResponsePayload;
 import com.poortorich.chat.service.ChatMessageService;
 import com.poortorich.chat.service.ChatParticipantService;
 import com.poortorich.chat.service.ChatroomService;
@@ -32,17 +31,16 @@ public class ChatroomLeaveManager {
     private final UnreadChatMessageService unreadChatMessageService;
     private final ReportService reportService;
 
-    public BasePayload leaveChatroom(PayloadContext payloadContext) {
-        if (payloadContext.chatroom().getIsClosed()) {
-            return getClosedMessageOrDeleteAll(payloadContext);
+    public ChatroomClosedResponsePayload leaveChatroom(ChatParticipant participant) {
+        if (participant.getChatroom().getIsClosed()) {
+            return getClosedMessageOrDeleteAll(participant);
         }
         return null;
     }
 
     @Transactional
-    private BasePayload getClosedMessageOrDeleteAll(PayloadContext payloadContext) {
-        Chatroom chatroom = payloadContext.chatroom();
-        ChatParticipant participant = payloadContext.chatParticipant();
+    public ChatroomClosedResponsePayload getClosedMessageOrDeleteAll(ChatParticipant participant) {
+        Chatroom chatroom = participant.getChatroom();
 
         if (chatParticipantService.isAllParticipantLeft(chatroom)) {
             tagService.deleteAllByChatroom(chatroom);
@@ -57,8 +55,8 @@ public class ChatroomLeaveManager {
             return null;
         }
 
-        if (participant.getRole().equals(ChatroomRole.HOST)) {
-            return chatMessageService.saveChatroomClosedMessage(chatroom).mapToBasePayload();
+        if (ChatroomRole.HOST.equals(participant.getRole())) {
+            return chatMessageService.saveChatroomClosedMessage(chatroom);
         }
         return null;
     }

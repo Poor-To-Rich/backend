@@ -23,5 +23,5 @@ public class ChatroomCoverInfoResponse {
     private String createdAt;
     private Boolean isJoined;
     private Boolean hasPassword;
-    private ProfileResponse hostProfile;
+    private ChatParticipantProfile hostProfile;
 }

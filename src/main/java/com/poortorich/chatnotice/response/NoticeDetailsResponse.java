@@ -1,6 +1,6 @@
 package com.poortorich.chatnotice.response;
 
-import com.poortorich.chat.response.ProfileResponse;
+import com.poortorich.chat.response.ChatParticipantProfile;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -15,5 +15,5 @@ public class NoticeDetailsResponse {
     private Long noticeId;
     private String content;
     private String createdAt;
-    private ProfileResponse author;
+    private ChatParticipantProfile author;
 }

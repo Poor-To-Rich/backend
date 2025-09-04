@@ -24,8 +24,10 @@ public class ChatroomService {
     private final ChatroomRepository chatroomRepository;
     private final RedisChatRepository redisChatRepository;
 
+    private final ChatBuilder chatBuilder;
+
     public Chatroom createChatroom(String imageUrl, ChatroomCreateRequest request) {
-        Chatroom chatroom = ChatBuilder.buildChatroom(imageUrl, request);
+        Chatroom chatroom = chatBuilder.buildChatroom(imageUrl, request);
         return chatroomRepository.save(chatroom);
     }
 

@@ -11,38 +11,81 @@ import com.poortorich.chat.response.ChatroomCoverInfoResponse;
 import com.poortorich.chat.response.ChatroomDetailsResponse;
 import com.poortorich.chat.response.ChatroomInfoResponse;
 import com.poortorich.chat.response.ChatroomResponse;
-import com.poortorich.chat.response.ProfileResponse;
+import com.poortorich.chat.util.mapper.ParticipantProfileMapper;
 import com.poortorich.s3.constants.S3Constants;
 import com.poortorich.user.entity.User;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Component
+@RequiredArgsConstructor
 public class ChatBuilder {
 
-    public static Chatroom buildChatroom(String imageUrl, ChatroomCreateRequest request) {
-        return Chatroom.builder()
-                .image(imageUrl)
-                .title(request.getChatroomTitle())
-                .description(request.getDescription())
-                .maxMemberCount(request.getMaxMemberCount())
-                .password(request.getChatroomPassword())
-                .isRankingEnabled(request.getIsRankingEnabled())
+    private final ParticipantProfileMapper profileMapper;
+
+    public AllParticipantsResponse buildAllParticipantsResponse(List<ChatParticipant> participants) {
+        return AllParticipantsResponse.builder()
+                .memberCount((long) participants.size())
+                .members(participants.stream()
+                        .map(profileMapper::mapToProfile)
+                        .collect(Collectors.toList()))
                 .build();
     }
 
-    public static ChatParticipant buildChatParticipant(User user, ChatroomRole role, Chatroom chatroom) {
-        return ChatParticipant.builder()
-                .role(role)
-                .isParticipated(true)
-                .rankingStatus(RankingStatus.NONE)
-                .noticeStatus(NoticeStatus.DEFAULT)
-                .user(user)
-                .chatroom(chatroom)
+    public ChatroomCoverInfoResponse buildChatroomCoverInfoResponse(
+            Chatroom chatroom,
+            List<String> hashtags,
+            Long currentMemberCount,
+            Boolean isJoined,
+            ChatParticipant hostInfo
+    ) {
+        return ChatroomCoverInfoResponse.builder()
+                .chatroomId(chatroom.getId())
+                .chatroomTitle(chatroom.getTitle())
+                .chatroomImage(chatroom.getImage())
+                .description(chatroom.getDescription())
+                .hashtags(hashtags)
+                .currentMemberCount(currentMemberCount)
+                .maxMemberCount(chatroom.getMaxMemberCount())
+                .createdAt(chatroom.getCreatedDate().toString())
+                .isJoined(isJoined)
+                .hasPassword(chatroom.getPassword() != null)
+                .hostProfile(profileMapper.mapToProfile(hostInfo))
                 .build();
     }
 
-    public static ChatroomInfoResponse buildChatroomInfoResponse(Chatroom chatroom, List<String> hashtags) {
+    public ChatroomDetailsResponse buildChatroomDetailsResponse(Chatroom chatroom, Long currentMemberCount) {
+        return ChatroomDetailsResponse.builder()
+                .chatroomImage(chatroom.getImage())
+                .chatroomTitle(chatroom.getTitle())
+                .currentMemberCount(currentMemberCount)
+                .isRankingEnabled(chatroom.getIsRankingEnabled())
+                .isClosed(chatroom.getIsClosed())
+                .build();
+    }
+
+    public ChatroomResponse buildChatroomResponse(
+            Chatroom chatroom,
+            List<String> hashtags,
+            Long currentMemberCount,
+            String lastMessageTime
+    ) {
+        return ChatroomResponse.builder()
+                .chatroomId(chatroom.getId())
+                .chatroomTitle(chatroom.getTitle())
+                .chatroomImage(chatroom.getImage())
+                .description(chatroom.getDescription())
+                .hashtags(hashtags)
+                .currentMemberCount(currentMemberCount)
+                .maxMemberCount(chatroom.getMaxMemberCount())
+                .lastMessageTime(lastMessageTime)
+                .build();
+    }
+
+    public ChatroomInfoResponse buildChatroomInfoResponse(Chatroom chatroom, List<String> hashtags) {
         boolean isDefaultImage = S3Constants.DEFAULT_PROFILES.contains(chatroom.getImage());
 
         String chatroomImage = null;
@@ -62,82 +105,25 @@ public class ChatBuilder {
                 .build();
     }
 
-    public static ChatroomResponse buildChatroomResponse(
-            Chatroom chatroom,
-            List<String> hashtags,
-            Long currentMemberCount,
-            String lastMessageTime
-    ) {
-        return ChatroomResponse.builder()
-                .chatroomId(chatroom.getId())
-                .chatroomTitle(chatroom.getTitle())
-                .chatroomImage(chatroom.getImage())
-                .description(chatroom.getDescription())
-                .hashtags(hashtags)
-                .currentMemberCount(currentMemberCount)
-                .maxMemberCount(chatroom.getMaxMemberCount())
-                .lastMessageTime(lastMessageTime)
+    public Chatroom buildChatroom(String imageUrl, ChatroomCreateRequest request) {
+        return Chatroom.builder()
+                .image(imageUrl)
+                .title(request.getChatroomTitle())
+                .description(request.getDescription())
+                .maxMemberCount(request.getMaxMemberCount())
+                .password(request.getChatroomPassword())
+                .isRankingEnabled(request.getIsRankingEnabled())
                 .build();
     }
 
-    public static ChatroomDetailsResponse buildChatroomDetailsResponse(Chatroom chatroom, Long currentMemberCount) {
-        return ChatroomDetailsResponse.builder()
-                .chatroomImage(chatroom.getImage())
-                .chatroomTitle(chatroom.getTitle())
-                .currentMemberCount(currentMemberCount)
-                .isRankingEnabled(chatroom.getIsRankingEnabled())
-                .isClosed(chatroom.getIsClosed())
-                .build();
-    }
-
-    public static ChatroomCoverInfoResponse buildChatroomCoverInfoResponse(
-            Chatroom chatroom,
-            List<String> hashtags,
-            Long currentMemberCount,
-            Boolean isJoined,
-            ChatParticipant hostInfo
-    ) {
-        return ChatroomCoverInfoResponse.builder()
-                .chatroomId(chatroom.getId())
-                .chatroomTitle(chatroom.getTitle())
-                .chatroomImage(chatroom.getImage())
-                .description(chatroom.getDescription())
-                .hashtags(hashtags)
-                .currentMemberCount(currentMemberCount)
-                .maxMemberCount(chatroom.getMaxMemberCount())
-                .createdAt(chatroom.getCreatedDate().toString())
-                .isJoined(isJoined)
-                .hasPassword(chatroom.getPassword() != null)
-                .hostProfile(buildProfileResponse(hostInfo))
-                .build();
-    }
-
-    public static AllParticipantsResponse buildAllParticipantsResponse(List<ChatParticipant> participants) {
-        return AllParticipantsResponse.builder()
-                .memberCount((long) participants.size())
-                .members(participants.stream()
-                        .map(ChatBuilder::buildProfileResponse)
-                        .collect(Collectors.toList()))
-                .build();
-    }
-
-    public static ProfileResponse buildProfileResponse(ChatParticipant participantInfo) {
-        return ProfileResponse.builder()
-                .userId(participantInfo.getUser().getId())
-                .profileImage(participantInfo.getUser().getProfileImage())
-                .nickname(participantInfo.getUser().getNickname())
-                .isHost(participantInfo.getRole().equals(ChatroomRole.HOST))
-                .rankingType(participantInfo.getRankingStatus().toString())
-                .build();
-    }
-
-    public static ProfileResponse buildProfileResponse(ChatParticipant participantInfo, RankingStatus rankingStatus) {
-        return ProfileResponse.builder()
-                .userId(participantInfo.getUser().getId())
-                .profileImage(participantInfo.getUser().getProfileImage())
-                .nickname(participantInfo.getUser().getNickname())
-                .isHost(participantInfo.getRole().equals(ChatroomRole.HOST))
-                .rankingType(rankingStatus.toString())
+    public ChatParticipant buildChatParticipant(User user, ChatroomRole role, Chatroom chatroom) {
+        return ChatParticipant.builder()
+                .role(role)
+                .isParticipated(true)
+                .rankingStatus(RankingStatus.NONE)
+                .noticeStatus(NoticeStatus.DEFAULT)
+                .user(user)
+                .chatroom(chatroom)
                 .build();
     }
 }

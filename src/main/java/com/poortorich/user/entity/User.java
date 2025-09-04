@@ -1,5 +1,6 @@
 package com.poortorich.user.entity;
 
+import com.poortorich.s3.constants.S3Constants;
 import com.poortorich.user.constants.UserValidationRules;
 import com.poortorich.user.entity.enums.Gender;
 import com.poortorich.user.entity.enums.Role;
@@ -12,12 +13,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.Collection;
-import java.util.List;
-
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -29,6 +24,13 @@ import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Collection;
+import java.util.List;
+import java.util.UUID;
 
 @Entity
 @Table(name = "user")
@@ -77,6 +79,9 @@ public class User implements UserDetails {
     @Builder.Default
     private Role role = Role.USER;
 
+    @Column(name = "withdraw_at")
+    private LocalDateTime withdrawAt;
+
     @Column(name = "created_date", nullable = false)
     @CreationTimestamp
     private LocalDateTime createdDate;
@@ -107,7 +112,7 @@ public class User implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return role != Role.WITHDRAW;
     }
 
     public void updateProfile(ProfileUpdateRequest userProfile, String newProfileImage) {
@@ -137,5 +142,17 @@ public class User implements UserDetails {
         this.profileImage = profileImage;
         this.nickname = name;
         return this;
+    }
+
+    public void withdraw(String password) {
+        String uuid = UUID.randomUUID().toString();
+        this.nickname = uuid;
+        this.email = uuid;
+        this.username = uuid;
+        this.password = password;
+        this.role = Role.WITHDRAW;
+        this.job = null;
+        this.profileImage = S3Constants.DEFAULT_PROFILE_IMAGE;
+        this.withdrawAt = LocalDateTime.now();
     }
 }

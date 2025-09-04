@@ -3,7 +3,6 @@ package com.poortorich.chat.realtime.facade;
 import com.poortorich.chat.entity.ChatParticipant;
 import com.poortorich.chat.entity.Chatroom;
 import com.poortorich.chat.entity.enums.ChatMessageType;
-import com.poortorich.chat.entity.enums.ChatroomRole;
 import com.poortorich.chat.model.MarkAllChatroomAsReadResult;
 import com.poortorich.chat.realtime.collect.ChatPayloadCollector;
 import com.poortorich.chat.realtime.event.chatroom.ChatroomUpdateEvent;
@@ -69,19 +68,6 @@ public class ChatRealTimeFacade {
                 .type(ChatMessageType.SYSTEM_MESSAGE)
                 .payload(payload)
                 .build();
-    }
-
-    public BasePayload createUserLeaveSystemMessage(String username, Long chatroomId) {
-        PayloadContext context = payloadCollector.getPayloadContext(username, chatroomId);
-        if (ChatroomRole.BANNED.equals(context.chatParticipant().getRole())) {
-            return null;
-        }
-        return chatMessageService.saveUserLeaveMessage(context.user(), context.chatroom()).mapToBasePayload();
-    }
-
-    public BasePayload createChatroomClosedMessageOrDeleteAll(String username, Long chatroomId) {
-        PayloadContext context = payloadCollector.getPayloadContext(username, chatroomId);
-        return chatroomLeaveManager.leaveChatroom(context);
     }
 
     @Transactional
