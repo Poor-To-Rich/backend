@@ -23,7 +23,6 @@ import com.poortorich.ranking.util.calculator.RankingCalculator;
 import com.poortorich.user.entity.User;
 import com.poortorich.user.service.UserService;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,7 +39,6 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class RankingFacade {
@@ -193,9 +191,6 @@ public class RankingFacade {
             return new LinkedHashMap<>();
         }
         List<Ranking> rankings = rankingService.findAllRankings(chatroom, mondays);
-        for (Ranking ranking : rankings) {
-            log.info(ranking.toString());
-        }
 
         Map<LocalDate, Ranking> byDate = rankings.stream()
                 .collect(Collectors.toMap(
