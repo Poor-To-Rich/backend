@@ -3,6 +3,7 @@ package com.poortorich.chat.realtime.facade;
 import com.poortorich.chat.entity.ChatParticipant;
 import com.poortorich.chat.entity.Chatroom;
 import com.poortorich.chat.entity.enums.ChatMessageType;
+import com.poortorich.chat.entity.enums.ChatroomRole;
 import com.poortorich.chat.model.MarkAllChatroomAsReadResult;
 import com.poortorich.chat.model.UnreadChatInfo;
 import com.poortorich.chat.realtime.collect.ChatPayloadCollector;
@@ -20,6 +21,7 @@ import com.poortorich.chat.realtime.payload.response.UserChatMessagePayload;
 import com.poortorich.chat.realtime.payload.response.UserEnterResponsePayload;
 import com.poortorich.chat.realtime.payload.response.enums.PayloadType;
 import com.poortorich.chat.response.MarkAllChatroomAsReadResponse;
+import com.poortorich.chat.response.enums.ChatResponse;
 import com.poortorich.chat.service.ChatMessageService;
 import com.poortorich.chat.service.ChatParticipantService;
 import com.poortorich.chat.service.ChatroomService;
@@ -28,6 +30,7 @@ import com.poortorich.chat.util.manager.ChatroomLeaveManager;
 import com.poortorich.chat.validator.ChatParticipantValidator;
 import com.poortorich.chat.validator.ChatroomValidator;
 import com.poortorich.chatnotice.service.ChatNoticeService;
+import com.poortorich.global.exceptions.ForbiddenException;
 import com.poortorich.user.entity.User;
 import com.poortorich.user.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -105,6 +108,21 @@ public class ChatRealTimeFacade {
             return payload.mapToBasePayload();
         }
         return null;
+    }
+
+    @Transactional
+    public BasePayload markMessagesAsReadByBannedParticipant(String username, Long chatroomId) {
+        PayloadContext context = payloadCollector.getPayloadContext(username, chatroomId);
+
+        if (!ChatroomRole.BANNED.equals(context.chatParticipant().getRole())) {
+            throw new ForbiddenException(ChatResponse.CHAT_PARTICIPANT_BANNED_ONLY_ALLOWED);
+        }
+        
+        Long latestReadMessageId = chatMessageService.getLatestReadMessageId(context.chatParticipant());
+        MessageReadPayload payload = unreadChatMessageService.markMessageAsRead(context.chatParticipant());
+        payload.setLastReadMessageId(latestReadMessageId);
+
+        return payload.mapToBasePayload();
     }
 
     @Transactional
