@@ -44,6 +44,7 @@ public class PhotoBuilder {
                 .nextCursor(buildPhotoCursorResponse(nextDate, nextId))
                 .photoCount((long) photos.size())
                 .photos(photos.stream()
+                        .filter(Objects::nonNull)
                         .map(PhotoBuilder::buildPhotoInfoByDateResponse)
                         .toList())
                 .build();
