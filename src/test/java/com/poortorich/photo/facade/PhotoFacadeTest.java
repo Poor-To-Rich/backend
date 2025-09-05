@@ -250,7 +250,9 @@ class PhotoFacadeTest {
         assertThat(result).isNotNull();
         assertThat(result.getHasNext()).isNull();
         assertThat(result.getNextCursor().getId()).isNull();
-        assertThat(result.getPhotos()).hasSize(0);
+        assertThat(result.getNextCursor().getDate()).isNull();
+        assertThat(result.getPhotoCount()).isZero();
+        assertThat(result.getPhotos()).isEmpty();
     }
 
     @Test
