@@ -306,6 +306,7 @@ public class ChatMessageService {
         return chatMessageRepository.findLatestReadMessageId(
                 participant.getChatroom(),
                 participant.getUser(),
+                participant.getJoinAt(),
                 ChatMessageType.CHAT_MESSAGE);
     }
 
