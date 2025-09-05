@@ -37,7 +37,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.IntStream;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -128,14 +128,15 @@ public class ChatRealTimeFacade {
     public MarkAllChatroomAsReadResult markAllChatroomAsRead(String username) {
         List<PayloadContext> contexts = payloadCollector.getAllPayloadContext(username);
 
-        List<Long> latestReadMessageIds = chatMessageService.getLatestReadMessageIds(contexts);
+        Map<Long, Long> latestReadMessageIds = chatMessageService.getLatestReadMessageIds(contexts);
         List<UnreadChatInfo> unreadChatInfos = unreadChatMessageService.markAllMessageAsRead(contexts);
-        List<MessageReadPayload> broadcastPayloads = IntStream.range(0, latestReadMessageIds.size())
-                .mapToObj(index -> MessageReadPayload.builder()
-                        .chatroomId(unreadChatInfos.get(index).getChatroomId())
-                        .userId(unreadChatInfos.get(index).getUserId())
-                        .lastReadMessageId(latestReadMessageIds.get(index))
-                        .readAt(LocalDateTime.now())
+        LocalDateTime readAt = LocalDateTime.now();
+        List<MessageReadPayload> broadcastPayloads = unreadChatInfos.stream()
+                .map(unreadChatInfo -> MessageReadPayload.builder()
+                        .userId(unreadChatInfo.getUserId())
+                        .chatroomId(unreadChatInfo.getChatroomId())
+                        .lastReadMessageId(latestReadMessageIds.get(unreadChatInfo.getChatroomId()))
+                        .readAt(readAt)
                         .build())
                 .toList();
 
@@ -147,7 +148,6 @@ public class ChatRealTimeFacade {
                 .apiResponse(MarkAllChatroomAsReadResponse.builder().chatroomIds(chatroomIds).build())
                 .broadcastPayloads(broadcastPayloads)
                 .build();
-
     }
 
     @Transactional

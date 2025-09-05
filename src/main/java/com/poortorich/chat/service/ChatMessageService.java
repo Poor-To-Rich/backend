@@ -36,9 +36,10 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.temporal.TemporalAdjusters;
-import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -321,12 +322,12 @@ public class ChatMessageService {
     }
 
     @Transactional(readOnly = true)
-    public List<Long> getLatestReadMessageIds(List<PayloadContext> contexts) {
-        List<Long> latestReadMessageIds = new ArrayList<>();
+    public Map<Long, Long> getLatestReadMessageIds(List<PayloadContext> contexts) {
+        Map<Long, Long> latestReadMessageIdByChatroom = new LinkedHashMap<>();
         for (var context : contexts) {
             Long latestReadMessageId = getLatestReadMessageId(context.chatParticipant());
-            latestReadMessageIds.add(latestReadMessageId);
+            latestReadMessageIdByChatroom.put(context.chatroom().getId(), latestReadMessageId);
         }
-        return latestReadMessageIds;
+        return latestReadMessageIdByChatroom;
     }
 }
