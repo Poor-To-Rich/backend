@@ -303,6 +303,16 @@ public class ChatMessageService {
 
     @Transactional(readOnly = true)
     public Long getLatestReadMessageId(ChatParticipant participant) {
+        if (ChatroomRole.BANNED.equals(participant.getRole())) {
+            return chatMessageRepository.findLatestReadMessageId(
+                    participant.getChatroom(),
+                    participant.getUser(),
+                    participant.getJoinAt(),
+                    participant.getBannedAt(),
+                    ChatMessageType.CHAT_MESSAGE
+            );
+        }
+
         return chatMessageRepository.findLatestReadMessageId(
                 participant.getChatroom(),
                 participant.getUser(),
