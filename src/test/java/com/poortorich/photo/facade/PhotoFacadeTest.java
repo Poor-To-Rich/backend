@@ -228,6 +228,34 @@ class PhotoFacadeTest {
     }
 
     @Test
+    @DisplayName("채팅방에 조회할 사진이 없는 경우 빈 배열 반환 성공")
+    void getAllPhotosByCursorEmpty() {
+        String username = "test";
+        Long chatroomId = 1L;
+        String dateString = "20250826010000";
+        LocalDateTime date = DateParser.parseDateTime(dateString);
+        Long photoId = 99L;
+        Pageable pageable = PageRequest.of(0, 20);
+        User user = User.builder().username(username).build();
+        Chatroom chatroom = Chatroom.builder().id(chatroomId).build();
+
+        Slice<Photo> slice = new SliceImpl<>(List.of(), pageable, false);
+
+        when(userService.findUserByUsername(username)).thenReturn(user);
+        when(chatroomService.findById(chatroomId)).thenReturn(chatroom);
+        when(photoService.getAllPhotosByCursor(chatroom, date, photoId, pageable)).thenReturn(slice);
+
+        AllPhotosResponse result = photoFacade.getAllPhotosByCursor(username, chatroomId, dateString, photoId);
+
+        assertThat(result).isNotNull();
+        assertThat(result.getHasNext()).isNull();
+        assertThat(result.getNextCursor().getId()).isNull();
+        assertThat(result.getNextCursor().getDate()).isNull();
+        assertThat(result.getPhotoCount()).isZero();
+        assertThat(result.getPhotos()).isEmpty();
+    }
+
+    @Test
     @DisplayName("사진 상세 조회 성공")
     void getPhotoDetailsSuccess() {
         String username = "test";
