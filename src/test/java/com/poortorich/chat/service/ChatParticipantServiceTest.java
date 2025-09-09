@@ -6,6 +6,7 @@ import com.poortorich.chat.entity.enums.ChatroomRole;
 import com.poortorich.chat.entity.enums.NoticeStatus;
 import com.poortorich.chat.repository.ChatParticipantRepository;
 import com.poortorich.chat.response.enums.ChatResponse;
+import com.poortorich.chat.util.ChatBuilder;
 import com.poortorich.chatnotice.request.ChatNoticeStatusUpdateRequest;
 import com.poortorich.chatnotice.response.enums.ChatNoticeResponse;
 import com.poortorich.global.exceptions.BadRequestException;
@@ -34,6 +35,9 @@ class ChatParticipantServiceTest {
     @Mock
     private ChatParticipantRepository chatParticipantRepository;
 
+    @Mock
+    private ChatBuilder chatBuilder;
+
     @InjectMocks
     private ChatParticipantService chatParticipantService;
 
@@ -50,7 +54,9 @@ class ChatParticipantServiceTest {
                 .user(user)
                 .chatroom(chatroom)
                 .build();
-
+        when(chatBuilder.buildChatParticipant(user, ChatroomRole.HOST, chatroom))
+                .thenReturn(chatParticipant);
+        
         chatParticipantService.createChatroomHost(user, chatroom);
 
         verify(chatParticipantRepository).save(chatParticipantCaptor.capture());

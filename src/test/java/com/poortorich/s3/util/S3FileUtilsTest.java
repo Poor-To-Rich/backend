@@ -13,8 +13,8 @@ public class S3FileUtilsTest {
 
         String result = S3FileUtils.generateUniqueFileName(testFile);
 
-        Assertions.assertTrue(result.endsWith(S3TestFile.JPG_EXTENSION));
-        Assertions.assertTrue(result.length() > S3TestFile.JPG_EXTENSION.length());
+        Assertions.assertTrue(result.endsWith(S3FileUtils.WEBP_EXTENSION));
+        Assertions.assertTrue(result.length() > S3FileUtils.WEBP_EXTENSION.length());
     }
 
     @Test
@@ -23,8 +23,8 @@ public class S3FileUtilsTest {
 
         String result = S3FileUtils.generateUniqueFileName(originalFileName);
 
-        Assertions.assertTrue(result.endsWith(S3TestFile.PNG_EXTENSION));
-        Assertions.assertTrue(result.length() > S3TestFile.PNG_EXTENSION.length());
+        Assertions.assertTrue(result.endsWith(S3FileUtils.WEBP_EXTENSION));
+        Assertions.assertTrue(result.length() > S3FileUtils.WEBP_EXTENSION.length());
     }
 
     @Test
@@ -33,6 +33,6 @@ public class S3FileUtilsTest {
 
         String result = S3FileUtils.generateUniqueFileName(originalFileName);
 
-        Assertions.assertFalse(result.contains(S3FileUtils.EXTENSION_SEPARATOR));
+        Assertions.assertTrue(result.contains(S3FileUtils.EXTENSION_SEPARATOR));
     }
 }

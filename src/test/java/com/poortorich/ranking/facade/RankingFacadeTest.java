@@ -4,14 +4,14 @@ import com.poortorich.chat.entity.ChatParticipant;
 import com.poortorich.chat.entity.Chatroom;
 import com.poortorich.chat.entity.enums.ChatroomRole;
 import com.poortorich.chat.entity.enums.RankingStatus;
+import com.poortorich.chat.response.ChatParticipantProfile;
 import com.poortorich.chat.service.ChatParticipantService;
 import com.poortorich.chat.service.ChatroomService;
 import com.poortorich.chat.validator.ChatParticipantValidator;
-import com.poortorich.global.response.BaseResponse;
-import com.poortorich.global.response.DataResponse;
 import com.poortorich.ranking.entity.Ranking;
-import com.poortorich.ranking.response.enums.RankingResponse;
+import com.poortorich.ranking.response.LatestRankingResponse;
 import com.poortorich.ranking.service.RankingService;
+import com.poortorich.ranking.util.RankingBuilder;
 import com.poortorich.user.entity.User;
 import com.poortorich.user.service.UserService;
 import org.junit.jupiter.api.DisplayName;
@@ -20,14 +20,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.TemporalAdjusters;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -37,6 +34,10 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class RankingFacadeTest {
 
+    private final LocalDateTime now = LocalDateTime.now();
+    private final LocalDate lastMonday = now
+            .with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
+            .toLocalDate();
     @Mock
     private UserService userService;
     @Mock
@@ -47,14 +48,10 @@ class RankingFacadeTest {
     private ChatParticipantValidator chatParticipantValidator;
     @Mock
     private RankingService rankingService;
-
+    @Mock
+    private RankingBuilder rankingBuilder;
     @InjectMocks
     private RankingFacade rankingFacade;
-
-    private final LocalDateTime now = LocalDateTime.now();
-    private final LocalDate lastMonday = now
-            .with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
-            .toLocalDate();
 
     @Test
     @DisplayName("최신 랭킹 조회 성공")
@@ -94,14 +91,32 @@ class RankingFacadeTest {
                 .role(ChatroomRole.MEMBER)
                 .rankingStatus(RankingStatus.FLEXER)
                 .build();
-
+        LatestRankingResponse expectedResponse = LatestRankingResponse.builder()
+                .rankedAt(ranking.getCreatedDate().toString())
+                .rankingId(ranking.getId())
+                .saver(ChatParticipantProfile.builder()
+                        .userId(saverUser.getId())
+                        .nickname(saverUser.getNickname())
+                        .profileImage(saverUser.getProfileImage())
+                        .rankingType(saver.getRankingStatus())
+                        .isHost(false)
+                        .build())
+                .flexer(ChatParticipantProfile.builder()
+                        .userId(flexerUser.getId())
+                        .nickname(flexerUser.getNickname())
+                        .profileImage(flexerUser.getProfileImage())
+                        .rankingType(flexer.getRankingStatus())
+                        .isHost(false)
+                        .build())
+                .build();
         when(userService.findUserByUsername(username)).thenReturn(user);
         when(chatroomService.findById(chatroomId)).thenReturn(chatroom);
         when(rankingService.findLatestRanking(eq(chatroom), eq(lastMonday.atStartOfDay()), any(LocalDateTime.class)))
                 .thenReturn(ranking);
         when(chatParticipantService.findByUserIdAndChatroom(saverId, chatroom)).thenReturn(saver);
         when(chatParticipantService.findByUserIdAndChatroom(flexerId, chatroom)).thenReturn(flexer);
-
+        when(rankingBuilder.buildLatestRankingResponse(ranking, saver, flexer))
+                .thenReturn(expectedResponse);
         var result = rankingFacade.getLatestRanking(username, chatroomId);
 
         assertThat(result).isNotNull();
@@ -119,12 +134,18 @@ class RankingFacadeTest {
         Long chatroomId = 1L;
         User user = User.builder().username(username).build();
         Chatroom chatroom = Chatroom.builder().id(chatroomId).build();
-
+        LatestRankingResponse expectedResponse = LatestRankingResponse.builder()
+                .rankedAt(lastMonday.atStartOfDay().toString())
+                .rankingId(null)
+                .saver(null)
+                .flexer(null)
+                .build();
         when(userService.findUserByUsername(username)).thenReturn(user);
         when(chatroomService.findById(chatroomId)).thenReturn(chatroom);
         when(rankingService.findLatestRanking(eq(chatroom), eq(lastMonday.atStartOfDay()), any(LocalDateTime.class)))
                 .thenReturn(null);
-
+        when(rankingBuilder.buildNotFoundLatestRankingResponse(lastMonday.atStartOfDay()))
+                .thenReturn(expectedResponse);
         var result = rankingFacade.getLatestRanking(username, chatroomId);
 
         assertThat(result).isNotNull();

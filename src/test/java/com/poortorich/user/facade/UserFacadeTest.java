@@ -1,15 +1,5 @@
 package com.poortorich.user.facade;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyBoolean;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import com.poortorich.category.service.CategoryService;
 import com.poortorich.global.response.Response;
 import com.poortorich.s3.constants.S3TestConfig;
@@ -29,6 +19,7 @@ import com.poortorich.user.service.UserService;
 import com.poortorich.user.service.UserValidationService;
 import com.poortorich.user.util.PasswordUpdateRequestTestBuilder;
 import com.poortorich.user.util.ProfileUpdateRequestTestBuilder;
+import com.poortorich.user.util.UserProfileUpdateEventDetector;
 import com.poortorich.user.util.UserRegistrationRequestTestBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -38,6 +29,16 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.multipart.MultipartFile;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class UserFacadeTest {
@@ -57,6 +58,9 @@ public class UserFacadeTest {
     @Mock
     private CategoryService categoryService;
 
+    @Mock
+    private UserProfileUpdateEventDetector userProfileUpdateEventDetector;
+    
     @InjectMocks
     private UserFacade userFacade;
 
