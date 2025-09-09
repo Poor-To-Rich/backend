@@ -3,10 +3,11 @@ package com.poortorich.chat.realtime.facade;
 import com.poortorich.chat.entity.ChatParticipant;
 import com.poortorich.chat.entity.Chatroom;
 import com.poortorich.chat.entity.enums.ChatMessageType;
+import com.poortorich.chat.entity.enums.ChatroomRole;
 import com.poortorich.chat.model.MarkAllChatroomAsReadResult;
+import com.poortorich.chat.model.UnreadChatInfo;
 import com.poortorich.chat.realtime.collect.ChatPayloadCollector;
 import com.poortorich.chat.realtime.event.chatroom.ChatroomUpdateEvent;
-import com.poortorich.chat.realtime.event.chatroom.UserChatroomUpdateEvent;
 import com.poortorich.chat.realtime.event.user.HostDelegationEvent;
 import com.poortorich.chat.realtime.model.PayloadContext;
 import com.poortorich.chat.realtime.payload.request.ChatMessageRequestPayload;
@@ -18,7 +19,9 @@ import com.poortorich.chat.realtime.payload.response.MessageReadPayload;
 import com.poortorich.chat.realtime.payload.response.RankingStatusMessagePayload;
 import com.poortorich.chat.realtime.payload.response.UserChatMessagePayload;
 import com.poortorich.chat.realtime.payload.response.UserEnterResponsePayload;
+import com.poortorich.chat.realtime.payload.response.enums.PayloadType;
 import com.poortorich.chat.response.MarkAllChatroomAsReadResponse;
+import com.poortorich.chat.response.enums.ChatResponse;
 import com.poortorich.chat.service.ChatMessageService;
 import com.poortorich.chat.service.ChatParticipantService;
 import com.poortorich.chat.service.ChatroomService;
@@ -27,6 +30,7 @@ import com.poortorich.chat.util.manager.ChatroomLeaveManager;
 import com.poortorich.chat.validator.ChatParticipantValidator;
 import com.poortorich.chat.validator.ChatroomValidator;
 import com.poortorich.chatnotice.service.ChatNoticeService;
+import com.poortorich.global.exceptions.ForbiddenException;
 import com.poortorich.user.entity.User;
 import com.poortorich.user.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -34,7 +38,9 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -90,7 +96,7 @@ public class ChatRealTimeFacade {
         UserChatMessagePayload chatMessage = chatMessageService
                 .saveUserChatMessage(chatParticipant, chatMembers, chatMessagePayload);
 
-        eventPublisher.publishEvent(new ChatroomUpdateEvent(chatroom));
+        eventPublisher.publishEvent(new ChatroomUpdateEvent(chatroom, PayloadType.CHATROOM_MESSAGE_UPDATED));
 
         return chatMessage.mapToBasePayload();
     }
@@ -105,10 +111,26 @@ public class ChatRealTimeFacade {
     }
 
     @Transactional
+    public BasePayload markMessagesAsReadByBannedParticipant(String username, Long chatroomId) {
+        PayloadContext context = payloadCollector.getPayloadContext(username, chatroomId);
+
+        if (!ChatroomRole.BANNED.equals(context.chatParticipant().getRole())) {
+            throw new ForbiddenException(ChatResponse.CHAT_PARTICIPANT_BANNED_ONLY_ALLOWED);
+        }
+        
+        Long latestReadMessageId = chatMessageService.getLatestReadMessageId(context.chatParticipant());
+        MessageReadPayload payload = unreadChatMessageService.markMessageAsRead(context.chatParticipant());
+        payload.setLastReadMessageId(latestReadMessageId);
+
+        return payload.mapToBasePayload();
+    }
+
+    @Transactional
     public BasePayload markMessagesAsRead(String username, MarkMessagesAsReadRequestPayload requestPayload) {
         PayloadContext context = payloadCollector.getPayloadContext(username, requestPayload.getChatroomId());
-
+        Long latestReadMessageId = chatMessageService.getLatestReadMessageId(context.chatParticipant());
         MessageReadPayload payload = unreadChatMessageService.markMessageAsRead(context.chatParticipant());
+        payload.setLastReadMessageId(latestReadMessageId);
 
         return payload.mapToBasePayload();
     }
@@ -124,9 +146,18 @@ public class ChatRealTimeFacade {
     public MarkAllChatroomAsReadResult markAllChatroomAsRead(String username) {
         List<PayloadContext> contexts = payloadCollector.getAllPayloadContext(username);
 
-        List<MessageReadPayload> broadcastPayloads = unreadChatMessageService.markAllMessageAsRead(contexts);
+        Map<Long, Long> latestReadMessageIds = chatMessageService.getLatestReadMessageIds(contexts);
+        List<UnreadChatInfo> unreadChatInfos = unreadChatMessageService.markAllMessageAsRead(contexts);
+        LocalDateTime readAt = LocalDateTime.now();
+        List<MessageReadPayload> broadcastPayloads = unreadChatInfos.stream()
+                .map(unreadChatInfo -> MessageReadPayload.builder()
+                        .userId(unreadChatInfo.getUserId())
+                        .chatroomId(unreadChatInfo.getChatroomId())
+                        .lastReadMessageId(latestReadMessageIds.get(unreadChatInfo.getChatroomId()))
+                        .readAt(readAt)
+                        .build())
+                .toList();
 
-        eventPublisher.publishEvent(new UserChatroomUpdateEvent(contexts.getFirst().user()));
         List<Long> chatroomIds = broadcastPayloads.stream()
                 .map(MessageReadPayload::getChatroomId)
                 .toList();
@@ -135,7 +166,6 @@ public class ChatRealTimeFacade {
                 .apiResponse(MarkAllChatroomAsReadResponse.builder().chatroomIds(chatroomIds).build())
                 .broadcastPayloads(broadcastPayloads)
                 .build();
-
     }
 
     @Transactional

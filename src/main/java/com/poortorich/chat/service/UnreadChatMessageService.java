@@ -46,35 +46,24 @@ public class UnreadChatMessageService {
 
     @Transactional
     public MessageReadPayload markMessageAsRead(ChatParticipant chatParticipant) {
-        Long lastReadMessageId = unreadChatMessageRepository.findLastUnreadMessageId(
-                chatParticipant.getChatroom(),
-                chatParticipant.getUser());
         unreadChatMessageRepository.markMessagesAsRead(chatParticipant.getChatroom(), chatParticipant.getUser());
 
         return MessageReadPayload.builder()
                 .chatroomId(chatParticipant.getChatroom().getId())
-                .lastReadMessageId(lastReadMessageId)
                 .userId(chatParticipant.getUser().getId())
                 .readAt(LocalDateTime.now())
                 .build();
     }
 
     @Transactional
-    public List<MessageReadPayload> markAllMessageAsRead(List<PayloadContext> contexts) {
+    public List<UnreadChatInfo> markAllMessageAsRead(List<PayloadContext> contexts) {
         List<Chatroom> chatrooms = contexts.stream().map(PayloadContext::chatroom).toList();
         List<User> users = contexts.stream().map(PayloadContext::user).toList();
 
         List<UnreadChatInfo> unreadChatInfos = unreadChatMessageRepository.findLastUnreadMessageIds(chatrooms, users);
         unreadChatMessageRepository.markAllMessageAsRead(chatrooms, users);
 
-        return unreadChatInfos.stream()
-                .map(unreadChatInfo -> MessageReadPayload.builder()
-                        .chatroomId(unreadChatInfo.getChatroomId())
-                        .lastReadMessageId(unreadChatInfo.getLastReadMessageId())
-                        .userId(unreadChatInfo.getUserId())
-                        .readAt(LocalDateTime.now())
-                        .build())
-                .toList();
+        return unreadChatInfos;
     }
 
     public Long countByUnreadChatMessage(User user, Chatroom chatroom) {

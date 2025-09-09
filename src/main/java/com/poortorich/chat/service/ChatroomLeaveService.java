@@ -3,9 +3,11 @@ package com.poortorich.chat.service;
 import com.poortorich.chat.entity.ChatParticipant;
 import com.poortorich.chat.entity.Chatroom;
 import com.poortorich.chat.entity.enums.ChatroomRole;
+import com.poortorich.chat.entity.enums.NoticeStatus;
 import com.poortorich.chat.realtime.event.chatroom.ChatroomUpdateEvent;
 import com.poortorich.chat.realtime.payload.response.ChatroomClosedResponsePayload;
 import com.poortorich.chat.realtime.payload.response.UserLeaveResponsePayload;
+import com.poortorich.chat.realtime.payload.response.enums.PayloadType;
 import com.poortorich.chat.util.manager.ChatroomLeaveManager;
 import com.poortorich.chat.validator.ChatParticipantValidator;
 import com.poortorich.tag.service.TagService;
@@ -46,11 +48,15 @@ public class ChatroomLeaveService {
     @Transactional
     public void leaveChatroom(ChatParticipant participant) {
         participantValidator.validateIsParticipate(participant);
+        participant.updateNoticeStatus(NoticeStatus.DEFAULT);
         participant.leave();
         if (ChatroomRole.HOST.equals(participant.getRole())) {
             deleteChatroom(participant.getChatroom());
         }
-        eventPublisher.publishEvent(new ChatroomUpdateEvent(participant.getChatroom()));
+        eventPublisher.publishEvent(new ChatroomUpdateEvent(
+                participant.getChatroom(),
+                PayloadType.CHATROOM_INFO_UPDATED));
+
         if (!ChatroomRole.BANNED.equals(participant.getRole())) {
             saveLeaveMessageAndBroadcast(participant.getUser(), participant.getChatroom());
             saveCloseMessageAndBroadcast(participant);

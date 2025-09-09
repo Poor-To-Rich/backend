@@ -7,6 +7,7 @@ import com.poortorich.chat.repository.RedisChatRepository;
 import com.poortorich.chat.request.ChatroomCreateRequest;
 import com.poortorich.chat.request.enums.SortBy;
 import com.poortorich.chat.response.enums.ChatResponse;
+import com.poortorich.chat.util.ChatBuilder;
 import com.poortorich.global.exceptions.NotFoundException;
 import com.poortorich.user.entity.User;
 import org.junit.jupiter.api.DisplayName;
@@ -34,6 +35,8 @@ class ChatroomServiceTest {
     private ChatroomRepository chatroomRepository;
     @Mock
     private RedisChatRepository redisChatRepository;
+    @Mock
+    private ChatBuilder chatBuilder;
 
     @InjectMocks
     private ChatroomService chatroomService;
@@ -50,8 +53,23 @@ class ChatroomServiceTest {
         Boolean isRankingEnabled = false;
         String chatroomPassword = "부자12";
         ChatroomCreateRequest request = new ChatroomCreateRequest(
-                null, chatroomTitle, maxMemberCount, null, null, isRankingEnabled, chatroomPassword
-        );
+                null,
+                chatroomTitle,
+                maxMemberCount,
+                null,
+                null,
+                isRankingEnabled,
+                chatroomPassword);
+
+        Chatroom expectedChatroom = Chatroom.builder()
+                .image(imageUrl)
+                .title(chatroomTitle)
+                .maxMemberCount(maxMemberCount)
+                .isRankingEnabled(isRankingEnabled)
+                .password(chatroomPassword)
+                .build();
+
+        when(chatBuilder.buildChatroom(imageUrl, request)).thenReturn(expectedChatroom);
 
         chatroomService.createChatroom(imageUrl, request);
 

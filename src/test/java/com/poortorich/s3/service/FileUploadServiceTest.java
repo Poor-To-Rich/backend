@@ -1,14 +1,5 @@
 package com.poortorich.s3.service;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import com.amazonaws.AmazonClientException;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.PutObjectRequest;
@@ -18,11 +9,8 @@ import com.poortorich.s3.constants.S3TestConfig;
 import com.poortorich.s3.constants.S3TestExceptionMessages;
 import com.poortorich.s3.response.enums.S3Response;
 import com.poortorich.s3.util.S3TestFileGenerator;
+import com.poortorich.s3.util.WebpConverter;
 import com.poortorich.s3.validator.FileValidator;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URL;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -35,6 +23,21 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URL;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class FileUploadServiceTest {
@@ -50,6 +53,8 @@ class FileUploadServiceTest {
 
     @Mock
     private MockMultipartFile testFileWithIOException;
+    @Mock
+    private WebpConverter webpConverter;
 
     @InjectMocks
     private FileUploadService fileUploadService;
@@ -70,6 +75,8 @@ class FileUploadServiceTest {
 
         Mockito.doNothing().when(fileValidator).validateFileType(any(MultipartFile.class));
         Mockito.doNothing().when(fileValidator).validateFileSize(any(MultipartFile.class));
+        when(webpConverter.convertToWebp(any(MultipartFile.class)))
+                .thenReturn(new byte[]{1, 2, 3});
         when(amazonS3Client.getUrl(Mockito.anyString(), Mockito.anyString())).thenReturn(mockUrl);
 
         String resultUrl = fileUploadService.uploadImage(testFile);
@@ -85,10 +92,12 @@ class FileUploadServiceTest {
     void uploadImage_WhenGetInputStreamThrowsIOException_ShouldThrowInternalServerErrorException() throws IOException {
         Mockito.doNothing().when(fileValidator).validateFileType(any(MultipartFile.class));
         Mockito.doNothing().when(fileValidator).validateFileSize(any(MultipartFile.class));
+        when(webpConverter.convertToWebp(any(MultipartFile.class)))
+                .thenReturn(new byte[]{1, 2, 3});
         when(testFileWithIOException.getOriginalFilename()).thenReturn("test.jpg");
-        when(testFileWithIOException.getInputStream())
-                .thenThrow(new IOException(S3TestExceptionMessages.GLOBAL_EXCEPTION_MESSAGE));
-
+        doThrow(new AmazonClientException("S3 failure"))
+                .when(amazonS3Client)
+                .putObject(any(PutObjectRequest.class));
         InternalServerErrorException exception = Assertions.assertThrows(
                 InternalServerErrorException.class,
                 () -> fileUploadService.uploadImage(testFileWithIOException)
@@ -101,9 +110,11 @@ class FileUploadServiceTest {
     void uploadImage_WhenPutObjectThrowsAmazonClientException_ShouldThrowInternalServerErrorException() {
         Mockito.doNothing().when(fileValidator).validateFileType(any(MultipartFile.class));
         Mockito.doNothing().when(fileValidator).validateFileSize(any(MultipartFile.class));
-        Mockito.doThrow(new AmazonClientException(S3TestExceptionMessages.GLOBAL_EXCEPTION_MESSAGE))
+        doThrow(new AmazonClientException(S3TestExceptionMessages.GLOBAL_EXCEPTION_MESSAGE))
                 .when(amazonS3Client)
                 .putObject(any(PutObjectRequest.class));
+        when(webpConverter.convertToWebp(any(MultipartFile.class)))
+                .thenReturn(new byte[]{1, 2, 3});
 
         InternalServerErrorException exception = Assertions.assertThrows(
                 InternalServerErrorException.class,
@@ -138,7 +149,8 @@ class FileUploadServiceTest {
         Mockito.doNothing().when(fileValidator).validateFileType(any(MultipartFile.class));
         Mockito.doNothing().when(fileValidator).validateFileSize(any(MultipartFile.class));
         when(amazonS3Client.getUrl(Mockito.anyString(), Mockito.anyString())).thenReturn(mockUrl);
-
+        when(webpConverter.convertToWebp(any(MultipartFile.class)))
+                .thenReturn(new byte[]{1, 2, 3});
         String result = fileUploadService.updateImage(currentProfileImage, newProfileImage, Boolean.FALSE);
 
         assertEquals(S3TestConfig.FILE_URL_SAMPLE_2, result);
@@ -160,7 +172,8 @@ class FileUploadServiceTest {
         doNothing().when(fileValidator).validateFileType(any(MultipartFile.class));
         doNothing().when(fileValidator).validateFileSize(any(MultipartFile.class));
         when(amazonS3Client.getUrl(anyString(), anyString())).thenReturn(mockUrl);
-
+        when(webpConverter.convertToWebp(any(MultipartFile.class)))
+                .thenReturn(new byte[]{1, 2, 3});
         String result = fileUploadService.updateImage(S3Constants.DEFAULT_PROFILE_IMAGE, newProfileFile, Boolean.FALSE);
 
         assertEquals(S3TestConfig.FILE_URL_SAMPLE_2, result);

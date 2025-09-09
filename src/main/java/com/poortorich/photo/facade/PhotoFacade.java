@@ -28,6 +28,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -77,6 +78,15 @@ public class PhotoFacade {
         LocalDateTime cursorDate = DateParser.parseDateTime(date);
         Pageable pageable = PageRequest.of(0, 20);
         Slice<Photo> photos = photoService.getAllPhotosByCursor(chatroom, cursorDate, id, pageable);
+
+        if (photos.getContent().isEmpty()) {
+            return PhotoBuilder.buildAllPhotosResponse(
+                    null,
+                    null,
+                    null,
+                    List.of()
+            );
+        }
 
         String nextDate = photos.getContent().getLast().getCreatedDate()
                 .format(DateTimeFormatter.ofPattern(DatePattern.LOCAL_DATE_TIME_PATTERN));

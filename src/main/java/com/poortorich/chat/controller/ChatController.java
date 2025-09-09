@@ -257,4 +257,23 @@ public class ChatController {
 
         return DataResponse.toResponseEntity(ChatResponse.CHAT_PARTICIPANT_KICK_SUCCESS, apiResponse);
     }
+
+    @DeleteMapping("/{chatroomId}/block-users/read")
+    public ResponseEntity<BaseResponse> markMessagesAsReadByBannedParticipant(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @PathVariable Long chatroomId
+    ) {
+        BasePayload responsePayload = realTimeFacade.markMessagesAsReadByBannedParticipant(
+                userDetails.getUsername(),
+                chatroomId);
+
+        if (Objects.nonNull(responsePayload)) {
+            messagingTemplate.convertAndSend(
+                    SubscribeEndpoint.CHATROOM_SUBSCRIBE_PREFIX + chatroomId,
+                    responsePayload
+            );
+        }
+
+        return BaseResponse.toResponseEntity(ChatResponse.MARK_CHATROOM_AS_READ_SUCCESS);
+    }
 }

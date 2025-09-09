@@ -11,12 +11,14 @@ import com.poortorich.chatnotice.response.NoticeDetailsResponse;
 import com.poortorich.chatnotice.response.PreviewNoticesResponse;
 import com.poortorich.chatnotice.response.enums.ChatNoticeResponse;
 import com.poortorich.global.config.BaseSecurityTest;
+import com.poortorich.websocket.config.WebSocketConfig;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -31,6 +33,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(ChatNoticeController.class)
 @ExtendWith(MockitoExtension.class)
+@Import(WebSocketConfig.class)
 class ChatNoticeControllerTest extends BaseSecurityTest {
 
     private final String username = "test";
