@@ -48,7 +48,13 @@ public enum ChatResponse implements Response {
     CHATROOM_IS_CLOSED(HttpStatus.BAD_REQUEST, ChatResponseMessage.CHATROOM_IS_CLOSED, null),
     GET_MY_CHATROOMS_SUCCESS(HttpStatus.OK, ChatResponseMessage.GET_MY_CHATROOMS_SUCCESS, null),
     MESSAGE_TYPE_INVALID(HttpStatus.BAD_REQUEST, ChatResponseMessage.MESSAGE_TYPE_INVALID, null),
-    CHAT_PARTICIPANT_BANNED(HttpStatus.BAD_REQUEST, ChatResponseMessage.CHAT_PARTICIPANT_BANNED, null);
+    CHAT_PARTICIPANT_BANNED(HttpStatus.BAD_REQUEST, ChatResponseMessage.CHAT_PARTICIPANT_BANNED, null),
+    CHAT_PARTICIPANT_BANNED_ONLY_ALLOWED(
+            HttpStatus.FORBIDDEN,
+            ChatResponseMessage.CHAT_PARTICIPANT_BANNED_ONLY_ALLOWED,
+            null),
+
+    MARK_CHATROOM_AS_READ_SUCCESS(HttpStatus.OK, ChatResponseMessage.MARK_CHATROOM_AS_READ_SUCCESS, null);
 
     private final HttpStatus httpStatus;
     private final String message;

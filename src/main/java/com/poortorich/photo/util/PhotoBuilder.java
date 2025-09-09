@@ -39,13 +39,16 @@ public class PhotoBuilder {
             Long nextId,
             List<Photo> photos
     ) {
+        List<PhotoInfoResponse> photoInfoResponse = photos.stream()
+                .filter(Objects::nonNull)
+                .map(PhotoBuilder::buildPhotoInfoByDateResponse)
+                .toList();
+
         return AllPhotosResponse.builder()
                 .hasNext(hasNext)
                 .nextCursor(buildPhotoCursorResponse(nextDate, nextId))
-                .photoCount((long) photos.size())
-                .photos(photos.stream()
-                        .map(PhotoBuilder::buildPhotoInfoByDateResponse)
-                        .toList())
+                .photoCount((long) photoInfoResponse.size())
+                .photos(photoInfoResponse)
                 .build();
     }
 
