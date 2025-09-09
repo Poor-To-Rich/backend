@@ -255,9 +255,10 @@ public class ChatMessageService {
                     List.of(ChatMessageType.CHAT_MESSAGE, ChatMessageType.RANKING_MESSAGE),
                     participant.getBannedAt());
         }
-        return chatMessageRepository.findTopByChatroomAndTypeInOrderByIdDesc(
+        return chatMessageRepository.findTopByChatroomAndTypeInAndSentAtAfterOrderByIdDesc(
                 participant.getChatroom(),
-                List.of(ChatMessageType.CHAT_MESSAGE, ChatMessageType.RANKING_MESSAGE));
+                List.of(ChatMessageType.CHAT_MESSAGE, ChatMessageType.RANKING_MESSAGE),
+                participant.getJoinAt());
     }
 
     @Transactional

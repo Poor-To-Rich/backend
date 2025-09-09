@@ -42,9 +42,10 @@ public interface ChatMessageRepository extends JpaRepository<ChatMessage, Long> 
 
     Optional<ChatMessage> findTopByChatroomOrderByIdDesc(Chatroom chatroom);
 
-    Optional<ChatMessage> findTopByChatroomAndTypeInOrderByIdDesc(
+    Optional<ChatMessage> findTopByChatroomAndTypeInAndSentAtAfterOrderByIdDesc(
             Chatroom chatroom,
-            Collection<ChatMessageType> chatMessage);
+            Collection<ChatMessageType> chatMessage,
+            LocalDateTime joinAt);
 
     @Query("""
             SELECT MAX(m.id)
