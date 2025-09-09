@@ -115,7 +115,7 @@ public class UserFacade {
     @Transactional
     public Response deleteUserAccount(String username, HttpServletResponse response) {
         User user = userService.findUserByUsername(username);
-        tokenManager.clearAuthTokensTest(response);
+        tokenManager.clearAuthTokens(response);
         kakaoService.callUnlinkAPI(username);
         userResetService.deleteDefaultCategories(user);
         userService.deleteUserAccount(user);

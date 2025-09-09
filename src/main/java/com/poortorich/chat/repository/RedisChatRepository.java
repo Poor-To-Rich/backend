@@ -27,6 +27,17 @@ public class RedisChatRepository {
         redisTemplate.expire(key, Duration.ofMinutes(CHAT_KEY_EXPIRATION_TIME));
     }
 
+    public void overwrite(SortBy sortBy, List<Long> chatroomIds) {
+        String key = getRedisKey(sortBy.name());
+        List<String> stringIds = chatroomIds.stream().map(String::valueOf).toList();
+
+        redisTemplate.delete(key);
+        if (!stringIds.isEmpty()) {
+            redisTemplate.opsForList().rightPushAll(key, stringIds);
+        }
+        redisTemplate.expire(key, Duration.ofMinutes(CHAT_KEY_EXPIRATION_TIME));
+    }
+
     public List<Long> getChatroomIds(SortBy sortBy, Long cursor, int size) {
         String key = getRedisKey(sortBy.name());
         List<String> allIds = redisTemplate.opsForList().range(key, 0, -1);
