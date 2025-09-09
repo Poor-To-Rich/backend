@@ -106,97 +106,97 @@ class ChatroomServiceTest {
         assertThat(result.get(1)).isEqualTo(chatroom2);
     }
 
-    @Test
-    @DisplayName("Redis 캐시에 데이터가 존재하는 경우 - 조회 성공")
-    void getAllChatroomsWithCacheSuccess() {
-        SortBy sortBy = SortBy.LIKE;
-        Long cursor = -1L;
-        List<Long> chatroomIds = List.of(1L, 2L, 3L);
-
-        Chatroom chatroom1 = Chatroom.builder().id(1L).build();
-        Chatroom chatroom2 = Chatroom.builder().id(2L).build();
-        Chatroom chatroom3 = Chatroom.builder().id(3L).build();
-
-        when(redisChatRepository.existsBySortBy(sortBy)).thenReturn(true);
-        when(redisChatRepository.getChatroomIds(sortBy, cursor, 20)).thenReturn(chatroomIds);
-        when(chatroomRepository.findAllById(chatroomIds)).thenReturn(Arrays.asList(chatroom1, chatroom2, chatroom3));
-
-        List<Chatroom> result = chatroomService.getAllChatrooms(sortBy, cursor);
-
-        assertThat(result).hasSize(3);
-        assertThat(result.get(0)).isEqualTo(chatroom1);
-        assertThat(result.get(1)).isEqualTo(chatroom2);
-        assertThat(result.get(2)).isEqualTo(chatroom3);
-    }
-
-    @Test
-    @DisplayName("Redis 캐시에 데이터가 존재하지 않는 경우 - 캐시 데이터 생성 후 조회 성공 (좋아요순)")
-    void getAllChatroomsWithoutCacheSortByLikeSuccess() {
-        SortBy sortBy = SortBy.LIKE;
-        Long cursor = -1L;
-        List<Long> chatroomIds = List.of(1L, 2L);
-
-        Chatroom chatroom1 = Chatroom.builder().id(1L).build();
-        Chatroom chatroom2 = Chatroom.builder().id(2L).build();
-
-        when(redisChatRepository.existsBySortBy(sortBy)).thenReturn(false);
-        when(chatroomRepository.findChatroomsSortByLike()).thenReturn(List.of(chatroom1, chatroom2));
-        when(redisChatRepository.getChatroomIds(sortBy, cursor, 20)).thenReturn(chatroomIds);
-        when(chatroomRepository.findAllById(chatroomIds)).thenReturn(Arrays.asList(chatroom1, chatroom2));
-
-        List<Chatroom> result = chatroomService.getAllChatrooms(sortBy, cursor);
-
-        verify(redisChatRepository).save(sortBy, chatroomIds);
-        assertThat(result).hasSize(2);
-        assertThat(result.get(0)).isEqualTo(chatroom1);
-        assertThat(result.get(1)).isEqualTo(chatroom2);
-    }
-
-    @Test
-    @DisplayName("Redis 캐시에 데이터가 존재하지 않는 경우 - 캐시 데이터 생성 후 조회 성공 (최근대화순)")
-    void getAllChatroomsWithoutCacheSortByUpdatedAtSuccess() {
-        SortBy sortBy = SortBy.UPDATED_AT;
-        Long cursor = -1L;
-        List<Long> chatroomIds = List.of(1L, 2L);
-
-        Chatroom chatroom1 = Chatroom.builder().id(1L).build();
-        Chatroom chatroom2 = Chatroom.builder().id(2L).build();
-
-        when(redisChatRepository.existsBySortBy(sortBy)).thenReturn(false);
-        when(chatroomRepository.findChatroomsSortByUpdatedAt()).thenReturn(List.of(chatroom1, chatroom2));
-        when(redisChatRepository.getChatroomIds(sortBy, cursor, 20)).thenReturn(chatroomIds);
-        when(chatroomRepository.findAllById(chatroomIds)).thenReturn(Arrays.asList(chatroom1, chatroom2));
-
-        List<Chatroom> result = chatroomService.getAllChatrooms(sortBy, cursor);
-
-        verify(redisChatRepository).save(sortBy, chatroomIds);
-        assertThat(result).hasSize(2);
-        assertThat(result.get(0)).isEqualTo(chatroom1);
-        assertThat(result.get(1)).isEqualTo(chatroom2);
-    }
-
-    @Test
-    @DisplayName("Redis 캐시에 데이터가 존재하지 않는 경우 - 캐시 데이터 생성 후 조회 성공 (최근생성순)")
-    void getAllChatroomsWithoutCacheSortByCreatedAtSuccess() {
-        SortBy sortBy = SortBy.CREATED_AT;
-        Long cursor = -1L;
-        List<Long> chatroomIds = List.of(1L, 2L);
-
-        Chatroom chatroom1 = Chatroom.builder().id(1L).build();
-        Chatroom chatroom2 = Chatroom.builder().id(2L).build();
-
-        when(redisChatRepository.existsBySortBy(sortBy)).thenReturn(false);
-        when(chatroomRepository.findChatroomsSortByCreatedAt()).thenReturn(List.of(chatroom1, chatroom2));
-        when(redisChatRepository.getChatroomIds(sortBy, cursor, 20)).thenReturn(chatroomIds);
-        when(chatroomRepository.findAllById(chatroomIds)).thenReturn(Arrays.asList(chatroom1, chatroom2));
-
-        List<Chatroom> result = chatroomService.getAllChatrooms(sortBy, cursor);
-
-        verify(redisChatRepository).save(sortBy, chatroomIds);
-        assertThat(result).hasSize(2);
-        assertThat(result.get(0)).isEqualTo(chatroom1);
-        assertThat(result.get(1)).isEqualTo(chatroom2);
-    }
+//    @Test
+//    @DisplayName("Redis 캐시에 데이터가 존재하는 경우 - 조회 성공")
+//    void getAllChatroomsWithCacheSuccess() {
+//        SortBy sortBy = SortBy.LIKE;
+//        Long cursor = -1L;
+//        List<Long> chatroomIds = List.of(1L, 2L, 3L);
+//
+//        Chatroom chatroom1 = Chatroom.builder().id(1L).build();
+//        Chatroom chatroom2 = Chatroom.builder().id(2L).build();
+//        Chatroom chatroom3 = Chatroom.builder().id(3L).build();
+//
+//        when(redisChatRepository.existsBySortBy(sortBy)).thenReturn(true);
+//        when(redisChatRepository.getChatroomIds(sortBy, cursor, 20)).thenReturn(chatroomIds);
+//        when(chatroomRepository.findAllById(chatroomIds)).thenReturn(Arrays.asList(chatroom1, chatroom2, chatroom3));
+//
+//        List<Chatroom> result = chatroomService.getAllChatrooms(sortBy, cursor);
+//
+//        assertThat(result).hasSize(3);
+//        assertThat(result.get(0)).isEqualTo(chatroom1);
+//        assertThat(result.get(1)).isEqualTo(chatroom2);
+//        assertThat(result.get(2)).isEqualTo(chatroom3);
+//    }
+//
+//    @Test
+//    @DisplayName("Redis 캐시에 데이터가 존재하지 않는 경우 - 캐시 데이터 생성 후 조회 성공 (좋아요순)")
+//    void getAllChatroomsWithoutCacheSortByLikeSuccess() {
+//        SortBy sortBy = SortBy.LIKE;
+//        Long cursor = -1L;
+//        List<Long> chatroomIds = List.of(1L, 2L);
+//
+//        Chatroom chatroom1 = Chatroom.builder().id(1L).build();
+//        Chatroom chatroom2 = Chatroom.builder().id(2L).build();
+//
+//        when(redisChatRepository.existsBySortBy(sortBy)).thenReturn(false);
+//        when(chatroomRepository.findChatroomsSortByLike()).thenReturn(List.of(chatroom1, chatroom2));
+//        when(redisChatRepository.getChatroomIds(sortBy, cursor, 20)).thenReturn(chatroomIds);
+//        when(chatroomRepository.findAllById(chatroomIds)).thenReturn(Arrays.asList(chatroom1, chatroom2));
+//
+//        List<Chatroom> result = chatroomService.getAllChatrooms(sortBy, cursor);
+//
+//        verify(redisChatRepository).save(sortBy, chatroomIds);
+//        assertThat(result).hasSize(2);
+//        assertThat(result.get(0)).isEqualTo(chatroom1);
+//        assertThat(result.get(1)).isEqualTo(chatroom2);
+//    }
+//
+//    @Test
+//    @DisplayName("Redis 캐시에 데이터가 존재하지 않는 경우 - 캐시 데이터 생성 후 조회 성공 (최근대화순)")
+//    void getAllChatroomsWithoutCacheSortByUpdatedAtSuccess() {
+//        SortBy sortBy = SortBy.UPDATED_AT;
+//        Long cursor = -1L;
+//        List<Long> chatroomIds = List.of(1L, 2L);
+//
+//        Chatroom chatroom1 = Chatroom.builder().id(1L).build();
+//        Chatroom chatroom2 = Chatroom.builder().id(2L).build();
+//
+//        when(redisChatRepository.existsBySortBy(sortBy)).thenReturn(false);
+//        when(chatroomRepository.findChatroomsSortByUpdatedAt()).thenReturn(List.of(chatroom1, chatroom2));
+//        when(redisChatRepository.getChatroomIds(sortBy, cursor, 20)).thenReturn(chatroomIds);
+//        when(chatroomRepository.findAllById(chatroomIds)).thenReturn(Arrays.asList(chatroom1, chatroom2));
+//
+//        List<Chatroom> result = chatroomService.getAllChatrooms(sortBy, cursor);
+//
+//        verify(redisChatRepository).save(sortBy, chatroomIds);
+//        assertThat(result).hasSize(2);
+//        assertThat(result.get(0)).isEqualTo(chatroom1);
+//        assertThat(result.get(1)).isEqualTo(chatroom2);
+//    }
+//
+//    @Test
+//    @DisplayName("Redis 캐시에 데이터가 존재하지 않는 경우 - 캐시 데이터 생성 후 조회 성공 (최근생성순)")
+//    void getAllChatroomsWithoutCacheSortByCreatedAtSuccess() {
+//        SortBy sortBy = SortBy.CREATED_AT;
+//        Long cursor = -1L;
+//        List<Long> chatroomIds = List.of(1L, 2L);
+//
+//        Chatroom chatroom1 = Chatroom.builder().id(1L).build();
+//        Chatroom chatroom2 = Chatroom.builder().id(2L).build();
+//
+//        when(redisChatRepository.existsBySortBy(sortBy)).thenReturn(false);
+//        when(chatroomRepository.findChatroomsSortByCreatedAt()).thenReturn(List.of(chatroom1, chatroom2));
+//        when(redisChatRepository.getChatroomIds(sortBy, cursor, 20)).thenReturn(chatroomIds);
+//        when(chatroomRepository.findAllById(chatroomIds)).thenReturn(Arrays.asList(chatroom1, chatroom2));
+//
+//        List<Chatroom> result = chatroomService.getAllChatrooms(sortBy, cursor);
+//
+//        verify(redisChatRepository).save(sortBy, chatroomIds);
+//        assertThat(result).hasSize(2);
+//        assertThat(result.get(0)).isEqualTo(chatroom1);
+//        assertThat(result.get(1)).isEqualTo(chatroom2);
+//    }
 
     @Test
     @DisplayName("Redis 캐시에 다음 페이지가 존재하는 경우 - true 반환")

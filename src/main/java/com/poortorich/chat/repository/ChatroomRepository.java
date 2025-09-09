@@ -3,6 +3,8 @@ package com.poortorich.chat.repository;
 import com.poortorich.chat.entity.Chatroom;
 import com.poortorich.chat.entity.enums.ChatroomRole;
 import com.poortorich.user.entity.User;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -30,13 +32,11 @@ public interface ChatroomRepository extends JpaRepository<Chatroom, Long> {
                 SELECT c
                   FROM Chatroom c
                   LEFT JOIN ChatMessage cm ON cm.chatroom = c
-                  LEFT JOIN Like l ON l.chatroom = c AND l.likeStatus = true
-                  LEFT JOIN ChatParticipant cp ON cp.chatroom = c AND cp.isParticipated = true
+                  LEFT JOIN Like l ON l.chatroom = c
                 WHERE c.isClosed = false
                 GROUP BY c.id
                 ORDER BY MAX(cm.sentAt) DESC,
                          COUNT(DISTINCT l.id) DESC,
-                         COUNT(DISTINCT cp.id) DESC,
                          c.createdDate DESC,
                          c.id ASC
             """)
@@ -46,19 +46,18 @@ public interface ChatroomRepository extends JpaRepository<Chatroom, Long> {
                 SELECT c
                   FROM Chatroom c
                 WHERE c.isClosed = false
-                ORDER BY c.createdDate DESC
+                  AND c.id < :cursor
+                ORDER BY c.id DESC
             """)
-    List<Chatroom> findChatroomsSortByCreatedAt();
+    Slice<Chatroom> findByCursorSortByCreatedAt(@Param("cursor") Long cursor, Pageable pageable);
 
     @Query("""
                 SELECT c
                   FROM Chatroom c
-                  LEFT JOIN Like l ON l.chatroom = c AND l.likeStatus = true
-                  LEFT JOIN ChatParticipant cp ON cp.chatroom = c AND cp.isParticipated = true
+                  LEFT JOIN Like l ON l.chatroom = c
                 WHERE c.isClosed = false
                 GROUP BY c.id
                 ORDER BY COUNT(DISTINCT l.id) DESC,
-                         COUNT(DISTINCT cp.id) DESC,
                          c.createdDate DESC,
                          c.id ASC
             """)
