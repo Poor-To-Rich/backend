@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -34,7 +35,7 @@ class ChatMessageServiceTest {
                 .sentAt(LocalDateTime.of(2025, 7, 31, 2, 30))
                 .build();
 
-        when(chatMessageRepository.findTopByChatroomOrderBySentAtDesc(chatroom)).thenReturn(Optional.of(lastMessage));
+        when(chatMessageRepository.findTopByChatroomOrderByIdDesc(any())).thenReturn(Optional.of(lastMessage));
 
         String result = chatMessageService.getLastMessageTime(chatroom);
 
@@ -45,8 +46,6 @@ class ChatMessageServiceTest {
     @DisplayName("채팅 정보가 없는 경우 null 반환")
     void getLastMessageTimeNull() {
         Chatroom chatroom = Chatroom.builder().id(1L).build();
-
-        when(chatMessageRepository.findTopByChatroomOrderBySentAtDesc(chatroom)).thenReturn(Optional.empty());
 
         String result = chatMessageService.getLastMessageTime(chatroom);
 

@@ -5,14 +5,18 @@ import com.poortorich.chat.entity.Chatroom;
 import com.poortorich.chat.entity.enums.ChatroomRole;
 import com.poortorich.chat.entity.enums.NoticeStatus;
 import com.poortorich.chat.entity.enums.RankingStatus;
+import com.poortorich.chat.response.ChatParticipantProfile;
 import com.poortorich.chat.service.ChatParticipantService;
 import com.poortorich.chat.service.ChatroomService;
 import com.poortorich.chatnotice.entity.ChatNotice;
 import com.poortorich.chatnotice.response.AllNoticesResponse;
 import com.poortorich.chatnotice.response.LatestNoticeResponse;
 import com.poortorich.chatnotice.response.NoticeDetailsResponse;
+import com.poortorich.chatnotice.response.NoticeResponse;
+import com.poortorich.chatnotice.response.PreviewNoticeResponse;
 import com.poortorich.chatnotice.response.PreviewNoticesResponse;
 import com.poortorich.chatnotice.service.ChatNoticeService;
+import com.poortorich.chatnotice.util.ChatNoticeBuilder;
 import com.poortorich.user.entity.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -35,18 +39,18 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class ChatNoticeFacadeTest {
 
+    private final String username = "test";
+    private final Long chatroomId = 1L;
     @Mock
     private ChatroomService chatroomService;
     @Mock
     private ChatParticipantService chatParticipantService;
     @Mock
     private ChatNoticeService chatNoticeService;
-
+    @Mock
+    private ChatNoticeBuilder noticeBuilder;
     @InjectMocks
     private ChatNoticeFacade chatNoticeFacade;
-
-    private final String username = "test";
-    private final Long chatroomId = 1L;
     private User user;
     private Chatroom chatroom;
     private ChatParticipant chatParticipant;
@@ -83,9 +87,19 @@ class ChatNoticeFacadeTest {
     @Test
     @DisplayName("최근 공지 조회 성공")
     void getLatestNoticeSuccess() {
+        LatestNoticeResponse expectedResponse = LatestNoticeResponse.builder()
+                .status(chatParticipant.getNoticeStatus().name())
+                .noticeId(chatNotice.getId())
+                .preview(chatNotice.getContent())
+                .createdAt(chatNotice.getCreatedDate().toString())
+                .authorNickname(user.getNickname())
+                .build();
+
         when(chatroomService.findById(chatroomId)).thenReturn(chatroom);
         when(chatParticipantService.findByUsernameAndChatroom(username, chatroom)).thenReturn(chatParticipant);
         when(chatNoticeService.getLatestNotice(chatroom)).thenReturn(chatNotice);
+        when(noticeBuilder.buildLatestNoticeResponse(chatParticipant.getNoticeStatus(), chatNotice))
+                .thenReturn(expectedResponse);
 
         LatestNoticeResponse result = chatNoticeFacade.getLatestNotice(username, chatroomId);
 
@@ -108,6 +122,16 @@ class ChatNoticeFacadeTest {
                 .content("코딩하다가 정신 차려보니 새벽 3시가 되었다. 피곤하지만 너무 재밌어서 멈출수가 없다.")
                 .createdDate(LocalDateTime.of(2025, 8, 8, 0, 0))
                 .build();
+
+        LatestNoticeResponse expectedResponse = LatestNoticeResponse.builder()
+                .status(chatParticipant.getNoticeStatus().name())
+                .noticeId(chatNotice.getId())
+                .preview(preview)
+                .createdAt(chatNotice.getCreatedDate().toString())
+                .authorNickname(user.getNickname())
+                .build();
+        when(noticeBuilder.buildLatestNoticeResponse(chatParticipant.getNoticeStatus(), chatNotice))
+                .thenReturn(expectedResponse);
 
         when(chatroomService.findById(chatroomId)).thenReturn(chatroom);
         when(chatParticipantService.findByUsernameAndChatroom(username, chatroom)).thenReturn(chatParticipant);
@@ -134,9 +158,20 @@ class ChatNoticeFacadeTest {
                 .content("공지 내용")
                 .createdDate(LocalDateTime.of(2025, 8, 8, 0, 0))
                 .build();
+        PreviewNoticeResponse notice1Response = PreviewNoticeResponse.builder()
+                .noticeId(chatNotice.getId())
+                .preview(chatNotice.getContent())
+                .build();
+        PreviewNoticeResponse notice2Response = PreviewNoticeResponse.builder()
+                .noticeId(chatNotice2.getId())
+                .preview(chatNotice2.getContent())
+                .build();
+        List<PreviewNoticeResponse> expectedResponses = List.of(notice1Response, notice2Response);
 
         when(chatroomService.findById(chatroomId)).thenReturn(chatroom);
         when(chatNoticeService.getPreviewNotices(chatroom)).thenReturn(List.of(chatNotice, chatNotice2));
+        when(noticeBuilder.buildPreviewNoticeResponse(List.of(chatNotice, chatNotice2)))
+                .thenReturn(expectedResponses);
 
         PreviewNoticesResponse result = chatNoticeFacade.getPreviewNotices(chatroomId);
 
@@ -159,10 +194,19 @@ class ChatNoticeFacadeTest {
                 .content("코딩하다가 정신 차려보니 새벽 3시가 되었다. 피곤하지만 너무 재밌어서 멈출수가 없다.")
                 .createdDate(LocalDateTime.of(2025, 8, 8, 0, 0))
                 .build();
-
+        PreviewNoticeResponse notice1Response = PreviewNoticeResponse.builder()
+                .noticeId(chatNotice.getId())
+                .preview(chatNotice.getContent())
+                .build();
+        PreviewNoticeResponse notice2Response = PreviewNoticeResponse.builder()
+                .noticeId(chatNotice2.getId())
+                .preview(preview)
+                .build();
+        List<PreviewNoticeResponse> expectedResponses = List.of(notice1Response, notice2Response);
         when(chatroomService.findById(chatroomId)).thenReturn(chatroom);
         when(chatNoticeService.getPreviewNotices(chatroom)).thenReturn(List.of(chatNotice, chatNotice2));
-
+        when(noticeBuilder.buildPreviewNoticeResponse(List.of(chatNotice, chatNotice2)))
+                .thenReturn(expectedResponses);
         PreviewNoticesResponse result = chatNoticeFacade.getPreviewNotices(chatroomId);
 
         assertThat(result).isNotNull();
@@ -178,6 +222,7 @@ class ChatNoticeFacadeTest {
     void getPreviewNoticesEmpty() {
         when(chatroomService.findById(chatroomId)).thenReturn(chatroom);
         when(chatNoticeService.getPreviewNotices(chatroom)).thenReturn(List.of());
+        when(noticeBuilder.buildPreviewNoticeResponse(List.of())).thenReturn(List.of());
 
         PreviewNoticesResponse result = chatNoticeFacade.getPreviewNotices(chatroomId);
 
@@ -191,7 +236,8 @@ class ChatNoticeFacadeTest {
         when(chatroomService.findById(chatroomId)).thenReturn(chatroom);
         when(chatParticipantService.findByUsernameAndChatroom(username, chatroom)).thenReturn(chatParticipant);
         when(chatNoticeService.getLatestNotice(chatroom)).thenReturn(null);
-
+        when(noticeBuilder.buildLatestNoticeResponse(chatParticipant.getNoticeStatus(), null))
+                .thenReturn(null);
         LatestNoticeResponse result = chatNoticeFacade.getLatestNotice(username, chatroomId);
 
         assertThat(result).isNull();
@@ -201,10 +247,24 @@ class ChatNoticeFacadeTest {
     @DisplayName("공지 상세 조회 성공")
     void getNoticeDetailsSuccess() {
         Long noticeId = 1L;
+        ChatParticipantProfile authorProfile = ChatParticipantProfile.builder()
+                .userId(user.getId())
+                .nickname(user.getNickname())
+                .profileImage(user.getProfileImage())
+                .rankingType(chatParticipant.getRankingStatus())
+                .isHost(ChatroomRole.HOST.equals(chatParticipant.getRole()))
+                .build();
 
+        NoticeDetailsResponse expectedResponse = NoticeDetailsResponse.builder()
+                .noticeId(chatNotice.getId())
+                .content(chatNotice.getContent())
+                .createdAt(chatNotice.getCreatedDate().toString())
+                .author(authorProfile)
+                .build();
         when(chatroomService.findById(chatroomId)).thenReturn(chatroom);
         when(chatNoticeService.findNotice(chatroom, noticeId)).thenReturn(chatNotice);
-
+        when(noticeBuilder.buildNoticeDetailsResponse(chatNotice))
+                .thenReturn(expectedResponse);
         NoticeDetailsResponse result = chatNoticeFacade.getNoticeDetails(chatroomId, noticeId);
 
         assertThat(result).isNotNull();
@@ -220,6 +280,13 @@ class ChatNoticeFacadeTest {
     void getAllNoticesSuccess() {
         Long cursor = Long.MAX_VALUE;
         Pageable pageable = PageRequest.of(0, 20);
+        NoticeResponse notice1Response = NoticeResponse.builder()
+                .noticeId(chatNotice.getId())
+                .preview(chatNotice.getContent())
+                .authorNickname(user.getNickname())
+                .createdAt(chatNotice.getCreatedDate().toString())
+                .build();
+
         ChatNotice chatNotice2 = ChatNotice.builder()
                 .id(4L)
                 .author(chatParticipant)
@@ -227,11 +294,27 @@ class ChatNoticeFacadeTest {
                 .content("공지 내용")
                 .createdDate(LocalDateTime.of(2025, 8, 8, 0, 0))
                 .build();
+        NoticeResponse notice2Response = NoticeResponse.builder()
+                .noticeId(chatNotice2.getId())
+                .preview(chatNotice2.getContent())
+                .authorNickname(user.getNickname())
+                .createdAt(chatNotice2.getCreatedDate().toString())
+                .build();
+
+        List<NoticeResponse> noticeResponses = List.of(notice1Response, notice2Response);
+
+        AllNoticesResponse expectedResponse = AllNoticesResponse.builder()
+                .hasNext(true)
+                .nextCursor(chatNotice2.getId())
+                .notices(noticeResponses)
+                .build();
+
         Slice<ChatNotice> slice = new SliceImpl<>(List.of(chatNotice, chatNotice2), pageable, true);
 
         when(chatroomService.findById(chatroomId)).thenReturn(chatroom);
         when(chatNoticeService.getAllNoticeByCursor(chatroom, cursor, pageable)).thenReturn(slice);
-
+        when(noticeBuilder.buildAllNoticesResponse(true, chatNotice2.getId(), List.of(chatNotice, chatNotice2)))
+                .thenReturn(expectedResponse);
         AllNoticesResponse result = chatNoticeFacade.getAllNotices(chatroomId, cursor);
 
         assertThat(result).isNotNull();
@@ -256,11 +339,32 @@ class ChatNoticeFacadeTest {
                 .content("공지 내용")
                 .createdDate(LocalDateTime.of(2025, 8, 8, 0, 0))
                 .build();
+        NoticeResponse notice1Response = NoticeResponse.builder()
+                .noticeId(chatNotice.getId())
+                .preview(chatNotice.getContent())
+                .authorNickname(user.getNickname())
+                .createdAt(chatNotice.getCreatedDate().toString())
+                .build();
+
+        NoticeResponse notice2Response = NoticeResponse.builder()
+                .noticeId(chatNotice2.getId())
+                .preview(chatNotice2.getContent())
+                .authorNickname(user.getNickname())
+                .createdAt(chatNotice2.getCreatedDate().toString())
+                .build();
+
+        List<NoticeResponse> noticeResponses = List.of(notice1Response, notice2Response);
+        AllNoticesResponse expectedResponse = AllNoticesResponse.builder()
+                .hasNext(false)
+                .nextCursor(null)
+                .notices(noticeResponses)
+                .build();
         Slice<ChatNotice> slice = new SliceImpl<>(List.of(chatNotice, chatNotice2), pageable, false);
 
         when(chatroomService.findById(chatroomId)).thenReturn(chatroom);
         when(chatNoticeService.getAllNoticeByCursor(chatroom, cursor, pageable)).thenReturn(slice);
-
+        when(noticeBuilder.buildAllNoticesResponse(false, null, List.of(chatNotice, chatNotice2)))
+                .thenReturn(expectedResponse);
         AllNoticesResponse result = chatNoticeFacade.getAllNotices(chatroomId, cursor);
 
         assertThat(result).isNotNull();

@@ -5,12 +5,14 @@ import com.poortorich.ranking.facade.RankingFacade;
 import com.poortorich.ranking.response.AllRankingsResponse;
 import com.poortorich.ranking.response.LatestRankingResponse;
 import com.poortorich.ranking.response.enums.RankingResponse;
+import com.poortorich.websocket.config.WebSocketConfig;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -23,15 +25,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(RankingController.class)
 @ExtendWith(MockitoExtension.class)
+@Import(WebSocketConfig.class)
 class RankingControllerTest extends BaseSecurityTest {
 
+    private final String username = "test";
     @Autowired
     private MockMvc mockMvc;
-
     @MockitoBean
     private RankingFacade rankingFacade;
-
-    private final String username = "test";
 
     @Test
     @WithMockUser(username = username)

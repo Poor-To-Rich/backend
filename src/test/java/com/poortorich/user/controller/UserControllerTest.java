@@ -1,17 +1,8 @@
 package com.poortorich.user.controller;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.poortorich.chat.facade.ChatFacade;
 import com.poortorich.global.config.BaseSecurityTest;
 import com.poortorich.s3.util.S3TestFileGenerator;
 import com.poortorich.security.config.SecurityConfig;
@@ -46,6 +37,16 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 @WebMvcTest(UserController.class)
 @Import(SecurityConfig.class)
 @ExtendWith(MockitoExtension.class)
@@ -56,7 +57,9 @@ class UserControllerTest extends BaseSecurityTest {
 
     @MockitoBean
     private UserFacade userFacade;
-
+    @MockitoBean
+    private ChatFacade chatFacade;
+    
     private ObjectMapper objectMapper;
     private MockMultipartFile userRegistrationRequest;
     private MockMultipartFile profileImage;

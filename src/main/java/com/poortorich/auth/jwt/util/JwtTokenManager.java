@@ -4,12 +4,13 @@ import com.poortorich.auth.jwt.constants.JwtConstants;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.util.Objects;
-import java.util.Optional;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Component;
+
+import java.util.Objects;
+import java.util.Optional;
 
 @Component
 @AllArgsConstructor
@@ -67,13 +68,6 @@ public class JwtTokenManager {
     }
 
     public void clearAuthTokens(HttpServletResponse response) {
-        // response.setHeader(JwtConstants.AUTHORIZATION_HEADER, "");
-
-        // ResponseCookie deleteRefreshToken = deleteRefreshTokenCookie();
-        // response.addHeader(HttpHeaders.SET_COOKIE, deleteRefreshToken.toString());
-    }
-
-    public void clearAuthTokensTest(HttpServletResponse response) {
         response.setHeader(JwtConstants.AUTHORIZATION_HEADER, "");
 
         ResponseCookie deleteRefreshToken = deleteRefreshTokenCookie();

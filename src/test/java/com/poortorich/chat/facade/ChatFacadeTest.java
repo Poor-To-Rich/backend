@@ -8,16 +8,20 @@ import com.poortorich.chat.request.ChatroomCreateRequest;
 import com.poortorich.chat.request.enums.SortBy;
 import com.poortorich.chat.response.AllChatroomsResponse;
 import com.poortorich.chat.response.AllParticipantsResponse;
+import com.poortorich.chat.response.ChatParticipantProfile;
 import com.poortorich.chat.response.ChatroomCoverInfoResponse;
 import com.poortorich.chat.response.ChatroomCreateResponse;
 import com.poortorich.chat.response.ChatroomDetailsResponse;
 import com.poortorich.chat.response.ChatroomInfoResponse;
+import com.poortorich.chat.response.ChatroomResponse;
 import com.poortorich.chat.response.ChatroomRoleResponse;
 import com.poortorich.chat.response.ChatroomsResponse;
 import com.poortorich.chat.response.SearchParticipantsResponse;
 import com.poortorich.chat.service.ChatMessageService;
 import com.poortorich.chat.service.ChatParticipantService;
 import com.poortorich.chat.service.ChatroomService;
+import com.poortorich.chat.util.ChatBuilder;
+import com.poortorich.chat.util.mapper.ParticipantProfileMapper;
 import com.poortorich.chat.validator.ChatParticipantValidator;
 import com.poortorich.chatnotice.request.ChatNoticeStatusUpdateRequest;
 import com.poortorich.s3.service.FileUploadService;
@@ -67,6 +71,11 @@ class ChatFacadeTest {
     private ChatMessageService chatMessageService;
     @Mock
     private ChatParticipantValidator chatParticipantValidator;
+    @Mock
+    private ParticipantProfileMapper participantProfileMapper;
+    @Mock
+    private ChatBuilder chatBuilder;
+
     @InjectMocks
     private ChatFacade chatFacade;
     private Chatroom chatroom;
@@ -129,8 +138,18 @@ class ChatFacadeTest {
     @Test
     @DisplayName("채팅방 정보 조회 성공")
     void getChatroomSuccess() {
+        ChatroomInfoResponse expectedResponse = ChatroomInfoResponse.builder()
+                .chatroomImage(chatroom.getImage())
+                .chatroomTitle(chatroom.getTitle())
+                .maxMemberCount(chatroom.getMaxMemberCount())
+                .isRankingEnabled(chatroom.getIsRankingEnabled())
+                .chatroomPassword(chatroom.getPassword())
+                .hashtags(hashtags)
+                .build();
+
         when(chatroomService.findById(chatroomId)).thenReturn(chatroom);
         when(tagService.getTagNames(chatroom)).thenReturn(hashtags);
+        when(chatBuilder.buildChatroomInfoResponse(chatroom, hashtags)).thenReturn(expectedResponse);
 
         ChatroomInfoResponse response = chatFacade.getChatroom(chatroomId);
 
@@ -159,7 +178,29 @@ class ChatFacadeTest {
         when(chatParticipantService.countByChatroom(chatroom2)).thenReturn(2L);
         when(chatMessageService.getLastMessageTime(chatroom)).thenReturn("2025-07-31T02:30");
         when(chatMessageService.getLastMessageTime(chatroom2)).thenReturn("2025-07-31T03:00");
+        when(chatBuilder.buildChatroomResponse(chatroom, hashtags, 1L, "2025-07-31T02:30"))
+                .thenReturn(ChatroomResponse.builder()
+                        .chatroomId(chatroom.getId())
+                        .chatroomTitle(chatroom.getTitle())
+                        .chatroomImage(chatroom.getImage())
+                        .description(chatroom.getDescription())
+                        .hashtags(hashtags)
+                        .currentMemberCount(1L)
+                        .maxMemberCount(chatroom.getMaxMemberCount())
+                        .lastMessageTime("2025-07-31T02:30")
+                        .build());
 
+        when(chatBuilder.buildChatroomResponse(chatroom2, hashtags, 2L, "2025-07-31T03:00"))
+                .thenReturn(ChatroomResponse.builder()
+                        .chatroomId(chatroom2.getId())
+                        .chatroomTitle(chatroom2.getTitle())
+                        .chatroomImage(chatroom2.getImage())
+                        .description(chatroom2.getDescription())
+                        .hashtags(hashtags)
+                        .currentMemberCount(2L)
+                        .maxMemberCount(chatroom2.getMaxMemberCount())
+                        .lastMessageTime("2025-07-31T03:00")
+                        .build());
         ChatroomsResponse response = chatFacade.getHostedChatrooms("test");
 
         assertThat(response.getChatrooms()).hasSize(2);
@@ -182,7 +223,29 @@ class ChatFacadeTest {
         when(tagService.getTagNames(any())).thenReturn(hashtags);
         when(chatParticipantService.countByChatroom(any())).thenReturn(3L);
         when(chatMessageService.getLastMessageTime(any())).thenReturn("2025-07-31T02:30");
+        when(chatBuilder.buildChatroomResponse(chatroom1, hashtags, 3L, "2025-07-31T02:30"))
+                .thenReturn(ChatroomResponse.builder()
+                        .chatroomId(chatroom1.getId())
+                        .chatroomTitle(chatroom1.getTitle())
+                        .chatroomImage(chatroom1.getImage())
+                        .description(chatroom1.getDescription())
+                        .hashtags(hashtags)
+                        .currentMemberCount(3L)
+                        .maxMemberCount(chatroom1.getMaxMemberCount())
+                        .lastMessageTime("2025-07-31T02:30")
+                        .build());
 
+        when(chatBuilder.buildChatroomResponse(chatroom2, hashtags, 3L, "2025-07-31T02:30"))
+                .thenReturn(ChatroomResponse.builder()
+                        .chatroomId(chatroom2.getId())
+                        .chatroomTitle(chatroom2.getTitle())
+                        .chatroomImage(chatroom2.getImage())
+                        .description(chatroom2.getDescription())
+                        .hashtags(hashtags)
+                        .currentMemberCount(3L)
+                        .maxMemberCount(chatroom2.getMaxMemberCount())
+                        .lastMessageTime("2025-07-31T02:30")
+                        .build());
         AllChatroomsResponse response = chatFacade.getAllChatrooms(sortBy, cursor);
 
         assertThat(response.getChatrooms()).hasSize(2);
@@ -204,7 +267,29 @@ class ChatFacadeTest {
         when(tagService.getTagNames(any())).thenReturn(hashtags);
         when(chatParticipantService.countByChatroom(any())).thenReturn(3L);
         when(chatMessageService.getLastMessageTime(any())).thenReturn("2025-07-31T02:30");
+        when(chatBuilder.buildChatroomResponse(chatroom1, hashtags, 3L, "2025-07-31T02:30"))
+                .thenReturn(ChatroomResponse.builder()
+                        .chatroomId(chatroom1.getId())
+                        .chatroomTitle(chatroom1.getTitle())
+                        .chatroomImage(chatroom1.getImage())
+                        .description(chatroom1.getDescription())
+                        .hashtags(hashtags)
+                        .currentMemberCount(3L)
+                        .maxMemberCount(chatroom1.getMaxMemberCount())
+                        .lastMessageTime("2025-07-31T02:30")
+                        .build());
 
+        when(chatBuilder.buildChatroomResponse(chatroom2, hashtags, 3L, "2025-07-31T02:30"))
+                .thenReturn(ChatroomResponse.builder()
+                        .chatroomId(chatroom2.getId())
+                        .chatroomTitle(chatroom2.getTitle())
+                        .chatroomImage(chatroom2.getImage())
+                        .description(chatroom2.getDescription())
+                        .hashtags(hashtags)
+                        .currentMemberCount(3L)
+                        .maxMemberCount(chatroom2.getMaxMemberCount())
+                        .lastMessageTime("2025-07-31T02:30")
+                        .build());
         ChatroomsResponse response = chatFacade.searchChatrooms(keyword);
 
         assertThat(response.getChatrooms()).hasSize(2);
@@ -217,7 +302,14 @@ class ChatFacadeTest {
     void getChatroomDetailsSuccess() {
         when(chatroomService.findById(chatroomId)).thenReturn(chatroom);
         when(chatParticipantService.countByChatroom(chatroom)).thenReturn(5L);
-
+        when(chatBuilder.buildChatroomDetailsResponse(chatroom, 5L))
+                .thenReturn(ChatroomDetailsResponse.builder()
+                        .chatroomImage(chatroom.getImage())
+                        .chatroomTitle(chatroom.getTitle())
+                        .currentMemberCount(5L)
+                        .isRankingEnabled(chatroom.getIsRankingEnabled())
+                        .isClosed(chatroom.getIsClosed())
+                        .build());
         ChatroomDetailsResponse response = chatFacade.getChatroomDetails(chatroomId);
 
         assertThat(response.getChatroomTitle()).isEqualTo(chatroom.getTitle());
@@ -241,14 +333,38 @@ class ChatFacadeTest {
                 .role(ChatroomRole.HOST)
                 .rankingStatus(RankingStatus.NONE)
                 .build();
-
+        ChatParticipantProfile hostProfile = ChatParticipantProfile.builder()
+                .userId(user.getId())
+                .nickname(user.getNickname())
+                .profileImage(user.getProfileImage())
+                .rankingType(hostParticipant.getRankingStatus())
+                .isHost(true)
+                .build();
         when(userService.findUserByUsername(username)).thenReturn(user);
         when(chatroomService.findById(chatroomId)).thenReturn(chatroom);
         when(tagService.getTagNames(chatroom)).thenReturn(hashtags);
         when(chatParticipantService.countByChatroom(chatroom)).thenReturn(3L);
         when(chatParticipantService.isJoined(user, chatroom)).thenReturn(true);
         when(chatParticipantService.getChatroomHost(chatroom)).thenReturn(hostParticipant);
-
+        when(chatBuilder.buildChatroomCoverInfoResponse(
+                chatroom,
+                hashtags,
+                3L,
+                true,
+                hostParticipant
+        )).thenReturn(ChatroomCoverInfoResponse.builder()
+                .chatroomId(chatroom.getId())
+                .chatroomTitle(chatroom.getTitle())
+                .chatroomImage(chatroom.getImage())
+                .description(chatroom.getDescription())
+                .hashtags(hashtags)
+                .currentMemberCount(3L)
+                .maxMemberCount(chatroom.getMaxMemberCount())
+                .createdAt(chatroom.getCreatedDate().toString())
+                .isJoined(true)
+                .hasPassword(true)
+                .hostProfile(hostProfile)
+                .build());
         ChatroomCoverInfoResponse response = chatFacade.getChatroomCoverInfo(username, chatroomId);
 
         assertThat(response.getChatroomId()).isEqualTo(chatroomId);
@@ -325,11 +441,30 @@ class ChatFacadeTest {
                 .role(ChatroomRole.MEMBER)
                 .rankingStatus(RankingStatus.NONE)
                 .build();
-
+        AllParticipantsResponse expectedResponse = AllParticipantsResponse.builder()
+                .memberCount(2L)
+                .members(List.of(
+                        ChatParticipantProfile.builder()
+                                .userId(hostUser.getId())
+                                .nickname(hostUser.getNickname())
+                                .profileImage(hostUser.getProfileImage())
+                                .rankingType(host.getRankingStatus())
+                                .isHost(true)
+                                .build(),
+                        ChatParticipantProfile.builder()
+                                .userId(memberUser.getId())
+                                .nickname(memberUser.getNickname())
+                                .profileImage(memberUser.getProfileImage())
+                                .rankingType(member1.getRankingStatus())
+                                .isHost(false)
+                                .build()
+                ))
+                .build();
         when(userService.findUserByUsername(username)).thenReturn(hostUser);
         when(chatroomService.findById(chatroomId)).thenReturn(chatroom);
         when(chatParticipantService.getAllParticipants(chatroom)).thenReturn(List.of(host, member1));
-
+        when(chatBuilder.buildAllParticipantsResponse(List.of(host, member1)))
+                .thenReturn(expectedResponse);
         AllParticipantsResponse response = chatFacade.getAllParticipants(username, chatroomId);
 
         assertThat(response).isNotNull();
@@ -384,12 +519,36 @@ class ChatFacadeTest {
                 .role(ChatroomRole.MEMBER)
                 .rankingStatus(RankingStatus.NONE)
                 .build();
+        ChatParticipantProfile profile1 = ChatParticipantProfile.builder()
+                .userId(1L)
+                .nickname("nick1")
+                .profileImage("profileImage.com")
+                .rankingType(RankingStatus.NONE)
+                .isHost(false)
+                .build();
 
+        ChatParticipantProfile profile2 = ChatParticipantProfile.builder()
+                .userId(2L)
+                .nickname("nick2")
+                .profileImage("profileImage.com")
+                .rankingType(RankingStatus.NONE)
+                .isHost(false)
+                .build();
+
+        ChatParticipantProfile profile3 = ChatParticipantProfile.builder()
+                .userId(3L)
+                .nickname("nick3")
+                .profileImage("profileImage.com")
+                .rankingType(RankingStatus.NONE)
+                .isHost(false)
+                .build();
         when(userService.findUserByUsername(username)).thenReturn(user);
         when(chatroomService.findById(chatroomId)).thenReturn(chatroom);
         when(chatParticipantService.searchParticipantsByNickname(chatroom, keyword))
                 .thenReturn(List.of(member1, member2, member3));
-
+        when(participantProfileMapper.mapToProfile(member1)).thenReturn(profile1);
+        when(participantProfileMapper.mapToProfile(member2)).thenReturn(profile2);
+        when(participantProfileMapper.mapToProfile(member3)).thenReturn(profile3);
         SearchParticipantsResponse result = chatFacade.searchParticipantsByNickname(username, chatroomId, keyword);
 
         assertThat(result).isNotNull();

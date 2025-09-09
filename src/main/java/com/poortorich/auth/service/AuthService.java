@@ -98,7 +98,7 @@ public class AuthService {
     }
 
     public Response logout(HttpServletResponse response) {
-        tokenManager.clearAuthTokensTest(response);
+        tokenManager.clearAuthTokens(response);
         return AuthResponse.LOGOUT_SUCCESS;
     }
 }
