@@ -11,8 +11,12 @@ import com.poortorich.chat.util.ChatBuilder;
 import com.poortorich.global.exceptions.NotFoundException;
 import com.poortorich.user.entity.User;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.util.Comparator;
 import java.util.List;
@@ -31,25 +35,61 @@ public class ChatroomService {
         return chatroomRepository.save(chatroom);
     }
 
+    public void overwriteChatroomsInRedis() {
+        if (TransactionSynchronizationManager.isSynchronizationActive()) {
+            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+                @Override
+                public void afterCommit() {
+                    overwriteChatroomsInRedisBySortBy(SortBy.UPDATED_AT);
+                    overwriteChatroomsInRedisBySortBy(SortBy.LIKE);
+                }
+            });
+        } else {
+            overwriteChatroomsInRedisBySortBy(SortBy.UPDATED_AT);
+            overwriteChatroomsInRedisBySortBy(SortBy.LIKE);
+        }
+    }
+
+    private void overwriteChatroomsInRedisBySortBy(SortBy sortBy) {
+        List<Long> chatrooms = getChatroomIdsBySortBy(sortBy);
+
+        if (!chatrooms.isEmpty()) {
+            redisChatRepository.overwrite(sortBy, chatrooms);
+        }
+    }
+
+    public Slice<Chatroom> findByCursorSortByCreatedAt(Long cursor, Pageable pageable) {
+        return chatroomRepository.findByCursorSortByCreatedAt(cursor, pageable);
+    }
+
     public List<Chatroom> getAllChatrooms(SortBy sortBy, Long cursor) {
         if (redisChatRepository.existsBySortBy(sortBy)) {
             return findByIds(redisChatRepository.getChatroomIds(sortBy, cursor, 20));
         }
 
-        List<Long> chatrooms = getBySortBy(sortBy).stream()
+        saveChatroomsInRedisBySortBy(SortBy.UPDATED_AT);
+        saveChatroomsInRedisBySortBy(SortBy.LIKE);
+
+        return findByIds(redisChatRepository.getChatroomIds(sortBy, cursor, 20));
+    }
+
+    private void saveChatroomsInRedisBySortBy(SortBy sortBy) {
+        List<Long> chatrooms = getChatroomIdsBySortBy(sortBy);
+
+        if (!chatrooms.isEmpty()) {
+            redisChatRepository.save(sortBy, chatrooms);
+        }
+    }
+
+    private List<Long> getChatroomIdsBySortBy(SortBy sortBy) {
+        return getBySortBy(sortBy).stream()
                 .map(Chatroom::getId)
                 .toList();
-        redisChatRepository.save(sortBy, chatrooms);
-        return findByIds(redisChatRepository.getChatroomIds(sortBy, cursor, 20));
     }
 
     private List<Chatroom> getBySortBy(SortBy sortBy) {
         if (sortBy.equals(SortBy.LIKE)) {
             return chatroomRepository.findChatroomsSortByLike();
-        }
-
-        if (sortBy.equals(SortBy.CREATED_AT)) {
-            return chatroomRepository.findChatroomsSortByCreatedAt();
         }
 
         return chatroomRepository.findChatroomsSortByUpdatedAt();

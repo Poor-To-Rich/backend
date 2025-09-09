@@ -59,6 +59,8 @@ import com.poortorich.user.entity.User;
 import com.poortorich.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -102,6 +104,8 @@ public class ChatFacade {
         chatParticipantService.createChatroomHost(user, chatroom);
         tagService.createTag(request.getHashtags(), chatroom);
 
+        chatroomService.overwriteChatroomsInRedis();
+
         return ChatroomCreateResponse.builder().newChatroomId(chatroom.getId()).build();
     }
 
@@ -113,20 +117,47 @@ public class ChatFacade {
     }
 
     public AllChatroomsResponse getAllChatrooms(SortBy sortBy, Long cursor) {
+        if (sortBy.equals(SortBy.CREATED_AT)) {
+            return getAllChatroomsSortByCreatedAt(cursor);
+        }
+
         List<Chatroom> chatrooms = chatroomService.getAllChatrooms(sortBy, cursor);
 
         if (chatrooms.isEmpty()) {
-            return AllChatroomsResponse.builder()
-                    .hasNext(false)
-                    .nextCursor(null)
-                    .chatrooms(List.of())
-                    .build();
+            return getAllChatroomsResponseEmptyChatroom();
         }
 
         return AllChatroomsResponse.builder()
                 .hasNext(chatroomService.hasNext(sortBy, chatrooms.getLast().getId()))
                 .nextCursor(chatroomService.getNextCursor(sortBy, chatrooms.getLast().getId()))
                 .chatrooms(getChatroomResponses(chatrooms))
+                .build();
+    }
+
+    private AllChatroomsResponse getAllChatroomsSortByCreatedAt(Long cursor) {
+        if (cursor == -1) {
+            cursor = Long.MAX_VALUE;
+        }
+        Pageable pageable = PageRequest.of(0, 20);
+        Slice<Chatroom> chatroomSlice = chatroomService.findByCursorSortByCreatedAt(cursor, pageable);
+        List<Chatroom> chatrooms = chatroomSlice.getContent();
+
+        if (chatrooms.isEmpty()) {
+            return getAllChatroomsResponseEmptyChatroom();
+        }
+
+        return AllChatroomsResponse.builder()
+                .hasNext(chatroomSlice.hasNext())
+                .nextCursor(chatroomSlice.hasNext() ? chatrooms.getLast().getId() : null)
+                .chatrooms(getChatroomResponses(chatrooms))
+                .build();
+    }
+
+    private AllChatroomsResponse getAllChatroomsResponseEmptyChatroom() {
+        return AllChatroomsResponse.builder()
+                .hasNext(false)
+                .nextCursor(null)
+                .chatrooms(List.of())
                 .build();
     }
 
