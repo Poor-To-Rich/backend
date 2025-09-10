@@ -15,7 +15,7 @@ import java.util.List;
 public class RankingInfoResponse {
 
     private Long rankingId;
-    private String rankingAt;
+    private String rankedAt;
     private List<ChatParticipantProfile> saverRankings;
     private List<ChatParticipantProfile> flexerRankings;
 }

@@ -250,7 +250,7 @@ public class RankingFacade {
     private RankingInfoResponse buildRankingInfoResponse(LocalDate rankingAt, Ranking ranking, Chatroom chatroom) {
         if (ranking == null) {
             return RankingInfoResponse.builder()
-                    .rankingAt(rankingAt.toString())
+                    .rankedAt(rankingAt.toString())
                     .saverRankings(List.of())
                     .flexerRankings(List.of())
                     .build();
@@ -258,7 +258,7 @@ public class RankingFacade {
 
         return RankingInfoResponse.builder()
                 .rankingId(ranking.getId())
-                .rankingAt(rankingAt.toString())
+                .rankedAt(rankingAt.toString())
                 .saverRankings(buildProfileResponse(
                         Arrays.asList(ranking.getSaverFirst(), ranking.getSaverSecond(), ranking.getSaverThird()),
                         RankingStatus.SAVER,
