@@ -178,21 +178,22 @@ public class ChatMessageService {
         if (Objects.isNull(context.cursor())) {
             return new SliceImpl<>(Collections.emptyList(), context.pageRequest(), false);
         }
+        ChatParticipant participant = context.chatParticipant();
 
         if (ChatroomRole.BANNED.equals(context.chatParticipant().getRole())) {
-            return chatMessageRepository.findByChatroomAndIdLessThanEqualAndSentAtBetweenOrderByIdDesc(
+            return chatMessageRepository.findByChatroomAndIdLessThanEqualAndIdBetweenOrderByIdDesc(
                     context.chatroom(),
                     context.cursor(),
-                    context.chatParticipant().getJoinAt(),
-                    context.chatParticipant().getBannedAt(),
-                    context.pageRequest()
-            );
+                    participant.getEnterMessageId(),
+                    participant.getKickMessageId(),
+                    context.pageRequest());
         }
-        return chatMessageRepository.findByChatroomAndIdLessThanEqualAndSentAtGreaterThanOrderByIdDesc(
+        return chatMessageRepository.findByChatroomAndIdLessThenEqualAndIdGreaterThanEqualOrderByIdDesc(
                 context.chatroom(),
                 context.cursor(),
-                context.chatParticipant().getJoinAt(),
-                context.pageRequest());
+                participant.getEnterMessageId(),
+                context.pageRequest()
+        );
     }
 
     @Transactional

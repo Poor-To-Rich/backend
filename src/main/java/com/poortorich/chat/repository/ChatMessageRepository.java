@@ -25,17 +25,17 @@ public interface ChatMessageRepository extends JpaRepository<ChatMessage, Long> 
 
     void deleteByChatroom(Chatroom chatroom);
 
-    Slice<ChatMessage> findByChatroomAndIdLessThanEqualAndSentAtGreaterThanOrderByIdDesc(
+    Slice<ChatMessage> findByChatroomAndIdLessThanEqualAndIdBetweenOrderByIdDesc(
             Chatroom chatroom,
             Long cursor,
-            LocalDateTime joinedAt,
+            Long enterMessageId,
+            Long kickMessageId,
             Pageable pageable);
 
-    Slice<ChatMessage> findByChatroomAndIdLessThanEqualAndSentAtBetweenOrderByIdDesc(
+    Slice<ChatMessage> findByChatroomAndIdLessThenEqualAndIdGreaterThanEqualOrderByIdDesc(
             Chatroom chatroom,
             Long cursor,
-            LocalDateTime joinAt,
-            LocalDateTime bannedAt,
+            Long enterMessageId,
             PageRequest pageRequest);
 
     boolean existsByContentAndMessageTypeAndChatroom(String content, MessageType messageType, Chatroom chatroom);
