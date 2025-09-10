@@ -188,7 +188,14 @@ public class ChatMessageService {
                     participant.getKickMessageId(),
                     context.pageRequest());
         }
-        return chatMessageRepository.findByChatroomAndIdLessThenEqualAndIdGreaterThanEqualOrderByIdDesc(
+        if (ChatroomRole.HOST.equals(participant.getRole())) {
+            return chatMessageRepository.findByChatroomAndIdLessThanEqualAndSentAtGreaterThanOrderByIdDesc(
+                    context.chatroom(),
+                    context.cursor(),
+                    context.chatParticipant().getJoinAt(),
+                    context.pageRequest());
+        }
+        return chatMessageRepository.findByChatroomAndIdLessThanEqualAndIdGreaterThanEqualOrderByIdDesc(
                 context.chatroom(),
                 context.cursor(),
                 participant.getEnterMessageId(),

@@ -32,7 +32,7 @@ public interface ChatMessageRepository extends JpaRepository<ChatMessage, Long> 
             Long kickMessageId,
             Pageable pageable);
 
-    Slice<ChatMessage> findByChatroomAndIdLessThenEqualAndIdGreaterThanEqualOrderByIdDesc(
+    Slice<ChatMessage> findByChatroomAndIdLessThanEqualAndIdGreaterThanEqualOrderByIdDesc(
             Chatroom chatroom,
             Long cursor,
             Long enterMessageId,
@@ -87,4 +87,10 @@ public interface ChatMessageRepository extends JpaRepository<ChatMessage, Long> 
             Chatroom chatroom,
             List<ChatMessageType> chatMessage,
             LocalDateTime bannedAt);
+
+    Slice<ChatMessage> findByChatroomAndIdLessThanEqualAndSentAtGreaterThanOrderByIdDesc(
+            Chatroom chatroom,
+            Long cursor,
+            LocalDateTime joinAt,
+            PageRequest pageRequest);
 }
