@@ -9,6 +9,7 @@ import com.poortorich.chat.service.ChatParticipantService;
 import com.poortorich.chat.service.ChatroomService;
 import com.poortorich.chat.service.UnreadChatMessageService;
 import com.poortorich.chatnotice.service.ChatNoticeService;
+import com.poortorich.like.service.LikeService;
 import com.poortorich.photo.service.PhotoService;
 import com.poortorich.ranking.service.RankingService;
 import com.poortorich.report.service.ReportService;
@@ -30,6 +31,7 @@ public class ChatroomLeaveManager {
     private final ChatNoticeService chatNoticeService;
     private final UnreadChatMessageService unreadChatMessageService;
     private final ReportService reportService;
+    private final LikeService likeService;
 
     public ChatroomClosedResponsePayload leaveChatroom(ChatParticipant participant) {
         if (participant.getChatroom().getIsClosed()) {
@@ -50,6 +52,7 @@ public class ChatroomLeaveManager {
             rankingService.deleteAllByChatroom(chatroom);
             chatNoticeService.deleteAllByChatroom(chatroom);
             reportService.deleteAllByChatroom(chatroom);
+            likeService.deleteAllByChatroom(chatroom);
             chatParticipantService.deleteAllByChatroom(chatroom);
             chatroomService.deleteById(chatroom.getId());
             return null;

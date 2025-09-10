@@ -6,6 +6,7 @@ import com.poortorich.like.repository.LikeRepository;
 import com.poortorich.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -37,5 +38,10 @@ public class LikeService {
                         .likeStatus(isLiked)
                         .build()
                 );
+    }
+
+    @Transactional
+    public void deleteAllByChatroom(Chatroom chatroom) {
+        likeRepository.deleteByChatroom(chatroom);
     }
 }
