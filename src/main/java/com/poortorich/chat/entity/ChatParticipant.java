@@ -67,6 +67,12 @@ public class ChatParticipant {
     @Column(name = "joinAt")
     private LocalDateTime joinAt;
 
+    @Column(name = "enter_message_id")
+    private Long enterMessageId;
+
+    @Column(name = "kick_message_id")
+    private Long kickMessageId;
+
     @Column(name = "banned_at")
     private LocalDateTime bannedAt;
 
@@ -114,5 +120,13 @@ public class ChatParticipant {
             return;
         }
         this.rankingStatus = rankingStatus;
+    }
+
+    public void updateEnterMessageId(Long messageId) {
+        this.enterMessageId = messageId;
+    }
+
+    public void updateKickMessageId(Long messageId) {
+        this.kickMessageId = messageId;
     }
 }
