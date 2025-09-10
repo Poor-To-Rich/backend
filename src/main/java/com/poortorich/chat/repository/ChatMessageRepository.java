@@ -93,4 +93,11 @@ public interface ChatMessageRepository extends JpaRepository<ChatMessage, Long> 
             Long cursor,
             LocalDateTime joinAt,
             PageRequest pageRequest);
+
+    Slice<ChatMessage> findByChatroomAndIdLessThanEqualAndSentAtBetweenOrderByIdDesc(
+            Chatroom chatroom,
+            Long cursor,
+            LocalDateTime joinAt,
+            LocalDateTime bannedAt,
+            PageRequest pageRequest);
 }

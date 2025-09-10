@@ -179,13 +179,23 @@ public class ChatMessageService {
             return new SliceImpl<>(Collections.emptyList(), context.pageRequest(), false);
         }
         ChatParticipant participant = context.chatParticipant();
+        Long enterMessageId = participant.getEnterMessageId();
+        Long kickMessageId = participant.getKickMessageId();
 
         if (ChatroomRole.BANNED.equals(context.chatParticipant().getRole())) {
-            return chatMessageRepository.findByChatroomAndIdLessThanEqualAndIdBetweenOrderByIdDesc(
+            if (Objects.nonNull(enterMessageId) && Objects.nonNull(kickMessageId)) {
+                return chatMessageRepository.findByChatroomAndIdLessThanEqualAndIdBetweenOrderByIdDesc(
+                        context.chatroom(),
+                        context.cursor(),
+                        participant.getEnterMessageId(),
+                        participant.getKickMessageId(),
+                        context.pageRequest());
+            }
+            return chatMessageRepository.findByChatroomAndIdLessThanEqualAndSentAtBetweenOrderByIdDesc(
                     context.chatroom(),
                     context.cursor(),
-                    participant.getEnterMessageId(),
-                    participant.getKickMessageId(),
+                    participant.getJoinAt(),
+                    participant.getBannedAt(),
                     context.pageRequest());
         }
         if (ChatroomRole.HOST.equals(participant.getRole())) {
@@ -195,12 +205,18 @@ public class ChatMessageService {
                     context.chatParticipant().getJoinAt(),
                     context.pageRequest());
         }
-        return chatMessageRepository.findByChatroomAndIdLessThanEqualAndIdGreaterThanEqualOrderByIdDesc(
+        if (Objects.nonNull(enterMessageId)) {
+            return chatMessageRepository.findByChatroomAndIdLessThanEqualAndIdGreaterThanEqualOrderByIdDesc(
+                    context.chatroom(),
+                    context.cursor(),
+                    participant.getEnterMessageId(),
+                    context.pageRequest());
+        }
+        return chatMessageRepository.findByChatroomAndIdLessThanEqualAndSentAtGreaterThanOrderByIdDesc(
                 context.chatroom(),
                 context.cursor(),
-                participant.getEnterMessageId(),
-                context.pageRequest()
-        );
+                context.chatParticipant().getJoinAt(),
+                context.pageRequest());
     }
 
     @Transactional
