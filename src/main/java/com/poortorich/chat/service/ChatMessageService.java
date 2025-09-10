@@ -188,7 +188,7 @@ public class ChatMessageService {
                     context.pageRequest()
             );
         }
-        return chatMessageRepository.findByChatroomAndIdLessThanEqualAndSentAtAfterOrderByIdDesc(
+        return chatMessageRepository.findByChatroomAndIdLessThanEqualAndSentAtGreaterThanOrderByIdDesc(
                 context.chatroom(),
                 context.cursor(),
                 context.chatParticipant().getJoinAt(),
