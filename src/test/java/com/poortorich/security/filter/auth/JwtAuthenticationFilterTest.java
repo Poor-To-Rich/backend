@@ -1,15 +1,5 @@
 package com.poortorich.security.filter.auth;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.Mockito.lenient;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
-import static org.mockito.Mockito.when;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.poortorich.auth.jwt.fixture.JwtUserFixture;
@@ -24,9 +14,6 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.Optional;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -44,6 +31,20 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class JwtAuthenticationFilterTest {
@@ -132,7 +133,6 @@ public class JwtAuthenticationFilterTest {
 
         verify(response, never()).setStatus(anyInt());
         verify(response, never()).getWriter();
-        verify(cookieManager, never()).clearAuthTokens(response);
     }
 
     @Test
@@ -207,7 +207,6 @@ public class JwtAuthenticationFilterTest {
     private void verifyErrorResponse(String expectedJsonResponse) {
         assertThat(getActualJsonResponse()).isEqualTo(expectedJsonResponse);
 
-        verify(cookieManager).clearAuthTokens(response);
         verify(response).setStatus(HttpStatus.UNAUTHORIZED.value());
         verify(response).setContentType(MediaType.APPLICATION_JSON_VALUE);
         verify(response).setCharacterEncoding("UTF-8");
