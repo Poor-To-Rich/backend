@@ -178,17 +178,41 @@ public class ChatMessageService {
         if (Objects.isNull(context.cursor())) {
             return new SliceImpl<>(Collections.emptyList(), context.pageRequest(), false);
         }
+        ChatParticipant participant = context.chatParticipant();
+        Long enterMessageId = participant.getEnterMessageId();
+        Long kickMessageId = participant.getKickMessageId();
 
         if (ChatroomRole.BANNED.equals(context.chatParticipant().getRole())) {
+            if (Objects.nonNull(enterMessageId) && Objects.nonNull(kickMessageId)) {
+                return chatMessageRepository.findByChatroomAndIdLessThanEqualAndIdBetweenOrderByIdDesc(
+                        context.chatroom(),
+                        context.cursor(),
+                        participant.getEnterMessageId(),
+                        participant.getKickMessageId(),
+                        context.pageRequest());
+            }
             return chatMessageRepository.findByChatroomAndIdLessThanEqualAndSentAtBetweenOrderByIdDesc(
                     context.chatroom(),
                     context.cursor(),
-                    context.chatParticipant().getJoinAt(),
-                    context.chatParticipant().getBannedAt(),
-                    context.pageRequest()
-            );
+                    participant.getJoinAt(),
+                    participant.getBannedAt(),
+                    context.pageRequest());
         }
-        return chatMessageRepository.findByChatroomAndIdLessThanEqualAndSentAtAfterOrderByIdDesc(
+        if (ChatroomRole.HOST.equals(participant.getRole())) {
+            return chatMessageRepository.findByChatroomAndIdLessThanEqualAndSentAtGreaterThanOrderByIdDesc(
+                    context.chatroom(),
+                    context.cursor(),
+                    context.chatParticipant().getJoinAt(),
+                    context.pageRequest());
+        }
+        if (Objects.nonNull(enterMessageId)) {
+            return chatMessageRepository.findByChatroomAndIdLessThanEqualAndIdGreaterThanEqualOrderByIdDesc(
+                    context.chatroom(),
+                    context.cursor(),
+                    participant.getEnterMessageId(),
+                    context.pageRequest());
+        }
+        return chatMessageRepository.findByChatroomAndIdLessThanEqualAndSentAtGreaterThanOrderByIdDesc(
                 context.chatroom(),
                 context.cursor(),
                 context.chatParticipant().getJoinAt(),
@@ -255,9 +279,10 @@ public class ChatMessageService {
                     List.of(ChatMessageType.CHAT_MESSAGE, ChatMessageType.RANKING_MESSAGE),
                     participant.getBannedAt());
         }
-        return chatMessageRepository.findTopByChatroomAndTypeInOrderByIdDesc(
+        return chatMessageRepository.findTopByChatroomAndTypeInAndSentAtAfterOrderByIdDesc(
                 participant.getChatroom(),
-                List.of(ChatMessageType.CHAT_MESSAGE, ChatMessageType.RANKING_MESSAGE));
+                List.of(ChatMessageType.CHAT_MESSAGE, ChatMessageType.RANKING_MESSAGE),
+                participant.getJoinAt());
     }
 
     @Transactional

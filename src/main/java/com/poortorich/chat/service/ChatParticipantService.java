@@ -194,4 +194,18 @@ public class ChatParticipantService {
         return chatParticipantRepository.findById(chatParticipantId)
                 .orElseThrow(() -> new NotFoundException(ChatResponse.CHAT_PARTICIPANT_NOT_FOUND));
     }
+
+    @Transactional
+    public void updateEnterMessageId(User user, Chatroom chatroom, Long messageId) {
+        chatParticipantRepository.findByUserAndChatroom(user, chatroom)
+                .orElseThrow(() -> new NotFoundException(ChatResponse.CHAT_PARTICIPANT_NOT_FOUND))
+                .updateEnterMessageId(messageId);
+    }
+
+    @Transactional
+    public void updateKickMessageId(User user, Chatroom chatroom, Long messageId) {
+        chatParticipantRepository.findByUserAndChatroom(user, chatroom)
+                .orElseThrow(() -> new NotFoundException(ChatResponse.CHAT_PARTICIPANT_NOT_FOUND))
+                .updateKickMessageId(messageId);
+    }
 }
