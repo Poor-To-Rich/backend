@@ -40,6 +40,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -332,6 +333,7 @@ class ChatFacadeTest {
                 .user(user)
                 .role(ChatroomRole.HOST)
                 .rankingStatus(RankingStatus.NONE)
+                .isParticipated(true)
                 .build();
         ChatParticipantProfile hostProfile = ChatParticipantProfile.builder()
                 .userId(user.getId())
@@ -342,16 +344,19 @@ class ChatFacadeTest {
                 .build();
         when(userService.findUserByUsername(username)).thenReturn(user);
         when(chatroomService.findById(chatroomId)).thenReturn(chatroom);
+        when(chatParticipantService.getChatParticipant(user, chatroom)).thenReturn(Optional.of(hostParticipant));
         when(tagService.getTagNames(chatroom)).thenReturn(hashtags);
         when(chatParticipantService.countByChatroom(chatroom)).thenReturn(3L);
         when(chatParticipantService.isJoined(user, chatroom)).thenReturn(true);
         when(chatParticipantService.getChatroomHost(chatroom)).thenReturn(hostParticipant);
+        when(chatMessageService.getLatestReadMessageId(hostParticipant)).thenReturn(1L);
         when(chatBuilder.buildChatroomCoverInfoResponse(
                 chatroom,
                 hashtags,
                 3L,
                 true,
-                hostParticipant
+                hostParticipant,
+                1L
         )).thenReturn(ChatroomCoverInfoResponse.builder()
                 .chatroomId(chatroom.getId())
                 .chatroomTitle(chatroom.getTitle())
@@ -364,6 +369,7 @@ class ChatFacadeTest {
                 .isJoined(true)
                 .hasPassword(true)
                 .hostProfile(hostProfile)
+                .latestReadMessageId(1L)
                 .build());
         ChatroomCoverInfoResponse response = chatFacade.getChatroomCoverInfo(username, chatroomId);
 
@@ -378,6 +384,7 @@ class ChatFacadeTest {
         assertThat(response.getHasPassword()).isTrue();
         assertThat(response.getHostProfile().getUserId()).isEqualTo(user.getId());
         assertThat(response.getHostProfile().getIsHost()).isTrue();
+        assertThat(response.getLatestReadMessageId()).isEqualTo(1L);
     }
 
     @Test

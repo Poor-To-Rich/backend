@@ -40,7 +40,8 @@ public class ChatBuilder {
             List<String> hashtags,
             Long currentMemberCount,
             Boolean isJoined,
-            ChatParticipant hostInfo
+            ChatParticipant hostInfo,
+            Long latestReadMessageId
     ) {
         return ChatroomCoverInfoResponse.builder()
                 .chatroomId(chatroom.getId())
@@ -54,6 +55,7 @@ public class ChatBuilder {
                 .isJoined(isJoined)
                 .hasPassword(chatroom.getPassword() != null)
                 .hostProfile(profileMapper.mapToProfile(hostInfo))
+                .latestReadMessageId(latestReadMessageId)
                 .build();
     }
 
