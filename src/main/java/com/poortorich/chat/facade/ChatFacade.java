@@ -202,6 +202,7 @@ public class ChatFacade {
 
         ChatParticipant participant = chatParticipantService.getChatParticipant(user, chatroom)
                 .orElse(null);
+        boolean isJoined = participant != null && participant.getIsParticipated();
 
         return chatBuilder.buildChatroomCoverInfoResponse(
                 chatroom,
@@ -209,7 +210,7 @@ public class ChatFacade {
                 chatParticipantService.countByChatroom(chatroom),
                 chatParticipantService.isJoined(user, chatroom),
                 chatParticipantService.getChatroomHost(chatroom),
-                participant != null && participant.getIsParticipated() ? chatMessageService.getLatestReadMessageId(participant) : null
+                isJoined ? chatMessageService.getLatestReadMessageId(participant) : null
         );
     }
 
