@@ -69,6 +69,7 @@ public class ChatRealTimeFacade {
         }
 
         UserEnterResponsePayload payload = chatMessageService.saveUserEnterMessage(user, chatroom);
+        chatParticipantService.updateEnterMessageId(user, chatroom, payload.getMessageId());
 
         return BasePayload.builder()
                 .type(ChatMessageType.SYSTEM_MESSAGE)
@@ -117,7 +118,7 @@ public class ChatRealTimeFacade {
         if (!ChatroomRole.BANNED.equals(context.chatParticipant().getRole())) {
             throw new ForbiddenException(ChatResponse.CHAT_PARTICIPANT_BANNED_ONLY_ALLOWED);
         }
-        
+
         Long latestReadMessageId = chatMessageService.getLatestReadMessageId(context.chatParticipant());
         MessageReadPayload payload = unreadChatMessageService.markMessageAsRead(context.chatParticipant());
         payload.setLastReadMessageId(latestReadMessageId);
@@ -128,6 +129,7 @@ public class ChatRealTimeFacade {
     @Transactional
     public BasePayload markMessagesAsRead(String username, MarkMessagesAsReadRequestPayload requestPayload) {
         PayloadContext context = payloadCollector.getPayloadContext(username, requestPayload.getChatroomId());
+        chatMessageService.updateLatestMessageId(context.chatParticipant());
         Long latestReadMessageId = chatMessageService.getLatestReadMessageId(context.chatParticipant());
         MessageReadPayload payload = unreadChatMessageService.markMessageAsRead(context.chatParticipant());
         payload.setLastReadMessageId(latestReadMessageId);

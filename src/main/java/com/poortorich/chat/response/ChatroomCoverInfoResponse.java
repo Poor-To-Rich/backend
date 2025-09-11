@@ -24,4 +24,5 @@ public class ChatroomCoverInfoResponse {
     private Boolean isJoined;
     private Boolean hasPassword;
     private ChatParticipantProfile hostProfile;
+    private Long latestReadMessageId;
 }

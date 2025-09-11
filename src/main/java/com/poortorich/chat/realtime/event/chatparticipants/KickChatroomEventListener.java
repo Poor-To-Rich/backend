@@ -24,7 +24,8 @@ public class KickChatroomEventListener {
     public void onKickChatroomEvent(KickChatroomEvent event) {
         ChatParticipant participant = chatParticipantService.findByIdOrThrow(event.getChatParticipantId());
         KickChatParticipantMessagePayload payload = chatMessageService.saveKickChatParticipantMessage(participant);
-
+        participant.updateKickMessageId(participant.getKickMessageId());
+        
         if (Objects.nonNull(payload)) {
             messagingTemplate.convertAndSend(
                     SubscribeEndpoint.CHATROOM_SUBSCRIBE_PREFIX + participant.getChatroom().getId(),

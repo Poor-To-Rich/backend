@@ -25,26 +25,27 @@ public interface ChatMessageRepository extends JpaRepository<ChatMessage, Long> 
 
     void deleteByChatroom(Chatroom chatroom);
 
-    Slice<ChatMessage> findByChatroomAndIdLessThanEqualAndSentAtAfterOrderByIdDesc(
+    Slice<ChatMessage> findByChatroomAndIdLessThanEqualAndIdBetweenOrderByIdDesc(
             Chatroom chatroom,
             Long cursor,
-            LocalDateTime joinedAt,
+            Long enterMessageId,
+            Long kickMessageId,
             Pageable pageable);
 
-    Slice<ChatMessage> findByChatroomAndIdLessThanEqualAndSentAtBetweenOrderByIdDesc(
+    Slice<ChatMessage> findByChatroomAndIdLessThanEqualAndIdGreaterThanEqualOrderByIdDesc(
             Chatroom chatroom,
             Long cursor,
-            LocalDateTime joinAt,
-            LocalDateTime bannedAt,
+            Long enterMessageId,
             PageRequest pageRequest);
 
     boolean existsByContentAndMessageTypeAndChatroom(String content, MessageType messageType, Chatroom chatroom);
 
     Optional<ChatMessage> findTopByChatroomOrderByIdDesc(Chatroom chatroom);
 
-    Optional<ChatMessage> findTopByChatroomAndTypeInOrderByIdDesc(
+    Optional<ChatMessage> findTopByChatroomAndTypeInAndSentAtAfterOrderByIdDesc(
             Chatroom chatroom,
-            Collection<ChatMessageType> chatMessage);
+            Collection<ChatMessageType> chatMessage,
+            LocalDateTime joinAt);
 
     @Query("""
             SELECT MAX(m.id)
@@ -86,4 +87,24 @@ public interface ChatMessageRepository extends JpaRepository<ChatMessage, Long> 
             Chatroom chatroom,
             List<ChatMessageType> chatMessage,
             LocalDateTime bannedAt);
+
+    Slice<ChatMessage> findByChatroomAndIdLessThanEqualAndSentAtGreaterThanOrderByIdDesc(
+            Chatroom chatroom,
+            Long cursor,
+            LocalDateTime joinAt,
+            PageRequest pageRequest);
+
+    Slice<ChatMessage> findByChatroomAndIdLessThanEqualAndSentAtBetweenOrderByIdDesc(
+            Chatroom chatroom,
+            Long cursor,
+            LocalDateTime joinAt,
+            LocalDateTime bannedAt,
+            PageRequest pageRequest);
+
+    @Query("""
+            SELECT MAX(m.id)
+            FROM ChatMessage m
+            WHERE m.chatroom = :chatroom
+            """)
+    Long findLatestMessageIdByChatroom(Chatroom chatroom);
 }

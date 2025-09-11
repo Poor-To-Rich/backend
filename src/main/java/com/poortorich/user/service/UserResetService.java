@@ -83,7 +83,7 @@ public class UserResetService {
         }
     }
 
-    public void closeChatroom(User user) {
-        chatroomLeaveService.leaveAllChatroom(user);
+    public void closeChatroom(User user, Boolean isWithdraw) {
+        chatroomLeaveService.leaveAllChatroom(user, isWithdraw);
     }
 }

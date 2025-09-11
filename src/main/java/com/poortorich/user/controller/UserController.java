@@ -104,7 +104,7 @@ public class UserController {
 
     @DeleteMapping("/reset")
     public ResponseEntity<BaseResponse> resetUserData(@AuthenticationPrincipal UserDetails userDetails) {
-        Response response = userFacade.resetAllByUser(userDetails.getUsername());
+        Response response = userFacade.resetAllByUser(userDetails.getUsername(), false);
         return BaseResponse.toResponseEntity(response);
     }
 
@@ -113,7 +113,7 @@ public class UserController {
             HttpServletResponse response,
             @AuthenticationPrincipal UserDetails userDetails
     ) {
-        userFacade.resetAllByUser(userDetails.getUsername());
+        userFacade.resetAllByUser(userDetails.getUsername(), true);
         return BaseResponse.toResponseEntity(userFacade.deleteUserAccount(userDetails.getUsername(), response));
     }
 

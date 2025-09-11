@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -71,13 +72,17 @@ public class ChatParticipantService {
                 .orElseThrow(() -> new NotFoundException(ChatResponse.CHAT_PARTICIPANT_NOT_FOUND));
     }
 
+    public Optional<ChatParticipant> getChatParticipant(User user, Chatroom chatroom) {
+        return chatParticipantRepository.findByUserAndChatroom(user, chatroom);
+    }
+
     public ChatParticipant findByUserIdAndChatroom(Long userId, Chatroom chatroom) {
         return chatParticipantRepository.findByUserIdAndChatroom(userId, chatroom)
                 .orElseThrow(() -> new NotFoundException(ChatResponse.CHAT_PARTICIPANT_NOT_FOUND));
     }
 
     public Long countByChatroom(Chatroom chatroom) {
-        return chatParticipantRepository.countByChatroomAndIsParticipatedTrue(chatroom);
+        return chatParticipantRepository.countParticipantsByChatroom(chatroom);
     }
 
     public Boolean isJoined(User user, Chatroom chatroom) {
@@ -193,5 +198,19 @@ public class ChatParticipantService {
     public ChatParticipant findByIdOrThrow(Long chatParticipantId) {
         return chatParticipantRepository.findById(chatParticipantId)
                 .orElseThrow(() -> new NotFoundException(ChatResponse.CHAT_PARTICIPANT_NOT_FOUND));
+    }
+
+    @Transactional
+    public void updateEnterMessageId(User user, Chatroom chatroom, Long messageId) {
+        chatParticipantRepository.findByUserAndChatroom(user, chatroom)
+                .orElseThrow(() -> new NotFoundException(ChatResponse.CHAT_PARTICIPANT_NOT_FOUND))
+                .updateEnterMessageId(messageId);
+    }
+
+    @Transactional
+    public void updateKickMessageId(User user, Chatroom chatroom, Long messageId) {
+        chatParticipantRepository.findByUserAndChatroom(user, chatroom)
+                .orElseThrow(() -> new NotFoundException(ChatResponse.CHAT_PARTICIPANT_NOT_FOUND))
+                .updateKickMessageId(messageId);
     }
 }

@@ -64,6 +64,7 @@ public class ChatController {
         realTimeFacade.createDateChangeSystemMessage(response.getNewChatroomId());
         realTimeFacade.createUserEnterSystemMessage(userDetails.getUsername(), response.getNewChatroomId());
         realTimeFacade.createRankingStatusMessage(response.getNewChatroomId(), request.getIsRankingEnabled());
+        chatFacade.overwriteChatroomsInRedis();
         return DataResponse.toResponseEntity(ChatResponse.CREATE_CHATROOM_SUCCESS, response);
     }
 

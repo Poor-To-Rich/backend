@@ -56,7 +56,7 @@ class ChatParticipantServiceTest {
                 .build();
         when(chatBuilder.buildChatParticipant(user, ChatroomRole.HOST, chatroom))
                 .thenReturn(chatParticipant);
-        
+
         chatParticipantService.createChatroomHost(user, chatroom);
 
         verify(chatParticipantRepository).save(chatParticipantCaptor.capture());
@@ -73,7 +73,7 @@ class ChatParticipantServiceTest {
         Chatroom chatroom = Chatroom.builder().build();
         Long currentMemberCount = 5L;
 
-        when(chatParticipantRepository.countByChatroomAndIsParticipatedTrue(chatroom)).thenReturn(currentMemberCount);
+        when(chatParticipantRepository.countParticipantsByChatroom(chatroom)).thenReturn(currentMemberCount);
 
         Long result = chatParticipantService.countByChatroom(chatroom);
 

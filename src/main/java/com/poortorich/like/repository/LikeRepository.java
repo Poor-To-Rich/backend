@@ -14,4 +14,6 @@ public interface LikeRepository extends JpaRepository<Like, Long> {
     Optional<Like> findByUserAndChatroom(User user, Chatroom chatroom);
 
     Long countByChatroomAndLikeStatusTrue(Chatroom chatroom);
+
+    void deleteByChatroom(Chatroom chatroom);
 }

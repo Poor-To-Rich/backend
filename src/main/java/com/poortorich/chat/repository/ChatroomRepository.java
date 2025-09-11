@@ -47,10 +47,6 @@ public interface ChatroomRepository extends JpaRepository<Chatroom, Long> {
     @Query("""
                 SELECT c
                   FROM Chatroom c
-                  LEFT JOIN ChatMessage cm ON cm.chatroom = c
-                  LEFT JOIN Like l ON l.chatroom = c
-                  LEFT JOIN ChatParticipant cp ON cp.chatroom = c
-                  LEFT JOIN Tag t ON t.chatroom = c
                 WHERE c.isClosed = false
                   AND c.id < :cursor
                 ORDER BY c.id DESC

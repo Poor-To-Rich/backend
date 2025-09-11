@@ -65,6 +65,7 @@ import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -104,9 +105,11 @@ public class ChatFacade {
         chatParticipantService.createChatroomHost(user, chatroom);
         tagService.createTag(request.getHashtags(), chatroom);
 
-        chatroomService.overwriteChatroomsInRedis();
-
         return ChatroomCreateResponse.builder().newChatroomId(chatroom.getId()).build();
+    }
+
+    public void overwriteChatroomsInRedis() {
+        chatroomService.overwriteChatroomsInRedis();
     }
 
     public ChatroomInfoResponse getChatroom(Long chatroomId) {
@@ -200,12 +203,17 @@ public class ChatFacade {
         User user = userService.findUserByUsername(username);
         Chatroom chatroom = chatroomService.findById(chatroomId);
 
+        ChatParticipant participant = chatParticipantService.getChatParticipant(user, chatroom)
+                .orElse(null);
+        boolean isJoined = participant != null && participant.getIsParticipated();
+
         return chatBuilder.buildChatroomCoverInfoResponse(
                 chatroom,
                 tagService.getTagNames(chatroom),
                 chatParticipantService.countByChatroom(chatroom),
                 chatParticipantService.isJoined(user, chatroom),
-                chatParticipantService.getChatroomHost(chatroom)
+                chatParticipantService.getChatroomHost(chatroom),
+                isJoined ? chatMessageService.getLatestReadMessageId(participant) : null
         );
     }
 
@@ -289,7 +297,7 @@ public class ChatFacade {
         Chatroom chatroom = chatroomService.findById(chatroomId);
         ChatParticipant chatParticipant = chatParticipantService.findByUserAndChatroom(user, chatroom);
 
-        chatroomLeaveService.leaveChatroom(chatParticipant);
+        chatroomLeaveService.leaveChatroom(chatParticipant, false);
 
         return ChatroomLeaveResponse.builder().deleteChatroomId(chatroomId).build();
     }
@@ -300,8 +308,7 @@ public class ChatFacade {
         for (Long chatroomId : chatroomLeaveAllRequest.getChatroomsToLeave()) {
             Chatroom chatroom = chatroomService.findById(chatroomId);
             ChatParticipant chatParticipant = chatParticipantService.findByUserAndChatroom(user, chatroom);
-            chatroomLeaveService.leaveChatroom(chatParticipant);
-
+            chatroomLeaveService.leaveChatroom(chatParticipant, false);
         }
 
         return ChatroomLeaveAllResponse.builder()
@@ -326,7 +333,8 @@ public class ChatFacade {
         Long nextCursor = paginationProvider.getNextCursor(chatMessages);
         List<ChatMessageResponse> messages = chatMessages.getContent().stream()
                 .map(chatMessageMapper::mapToChatMessageResponse)
-                .toList();
+                .collect(Collectors.toList());
+        Collections.reverse(messages);
 
         return ChatMessagePageResponse.builder()
                 .nextCursor(nextCursor)
