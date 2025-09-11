@@ -65,6 +65,7 @@ import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -331,7 +332,8 @@ public class ChatFacade {
         Long nextCursor = paginationProvider.getNextCursor(chatMessages);
         List<ChatMessageResponse> messages = chatMessages.getContent().stream()
                 .map(chatMessageMapper::mapToChatMessageResponse)
-                .toList();
+                .collect(Collectors.toList());
+        Collections.reverse(messages);
 
         return ChatMessagePageResponse.builder()
                 .nextCursor(nextCursor)
