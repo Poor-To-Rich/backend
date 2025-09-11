@@ -35,7 +35,7 @@ class ChatMessageServiceTest {
                 .sentAt(LocalDateTime.of(2025, 7, 31, 2, 30))
                 .build();
 
-        when(chatMessageRepository.findTopByChatroomOrderByIdDesc(any())).thenReturn(Optional.of(lastMessage));
+        when(chatMessageRepository.findTopByChatroomAndTypeInOrderByIdDesc(any(), any())).thenReturn(Optional.of(lastMessage));
 
         String result = chatMessageService.getLastMessageTime(chatroom);
 
