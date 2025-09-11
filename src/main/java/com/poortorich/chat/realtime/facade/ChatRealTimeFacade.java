@@ -129,6 +129,7 @@ public class ChatRealTimeFacade {
     @Transactional
     public BasePayload markMessagesAsRead(String username, MarkMessagesAsReadRequestPayload requestPayload) {
         PayloadContext context = payloadCollector.getPayloadContext(username, requestPayload.getChatroomId());
+        chatMessageService.updateLatestMessageId(context.chatParticipant());
         Long latestReadMessageId = chatMessageService.getLatestReadMessageId(context.chatParticipant());
         MessageReadPayload payload = unreadChatMessageService.markMessageAsRead(context.chatParticipant());
         payload.setLastReadMessageId(latestReadMessageId);

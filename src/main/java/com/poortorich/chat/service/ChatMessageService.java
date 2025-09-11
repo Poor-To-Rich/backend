@@ -329,21 +329,31 @@ public class ChatMessageService {
 
     @Transactional(readOnly = true)
     public Long getLatestReadMessageId(ChatParticipant participant) {
+        Long latestReadMessageId;
         if (ChatroomRole.BANNED.equals(participant.getRole())) {
-            return chatMessageRepository.findLatestReadMessageId(
+            latestReadMessageId = chatMessageRepository.findLatestReadMessageId(
                     participant.getChatroom(),
                     participant.getUser(),
                     participant.getJoinAt(),
                     participant.getBannedAt(),
                     ChatMessageType.CHAT_MESSAGE
             );
+        } else {
+            latestReadMessageId = chatMessageRepository.findLatestReadMessageId(
+                    participant.getChatroom(),
+                    participant.getUser(),
+                    participant.getJoinAt(),
+                    ChatMessageType.CHAT_MESSAGE);
         }
 
-        return chatMessageRepository.findLatestReadMessageId(
-                participant.getChatroom(),
-                participant.getUser(),
-                participant.getJoinAt(),
-                ChatMessageType.CHAT_MESSAGE);
+        if (Objects.nonNull(latestReadMessageId)) {
+            return latestReadMessageId;
+        }
+
+        if (Objects.nonNull(participant.getLatestReadMessageId())) {
+            return participant.getLatestReadMessageId();
+        }
+        return participant.getEnterMessageId();
     }
 
     @Transactional(readOnly = true)
@@ -354,5 +364,11 @@ public class ChatMessageService {
             latestReadMessageIdByChatroom.put(context.chatroom().getId(), latestReadMessageId);
         }
         return latestReadMessageIdByChatroom;
+    }
+
+    @Transactional
+    public void updateLatestMessageId(ChatParticipant chatParticipant) {
+        Long latestMessageId = chatMessageRepository.findLatestMessageIdByChatroom(chatParticipant.getChatroom());
+        chatParticipant.updateLatestReadMessageId(latestMessageId);
     }
 }
