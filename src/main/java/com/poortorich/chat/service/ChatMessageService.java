@@ -72,9 +72,12 @@ public class ChatMessageService {
     }
 
     @Transactional
-    public UserLeaveResponsePayload saveUserLeaveMessage(User user, Chatroom chatroom) {
+    public UserLeaveResponsePayload saveUserLeaveMessage(User user, Chatroom chatroom, Boolean isWithdraw) {
         dateChangeDetector.detect(chatroom);
-        ChatMessage chatMessage = chatMessageRepository.save(SystemMessageBuilder.buildLeaveMessage(user, chatroom));
+        ChatMessage chatMessage = chatMessageRepository.save(SystemMessageBuilder.buildLeaveMessage(
+                user,
+                chatroom,
+                isWithdraw));
 
         return UserLeaveResponsePayload.builder()
                 .userId(user.getId())

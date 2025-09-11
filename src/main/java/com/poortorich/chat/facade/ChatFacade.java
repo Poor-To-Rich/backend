@@ -289,7 +289,7 @@ public class ChatFacade {
         Chatroom chatroom = chatroomService.findById(chatroomId);
         ChatParticipant chatParticipant = chatParticipantService.findByUserAndChatroom(user, chatroom);
 
-        chatroomLeaveService.leaveChatroom(chatParticipant);
+        chatroomLeaveService.leaveChatroom(chatParticipant, false);
 
         return ChatroomLeaveResponse.builder().deleteChatroomId(chatroomId).build();
     }
@@ -300,8 +300,7 @@ public class ChatFacade {
         for (Long chatroomId : chatroomLeaveAllRequest.getChatroomsToLeave()) {
             Chatroom chatroom = chatroomService.findById(chatroomId);
             ChatParticipant chatParticipant = chatParticipantService.findByUserAndChatroom(user, chatroom);
-            chatroomLeaveService.leaveChatroom(chatParticipant);
-
+            chatroomLeaveService.leaveChatroom(chatParticipant, false);
         }
 
         return ChatroomLeaveAllResponse.builder()

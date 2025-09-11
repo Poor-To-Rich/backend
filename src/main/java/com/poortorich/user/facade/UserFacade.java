@@ -98,10 +98,10 @@ public class UserFacade {
     }
 
     @Transactional
-    public Response resetAllByUser(String username) {
+    public Response resetAllByUser(String username, Boolean isWithdraw) {
         User user = userService.findUserByUsername(username);
-        userResetService.closeChatroom(user);
         userResetService.deleteUserAllData(user);
+        userResetService.closeChatroom(user, isWithdraw);
         return UserResponse.RESET_SUCCESS;
     }
 

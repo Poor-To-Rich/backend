@@ -26,11 +26,11 @@ public class SystemMessageBuilder {
                 .build();
     }
 
-    public static ChatMessage buildLeaveMessage(User user, Chatroom chatroom) {
+    public static ChatMessage buildLeaveMessage(User user, Chatroom chatroom, Boolean isWithdraw) {
         return ChatMessage.builder()
                 .messageType(MessageType.LEAVE)
                 .type(ChatMessageType.SYSTEM_MESSAGE)
-                .content(user.getNickname() + LEAVE_CONTENT_SUFFIX)
+                .content((isWithdraw ? "알 수 없음" : user.getNickname()) + LEAVE_CONTENT_SUFFIX)
                 .chatroom(chatroom)
                 .build();
     }
