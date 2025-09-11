@@ -209,7 +209,7 @@ public class ChatFacade {
                 chatParticipantService.countByChatroom(chatroom),
                 chatParticipantService.isJoined(user, chatroom),
                 chatParticipantService.getChatroomHost(chatroom),
-                participant == null ? null : chatMessageService.getLatestReadMessageId(participant)
+                participant != null && participant.getIsParticipated() ? chatMessageService.getLatestReadMessageId(participant) : null
         );
     }
 
