@@ -26,6 +26,7 @@ import com.poortorich.websocket.stomp.command.subscribe.endpoint.SubscribeEndpoi
 import jakarta.annotation.Nullable;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -45,6 +46,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Objects;
 
+@Slf4j
 @RestController
 @RequestMapping("/chatrooms")
 @RequiredArgsConstructor
@@ -139,12 +141,23 @@ public class ChatController {
             messagingTemplate.convertAndSend(SubscribeEndpoint.CHATROOM_SUBSCRIBE_PREFIX + chatroomId, basePayload);
         }
 
+        log.info("****************************************************************");
+        log.info("****************************************************************");
+        log.info("****************************************************************");
+        log.info("NULL인가요: {}", Objects.isNull(result.getBroadcastPayload()));
         if (!Objects.isNull(result.getBroadcastPayload())) {
+            log.info("회원 아이디: {}", result.getBroadcastPayload().getUserId());
+            log.info("프로필 이미지: {}", result.getBroadcastPayload().getProfileImage());
+            log.info("닉네임: {}", result.getBroadcastPayload().getNickname());
+            log.info("방장여부: {}", result.getBroadcastPayload().getIsHost());
             messagingTemplate.convertAndSend(
                     SubscribeEndpoint.CHATROOM_SUBSCRIBE_PREFIX + chatroomId,
                     result.getBroadcastPayload().mapToBasePayload());
         }
 
+        log.info("****************************************************************");
+        log.info("****************************************************************");
+        log.info("****************************************************************");
         return DataResponse.toResponseEntity(ChatResponse.CHATROOM_ENTER_SUCCESS, result.getApiResponse());
     }
 
