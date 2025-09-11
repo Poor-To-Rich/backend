@@ -82,7 +82,7 @@ public class ChatParticipantService {
     }
 
     public Long countByChatroom(Chatroom chatroom) {
-        return chatParticipantRepository.countByChatroomAndIsParticipatedTrue(chatroom);
+        return chatParticipantRepository.countParticipantsByChatroom(chatroom);
     }
 
     public Boolean isJoined(User user, Chatroom chatroom) {
