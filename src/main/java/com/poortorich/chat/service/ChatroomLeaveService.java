@@ -38,15 +38,15 @@ public class ChatroomLeaveService {
     private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
-    public void leaveAllChatroom(User user) {
+    public void leaveAllChatroom(User user, Boolean isWithDraw) {
         List<ChatParticipant> participants = participantService.findAllByUser(user);
         for (ChatParticipant participant : participants) {
-            leaveChatroom(participant);
+            leaveChatroom(participant, isWithDraw);
         }
     }
 
     @Transactional
-    public void leaveChatroom(ChatParticipant participant) {
+    public void leaveChatroom(ChatParticipant participant, Boolean isWithdarw) {
         participantValidator.validateIsParticipate(participant);
         participant.updateNoticeStatus(NoticeStatus.DEFAULT);
         participant.leave();
@@ -58,14 +58,14 @@ public class ChatroomLeaveService {
                 PayloadType.CHATROOM_INFO_UPDATED));
 
         if (!ChatroomRole.BANNED.equals(participant.getRole())) {
-            saveLeaveMessageAndBroadcast(participant.getUser(), participant.getChatroom());
+            saveLeaveMessageAndBroadcast(participant.getUser(), participant.getChatroom(), isWithdarw);
             saveCloseMessageAndBroadcast(participant);
         }
     }
 
     @Transactional
-    protected void saveLeaveMessageAndBroadcast(User user, Chatroom chatroom) {
-        UserLeaveResponsePayload payload = chatMessageService.saveUserLeaveMessage(user, chatroom);
+    protected void saveLeaveMessageAndBroadcast(User user, Chatroom chatroom, Boolean isWithdraw) {
+        UserLeaveResponsePayload payload = chatMessageService.saveUserLeaveMessage(user, chatroom, isWithdraw);
 
         if (Objects.nonNull(payload)) {
             messagingTemplate.convertAndSend(
