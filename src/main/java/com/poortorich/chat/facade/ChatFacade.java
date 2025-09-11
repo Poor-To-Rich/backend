@@ -105,9 +105,11 @@ public class ChatFacade {
         chatParticipantService.createChatroomHost(user, chatroom);
         tagService.createTag(request.getHashtags(), chatroom);
 
-        chatroomService.overwriteChatroomsInRedis();
-
         return ChatroomCreateResponse.builder().newChatroomId(chatroom.getId()).build();
+    }
+
+    public void overwriteChatroomsInRedis() {
+        chatroomService.overwriteChatroomsInRedis();
     }
 
     public ChatroomInfoResponse getChatroom(Long chatroomId) {
