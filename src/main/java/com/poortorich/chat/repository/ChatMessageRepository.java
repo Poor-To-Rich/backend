@@ -100,4 +100,11 @@ public interface ChatMessageRepository extends JpaRepository<ChatMessage, Long> 
             LocalDateTime joinAt,
             LocalDateTime bannedAt,
             PageRequest pageRequest);
+
+    @Query("""
+            SELECT MAX(m.id)
+            FROM ChatMessage m
+            WHERE m.chatroom = :chatroom
+            """)
+    Long findLatestMessageIdByChatroom(Chatroom chatroom);
 }
