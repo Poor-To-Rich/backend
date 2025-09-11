@@ -200,12 +200,16 @@ public class ChatFacade {
         User user = userService.findUserByUsername(username);
         Chatroom chatroom = chatroomService.findById(chatroomId);
 
+        ChatParticipant participant = chatParticipantService.getChatParticipant(user, chatroom)
+                .orElse(null);
+
         return chatBuilder.buildChatroomCoverInfoResponse(
                 chatroom,
                 tagService.getTagNames(chatroom),
                 chatParticipantService.countByChatroom(chatroom),
                 chatParticipantService.isJoined(user, chatroom),
-                chatParticipantService.getChatroomHost(chatroom)
+                chatParticipantService.getChatroomHost(chatroom),
+                participant == null ? null : chatMessageService.getLatestReadMessageId(participant)
         );
     }
 
