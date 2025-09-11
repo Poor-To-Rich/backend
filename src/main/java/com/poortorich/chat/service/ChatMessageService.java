@@ -91,7 +91,8 @@ public class ChatMessageService {
     }
 
     public String getLastMessageTime(Chatroom chatroom) {
-        return chatMessageRepository.findTopByChatroomOrderByIdDesc(chatroom)
+        return chatMessageRepository.findTopByChatroomAndTypeInOrderByIdDesc(
+                        chatroom, List.of(ChatMessageType.CHAT_MESSAGE, ChatMessageType.RANKING_MESSAGE))
                 .map(chatMessage -> chatMessage.getSentAt().toString())
                 .orElse(null);
     }
@@ -171,7 +172,9 @@ public class ChatMessageService {
     }
 
     public Long getLatestMessageId(Chatroom chatroom) {
-        return chatMessageRepository.findTopByChatroomOrderByIdDesc(chatroom)
+        return chatMessageRepository.findTopByChatroomAndTypeInOrderByIdDesc(
+                        chatroom,
+                        List.of(ChatMessageType.CHAT_MESSAGE, ChatMessageType.RANKING_MESSAGE))
                 .map(ChatMessage::getId)
                 .orElse(null);
     }
