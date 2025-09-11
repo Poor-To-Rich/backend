@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -69,6 +70,10 @@ public class ChatParticipantService {
     public ChatParticipant findByUserAndChatroom(User user, Chatroom chatroom) {
         return chatParticipantRepository.findByUserAndChatroom(user, chatroom)
                 .orElseThrow(() -> new NotFoundException(ChatResponse.CHAT_PARTICIPANT_NOT_FOUND));
+    }
+
+    public Optional<ChatParticipant> getChatParticipant(User user, Chatroom chatroom) {
+        return chatParticipantRepository.findByUserAndChatroom(user, chatroom);
     }
 
     public ChatParticipant findByUserIdAndChatroom(Long userId, Chatroom chatroom) {
