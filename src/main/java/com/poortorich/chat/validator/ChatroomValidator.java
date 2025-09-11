@@ -33,7 +33,7 @@ public class ChatroomValidator {
             }
         }
 
-        long currentMemberCount = chatParticipantRepository.countByChatroomAndIsParticipatedTrue(chatroom);
+        long currentMemberCount = chatParticipantRepository.countParticipantsByChatroom(chatroom);
         if (currentMemberCount == chatroom.getMaxMemberCount()) {
             throw new ForbiddenException(ChatResponse.CHATROOM_ENTER_DENIED);
         }
@@ -55,7 +55,7 @@ public class ChatroomValidator {
     }
 
     public void validateCanUpdateMaxMemberCount(Chatroom chatroom, Long maxMemberCount) {
-        Long currentMemberCount = chatParticipantRepository.countByChatroomAndIsParticipatedTrue(chatroom);
+        Long currentMemberCount = chatParticipantRepository.countParticipantsByChatroom(chatroom);
         if (currentMemberCount > maxMemberCount) {
             throw new BadRequestException(ChatResponse.CHATROOM_MAX_MEMBER_COUNT_EXCEED);
         }
