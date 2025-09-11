@@ -333,6 +333,7 @@ class ChatFacadeTest {
                 .user(user)
                 .role(ChatroomRole.HOST)
                 .rankingStatus(RankingStatus.NONE)
+                .isParticipated(true)
                 .build();
         ChatParticipantProfile hostProfile = ChatParticipantProfile.builder()
                 .userId(user.getId())
@@ -383,6 +384,7 @@ class ChatFacadeTest {
         assertThat(response.getHasPassword()).isTrue();
         assertThat(response.getHostProfile().getUserId()).isEqualTo(user.getId());
         assertThat(response.getHostProfile().getIsHost()).isTrue();
+        assertThat(response.getLatestReadMessageId()).isEqualTo(1L);
     }
 
     @Test
