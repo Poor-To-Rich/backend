@@ -73,6 +73,9 @@ public class ChatParticipant {
     @Column(name = "kick_message_id")
     private Long kickMessageId;
 
+    @Column(name = "latest_read_message_id")
+    private Long latestReadMessageId;
+
     @Column(name = "banned_at")
     private LocalDateTime bannedAt;
 
@@ -128,5 +131,9 @@ public class ChatParticipant {
 
     public void updateKickMessageId(Long messageId) {
         this.kickMessageId = messageId;
+    }
+
+    public void updateLatestReadMessageId(Long messageId) {
+        this.latestReadMessageId = messageId;
     }
 }
