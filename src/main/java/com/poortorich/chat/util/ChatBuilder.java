@@ -42,7 +42,7 @@ public class ChatBuilder {
             Boolean isJoined,
             ChatParticipant hostInfo,
             Long latestReadMessageId,
-            Long lastReadMessageCount
+            Long unreadMessageCount
     ) {
         return ChatroomCoverInfoResponse.builder()
                 .chatroomId(chatroom.getId())
@@ -57,7 +57,7 @@ public class ChatBuilder {
                 .hasPassword(chatroom.getPassword() != null)
                 .hostProfile(profileMapper.mapToProfile(hostInfo))
                 .latestReadMessageId(latestReadMessageId)
-                .unreadMessageCount(lastReadMessageCount)
+                .unreadMessageCount(unreadMessageCount)
                 .build();
     }
 
