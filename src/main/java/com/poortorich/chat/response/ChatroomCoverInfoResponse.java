@@ -25,4 +25,5 @@ public class ChatroomCoverInfoResponse {
     private Boolean hasPassword;
     private ChatParticipantProfile hostProfile;
     private Long latestReadMessageId;
+    private Long unreadMessageCount;
 }

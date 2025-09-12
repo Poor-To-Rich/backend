@@ -44,6 +44,7 @@ import com.poortorich.chat.service.ChatMessageService;
 import com.poortorich.chat.service.ChatParticipantService;
 import com.poortorich.chat.service.ChatroomLeaveService;
 import com.poortorich.chat.service.ChatroomService;
+import com.poortorich.chat.service.UnreadChatMessageService;
 import com.poortorich.chat.util.ChatBuilder;
 import com.poortorich.chat.util.detector.RankingStatusChangeDetector;
 import com.poortorich.chat.util.mapper.ChatMessageMapper;
@@ -92,6 +93,7 @@ public class ChatFacade {
     private final ParticipantProfileMapper participantProfileMapper;
     private final ApplicationEventPublisher eventPublisher;
     private final ChatBuilder chatBuilder;
+    private final UnreadChatMessageService unreadChatMessageService;
 
     @Transactional
     public ChatroomCreateResponse createChatroom(
@@ -211,9 +213,10 @@ public class ChatFacade {
                 chatroom,
                 tagService.getTagNames(chatroom),
                 chatParticipantService.countByChatroom(chatroom),
-                chatParticipantService.isJoined(user, chatroom),
+                isJoined,
                 chatParticipantService.getChatroomHost(chatroom),
-                isJoined ? chatMessageService.getLatestReadMessageId(participant) : null
+                isJoined ? chatMessageService.getLatestReadMessageId(participant) : null,
+                isJoined ? unreadChatMessageService.countByUnreadChatMessage(user, chatroom) : null
         );
     }
 

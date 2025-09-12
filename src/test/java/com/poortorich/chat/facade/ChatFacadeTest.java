@@ -20,6 +20,7 @@ import com.poortorich.chat.response.SearchParticipantsResponse;
 import com.poortorich.chat.service.ChatMessageService;
 import com.poortorich.chat.service.ChatParticipantService;
 import com.poortorich.chat.service.ChatroomService;
+import com.poortorich.chat.service.UnreadChatMessageService;
 import com.poortorich.chat.util.ChatBuilder;
 import com.poortorich.chat.util.mapper.ParticipantProfileMapper;
 import com.poortorich.chat.validator.ChatParticipantValidator;
@@ -72,6 +73,8 @@ class ChatFacadeTest {
     private ChatMessageService chatMessageService;
     @Mock
     private ChatParticipantValidator chatParticipantValidator;
+    @Mock
+    private UnreadChatMessageService unreadChatMessageService;
     @Mock
     private ParticipantProfileMapper participantProfileMapper;
     @Mock
@@ -347,15 +350,16 @@ class ChatFacadeTest {
         when(chatParticipantService.getChatParticipant(user, chatroom)).thenReturn(Optional.of(hostParticipant));
         when(tagService.getTagNames(chatroom)).thenReturn(hashtags);
         when(chatParticipantService.countByChatroom(chatroom)).thenReturn(3L);
-        when(chatParticipantService.isJoined(user, chatroom)).thenReturn(true);
         when(chatParticipantService.getChatroomHost(chatroom)).thenReturn(hostParticipant);
         when(chatMessageService.getLatestReadMessageId(hostParticipant)).thenReturn(1L);
+        when(unreadChatMessageService.countByUnreadChatMessage(user, chatroom)).thenReturn(1L);
         when(chatBuilder.buildChatroomCoverInfoResponse(
                 chatroom,
                 hashtags,
                 3L,
                 true,
                 hostParticipant,
+                1L,
                 1L
         )).thenReturn(ChatroomCoverInfoResponse.builder()
                 .chatroomId(chatroom.getId())
@@ -370,6 +374,7 @@ class ChatFacadeTest {
                 .hasPassword(true)
                 .hostProfile(hostProfile)
                 .latestReadMessageId(1L)
+                .unreadMessageCount(1L)
                 .build());
         ChatroomCoverInfoResponse response = chatFacade.getChatroomCoverInfo(username, chatroomId);
 
@@ -385,6 +390,7 @@ class ChatFacadeTest {
         assertThat(response.getHostProfile().getUserId()).isEqualTo(user.getId());
         assertThat(response.getHostProfile().getIsHost()).isTrue();
         assertThat(response.getLatestReadMessageId()).isEqualTo(1L);
+        assertThat(response.getUnreadMessageCount()).isEqualTo(1L);
     }
 
     @Test
