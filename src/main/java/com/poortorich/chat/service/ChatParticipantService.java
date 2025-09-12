@@ -85,12 +85,6 @@ public class ChatParticipantService {
         return chatParticipantRepository.countParticipantsByChatroom(chatroom);
     }
 
-    public Boolean isJoined(User user, Chatroom chatroom) {
-        return chatParticipantRepository.findByUserAndChatroom(user, chatroom)
-                .map(ChatParticipant::getIsParticipated)
-                .orElse(false);
-    }
-
     public ChatParticipant getChatroomHost(Chatroom chatroom) {
         return chatParticipantRepository.getChatroomHost(chatroom);
     }
