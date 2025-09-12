@@ -66,6 +66,7 @@ import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -127,6 +128,7 @@ public class ChatFacade {
         }
 
         List<Chatroom> chatrooms = chatroomService.getAllChatrooms(sortBy, cursor);
+        List<String> lastMessageTimes = chatroomService.getAllLastMessageTimes(sortBy, cursor);
 
         if (chatrooms.isEmpty()) {
             return getAllChatroomsResponseEmptyChatroom();
@@ -135,8 +137,28 @@ public class ChatFacade {
         return AllChatroomsResponse.builder()
                 .hasNext(chatroomService.hasNext(sortBy, chatrooms.getLast().getId()))
                 .nextCursor(chatroomService.getNextCursor(sortBy, chatrooms.getLast().getId()))
-                .chatrooms(getChatroomResponses(chatrooms))
+                .chatrooms(getChatroomResponses(chatrooms, lastMessageTimes))
                 .build();
+    }
+
+    private List<ChatroomResponse> getChatroomResponses(List<Chatroom> chatrooms, List<String> lastMessageTimes) {
+        List<ChatroomResponse> chatroomResponses = new ArrayList<>();
+        for (int i = 0; i < chatrooms.size(); i++) {
+            Chatroom chatroom = chatrooms.get(i);
+            if (chatroom == null) {
+                continue;
+            }
+
+            chatroomResponses.add(
+                    chatBuilder.buildChatroomResponse(
+                            chatroom,
+                            tagService.getTagNames(chatroom),
+                            chatParticipantService.countByChatroom(chatroom),
+                            lastMessageTimes.get(i))
+            );
+        }
+
+        return chatroomResponses;
     }
 
     private AllChatroomsResponse getAllChatroomsSortByCreatedAt(Long cursor) {

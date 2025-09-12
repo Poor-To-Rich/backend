@@ -25,6 +25,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ChatroomService {
 
+    private final ChatMessageService chatMessageService;
     private final ChatroomRepository chatroomRepository;
     private final RedisChatRepository redisChatRepository;
 
@@ -52,9 +53,10 @@ public class ChatroomService {
 
     private void overwriteChatroomsInRedisBySortBy(SortBy sortBy) {
         List<Long> chatrooms = getChatroomIdsBySortBy(sortBy);
+        List<String> lastMessageTimes = getLastMessageTimes(chatrooms);
 
         if (!chatrooms.isEmpty()) {
-            redisChatRepository.overwrite(sortBy, chatrooms);
+            redisChatRepository.overwrite(sortBy, chatrooms, lastMessageTimes);
         }
     }
 
@@ -73,17 +75,31 @@ public class ChatroomService {
         return findByIds(redisChatRepository.getChatroomIds(sortBy, cursor, 20));
     }
 
+    public List<String> getAllLastMessageTimes(SortBy sortBy, Long cursor) {
+        return redisChatRepository.getLastMessageTimes(sortBy, cursor, 20);
+    }
+
     private void saveChatroomsInRedisBySortBy(SortBy sortBy) {
         List<Long> chatrooms = getChatroomIdsBySortBy(sortBy);
+        List<String> lastMessageTimes = getLastMessageTimes(chatrooms);
 
         if (!chatrooms.isEmpty()) {
-            redisChatRepository.save(sortBy, chatrooms);
+            redisChatRepository.save(sortBy, chatrooms, lastMessageTimes);
         }
     }
 
     private List<Long> getChatroomIdsBySortBy(SortBy sortBy) {
         return getBySortBy(sortBy).stream()
                 .map(Chatroom::getId)
+                .toList();
+    }
+
+    private List<String> getLastMessageTimes(List<Long> chatroomIds) {
+        return chatroomIds.stream()
+                .map(chatroomId -> {
+                    Chatroom chatroom = findById(chatroomId);
+                    return chatMessageService.getLastMessageTime(chatroom);
+                })
                 .toList();
     }
 
