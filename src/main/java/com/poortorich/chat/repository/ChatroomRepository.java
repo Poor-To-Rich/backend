@@ -32,7 +32,7 @@ public interface ChatroomRepository extends JpaRepository<Chatroom, Long> {
                 SELECT c
                   FROM Chatroom c
                   LEFT JOIN ChatMessage cm ON cm.chatroom = c
-                        AND cm.messageType IN ('TEXT', 'PHOTO', 'RANKING')
+                        AND cm.type IN ('CHAT_MESSAGE', 'RANKING_MESSAGE')
                   LEFT JOIN Like l ON l.chatroom = c
                         AND l.likeStatus = true
                   LEFT JOIN ChatParticipant cp ON cp.chatroom = c
