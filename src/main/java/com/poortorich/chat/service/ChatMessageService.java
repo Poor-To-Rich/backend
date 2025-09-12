@@ -171,12 +171,16 @@ public class ChatMessageService {
         chatMessageRepository.deleteByChatroom(chatroom);
     }
 
-    public Long getLatestMessageId(Chatroom chatroom) {
+    public Long getLatestMessageIdWithTypes(Chatroom chatroom) {
         return chatMessageRepository.findTopByChatroomAndTypeInOrderByIdDesc(
                         chatroom,
                         List.of(ChatMessageType.CHAT_MESSAGE, ChatMessageType.RANKING_MESSAGE))
                 .map(ChatMessage::getId)
                 .orElse(null);
+    }
+
+    public Long getLatestMessageId(Chatroom chatroom) {
+        return chatMessageRepository.findLatestMessageIdByChatroom(chatroom);
     }
 
     @Transactional(readOnly = true)
