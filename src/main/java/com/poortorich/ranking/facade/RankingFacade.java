@@ -63,43 +63,6 @@ public class RankingFacade {
         return calculateRanking(chatroom);
     }
 
-    // TODO: 테스트 이후 삭제
-    @Transactional
-    public RankingResponsePayload calculateRankingTest(Long chatroomId, LocalDate date) {
-        Chatroom chatroom = chatroomService.findById(chatroomId);
-        return calculateRanking(chatroom, date);
-    }
-
-    // TODO: 테스트 이후 삭제
-    @Transactional
-    public RankingResponsePayload calculateRanking(Chatroom chatroom, LocalDate date) {
-        Rankers rankers = rankingCalculator.calculate(chatroom, date);
-        Ranking ranking = rankingService.create(
-                chatroom,
-                rankers,
-                date.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY)));
-
-        List<ChatParticipant> participants = chatParticipantService.findAllByChatroom(chatroom);
-        ChatParticipant prevSaver = chatParticipantService.findByChatroomAndRankingStatus(
-                chatroom,
-                RankingStatus.SAVER);
-
-        ChatParticipant prevFLexer = chatParticipantService.findByChatroomAndRankingStatus(
-                chatroom,
-                RankingStatus.FLEXER);
-
-        chatParticipantService.updateAllRankingStatus(participants, RankingStatus.NONE);
-        rankingService.updateRankingStatus(rankers);
-        if (!Objects.isNull(prevSaver)) {
-            eventPublisher.publishEvent(new UserProfileUpdateEvent(prevSaver.getUser().getUsername()));
-        }
-        if (!Objects.isNull(prevFLexer)) {
-            eventPublisher.publishEvent(new UserProfileUpdateEvent(prevFLexer.getUser().getUsername()));
-        }
-
-        return chatMessageService.saveRankingMessage(chatroom, ranking, date);
-    }
-
     @Transactional
     public RankingResponsePayload calculateRanking(Chatroom chatroom) {
         Rankers rankers = rankingCalculator.calculate(chatroom);
@@ -287,7 +250,7 @@ public class RankingFacade {
                     }
 
                     ChatParticipant chatParticipant = chatParticipantService.findByUserAndChatroom(user, chatroom);
-                   return profileMapper.mapToProfile(chatParticipant, i == 0 ? type : RankingStatus.NONE);
+                    return profileMapper.mapToProfile(chatParticipant, i == 0 ? type : RankingStatus.NONE);
                 })
                 .filter(Objects::nonNull)
                 .toList();
