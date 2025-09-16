@@ -1,5 +1,6 @@
 package com.poortorich.chat.controller;
 
+import com.poortorich.broadcast.BroadcastService;
 import com.poortorich.chat.constants.ChatResponseMessage;
 import com.poortorich.chat.facade.ChatFacade;
 import com.poortorich.chat.realtime.facade.ChatRealTimeFacade;
@@ -22,7 +23,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -47,7 +47,8 @@ public class ChatControllerTest extends BaseSecurityTest {
     @MockitoBean
     private ChatFacade chatFacade;
     @MockitoBean
-    private SimpMessagingTemplate simpMessagingTemplate;
+    private BroadcastService broadcastService;
+    
     @MockitoBean
     private ChatRealTimeFacade chatRealTimeFacade;
 
