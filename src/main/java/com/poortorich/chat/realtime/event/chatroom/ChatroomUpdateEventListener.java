@@ -1,13 +1,12 @@
 package com.poortorich.chat.realtime.event.chatroom;
 
+import com.poortorich.broadcast.BroadcastService;
 import com.poortorich.chat.entity.ChatParticipant;
 import com.poortorich.chat.realtime.payload.response.BasePayload;
 import com.poortorich.chat.realtime.payload.response.enums.PayloadType;
 import com.poortorich.chat.service.ChatParticipantService;
 import com.poortorich.chat.util.mapper.ChatroomMapper;
-import com.poortorich.websocket.stomp.command.subscribe.endpoint.SubscribeEndpoint;
 import lombok.RequiredArgsConstructor;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
@@ -18,7 +17,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ChatroomUpdateEventListener {
 
-    private final SimpMessagingTemplate messagingTemplate;
+    private final BroadcastService broadcastService;
     private final ChatParticipantService chatParticipantService;
     private final ChatroomMapper chatroomMapper;
 
@@ -32,9 +31,7 @@ public class ChatroomUpdateEventListener {
                     .payload(chatroomMapper.mapToMyChatroom(participant))
                     .build();
 
-            messagingTemplate.convertAndSend(
-                    SubscribeEndpoint.JOINED_CHATROOM_LIST_PREFIX + participant.getUser().getId(),
-                    basePayload);
+            broadcastService.broadcastInMyChatroom(participant.getUser().getId(), basePayload);
         });
     }
 
@@ -47,8 +44,6 @@ public class ChatroomUpdateEventListener {
                 .payload(chatroomMapper.mapToMyChatroom(participant))
                 .build();
 
-        messagingTemplate.convertAndSend(
-                SubscribeEndpoint.JOINED_CHATROOM_LIST_PREFIX + participant.getUser().getId(),
-                basePayload);
+        broadcastService.broadcastInMyChatroom(participant.getUser().getId(), basePayload);
     }
 }

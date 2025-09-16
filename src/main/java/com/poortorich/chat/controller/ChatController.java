@@ -1,5 +1,6 @@
 package com.poortorich.chat.controller;
 
+import com.poortorich.broadcast.BroadcastService;
 import com.poortorich.chat.constants.ChatResponseMessage;
 import com.poortorich.chat.facade.ChatFacade;
 import com.poortorich.chat.model.MarkAllChatroomAsReadResult;
@@ -22,14 +23,12 @@ import com.poortorich.chat.response.KickChatParticipantResponse;
 import com.poortorich.chat.response.enums.ChatResponse;
 import com.poortorich.global.response.BaseResponse;
 import com.poortorich.global.response.DataResponse;
-import com.poortorich.websocket.stomp.command.subscribe.endpoint.SubscribeEndpoint;
 import jakarta.annotation.Nullable;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -50,7 +49,7 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class ChatController {
 
-    private final SimpMessagingTemplate messagingTemplate;
+    private final BroadcastService broadcastService;
 
     private final ChatFacade chatFacade;
     private final ChatRealTimeFacade realTimeFacade;
@@ -135,15 +134,7 @@ public class ChatController {
         BasePayload basePayload = realTimeFacade.createUserEnterSystemMessage(userDetails.getUsername(),
                 chatroomId);
 
-        if (!Objects.isNull(basePayload)) {
-            messagingTemplate.convertAndSend(SubscribeEndpoint.CHATROOM_SUBSCRIBE_PREFIX + chatroomId, basePayload);
-        }
-
-        if (!Objects.isNull(result.getBroadcastPayload())) {
-            messagingTemplate.convertAndSend(
-                    SubscribeEndpoint.CHATROOM_SUBSCRIBE_PREFIX + chatroomId,
-                    result.getBroadcastPayload().mapToBasePayload());
-        }
+        broadcastService.broadcastInChatroom(chatroomId, basePayload, result.getBroadcastPayload().mapToBasePayload());
         return DataResponse.toResponseEntity(ChatResponse.CHATROOM_ENTER_SUCCESS, result.getApiResponse());
     }
 
@@ -162,9 +153,7 @@ public class ChatController {
                 chatroomId,
                 response.getIsChangedRankingStatus());
 
-        if (!Objects.isNull(payload)) {
-            messagingTemplate.convertAndSend(SubscribeEndpoint.CHATROOM_SUBSCRIBE_PREFIX + chatroomId, payload);
-        }
+        broadcastService.broadcastInChatroom(chatroomId, payload);
 
         return DataResponse.toResponseEntity(ChatResponse.CHATROOM_UPDATE_SUCCESS, response);
     }
@@ -214,9 +203,7 @@ public class ChatController {
         result.getBroadcastPayloads()
                 .forEach(payload -> {
                     if (!Objects.isNull(payload)) {
-                        messagingTemplate.convertAndSend(
-                                SubscribeEndpoint.CHATROOM_SUBSCRIBE_PREFIX + payload.getChatroomId(),
-                                payload.mapToBasePayload());
+                        broadcastService.broadcastInMyChatroom(payload.getChatroomId(), payload.mapToBasePayload());
                     }
                 });
 
@@ -234,12 +221,7 @@ public class ChatController {
                 apiResponse.getPrevHost(),
                 apiResponse.getNewHost());
 
-        if (!Objects.isNull(responsePayload)) {
-            messagingTemplate.convertAndSend(
-                    SubscribeEndpoint.CHATROOM_SUBSCRIBE_PREFIX + chatroomId,
-                    responsePayload
-            );
-        }
+        broadcastService.broadcastInChatroom(chatroomId, responsePayload);
 
         return DataResponse.toResponseEntity(ChatResponse.HOST_DELEGATION_SUCCESS, apiResponse);
     }
@@ -267,12 +249,7 @@ public class ChatController {
                 userDetails.getUsername(),
                 chatroomId);
 
-        if (Objects.nonNull(responsePayload)) {
-            messagingTemplate.convertAndSend(
-                    SubscribeEndpoint.CHATROOM_SUBSCRIBE_PREFIX + chatroomId,
-                    responsePayload
-            );
-        }
+        broadcastService.broadcastInChatroom(chatroomId, responsePayload);
 
         return BaseResponse.toResponseEntity(ChatResponse.MARK_CHATROOM_AS_READ_SUCCESS);
     }
