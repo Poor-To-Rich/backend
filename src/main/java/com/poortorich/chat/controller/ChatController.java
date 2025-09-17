@@ -203,7 +203,7 @@ public class ChatController {
         result.getBroadcastPayloads()
                 .forEach(payload -> {
                     if (!Objects.isNull(payload)) {
-                        broadcastService.broadcastInMyChatroom(payload.getChatroomId(), payload.mapToBasePayload());
+                        broadcastService.broadcastInChatroom(payload.getChatroomId(), payload.mapToBasePayload());
                     }
                 });
 
