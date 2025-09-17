@@ -9,17 +9,23 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.Objects;
 
 @Component
 @RequiredArgsConstructor
 public class WebpConverter {
 
+    private boolean isWebp(byte[] bytes) {
+        if (bytes == null || bytes.length < 12) return false;
+        return bytes[0] == 'R' && bytes[1] == 'I' && bytes[2] == 'F' && bytes[3] == 'F'
+                && bytes[8] == 'W' && bytes[9] == 'E' && bytes[10] == 'B' && bytes[11] == 'P';
+    }
+
     public byte[] convertToWebp(MultipartFile file) {
         try {
             String contentType = file.getContentType();
-            if (Objects.nonNull(contentType) && contentType.equals("image/webp")) {
-                return file.getBytes();
+            byte[] bytes = file.getBytes();
+            if ("image/webp".equalsIgnoreCase(contentType) && isWebp(bytes)) {
+                return bytes;
             }
 
             return ImmutableImage.loader().fromBytes(file.getBytes())
