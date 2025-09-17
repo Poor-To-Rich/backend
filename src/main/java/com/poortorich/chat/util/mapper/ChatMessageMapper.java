@@ -26,14 +26,14 @@ public class ChatMessageMapper {
 
     private final RankerProfileMapper rankerProfileMapper;
 
-    public ChatMessageResponse mapToChatMessageResponse(ChatMessage chatMessage) {
+    public ChatMessageResponse mapToChatMessageResponse(Long userId, ChatMessage chatMessage) {
         return switch (chatMessage.getMessageType()) {
             case RANKING -> rankingMessage(chatMessage);
             case RANKING_STATUS -> rankingStatusMessage(chatMessage);
             case ENTER -> userEnterMessage(chatMessage);
             case LEAVE, KICK -> userLeaveMessage(chatMessage);
             case CLOSE -> chatroomClosedMessage(chatMessage);
-            case TEXT, PHOTO -> userChatMessage(chatMessage);
+            case TEXT, PHOTO -> userChatMessage(userId, chatMessage);
             case DATE -> dateChangeMessage(chatMessage);
             case DELEGATE -> hostDelegationMessage(chatMessage);
         };
@@ -123,7 +123,7 @@ public class ChatMessageMapper {
                 .build();
     }
 
-    private ChatMessageResponse userChatMessage(ChatMessage chatMessage) {
+    private ChatMessageResponse userChatMessage(Long userId, ChatMessage chatMessage) {
         return UserChatMessagePayload.builder()
                 .messageId(chatMessage.getId())
                 .chatroomId(chatMessage.getChatroom().getId())
@@ -132,7 +132,7 @@ public class ChatMessageMapper {
                 .messageType(chatMessage.getMessageType())
                 .content(chatMessage.getContent())
                 .sentAt(chatMessage.getSentAt())
-                .unreadBy(unreadChatMessageService.getUserIdsByChatMessage(chatMessage))
+                .unreadBy(unreadChatMessageService.getUserIdsByChatMessage(userId, chatMessage))
                 .type(chatMessage.getType())
                 .build();
     }
