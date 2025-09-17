@@ -22,9 +22,6 @@ public class RedisChatRepository {
         String idsKey = getRedisIdsKey(sortBy.name());
         String timesKey = getRedisTimesKey(sortBy.name());
 
-        String idsTmp = idsKey  + ":tmp";
-        String timesTmp = timesKey + ":tmp";
-
         if (chatroomIds == null || lastMessageTimes == null) {
             return;
         }
@@ -39,8 +36,8 @@ public class RedisChatRepository {
         redisTemplate.opsForList().rightPushAll(idsKey, stringIds);
         redisTemplate.opsForList().rightPushAll(timesKey, lastMessageTimes);
 
-        redisTemplate.expire(idsTmp, Duration.ofMinutes(CHAT_KEY_EXPIRATION_TIME));
-        redisTemplate.expire(timesTmp, Duration.ofMinutes(CHAT_KEY_EXPIRATION_TIME));
+        redisTemplate.expire(idsKey, Duration.ofMinutes(CHAT_KEY_EXPIRATION_TIME));
+        redisTemplate.expire(timesKey, Duration.ofMinutes(CHAT_KEY_EXPIRATION_TIME));
     }
 
     public void save(SortBy sortBy, List<Long> chatroomIds, List<String> lastMessageTimes) {
