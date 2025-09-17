@@ -82,19 +82,19 @@ public class ChatFacade {
     private final ChatroomLeaveService chatroomLeaveService;
     private final ChatMessageService chatMessageService;
     private final FileUploadService fileUploadService;
+    private final UnreadChatMessageService unreadChatMessageService;
     private final TagService tagService;
-
+    
+    private final ChatBuilder chatBuilder;
     private final ChatMessageMapper chatMessageMapper;
     private final ChatroomMapper chatroomMapper;
+    private final ParticipantProfileMapper participantProfileMapper;
     private final ChatPaginationProvider paginationProvider;
     private final ChatroomValidator chatroomValidator;
     private final ChatParticipantValidator chatParticipantValidator;
+    private final ApplicationEventPublisher eventPublisher;
     private final RankingStatusChangeDetector rankingStatusChangeDetector;
     private final ChatroomUpdateDetector chatroomUpdateDetector;
-    private final ParticipantProfileMapper participantProfileMapper;
-    private final ApplicationEventPublisher eventPublisher;
-    private final ChatBuilder chatBuilder;
-    private final UnreadChatMessageService unreadChatMessageService;
 
     @Transactional
     public ChatroomCreateResponse createChatroom(

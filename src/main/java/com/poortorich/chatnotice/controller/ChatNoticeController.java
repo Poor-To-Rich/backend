@@ -1,5 +1,6 @@
 package com.poortorich.chatnotice.controller;
 
+import com.poortorich.broadcast.BroadcastService;
 import com.poortorich.chat.facade.ChatFacade;
 import com.poortorich.chat.realtime.payload.response.BasePayload;
 import com.poortorich.chatnotice.facade.ChatNoticeFacade;
@@ -11,11 +12,9 @@ import com.poortorich.chatnotice.request.ChatNoticeUpdateRequest;
 import com.poortorich.chatnotice.response.enums.ChatNoticeResponse;
 import com.poortorich.global.response.BaseResponse;
 import com.poortorich.global.response.DataResponse;
-import com.poortorich.websocket.stomp.command.subscribe.endpoint.SubscribeEndpoint;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -29,8 +28,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Objects;
-
 @RestController
 @RequestMapping("/chatrooms/{chatroomId}/notices")
 @RequiredArgsConstructor
@@ -40,8 +37,7 @@ public class ChatNoticeController {
 
     private final ChatFacade chatFacade;
     private final ChatNoticeFacade chatNoticeFacade;
-
-    private final SimpMessagingTemplate messagingTemplate;
+    private final BroadcastService broadcastService;
 
     @PostMapping
     public ResponseEntity<BaseResponse> createNewNotice(
@@ -50,11 +46,8 @@ public class ChatNoticeController {
             @RequestBody @Valid ChatNoticeCreateRequest noticeCreateRequest
     ) {
         NoticeCreateResult result = chatNoticeFacade.create(userDetails.getUsername(), chatroomId, noticeCreateRequest);
-        if (!Objects.isNull(result.getBroadcastPayload())) {
-            messagingTemplate.convertAndSend(
-                    SubscribeEndpoint.CHATROOM_SUBSCRIBE_PREFIX + chatroomId,
-                    result.getBroadcastPayload());
-        }
+        broadcastService.broadcastInChatroom(chatroomId, result.getBroadcastPayload());
+
         return DataResponse.toResponseEntity(ChatNoticeResponse.CHAT_NOTICE_CREATE_SUCCESS, result.getApiResponse());
     }
 
@@ -70,12 +63,9 @@ public class ChatNoticeController {
                 chatroomId,
                 noticeId,
                 noticeUpdateRequest);
-        if (!Objects.isNull(result.getBroadcastPayload())) {
-            messagingTemplate.convertAndSend(
-                    SubscribeEndpoint.CHATROOM_SUBSCRIBE_PREFIX + chatroomId,
-                    result.getBroadcastPayload()
-            );
-        }
+
+        broadcastService.broadcastInChatroom(chatroomId, result.getBroadcastPayload());
+
         return DataResponse.toResponseEntity(ChatNoticeResponse.CHAT_NOTICE_UPDATE_SUCCESS, result.getApiResponse());
     }
 
@@ -87,11 +77,7 @@ public class ChatNoticeController {
     ) {
         BasePayload basePayload = chatNoticeFacade.deleteNotice(userDetails.getUsername(), chatroomId, noticeId);
 
-        if (!Objects.isNull(basePayload)) {
-            messagingTemplate.convertAndSend(
-                    SubscribeEndpoint.CHATROOM_SUBSCRIBE_PREFIX + chatroomId,
-                    basePayload);
-        }
+        broadcastService.broadcastInChatroom(chatroomId, basePayload);
         return BaseResponse.toResponseEntity(ChatNoticeResponse.CHAT_NOTICE_DELETE_SUCCESS);
     }
 
