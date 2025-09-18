@@ -33,6 +33,7 @@ import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -355,5 +356,10 @@ public class ChatMessageService {
     public void updateLatestMessageId(ChatParticipant chatParticipant) {
         Long latestMessageId = chatMessageRepository.findLatestMessageIdByChatroom(chatParticipant.getChatroom());
         chatParticipant.updateLatestReadMessageId(latestMessageId);
+    }
+
+    public LocalDateTime getLatestMessageTimeByUser(User user) {
+        Optional<LocalDateTime> latestTime = chatMessageRepository.findLatestMessageTimeByUser(user);
+        return latestTime.orElse(null);
     }
 }
