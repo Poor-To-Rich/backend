@@ -2,12 +2,14 @@ package com.poortorich.chat.repository;
 
 import com.poortorich.chat.request.enums.SortBy;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Repository;
 
 import java.time.Duration;
 import java.util.List;
 
+@Slf4j
 @Repository
 @RequiredArgsConstructor
 public class RedisChatRepository {
@@ -76,9 +78,13 @@ public class RedisChatRepository {
     }
 
     public List<String> getLastMessageTimes(SortBy sortBy, Long cursor, int size) {
-        String key = getRedisTimesKey(sortBy.name());
-        List<String> allTimes = redisTemplate.opsForList().range(key, 0, -1);
-        if (allTimes == null || allTimes.isEmpty()) {
+        String idKey = getRedisIdsKey(sortBy.name());
+        String timeKey = getRedisTimesKey(sortBy.name());
+
+        List<String> allIds = redisTemplate.opsForList().range(idKey, 0, -1);
+        List<String> allTimes = redisTemplate.opsForList().range(timeKey, 0, -1);
+
+        if (allIds == null || allTimes == null || allIds.isEmpty() || allTimes.isEmpty()) {
             return List.of();
         }
 
@@ -86,7 +92,7 @@ public class RedisChatRepository {
             return allTimes.subList(0, Math.min(size, allTimes.size()));
         }
 
-        int startIndex = allTimes.indexOf(cursor.toString());
+        int startIndex = allIds.indexOf(cursor.toString());
         return allTimes.subList(startIndex, Math.min(startIndex + size, allTimes.size()));
     }
 
