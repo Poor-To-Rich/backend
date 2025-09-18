@@ -84,7 +84,7 @@ public class ChatFacade {
     private final FileUploadService fileUploadService;
     private final UnreadChatMessageService unreadChatMessageService;
     private final TagService tagService;
-    
+
     private final ChatBuilder chatBuilder;
     private final ChatMessageMapper chatMessageMapper;
     private final ChatroomMapper chatroomMapper;
@@ -357,7 +357,9 @@ public class ChatFacade {
 
         Long nextCursor = paginationProvider.getNextCursor(chatMessages);
         List<ChatMessageResponse> messages = chatMessages.getContent().stream()
-                .map(chatMessageMapper::mapToChatMessageResponse)
+                .map(message -> chatMessageMapper.mapToChatMessageResponse(
+                        context.chatParticipant().getUser().getId(),
+                        message))
                 .collect(Collectors.toList());
         Collections.reverse(messages);
 
