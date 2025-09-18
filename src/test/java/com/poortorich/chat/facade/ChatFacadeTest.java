@@ -226,8 +226,8 @@ class ChatFacadeTest {
         when(chatroomService.getNextCursor(sortBy, 2L)).thenReturn(3L);
         when(tagService.getTagNames(any())).thenReturn(hashtags);
         when(chatParticipantService.countByChatroom(any())).thenReturn(3L);
-        when(chatMessageService.getLastMessageTime(any())).thenReturn("2025-07-31T02:30");
-        when(chatBuilder.buildChatroomResponse(chatroom1, hashtags, 3L, "2025-07-31T02:30"))
+        when(chatroomService.getAllLastMessageTimes(sortBy, cursor)).thenReturn(List.of("", "2025-07-31T02:30"));
+        when(chatBuilder.buildChatroomResponse(chatroom1, hashtags, 3L, ""))
                 .thenReturn(ChatroomResponse.builder()
                         .chatroomId(chatroom1.getId())
                         .chatroomTitle(chatroom1.getTitle())
@@ -236,7 +236,7 @@ class ChatFacadeTest {
                         .hashtags(hashtags)
                         .currentMemberCount(3L)
                         .maxMemberCount(chatroom1.getMaxMemberCount())
-                        .lastMessageTime("2025-07-31T02:30")
+                        .lastMessageTime("")
                         .build());
 
         when(chatBuilder.buildChatroomResponse(chatroom2, hashtags, 3L, "2025-07-31T02:30"))

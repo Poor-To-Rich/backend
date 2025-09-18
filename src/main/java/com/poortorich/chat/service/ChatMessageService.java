@@ -91,7 +91,7 @@ public class ChatMessageService {
         return chatMessageRepository.findTopByChatroomAndTypeInOrderByIdDesc(
                         chatroom, List.of(ChatMessageType.CHAT_MESSAGE, ChatMessageType.RANKING_MESSAGE))
                 .map(chatMessage -> chatMessage.getSentAt().toString())
-                .orElse(null);
+                .orElse("");
     }
 
     @Transactional

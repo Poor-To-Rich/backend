@@ -37,7 +37,6 @@ public interface ChatroomRepository extends JpaRepository<Chatroom, Long> {
                         AND l.likeStatus = true
                   LEFT JOIN ChatParticipant cp ON cp.chatroom = c
                         AND cp.isParticipated = true
-                  LEFT JOIN Tag t ON t.chatroom = c
                 WHERE c.isClosed = false
                 GROUP BY c.id
                 ORDER BY MAX(cm.sentAt) DESC,
@@ -51,21 +50,10 @@ public interface ChatroomRepository extends JpaRepository<Chatroom, Long> {
     @Query("""
                 SELECT c
                   FROM Chatroom c
-                WHERE c.isClosed = false
-                  AND c.id < :cursor
-                ORDER BY c.id DESC
-            """)
-    Slice<Chatroom> findByCursorSortByCreatedAt(@Param("cursor") Long cursor, Pageable pageable);
-
-    @Query("""
-                SELECT c
-                  FROM Chatroom c
-                  LEFT JOIN ChatMessage cm ON cm.chatroom = c
                   LEFT JOIN Like l ON l.chatroom = c
                         AND l.likeStatus = true
                   LEFT JOIN ChatParticipant cp ON cp.chatroom = c
                         AND cp.isParticipated = true
-                  LEFT JOIN Tag t ON t.chatroom = c
                 WHERE c.isClosed = false
                 GROUP BY c.id
                 ORDER BY COUNT(DISTINCT l.id) DESC,
@@ -74,6 +62,15 @@ public interface ChatroomRepository extends JpaRepository<Chatroom, Long> {
                          c.id ASC
             """)
     List<Chatroom> findChatroomsSortByLike();
+
+    @Query("""
+                SELECT c
+                  FROM Chatroom c
+                WHERE c.isClosed = false
+                  AND c.id < :cursor
+                ORDER BY c.id DESC
+            """)
+    Slice<Chatroom> findByCursorSortByCreatedAt(@Param("cursor") Long cursor, Pageable pageable);
 
     @Query("""
                 SELECT DISTINCT c
