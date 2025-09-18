@@ -15,6 +15,7 @@ import java.util.List;
 
 @Repository
 public interface UnreadChatMessageRepository extends JpaRepository<UnreadChatMessage, Long> {
+    
     List<UnreadChatMessage> findAllByChatMessage(ChatMessage chatMessage);
 
     @Query("""

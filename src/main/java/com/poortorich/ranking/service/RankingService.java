@@ -47,27 +47,6 @@ public class RankingService {
         return rankingRepository.save(ranking);
     }
 
-    // TODO: 테스트 이후 삭제
-    public Ranking create(Chatroom chatroom, Rankers rankers, LocalDate date) {
-        if (rankers == null) {
-            return null;
-        }
-
-        Ranking ranking = Ranking.builder()
-                .chatroom(chatroom)
-                .saverFirst(rankers.firstSaver())
-                .saverSecond(rankers.secondSaver())
-                .saverThird(rankers.thirdSaver())
-                .flexerFirst(rankers.firstFlexer())
-                .flexerSecond(rankers.secondFlexer())
-                .flexerThird(rankers.thirdFlexer())
-                .build();
-
-        ranking = rankingRepository.save(ranking);
-        ranking.updateCreatedDate(date);
-        return rankingRepository.save(ranking);
-    }
-
     @Transactional
     public void updateAll(List<ChatParticipant> participants, RankingStatus rankingStatus) {
         participants.forEach(participant -> participant.updateRankingStatus(rankingStatus));

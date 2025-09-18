@@ -66,6 +66,7 @@ import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -82,19 +83,19 @@ public class ChatFacade {
     private final ChatroomLeaveService chatroomLeaveService;
     private final ChatMessageService chatMessageService;
     private final FileUploadService fileUploadService;
+    private final UnreadChatMessageService unreadChatMessageService;
     private final TagService tagService;
 
+    private final ChatBuilder chatBuilder;
     private final ChatMessageMapper chatMessageMapper;
     private final ChatroomMapper chatroomMapper;
+    private final ParticipantProfileMapper participantProfileMapper;
     private final ChatPaginationProvider paginationProvider;
     private final ChatroomValidator chatroomValidator;
     private final ChatParticipantValidator chatParticipantValidator;
+    private final ApplicationEventPublisher eventPublisher;
     private final RankingStatusChangeDetector rankingStatusChangeDetector;
     private final ChatroomUpdateDetector chatroomUpdateDetector;
-    private final ParticipantProfileMapper participantProfileMapper;
-    private final ApplicationEventPublisher eventPublisher;
-    private final ChatBuilder chatBuilder;
-    private final UnreadChatMessageService unreadChatMessageService;
 
     @Transactional
     public ChatroomCreateResponse createChatroom(
@@ -357,7 +358,9 @@ public class ChatFacade {
 
         Long nextCursor = paginationProvider.getNextCursor(chatMessages);
         List<ChatMessageResponse> messages = chatMessages.getContent().stream()
-                .map(chatMessageMapper::mapToChatMessageResponse)
+                .map(message -> chatMessageMapper.mapToChatMessageResponse(
+                        context.chatParticipant().getUser().getId(),
+                        message))
                 .collect(Collectors.toList());
         Collections.reverse(messages);
 
@@ -375,12 +378,12 @@ public class ChatFacade {
     }
 
     @Transactional
-    public MyChatroomsResponse getMyChatrooms(String username, Long cursor) {
+    public MyChatroomsResponse getMyChatrooms(String username, LocalDateTime cursor) {
         ChatroomPaginationContext context = paginationProvider.getMyChatroomsContext(username, cursor);
 
         Slice<ChatParticipant> participants = chatParticipantService.getMyParticipants(context);
 
-        Long nextCursor = paginationProvider.getChatroomNextCursor(participants);
+        LocalDateTime nextCursor = paginationProvider.getChatroomNextCursor(participants);
 
         List<MyChatroom> myChatrooms = participants.stream()
                 .map(chatroomMapper::mapToMyChatroom)

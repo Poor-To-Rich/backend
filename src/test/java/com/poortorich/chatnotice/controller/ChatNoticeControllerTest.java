@@ -1,6 +1,7 @@
 package com.poortorich.chatnotice.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.poortorich.broadcast.BroadcastService;
 import com.poortorich.chat.facade.ChatFacade;
 import com.poortorich.chatnotice.constants.ChatNoticeResponseMessage;
 import com.poortorich.chatnotice.facade.ChatNoticeFacade;
@@ -41,6 +42,8 @@ class ChatNoticeControllerTest extends BaseSecurityTest {
     private MockMvc mockMvc;
     @Autowired
     private ObjectMapper objectMapper;
+    @MockitoBean
+    private BroadcastService broadcastService;
     @MockitoBean
     private ChatFacade chatFacade;
     @MockitoBean

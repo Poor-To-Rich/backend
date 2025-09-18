@@ -4,10 +4,12 @@ import com.poortorich.user.entity.User;
 import lombok.Builder;
 import org.springframework.data.domain.PageRequest;
 
+import java.time.LocalDateTime;
+
 @Builder
 public record ChatroomPaginationContext(
         User user,
-        Long cursor,
+        LocalDateTime cursor,
         PageRequest pageRequest
 ) {
 }

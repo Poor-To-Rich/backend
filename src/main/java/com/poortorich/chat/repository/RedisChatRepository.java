@@ -3,163 +3,136 @@ package com.poortorich.chat.repository;
 import com.poortorich.chat.request.enums.SortBy;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Repository;
 
 import java.time.Duration;
-import java.time.Instant;
-import java.time.ZoneId;
-import java.time.format.DateTimeParseException;
 import java.util.List;
-import java.util.Objects;
-import java.util.Set;
 
 @Repository
 @RequiredArgsConstructor
 public class RedisChatRepository {
 
-    private static final String REDIS_CHAT_ZSET_KEY = "chatrooms:zset:%s";
+    private static final String REDIS_CHAT_KEY = "chatrooms:list:%s:ids";
+    private static final String REDIS_LAST_MESSAGE_TIME_KEY = "chatrooms:list:%s:times";
     private static final int CHAT_KEY_EXPIRATION_TIME = 5;
 
     private final RedisTemplate<String, String> redisTemplate;
 
     public void overwrite(SortBy sortBy, List<Long> chatroomIds, List<String> lastMessageTimes) {
-        String key = getRedisKey(sortBy.name());
-        redisTemplate.delete(key);
+        String idsKey = getRedisIdsKey(sortBy.name());
+        String timesKey = getRedisTimesKey(sortBy.name());
 
-        save(sortBy, chatroomIds, lastMessageTimes);
+        if (chatroomIds == null || lastMessageTimes == null) {
+            return;
+        }
+
+        redisTemplate.delete(idsKey);
+        redisTemplate.delete(timesKey);
+
+        List<String> stringIds = chatroomIds.stream()
+                .map(String::valueOf)
+                .toList();
+
+        redisTemplate.opsForList().rightPushAll(idsKey, stringIds);
+        redisTemplate.opsForList().rightPushAll(timesKey, lastMessageTimes);
+
+        redisTemplate.expire(idsKey, Duration.ofMinutes(CHAT_KEY_EXPIRATION_TIME));
+        redisTemplate.expire(timesKey, Duration.ofMinutes(CHAT_KEY_EXPIRATION_TIME));
     }
 
     public void save(SortBy sortBy, List<Long> chatroomIds, List<String> lastMessageTimes) {
-        String key = getRedisKey(sortBy.name());
-        ZSetOperations<String, String> zset = redisTemplate.opsForZSet();
+        String idsKey = getRedisIdsKey(sortBy.name());
+        String timesKey = getRedisTimesKey(sortBy.name());
 
-        for (int i = 0; i < chatroomIds.size(); i++) {
-            String member = String.valueOf(chatroomIds.get(i));
-            double score = toEpochMillis(lastMessageTimes.get(i));
-            zset.add(key, member, score);
-        }
+        List<String> stringIds = chatroomIds.stream()
+                .map(String::valueOf)
+                .toList();
 
-        redisTemplate.expire(key, Duration.ofMinutes(CHAT_KEY_EXPIRATION_TIME));
+        redisTemplate.opsForList().rightPushAll(idsKey, stringIds);
+        redisTemplate.opsForList().rightPushAll(timesKey, lastMessageTimes);
+
+        redisTemplate.expire(idsKey, Duration.ofMinutes(CHAT_KEY_EXPIRATION_TIME));
+        redisTemplate.expire(timesKey, Duration.ofMinutes(CHAT_KEY_EXPIRATION_TIME));
     }
 
     public List<Long> getChatroomIds(SortBy sortBy, Long cursor, int size) {
-        var tuples = getWindowTuples(sortBy, cursor, size);
-        if (tuples.isEmpty()) {
+        String key = getRedisIdsKey(sortBy.name());
+        List<String> allIds = redisTemplate.opsForList().range(key, 0, -1);
+        if (allIds == null || allIds.isEmpty()) {
             return List.of();
         }
 
-        return tuples.stream()
-                .map(t -> Long.parseLong(Objects.requireNonNull(t.getValue())))
+        if (cursor == 0 || cursor == -1) {
+            return allIds.subList(0, Math.min(size, allIds.size())).stream()
+                    .map(Long::parseLong)
+                    .toList();
+        }
+
+        int startIndex = allIds.indexOf(cursor.toString());
+        List<String> result = allIds.subList(startIndex, Math.min(startIndex + size, allIds.size()));
+        return result.stream()
+                .map(Long::parseLong)
                 .toList();
     }
 
     public List<String> getLastMessageTimes(SortBy sortBy, Long cursor, int size) {
-        var tuples = getWindowTuples(sortBy, cursor, size);
-        if (tuples.isEmpty()) {
+        String key = getRedisTimesKey(sortBy.name());
+        List<String> allTimes = redisTemplate.opsForList().range(key, 0, -1);
+        if (allTimes == null || allTimes.isEmpty()) {
             return List.of();
         }
 
-        return tuples.stream()
-                .map(t -> {
-                    Double s = t.getScore();
-                    if (s == null || s.doubleValue() == 0D) return null; // 메시지 없음은 null
-                    return Instant.ofEpochMilli(s.longValue())
-                            .atZone(ZoneId.of("Asia/Seoul"))
-                            .toLocalDateTime()
-                            .toString();
-                })
-                .toList();
-    }
-
-    private Set<ZSetOperations.TypedTuple<String>> getWindowTuples(SortBy sortBy, Long cursor, int size) {
-        String key = getRedisKey(sortBy.name());
-        ZSetOperations<String, String> zset = redisTemplate.opsForZSet();
-
-        Long total = zset.size(key);
-        if (total == null || total == 0) {
-            return Set.of();
+        if (cursor == 0 || cursor == -1) {
+            return allTimes.subList(0, Math.min(size, allTimes.size()));
         }
 
-        long startIndex;
-        if (cursor == null || cursor == 0 || cursor == -1) {
-            startIndex = 0;
-        } else {
-            Long rank = zset.reverseRank(key, String.valueOf(cursor));
-            if (rank == null) return Set.of();
-            startIndex = rank + 1;
-        }
-        long endIndex = Math.min(startIndex + size - 1, total - 1);
-        if (startIndex > endIndex) return Set.of();
-
-        Set<ZSetOperations.TypedTuple<String>> tuples = zset.reverseRangeWithScores(key, startIndex, endIndex);
-        return (tuples == null) ? Set.of() : tuples;
+        int startIndex = allTimes.indexOf(cursor.toString());
+        return allTimes.subList(startIndex, Math.min(startIndex + size, allTimes.size()));
     }
 
     public boolean existsBySortBy(SortBy sortBy) {
-        String key = getRedisKey(sortBy.name());
+        String key = getRedisIdsKey(sortBy.name());
         return redisTemplate.hasKey(key);
     }
 
     public Boolean hasNext(SortBy sortBy, Long lastChatroomId) {
-        String zsetKey = getRedisKey(sortBy.name());
-        ZSetOperations<String, String> zset = redisTemplate.opsForZSet();
-
-        Long total = zset.size(zsetKey);
-        if (total == null || total == 0) {
+        List<String> stringIds = getAllList(sortBy);
+        if (stringIds == null || stringIds.isEmpty()) {
             return false;
         }
 
-        Long rank = zset.reverseRank(zsetKey, String.valueOf(lastChatroomId));
-        return rank != null && (rank + 1) < total;
+        int idx = stringIds.indexOf(lastChatroomId.toString());
+        return hasNext(idx, stringIds.size());
     }
 
     public Long getNextCursor(SortBy sortBy, Long lastChatroomId) {
-        String zsetKey = getRedisKey(sortBy.name());
-        ZSetOperations<String, String> zset = redisTemplate.opsForZSet();
-
-        Long total = zset.size(zsetKey);
-        if (total == null || total == 0) {
-            return null;
-        }
-        Long rank = zset.reverseRank(zsetKey, String.valueOf(lastChatroomId));
-        if (rank == null) {
-            return null;
-        }
-        long nextIndex = rank + 1;
-        if (nextIndex >= total) {
-            return null;
-        }
-        Set<String> range = zset.reverseRange(zsetKey, nextIndex, nextIndex);
-        if (range == null || range.isEmpty()) {
+        List<String> stringIds = getAllList(sortBy);
+        if (stringIds == null || stringIds.isEmpty()) {
             return null;
         }
 
-        return Long.parseLong(range.iterator().next());
+        int idx = stringIds.indexOf(lastChatroomId.toString());
+        if (hasNext(idx, stringIds.size())) {
+            return Long.parseLong(stringIds.get(idx + 1));
+        }
+
+        return null;
     }
 
-    private String getRedisKey(String sortBy) {
-        return String.format(REDIS_CHAT_ZSET_KEY, sortBy);
+    private List<String> getAllList(SortBy sortBy) {
+        String key = getRedisIdsKey(sortBy.name());
+        return redisTemplate.opsForList().range(key, 0, -1);
     }
 
-    private double toEpochMillis(String isoDateTime) {
-        if (isoDateTime == null || isoDateTime.isBlank()) {
-            return 0D;
-        }
+    private Boolean hasNext(int idx, int size) {
+        return idx != -1 && idx + 1 < size;
+    }
 
-        try {
-            return (double) Instant.parse(isoDateTime).toEpochMilli();
-        } catch (DateTimeParseException ignored) { }
-        try {
-            return (double) java.time.LocalDateTime.parse(isoDateTime)
-                    .atZone(ZoneId.of("Asia/Seoul"))
-                    .toInstant()
-                    .toEpochMilli();
-        } catch (DateTimeParseException ignored) { }
-        try {
-            return Double.parseDouble(isoDateTime);
-        } catch (NumberFormatException ignored) {
-            return 0D;
-        }
+    private String getRedisIdsKey(String sortBy) {
+        return String.format(REDIS_CHAT_KEY, sortBy);
+    }
+
+    private String getRedisTimesKey(String sortBy) {
+        return String.format(REDIS_LAST_MESSAGE_TIME_KEY, sortBy);
     }
 }

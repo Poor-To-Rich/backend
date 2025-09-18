@@ -8,6 +8,7 @@ import com.poortorich.chat.model.ChatroomPaginationContext;
 import com.poortorich.chat.service.ChatMessageService;
 import com.poortorich.chat.service.ChatParticipantService;
 import com.poortorich.chat.service.ChatroomService;
+import com.poortorich.chat.util.mapper.ChatMessageContentMapper;
 import com.poortorich.user.entity.User;
 import com.poortorich.user.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +16,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
 import java.util.Objects;
+import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
@@ -25,6 +28,8 @@ public class ChatPaginationProvider {
     private final ChatMessageService chatMessageService;
     private final ChatParticipantService chatParticipantService;
     private final UserService userService;
+
+    private final ChatMessageContentMapper contentMapper;
 
     public ChatPaginationContext getChatMessagesContext(String username, Long chatroomId, Long cursor, Long pageSize) {
         User user = userService.findUserByUsername(username);
@@ -38,22 +43,22 @@ public class ChatPaginationProvider {
                 .build();
     }
 
-    public ChatroomPaginationContext getMyChatroomsContext(String username, Long cursor) {
+    public ChatroomPaginationContext getMyChatroomsContext(String username, LocalDateTime cursor) {
         User user = userService.findUserByUsername(username);
 
         return ChatroomPaginationContext.builder()
                 .user(user)
-                .cursor(getChatroomCursor(user, cursor))
+                .cursor(cursor)
                 .pageRequest(getPageRequest(20L))
                 .build();
     }
 
-    private Long getChatroomCursor(User user, Long cursor) {
+    private LocalDateTime getChatroomCursor(User user, LocalDateTime cursor) {
         if (!Objects.isNull(cursor)) {
             return cursor;
         }
 
-        return chatroomService.getFirstChatroomIdByUser(user);
+        return chatMessageService.getLatestMessageTimeByUser(user);
     }
 
     private Long getCursor(Chatroom chatroom, Long cursor) {
@@ -72,9 +77,12 @@ public class ChatPaginationProvider {
         return null;
     }
 
-    public Long getChatroomNextCursor(Slice<ChatParticipant> participants) {
+    public LocalDateTime getChatroomNextCursor(Slice<ChatParticipant> participants) {
         if (participants.hasContent()) {
-            return participants.getContent().getLast().getChatroom().getId() + 1;
+            ChatParticipant participant = participants.getContent().getLast();
+            Optional<ChatMessage> latestChatMessage = chatMessageService.getLastMessage(participant);
+            return latestChatMessage.map(ChatMessage::getSentAt)
+                    .orElseGet(() -> contentMapper.mapToTime(participant));
         }
         return null;
     }
