@@ -107,4 +107,28 @@ public interface ChatMessageRepository extends JpaRepository<ChatMessage, Long> 
             WHERE m.chatroom = :chatroom
             """)
     Long findLatestMessageIdByChatroom(Chatroom chatroom);
+
+    @Query(value = """
+            SELECT MAX(
+                COALESCE(
+                    cm.sent_at,
+                    CASE when cp.role = 'HOST' THEN cr.created_date ELSE cp.join_at END
+                )
+            ) as latest_time
+            FROM chat_participant cp
+            JOIN chatroom cr ON cp.chatroom_id = cr.id
+            LEFT JOIN chat_message cm ON (
+                    cm.chatroom_id = cr.id
+                    AND cm.type IN ('CHAT_MESSAGE', 'RANKING_MESSAGE')
+                    AND cm.id = (
+                        SELECT MAX(cm2.id)
+                        FROM chat_message cm2
+                        WHERE cm2.chatroom_id = cr.id
+                        AND cm2.type IN ('CHAT_MESSAGE', 'RANKING_MESSAGE')
+                    )
+            )
+            WHERE cp.user_id = :#{#user.id}
+            AND cp.is_participated = true
+            """, nativeQuery = true)
+    Optional<LocalDateTime> findLatestMessageTimeByUser(User user);
 }

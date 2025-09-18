@@ -3,6 +3,7 @@ package com.poortorich.chat.response;
 import lombok.Builder;
 import lombok.Data;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -10,6 +11,6 @@ import java.util.List;
 public class MyChatroomsResponse {
 
     private boolean hasNext;
-    private Long nextCursor;
+    private LocalDateTime nextCursor;
     private List<MyChatroom> chatrooms;
 }

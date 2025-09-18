@@ -18,6 +18,7 @@ import com.poortorich.user.entity.User;
 import com.poortorich.websocket.stomp.service.SubscribeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -172,11 +173,17 @@ public class ChatParticipantService {
     }
 
     public Slice<ChatParticipant> getMyParticipants(ChatroomPaginationContext context) {
-        return chatParticipantRepository
-                .findMyParticipants(
-                        context.user(),
-                        context.cursor(),
-                        context.pageRequest());
+        List<ChatParticipant> myParticipants = chatParticipantRepository.findMyParticipants(
+                context.user().getId(),
+                context.cursor(),
+                context.pageRequest());
+
+        boolean hasNext = myParticipants.size() > context.pageRequest().getPageSize();
+        if (hasNext) {
+            myParticipants.removeLast();
+        }
+
+        return new SliceImpl<>(myParticipants, context.pageRequest(), hasNext);
     }
 
     @Transactional

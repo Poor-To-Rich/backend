@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDateTime;
+
 @RestController
 @RequestMapping("/users")
 @RequiredArgsConstructor
@@ -24,7 +26,7 @@ public class UserChatroomController {
     @GetMapping("/me/chatrooms")
     public ResponseEntity<BaseResponse> getMyChatrooms(
             @AuthenticationPrincipal UserDetails userDetails,
-            @RequestParam(required = false) Long cursor
+            @RequestParam(required = false) LocalDateTime cursor
     ) {
         MyChatroomsResponse response = chatFacade.getMyChatrooms(userDetails.getUsername(), cursor);
         return DataResponse.toResponseEntity(ChatResponse.GET_MY_CHATROOMS_SUCCESS, response);

@@ -66,6 +66,7 @@ import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -377,12 +378,12 @@ public class ChatFacade {
     }
 
     @Transactional
-    public MyChatroomsResponse getMyChatrooms(String username, Long cursor) {
+    public MyChatroomsResponse getMyChatrooms(String username, LocalDateTime cursor) {
         ChatroomPaginationContext context = paginationProvider.getMyChatroomsContext(username, cursor);
 
         Slice<ChatParticipant> participants = chatParticipantService.getMyParticipants(context);
 
-        Long nextCursor = paginationProvider.getChatroomNextCursor(participants);
+        LocalDateTime nextCursor = paginationProvider.getChatroomNextCursor(participants);
 
         List<MyChatroom> myChatrooms = participants.stream()
                 .map(chatroomMapper::mapToMyChatroom)
