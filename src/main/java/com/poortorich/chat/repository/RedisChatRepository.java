@@ -21,25 +21,22 @@ public class RedisChatRepository {
     private final RedisTemplate<String, String> redisTemplate;
 
     public void overwrite(SortBy sortBy, List<Long> chatroomIds, List<String> lastMessageTimes) {
-        String idsKey = getRedisIdsKey(sortBy.name());
-        String timesKey = getRedisTimesKey(sortBy.name());
-
         if (chatroomIds == null || lastMessageTimes == null) {
             return;
         }
 
+        deleteAll(sortBy);
+
+        save(sortBy, chatroomIds, lastMessageTimes);
+    }
+
+    private void deleteAll(SortBy sortBy) {
+        String idsKey = getRedisIdsKey(sortBy.name());
+        String timesKey = getRedisTimesKey(sortBy.name());
+
         redisTemplate.delete(idsKey);
         redisTemplate.delete(timesKey);
 
-        List<String> stringIds = chatroomIds.stream()
-                .map(String::valueOf)
-                .toList();
-
-        redisTemplate.opsForList().rightPushAll(idsKey, stringIds);
-        redisTemplate.opsForList().rightPushAll(timesKey, lastMessageTimes);
-
-        redisTemplate.expire(idsKey, Duration.ofMinutes(CHAT_KEY_EXPIRATION_TIME));
-        redisTemplate.expire(timesKey, Duration.ofMinutes(CHAT_KEY_EXPIRATION_TIME));
     }
 
     public void save(SortBy sortBy, List<Long> chatroomIds, List<String> lastMessageTimes) {
