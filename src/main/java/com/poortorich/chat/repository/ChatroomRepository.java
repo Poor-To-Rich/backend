@@ -67,10 +67,9 @@ public interface ChatroomRepository extends JpaRepository<Chatroom, Long> {
                 SELECT c
                   FROM Chatroom c
                 WHERE c.isClosed = false
-                  AND c.id < :cursor
                 ORDER BY c.id DESC
             """)
-    Slice<Chatroom> findByCursorSortByCreatedAt(@Param("cursor") Long cursor, Pageable pageable);
+    List<Chatroom> findChatroomsByCreatedAt();
 
     @Query("""
                 SELECT DISTINCT c
