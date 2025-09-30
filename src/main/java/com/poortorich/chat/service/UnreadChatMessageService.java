@@ -4,6 +4,7 @@ import com.poortorich.chat.entity.ChatMessage;
 import com.poortorich.chat.entity.ChatParticipant;
 import com.poortorich.chat.entity.Chatroom;
 import com.poortorich.chat.entity.UnreadChatMessage;
+import com.poortorich.chat.entity.enums.ChatroomRole;
 import com.poortorich.chat.model.UnreadChatInfo;
 import com.poortorich.chat.realtime.model.PayloadContext;
 import com.poortorich.chat.realtime.payload.response.MessageReadPayload;
@@ -39,7 +40,8 @@ public class UnreadChatMessageService {
     }
 
     public List<Long> getUserIdsByChatMessage(Long userId, ChatMessage chatMessage) {
-        return unreadChatMessageRepository.findAllByChatMessage(chatMessage).stream()
+        return unreadChatMessageRepository.findAllByChatMessageExcludingChatroomRole(chatMessage, ChatroomRole.BANNED)
+                .stream()
                 .filter(unreadChatMessage -> !userId.equals(unreadChatMessage.getUser().getId()))
                 .map(unreadChatMessage -> unreadChatMessage.getUser().getId())
                 .toList();
