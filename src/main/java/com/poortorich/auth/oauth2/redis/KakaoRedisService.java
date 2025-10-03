@@ -6,6 +6,7 @@ import com.poortorich.auth.model.UserReversionData;
 import com.poortorich.global.exceptions.InternalServerErrorException;
 import com.poortorich.global.response.enums.GlobalResponse;
 import com.poortorich.user.entity.User;
+import com.poortorich.user.entity.enums.Role;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
@@ -47,7 +48,6 @@ public class KakaoRedisService {
             String key = getKakaoUserKey(user.getId());
             String value = redisTemplate.opsForValue().get(key);
             if (value == null) {
-                System.out.println("데이터를 찾을 수 없다.");
                 return UserReversionData.builder()
                         .name(user.getName())
                         .username(user.getUsername())
@@ -56,8 +56,8 @@ public class KakaoRedisService {
                         .email(user.getEmail())
                         .gender(user.getGender())
                         .profileImage(user.getProfileImage())
-                        .role(user.getRole())
-                        .identify(user.getIdentify())
+                        .role(Role.USER)
+                        .identify(null)
                         .build();
             }
             return objectMapper.readValue(value, UserReversionData.class);
