@@ -13,6 +13,7 @@ public enum Role {
     USER("ROLE_USER", "일반회원"),
     TEST("ROLE_TEST", "테스트용"),
     PENDING("ROLE_PENDING", "보류중"),
+    KAKAO_EXISTING_USER_PENDING("ROLE_KAKAO_EXISTING_USER_PENDING", "카카오기존회원보류"),
     WITHDRAW("ROLE_WITHDRAW", "회원탈퇴");
 
     private final String value;
