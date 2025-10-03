@@ -3,6 +3,7 @@ package com.poortorich.chat.repository;
 import com.poortorich.chat.entity.ChatMessage;
 import com.poortorich.chat.entity.Chatroom;
 import com.poortorich.chat.entity.UnreadChatMessage;
+import com.poortorich.chat.entity.enums.ChatroomRole;
 import com.poortorich.chat.model.UnreadChatInfo;
 import com.poortorich.user.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -15,8 +16,18 @@ import java.util.List;
 
 @Repository
 public interface UnreadChatMessageRepository extends JpaRepository<UnreadChatMessage, Long> {
-    
-    List<UnreadChatMessage> findAllByChatMessage(ChatMessage chatMessage);
+
+    @Query("""
+            SELECT u
+            FROM UnreadChatMessage u
+            JOIN u.user user
+            JOIN ChatParticipant cp ON cp.user = user AND cp.chatroom = u.chatroom
+            WHERE u.chatMessage = :chatMessage
+            AND cp.role != :role
+            """)
+    List<UnreadChatMessage> findAllByChatMessageExcludingChatroomRole(
+            @Param("chatMessage") ChatMessage chatMessage,
+            @Param("role") ChatroomRole role);
 
     @Query("""
             SELECT MAX(u.chatMessage.id)
