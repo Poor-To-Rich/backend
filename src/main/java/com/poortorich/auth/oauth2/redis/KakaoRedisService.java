@@ -10,6 +10,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
+
 @Service
 @RequiredArgsConstructor
 public class KakaoRedisService {
@@ -34,7 +36,7 @@ public class KakaoRedisService {
         try {
             String key = getKakaoUserKey(user.getId());
             String value = objectMapper.writeValueAsString(data);
-            redisTemplate.opsForValue().set(key, value);
+            redisTemplate.opsForValue().set(key, value, Duration.ofDays(1));
         } catch (JsonProcessingException exception) {
             throw new InternalServerErrorException(GlobalResponse.INTERNAL_SERVER_EXCEPTION);
         }

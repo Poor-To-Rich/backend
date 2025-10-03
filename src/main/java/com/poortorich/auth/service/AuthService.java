@@ -114,6 +114,7 @@ public class AuthService {
             UserReversionData data = kakaoRedisService.getData(user);
             System.out.println(data);
             user.updateReversionData(data);
+            kakaoRedisService.deleteUser(user);
         }
     }
 }
