@@ -168,7 +168,6 @@ public class User implements UserDetails {
         this.name = data.getName();
         this.nickname = data.getNickname();
         this.username = data.getUsername();
-        this.password = data.getPassword();
         this.profileImage = data.getProfileImage();
         this.role = data.getRole();
         this.email = data.getEmail();

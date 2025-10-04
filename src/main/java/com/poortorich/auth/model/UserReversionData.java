@@ -13,13 +13,12 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class UserReversionData {
 
-    private String name = null;
-    private String nickname = null;
-    private String email = null;
-    private Gender gender = null;
-    private Role role = null;
-    private String profileImage = null;
-    private String identify = null;
-    private String username = null;
-    private String password = null;
+    private String name;
+    private String nickname;
+    private String email;
+    private Gender gender;
+    private Role role;
+    private String profileImage;
+    private String identify;
+    private String username;
 }
