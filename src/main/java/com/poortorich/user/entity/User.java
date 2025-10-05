@@ -1,5 +1,6 @@
 package com.poortorich.user.entity;
 
+import com.poortorich.auth.model.UserReversionData;
 import com.poortorich.s3.constants.S3Constants;
 import com.poortorich.user.constants.UserValidationRules;
 import com.poortorich.user.entity.enums.Gender;
@@ -79,6 +80,9 @@ public class User implements UserDetails {
     @Builder.Default
     private Role role = Role.USER;
 
+    @Column(name = "identify")
+    private String identify;
+
     @Column(name = "withdraw_at")
     private LocalDateTime withdrawAt;
 
@@ -154,5 +158,20 @@ public class User implements UserDetails {
         this.job = null;
         this.profileImage = S3Constants.DEFAULT_PROFILE_IMAGE;
         this.withdrawAt = LocalDateTime.now();
+    }
+
+    public void updateIdentify(String identify) {
+        this.identify = identify;
+    }
+
+    public void updateReversionData(UserReversionData data) {
+        this.name = data.getName();
+        this.nickname = data.getNickname();
+        this.username = data.getUsername();
+        this.profileImage = data.getProfileImage();
+        this.role = data.getRole();
+        this.email = data.getEmail();
+        this.gender = data.getGender();
+        this.identify = data.getIdentify();
     }
 }

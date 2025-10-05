@@ -4,6 +4,8 @@ import com.poortorich.auth.jwt.util.JwtTokenExtractor;
 import com.poortorich.auth.jwt.util.JwtTokenGenerator;
 import com.poortorich.auth.jwt.util.JwtTokenManager;
 import com.poortorich.auth.jwt.validator.JwtTokenValidator;
+import com.poortorich.auth.model.UserReversionData;
+import com.poortorich.auth.oauth2.redis.KakaoRedisService;
 import com.poortorich.auth.repository.interfaces.RefreshTokenRepository;
 import com.poortorich.auth.request.LoginRequest;
 import com.poortorich.auth.response.AccessTokenResponse;
@@ -23,6 +25,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -34,6 +37,7 @@ public class AuthService {
     private final RefreshTokenRepository refreshTokenRepository;
     private final UserRepository userRepository;
 
+    private final KakaoRedisService kakaoRedisService;
     private final UserDetailsService userDetailsService;
 
     private final PasswordEncoder passwordEncoder;
@@ -100,5 +104,17 @@ public class AuthService {
     public Response logout(HttpServletResponse response) {
         tokenManager.clearAuthTokens(response);
         return AuthResponse.LOGOUT_SUCCESS;
+    }
+
+    @Transactional
+    public void revertUser(String username) {
+        Optional<User> userOptional = userRepository.findByUsername(username);
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
+            UserReversionData data = kakaoRedisService.getData(user);
+            System.out.println(data);
+            user.updateReversionData(data);
+            kakaoRedisService.deleteUser(user);
+        }
     }
 }

@@ -124,10 +124,6 @@ public class ChatFacade {
     }
 
     public AllChatroomsResponse getAllChatrooms(SortBy sortBy, Long cursor) {
-        if (sortBy.equals(SortBy.CREATED_AT)) {
-            return getAllChatroomsSortByCreatedAt(cursor);
-        }
-
         List<Chatroom> chatrooms = chatroomService.getAllChatrooms(sortBy, cursor);
         List<String> lastMessageTimes = chatroomService.getAllLastMessageTimes(sortBy, cursor);
 
@@ -160,25 +156,6 @@ public class ChatFacade {
         }
 
         return chatroomResponses;
-    }
-
-    private AllChatroomsResponse getAllChatroomsSortByCreatedAt(Long cursor) {
-        if (cursor == -1) {
-            cursor = Long.MAX_VALUE;
-        }
-        Pageable pageable = PageRequest.of(0, 20);
-        Slice<Chatroom> chatroomSlice = chatroomService.findByCursorSortByCreatedAt(cursor, pageable);
-        List<Chatroom> chatrooms = chatroomSlice.getContent();
-
-        if (chatrooms.isEmpty()) {
-            return getAllChatroomsResponseEmptyChatroom();
-        }
-
-        return AllChatroomsResponse.builder()
-                .hasNext(chatroomSlice.hasNext())
-                .nextCursor(chatroomSlice.hasNext() ? chatrooms.getLast().getId() : null)
-                .chatrooms(getChatroomResponses(chatrooms))
-                .build();
     }
 
     private AllChatroomsResponse getAllChatroomsResponseEmptyChatroom() {

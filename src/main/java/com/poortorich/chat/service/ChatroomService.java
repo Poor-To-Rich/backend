@@ -41,14 +41,18 @@ public class ChatroomService {
             TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
                 @Override
                 public void afterCommit() {
-                    overwriteChatroomsInRedisBySortBy(SortBy.UPDATED_AT);
-                    overwriteChatroomsInRedisBySortBy(SortBy.LIKE);
+                    overwriteInRedis();
                 }
             });
         } else {
-            overwriteChatroomsInRedisBySortBy(SortBy.UPDATED_AT);
-            overwriteChatroomsInRedisBySortBy(SortBy.LIKE);
+            overwriteInRedis();
         }
+    }
+
+    private void overwriteInRedis() {
+        overwriteChatroomsInRedisBySortBy(SortBy.UPDATED_AT);
+        overwriteChatroomsInRedisBySortBy(SortBy.LIKE);
+        overwriteChatroomsInRedisBySortBy(SortBy.CREATED_AT);
     }
 
     private void overwriteChatroomsInRedisBySortBy(SortBy sortBy) {
@@ -60,10 +64,6 @@ public class ChatroomService {
         }
     }
 
-    public Slice<Chatroom> findByCursorSortByCreatedAt(Long cursor, Pageable pageable) {
-        return chatroomRepository.findByCursorSortByCreatedAt(cursor, pageable);
-    }
-
     public List<Chatroom> getAllChatrooms(SortBy sortBy, Long cursor) {
         if (redisChatRepository.existsBySortBy(sortBy)) {
             return findByIds(redisChatRepository.getChatroomIds(sortBy, cursor, 20));
@@ -71,6 +71,7 @@ public class ChatroomService {
 
         saveChatroomsInRedisBySortBy(SortBy.UPDATED_AT);
         saveChatroomsInRedisBySortBy(SortBy.LIKE);
+        saveChatroomsInRedisBySortBy(SortBy.CREATED_AT);
 
         return findByIds(redisChatRepository.getChatroomIds(sortBy, cursor, 20));
     }
@@ -108,7 +109,11 @@ public class ChatroomService {
             return chatroomRepository.findChatroomsSortByLike();
         }
 
-        return chatroomRepository.findChatroomsSortByUpdatedAt();
+        if (sortBy.equals(SortBy.UPDATED_AT)) {
+            return chatroomRepository.findChatroomsSortByUpdatedAt();
+        }
+
+        return chatroomRepository.findChatroomsByCreatedAt();
     }
 
     private List<Chatroom> findByIds(List<Long> chatroomIds) {

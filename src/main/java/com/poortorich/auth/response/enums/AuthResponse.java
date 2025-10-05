@@ -17,7 +17,8 @@ public enum AuthResponse implements Response {
     LOGIN_SUCCESS(HttpStatus.OK, AuthResponseMessage.LOGIN_SUCCESS, null),
     LOGOUT_SUCCESS(HttpStatus.OK, AuthResponseMessage.LOGOUT_SUCCESS, null),
 
-    REDIS_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, AuthResponseMessage.REDIS_SERVER_EXCEPTION, null);
+    REDIS_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, AuthResponseMessage.REDIS_SERVER_EXCEPTION, null),
+    KAKAO_LOGIN_REVERT_SUCCESS(HttpStatus.OK, AuthResponseMessage.KAKAO_LOGIN_REVERT_SUCCESS, null);
 
     private final HttpStatus httpStatus;
     private final String message;
